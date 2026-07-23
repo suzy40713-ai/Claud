@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTok AI Studio — Images &amp; videos gratuites par IA</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="logo">
+        <span class="logo-dot"></span>
+        TikTok <span class="accent">AI</span> Studio
+      </div>
+      <p class="tagline">Genere des images et des videos au format TikTok a partir d'un simple prompt — 100% gratuit, sans cle API.</p>
+    </header>
+
+    <main class="layout">
+      <section class="panel">
+        <div class="field">
+          <label for="prompt">Ton prompt</label>
+          <textarea id="prompt" maxlength="500" rows="4" placeholder="Ex: un astronaute qui danse sur la lune, ambiance neon, style cyberpunk"></textarea>
+          <div class="char-count"><span id="charCount">0</span>/500</div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Mode</label>
+            <div class="segmented" id="modeSwitch">
+              <button type="button" class="segment active" data-mode="image">🖼️ Image</button>
+              <button type="button" class="segment" data-mode="video">🎬 Video</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="style">Style visuel</label>
+            <select id="style">
+              <option value="none">Automatique</option>
+              <option value="cinematic">Cinematique</option>
+              <option value="realistic">Photo realiste</option>
+              <option value="anime">Anime</option>
+              <option value="cyberpunk">Cyberpunk</option>
+              <option value="render3d">Rendu 3D</option>
+              <option value="fantasy">Fantasy</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field video-only" id="sceneCountField">
+          <label for="sceneCount">Nombre de scenes : <span id="sceneCountValue">4</span> (~<span id="durationValue">14</span>s)</label>
+          <input type="range" id="sceneCount" min="2" max="6" value="4" step="1" />
+        </div>
+
+        <div class="field-row video-only" id="videoOptions">
+          <label class="checkbox">
+            <input type="checkbox" id="withCaptions" checked />
+            Sous-titres incrustes
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" id="withMusic" checked />
+            Ambiance sonore generee
+          </label>
+        </div>
+
+        <button id="generateBtn" class="generate-btn">Generer</button>
+
+        <p class="error" id="errorBox" hidden></p>
+
+        <p class="hint">
+          Les images sont creees via l'API publique et gratuite <strong>Pollinations.ai</strong>.
+          Les videos sont assemblees localement avec <strong>ffmpeg</strong> (effet Ken Burns + sous-titres + ambiance sonore generee, libre de droits).
+        </p>
+      </section>
+
+      <section class="preview">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen" id="phoneScreen">
+            <div class="placeholder" id="placeholder">
+              <div class="placeholder-icon">📱</div>
+              <p>Ton resultat apparaitra ici au format TikTok (9:16)</p>
+            </div>
+            <img id="resultImage" hidden />
+            <video id="resultVideo" playsinline controls loop hidden></video>
+            <div class="loading" id="loading" hidden>
+              <div class="spinner"></div>
+              <p id="loadingText">Generation en cours…</p>
+            </div>
+          </div>
+        </div>
+        <a id="downloadBtn" class="download-btn" hidden download>⬇️ Telecharger</a>
+      </section>
+    </main>
+
+    <section class="history" id="historySection" hidden>
+      <h2>Generations recentes</h2>
+      <div class="history-grid" id="historyGrid"></div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
