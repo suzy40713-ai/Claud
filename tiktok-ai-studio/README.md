@@ -23,6 +23,23 @@ npm start
 
 Puis ouvre [http://localhost:3000](http://localhost:3000).
 
+## Deployer en ligne (obtenir un vrai lien public)
+
+L'app est prete pour [Render](https://render.com) (hebergeur avec un plan gratuit, Docker + ffmpeg supportes nativement).
+
+1. Cree un compte gratuit sur [render.com](https://render.com) (inscription via GitHub, aucune carte bancaire requise pour le plan gratuit).
+2. Clique sur ce bouton, ou vas dans le dashboard Render sur **New > Blueprint** :
+
+   [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/suzy40713-ai/Claud)
+3. Autorise Render a acceder au repo GitHub `suzy40713-ai/Claud` quand c'est demande.
+4. Render detecte automatiquement `render.yaml` a la racine du repo et configure le service `tiktok-ai-studio` (Docker, plan gratuit). Clique sur **Apply**.
+5. Attends la fin du build (quelques minutes la premiere fois). Render te donne une URL du type `https://tiktok-ai-studio-xxxx.onrender.com` — c'est ton site, accessible depuis n'importe quel navigateur.
+
+**A savoir sur le plan gratuit Render** :
+- Le service s'endort apres ~15 minutes sans visite ; la premiere requete apres une pause reveille le serveur en 30-60 secondes.
+- Le stockage est ephemere : les images/videos generees disparaissent a chaque redemarrage ou redeploiement (pas de base de donnees, ce n'est pas necessaire pour un usage ponctuel).
+- Contrairement a cet environnement de developpement, les serveurs Render ont un acces internet normal : les appels a Pollinations.ai fonctionnent sans restriction particuliere.
+
 ## Utilisation
 
 1. Ecris un prompt (ex: *"un chat astronaute qui flotte dans l'espace, style cyberpunk"*).
@@ -43,8 +60,11 @@ tiktok-ai-studio/
 │   └── videoBuilder.js    # Montage ffmpeg (zoom, sous-titres, concat, audio)
 ├── public/                # Interface web (HTML/CSS/JS vanilla)
 ├── assets/fonts/          # Police DejaVu Sans Bold (licence libre, pour les sous-titres)
-└── generated/             # Images et videos generees (non versionnees)
+├── generated/             # Images et videos generees (non versionnees)
+└── Dockerfile             # Image pour deploiement (Render, ou tout hebergeur Docker)
 ```
+
+Le fichier `render.yaml` a la racine du repo decrit le service pour un deploiement Render en un clic (voir section precedente).
 
 ## Limites connues
 
