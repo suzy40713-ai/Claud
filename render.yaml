@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: tiktok-ai-studio
+    runtime: docker
+    rootDir: tiktok-ai-studio
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
