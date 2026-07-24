@@ -1,0 +1,25 @@
+import { ClerkProvider } from "@clerk/clerk-expo";
+import { Slot } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+
+import { tokenCache } from "../services/tokenCache";
+
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+if (!publishableKey) {
+  throw new Error(
+    "Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY — set it in apps/mobile/.env (see .env.example).",
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+      <SafeAreaProvider>
+        <StatusBar style="light" />
+        <Slot />
+      </SafeAreaProvider>
+    </ClerkProvider>
+  );
+}
