@@ -22,6 +22,26 @@ App Mobile (Expo/RN)
                  -> Groq API (Whisper + scoring LLM)
 ```
 
+## Flux d'un upload
+
+1. Mobile : `POST /api/videos` → l'API vérifie le quota, crée la ligne `videos`, renvoie une
+   URL présignée R2 (PUT direct depuis le téléphone, la vidéo ne transite jamais par l'API)
+2. Mobile : upload direct vers R2, puis `POST /api/videos/:id/process` → statut `queued`,
+   job ajouté à la queue BullMQ `video-processing`
+3. Worker : consomme le job, télécharge la vidéo depuis R2, `ffprobe` pour la durée réelle,
+   réserve le quota via `POST /internal/videos/:id/duration` (rejette si dépassement)
+4. Worker : transcription (Groq Whisper, mots horodatés) + analyse d'énergie audio (librosa)
+   → fenêtres candidates (15–90s) scorées par heuristique (énergie + ponctuation/mots-clés)
+   → reclassement des meilleures par LLM (Groq Llama), repli sur l'heuristique si l'appel échoue
+5. Worker : pour chaque clip retenu — découpage + recadrage 9:16 (ffmpeg), sous-titres
+   animés mot par mot (ASS/libass), miniature, upload vers R2, puis
+   `POST /internal/videos/:id/clips` pour créer la ligne en base
+6. Worker : `PATCH /internal/videos/:id/status` → `completed` (ou `failed` avec le message
+   d'erreur). Le mobile poll `GET /api/videos/:id` pendant le traitement.
+
+Les routes `/internal/*` ne sont accessibles qu'avec le header `x-internal-secret` (valeur
+partagée entre l'API et le worker, jamais exposée au mobile).
+
 ## Base de données
 
 Voir `apps/api/src/db/schema.ts` pour la source de vérité (Drizzle).
@@ -47,5 +67,8 @@ Voir `apps/api/src/db/schema.ts` pour la source de vérité (Drizzle).
 
 ## Statut actuel
 
-Squelette : auth (Clerk, email + Google/Apple) + navigation mobile, API de base avec
-`/health` et `/api/me`, schéma DB + migration générée. Pipeline vidéo pas encore implémenté.
+MVP fonctionnellement complet : auth, upload, pipeline de traitement (transcription,
+scoring, découpage, sous-titres), résultats, quota/paywall. Vérifié localement avec un
+Postgres/Redis réels et une vidéo de test (le pipeline ffmpeg tourne de bout en bout) ;
+pas encore vérifié avec de vrais comptes Clerk/Groq/R2 puisqu'ils n'ont pas encore été créés.
+Reste à faire avant un lancement public : voir la section correspondante dans le README.

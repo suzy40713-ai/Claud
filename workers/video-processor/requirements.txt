@@ -1,0 +1,8 @@
+bullmq==2.25.4
+boto3==1.35.68
+groq==0.13.0
+librosa==0.10.2.post1
+numpy==1.26.4
+soundfile==0.12.1
+python-dotenv==1.0.1
+requests==2.32.3

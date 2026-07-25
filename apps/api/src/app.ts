@@ -5,7 +5,9 @@ import Fastify from "fastify";
 
 import { env } from "./config/env.js";
 import { healthRoutes } from "./routes/health.js";
+import { internalRoutes } from "./routes/internal.js";
 import { userRoutes } from "./routes/users.js";
+import { videoRoutes } from "./routes/videos.js";
 
 export function buildApp() {
   const app = Fastify({
@@ -21,6 +23,8 @@ export function buildApp() {
 
   app.register(healthRoutes);
   app.register(userRoutes, { prefix: "/api" });
+  app.register(videoRoutes, { prefix: "/api" });
+  app.register(internalRoutes, { prefix: "/internal" });
 
   return app;
 }

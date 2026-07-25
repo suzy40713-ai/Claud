@@ -1,10 +1,9 @@
 {
   "name": "clipai",
   "private": true,
-  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "mobile": "npm run start --workspace apps/mobile",
-    "api:dev": "npm run dev --workspace apps/api",
-    "api:build": "npm run build --workspace apps/api"
+    "mobile": "npm --prefix apps/mobile run start",
+    "api:dev": "npm --prefix apps/api run dev",
+    "api:build": "npm --prefix apps/api run build"
   }
 }
