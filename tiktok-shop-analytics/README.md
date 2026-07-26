@@ -164,6 +164,53 @@ Le sélecteur de période (`components/dashboard/DateRangePicker.tsx`) pilote
 tout via les paramètres d'URL (`?preset=30d` ou `?from=...&to=...`), donc
 `/dashboard` et `/products/[id]` restent des Server Components.
 
+## Déploiement sur Vercel
+
+Le repo GitHub contient plusieurs projets à sa racine ; celui-ci vit dans
+`tiktok-shop-analytics/`. Sur Vercel, chaque app se déploie comme un projet
+distinct avec son propre **Root Directory**.
+
+### 1. Importer le projet
+
+1. Sur [vercel.com/new](https://vercel.com/new), importez le repo GitHub.
+2. Dans **Root Directory**, sélectionnez `tiktok-shop-analytics` (pas la
+   racine du repo).
+3. Vercel détecte automatiquement le framework Next.js
+   (`vercel.json` le précise aussi explicitement) — aucune commande de build
+   à changer.
+
+### 2. Renseigner les variables d'environnement
+
+Dans **Project Settings > Environment Variables**, ajoutez pour
+Production, Preview et Development :
+
+| Variable                        | Valeur                                   | Visibilité |
+| -------------------------------- | ----------------------------------------- | ---------- |
+| `NEXT_PUBLIC_SUPABASE_URL`       | URL de votre projet Supabase              | Publique (exposée au navigateur) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`  | Clé anonyme (Project Settings > API)      | Publique (exposée au navigateur) |
+| `SUPABASE_SERVICE_ROLE_KEY`      | Clé service role (Project Settings > API) | **Secrète** — ne jamais préfixer par `NEXT_PUBLIC_` ; réservée à un futur usage serveur (opérations admin contournant la RLS), non utilisée par le code actuel |
+
+Utilisez de préférence un **projet Supabase distinct pour Preview/dev** afin
+de ne pas mélanger des données de test avec la production.
+
+### 3. Mettre à jour les Redirect URLs Supabase
+
+Dans le dashboard Supabase, **Authentication > URL Configuration**, ajoutez
+l'URL de callback de votre domaine Vercel :
+
+- `https://<votre-domaine>.vercel.app/auth/callback`
+- Si vous utilisez les Preview Deployments, ajoutez aussi un pattern
+  générique (`https://*-<votre-org>.vercel.app/auth/callback`) ou l'URL de
+  chaque preview au fur et à mesure.
+
+### 4. Déployer
+
+Chaque push sur la branche de production déclenche un déploiement ; chaque
+PR obtient une Preview Deployment. Aucune configuration `vercel.json`
+supplémentaire n'est nécessaire (Server Components, Server Actions et le
+middleware d'auth fonctionnent nativement sur l'Edge/Node runtime de
+Vercel).
+
 ## Feuille de route
 
 - [x] Étape 1 — Scaffold Next.js + Supabase Auth
