@@ -5,15 +5,10 @@
  * Partner API access is approved, a `TikTokShopApiDataSource` can implement
  * the same interface and be swapped in without touching the import
  * pipeline, the DB writes, or the dashboard.
- *
- * Row shapes are refined in Étape 2/3 once the Supabase schema (and its
- * generated types) exist; for now each entity maps to a plain record.
  */
-export type ImportableEntity =
-  | "orders"
-  | "returns"
-  | "ad_spend"
-  | "platform_fees";
+import type { TablesInsert } from "@/types/database";
+
+export type ImportableEntity = "orders" | "returns" | "ad_spend" | "platform_fees";
 
 export interface FetchParams {
   storeId: string;
@@ -23,9 +18,9 @@ export interface FetchParams {
   until?: string;
 }
 
-export interface DataSourceResult<Row = Record<string, unknown>> {
-  entity: ImportableEntity;
-  rows: Row[];
+export interface DataSourceResult<E extends ImportableEntity = ImportableEntity> {
+  entity: E;
+  rows: TablesInsert<E>[];
   /** Opaque cursor for sources that paginate (API-based sources). */
   nextCursor?: string;
 }
@@ -37,5 +32,8 @@ export interface DataSourceResult<Row = Record<string, unknown>> {
 export interface DataSource {
   readonly id: string;
   readonly label: string;
-  fetch(entity: ImportableEntity, params: FetchParams): Promise<DataSourceResult>;
+  fetch<E extends ImportableEntity>(
+    entity: E,
+    params: FetchParams,
+  ): Promise<DataSourceResult<E>>;
 }

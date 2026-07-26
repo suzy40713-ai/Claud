@@ -82,10 +82,37 @@ types/                Types partagés, dont les types générés de la DB
 supabase/migrations/  Schéma SQL versionné
 ```
 
+## Schéma de données
+
+Toutes les tables métier remontent à `stores`, rattachée à un `user_id`
+(Supabase Auth). La Row Level Security est activée sur chaque table : un
+utilisateur ne peut lire/écrire que les lignes liées à ses propres
+boutiques (via une policy `exists (... stores.user_id = auth.uid())`).
+
+| Table            | Rattachement                        | Rôle |
+| ---------------- | ------------------------------------ | ---- |
+| `stores`         | `user_id → auth.users`               | Boutique TikTok Shop d'un utilisateur |
+| `products`       | `store_id → stores`                  | Nom, SKU, prix de vente, coût de revient |
+| `orders`         | `store_id`, `product_id`             | Commande : quantité, prix de vente réel, date, statut |
+| `returns`        | `order_id → orders`                  | Retour lié à une commande : date, raison, montant remboursé |
+| `ad_spend`       | `store_id`, `product_id` (optionnel) | Dépense pub par campagne/période, éventuellement liée à un produit |
+| `platform_fees`  | `store_id`, `order_id` (optionnel)   | Frais de plateforme liés à une commande ou à une période |
+
+Les migrations SQL (`supabase/migrations/`) ont été testées de bout en bout
+sur un Postgres local (contraintes, clés étrangères, et policies RLS
+vérifiées avec deux utilisateurs distincts).
+
+Les types TypeScript correspondants sont dans `types/database.ts`. Une fois
+le projet Supabase lié, régénérez-les avec :
+
+```bash
+npx supabase gen types typescript --project-id <votre-project-ref> > types/database.ts
+```
+
 ## Feuille de route
 
 - [x] Étape 1 — Scaffold Next.js + Supabase Auth
-- [ ] Étape 2 — Schéma Postgres (stores, products, orders, returns, ad_spend, platform_fees)
+- [x] Étape 2 — Schéma Postgres (stores, products, orders, returns, ad_spend, platform_fees) + RLS
 - [ ] Étape 3 — Import CSV avec mapping de colonnes
 - [ ] Étape 4 — Dashboard (marge nette, graphique, tableau produits, taux de retour)
 - [ ] Étape 5 — Vue détaillée par produit
