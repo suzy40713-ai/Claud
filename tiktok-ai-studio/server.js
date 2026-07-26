@@ -61,7 +61,64 @@ app.post('/api/generate/image', async (req, res) => {
   }
 });
 
-app.post('/api/generate/video', async (req, res) => {
+// Video generation runs several sequential Pollinations.ai calls plus
+// several ffmpeg passes, which can easily take longer than the request
+// timeout enforced by most hosting proxies (Render, Vercel, etc.). Holding
+// a single HTTP request open for the whole pipeline gets that connection
+// cut mid-response. Instead, the job runs in the background and the client
+// polls GET /api/generate/video/:jobId for its status.
+const videoJobs = new Map();
+const JOB_TTL_MS = 10 * 60 * 1000;
+
+function scheduleJobCleanup(jobId) {
+  setTimeout(() => videoJobs.delete(jobId), JOB_TTL_MS).unref();
+}
+
+async function runVideoJob(jobId, { prompt, style, scenes, withMusic, withCaptions }) {
+  let workingFiles = [];
+  try {
+    const sceneDescriptions = buildScenes(prompt, scenes, style);
+
+    const scenesWithImages = [];
+    for (let i = 0; i < sceneDescriptions.length; i += 1) {
+      const scene = sceneDescriptions[i];
+      const imageBuffer = await fetchPollinationsImage(scene.imagePrompt, {
+        width: 1080,
+        height: 1920,
+        seed: scene.seed,
+      });
+      const tempImagePath = path.join(GENERATED_DIR, `.tmp-${jobId}-${i}.jpg`);
+      await fs.writeFile(tempImagePath, imageBuffer);
+      workingFiles.push(tempImagePath);
+      scenesWithImages.push({ imagePath: tempImagePath, caption: scene.caption });
+    }
+
+    const fileName = `video-${Date.now()}-${jobId.slice(0, 8)}.mp4`;
+    const outPath = path.join(GENERATED_DIR, fileName);
+
+    await buildSlideshow({
+      scenes: scenesWithImages,
+      outPath,
+      withMusic: Boolean(withMusic),
+      withCaptions: Boolean(withCaptions),
+    });
+
+    videoJobs.set(jobId, { status: 'done', url: `/generated/${fileName}`, sceneCount: scenes });
+  } catch (err) {
+    console.error('Erreur generation video:', err);
+    videoJobs.set(jobId, {
+      status: 'error',
+      error:
+        "La generation de video a echoue. Verifiez que ffmpeg est installe sur le serveur et que la connexion internet permet de joindre Pollinations.ai.",
+      detail: err.message,
+    });
+  } finally {
+    scheduleJobCleanup(jobId);
+    await Promise.all(workingFiles.map((f) => fs.rm(f, { force: true }).catch(() => {})));
+  }
+}
+
+app.post('/api/generate/video', (req, res) => {
   const {
     prompt,
     style = 'none',
@@ -76,46 +133,20 @@ app.post('/api/generate/video', async (req, res) => {
   }
 
   const scenes = Math.min(MAX_SCENES, Math.max(MIN_SCENES, Number(sceneCount) || 4));
+  const jobId = crypto.randomUUID();
+  videoJobs.set(jobId, { status: 'pending' });
 
-  let workingFiles = [];
-  try {
-    const sceneDescriptions = buildScenes(prompt.trim(), scenes, style);
+  runVideoJob(jobId, { prompt: prompt.trim(), style, scenes, withMusic, withCaptions });
 
-    const scenesWithImages = [];
-    for (let i = 0; i < sceneDescriptions.length; i += 1) {
-      const scene = sceneDescriptions[i];
-      const imageBuffer = await fetchPollinationsImage(scene.imagePrompt, {
-        width: 1080,
-        height: 1920,
-        seed: scene.seed,
-      });
-      const tempImagePath = path.join(GENERATED_DIR, `.tmp-${Date.now()}-${i}.jpg`);
-      await fs.writeFile(tempImagePath, imageBuffer);
-      workingFiles.push(tempImagePath);
-      scenesWithImages.push({ imagePath: tempImagePath, caption: scene.caption });
-    }
+  res.status(202).json({ jobId, sceneCount: scenes });
+});
 
-    const fileName = `video-${Date.now()}-${crypto.randomUUID().slice(0, 8)}.mp4`;
-    const outPath = path.join(GENERATED_DIR, fileName);
-
-    await buildSlideshow({
-      scenes: scenesWithImages,
-      outPath,
-      withMusic: Boolean(withMusic),
-      withCaptions: Boolean(withCaptions),
-    });
-
-    res.json({ type: 'video', url: `/generated/${fileName}`, sceneCount: scenes });
-  } catch (err) {
-    console.error('Erreur generation video:', err);
-    res.status(502).json({
-      error:
-        "La generation de video a echoue. Verifiez que ffmpeg est installe sur le serveur et que la connexion internet permet de joindre Pollinations.ai.",
-      detail: err.message,
-    });
-  } finally {
-    await Promise.all(workingFiles.map((f) => fs.rm(f, { force: true }).catch(() => {})));
+app.get('/api/generate/video/:jobId', (req, res) => {
+  const job = videoJobs.get(req.params.jobId);
+  if (!job) {
+    return res.status(404).json({ error: 'Job introuvable ou expire.' });
   }
+  res.json({ type: 'video', ...job });
 });
 
 async function ensureDirs() {

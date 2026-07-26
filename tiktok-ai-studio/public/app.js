@@ -150,13 +150,38 @@ async function generate() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erreur inconnue');
-      showResult('video', data.url);
+      const job = await pollVideoJob(data.jobId);
+      showResult('video', job.url);
     } catch (err) {
       showError(err.message);
     } finally {
       setLoading(false);
     }
   }
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+const POLL_INTERVAL_MS = 2500;
+const POLL_TIMEOUT_MS = 5 * 60 * 1000;
+
+async function pollVideoJob(jobId) {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < POLL_TIMEOUT_MS) {
+    const res = await fetch(`/api/generate/video/${jobId}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erreur inconnue');
+
+    if (data.status === 'done') return data;
+    if (data.status === 'error') throw new Error(data.error || 'Erreur inconnue');
+
+    const elapsed = Math.round((Date.now() - startedAt) / 1000);
+    loadingText.textContent = `Generation en cours… (${elapsed}s)`;
+    await sleep(POLL_INTERVAL_MS);
+  }
+  throw new Error('La generation prend trop de temps, reessayez plus tard.');
 }
 
 generateBtn.addEventListener('click', generate);
