@@ -109,10 +109,35 @@ le projet Supabase lié, régénérez-les avec :
 npx supabase gen types typescript --project-id <votre-project-ref> > types/database.ts
 ```
 
+## Import CSV (/import)
+
+MVP sans API TikTok Shop Partner : chaque type de donnée (commandes,
+retours, dépenses pub, frais de plateforme) s'importe via un fichier CSV.
+
+1. Si l'utilisateur n'a pas encore de boutique, un formulaire de création
+   s'affiche en premier (`components/import/CreateStoreForm.tsx`).
+2. L'utilisateur choisit un type de données, upload son CSV (parsé côté
+   navigateur avec `papaparse`), puis mappe les colonnes du fichier vers les
+   champs attendus (`lib/import/entities.ts` définit les champs par entité).
+   Un modèle CSV téléchargeable est proposé pour chaque type.
+3. La validation de format (champs requis, nombres, dates `AAAA-MM-JJ` ou
+   `JJ/MM/AAAA`, valeurs autorisées) s'exécute côté client
+   (`lib/import/validate.ts`) et affiche un rapport ligne par ligne avant
+   toute écriture en base.
+4. Seules les lignes valides sont envoyées à un Server Action
+   (`lib/import/actions.ts`) qui résout les références (SKU → produit, n° de
+   commande TikTok → commande) puis insère les lignes en une seule requête
+   atomique. Les commandes dont le SKU est inconnu peuvent créer le produit
+   à la volée si un nom et un coût de revient sont fournis dans le CSV.
+
+Les retours et les frais de plateforme se rattachent aux commandes via la
+colonne "N° de commande TikTok" (`external_order_id`) : importez d'abord vos
+commandes avec cette colonne renseignée.
+
 ## Feuille de route
 
 - [x] Étape 1 — Scaffold Next.js + Supabase Auth
 - [x] Étape 2 — Schéma Postgres (stores, products, orders, returns, ad_spend, platform_fees) + RLS
-- [ ] Étape 3 — Import CSV avec mapping de colonnes
+- [x] Étape 3 — Import CSV avec mapping de colonnes
 - [ ] Étape 4 — Dashboard (marge nette, graphique, tableau produits, taux de retour)
 - [ ] Étape 5 — Vue détaillée par produit

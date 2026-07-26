@@ -46,6 +46,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       products: {
         Row: {
@@ -78,6 +79,15 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "products_store_id_fkey";
+            columns: ["store_id"];
+            isOneToOne: false;
+            referencedRelation: "stores";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       orders: {
         Row: {
@@ -113,6 +123,22 @@ export interface Database {
           status?: OrderStatus;
           created_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "orders_store_id_fkey";
+            columns: ["store_id"];
+            isOneToOne: false;
+            referencedRelation: "stores";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "orders_product_id_fkey";
+            columns: ["product_id"];
+            isOneToOne: false;
+            referencedRelation: "products";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       returns: {
         Row: {
@@ -139,6 +165,15 @@ export interface Database {
           refunded_amount?: number;
           created_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "returns_order_id_fkey";
+            columns: ["order_id"];
+            isOneToOne: false;
+            referencedRelation: "orders";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       ad_spend: {
         Row: {
@@ -174,6 +209,22 @@ export interface Database {
           period_end?: string;
           created_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "ad_spend_store_id_fkey";
+            columns: ["store_id"];
+            isOneToOne: false;
+            referencedRelation: "stores";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ad_spend_product_id_fkey";
+            columns: ["product_id"];
+            isOneToOne: false;
+            referencedRelation: "products";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       platform_fees: {
         Row: {
@@ -206,6 +257,22 @@ export interface Database {
           period_end?: string | null;
           created_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "platform_fees_store_id_fkey";
+            columns: ["store_id"];
+            isOneToOne: false;
+            referencedRelation: "stores";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "platform_fees_order_id_fkey";
+            columns: ["order_id"];
+            isOneToOne: false;
+            referencedRelation: "orders";
+            referencedColumns: ["id"];
+          },
+        ];
       };
     };
     Views: Record<string, never>;
