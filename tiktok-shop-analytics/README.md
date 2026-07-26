@@ -134,10 +134,40 @@ Les retours et les frais de plateforme se rattachent aux commandes via la
 colonne "N° de commande TikTok" (`external_order_id`) : importez d'abord vos
 commandes avec cette colonne renseignée.
 
+## Calcul de la marge nette (/dashboard et /products/[id])
+
+`lib/margin/compute.ts` contient des fonctions pures (testées indépendamment
+de la base et de l'UI) qui calculent, pour une période donnée :
+
+- **Marge nette globale** = CA − coût produit − frais de plateforme − pub − retours.
+  Une commande `cancelled` ne compte ni dans le CA ni dans le coût ; une
+  commande `refunded` compte normalement et le retour associé vient
+  soustraire son montant remboursé séparément.
+- **Marge par produit**, en n'attribuant les dépenses pub / frais de
+  plateforme au produit que lorsqu'ils sont explicitement liés à un SKU ou
+  une commande. Les dépenses non rattachées à un produit n'apparaissent que
+  dans le total global (c'est pourquoi la somme des marges produits peut
+  différer de la marge globale).
+- **Taux de retour par produit** = nombre de commandes retournées / nombre
+  de commandes, sur la période.
+- **Évolution temporelle** (jour par jour) de la marge, dont la somme sur la
+  période reconstitue exactement la marge globale — vérifié avec un jeu de
+  données de test.
+
+`lib/margin/queries.ts` récupère l'historique complet d'une boutique
+(commandes jointes aux produits, retours joints aux commandes, dépenses pub,
+frais de plateforme) et le normalise pour ces fonctions ; le filtrage par
+période se fait ensuite en mémoire. Adapté au volume d'un import CSV manuel
+— à revoir avec une agrégation SQL si le nombre de lignes grossit beaucoup.
+
+Le sélecteur de période (`components/dashboard/DateRangePicker.tsx`) pilote
+tout via les paramètres d'URL (`?preset=30d` ou `?from=...&to=...`), donc
+`/dashboard` et `/products/[id]` restent des Server Components.
+
 ## Feuille de route
 
 - [x] Étape 1 — Scaffold Next.js + Supabase Auth
 - [x] Étape 2 — Schéma Postgres (stores, products, orders, returns, ad_spend, platform_fees) + RLS
 - [x] Étape 3 — Import CSV avec mapping de colonnes
-- [ ] Étape 4 — Dashboard (marge nette, graphique, tableau produits, taux de retour)
-- [ ] Étape 5 — Vue détaillée par produit
+- [x] Étape 4 — Dashboard (marge nette, graphique, tableau produits, taux de retour)
+- [x] Étape 5 — Vue détaillée par produit
