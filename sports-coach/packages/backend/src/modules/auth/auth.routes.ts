@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "../../lib/prisma.js";
 import { env } from "../../lib/env.js";
 import { requireAuth } from "../../middleware/auth.js";
+import { authRateLimiter } from "../../lib/rate-limit.js";
 import { toUserProfileDTO } from "../users/users.mapper.js";
 import {
   AUTH_COOKIE_MAX_AGE_MS,
@@ -13,6 +14,7 @@ import {
 } from "./auth.service.js";
 
 export const authRouter = Router();
+authRouter.use(["/register", "/login"], authRateLimiter);
 
 const credentialsSchema = z.object({
   email: z.string().email(),

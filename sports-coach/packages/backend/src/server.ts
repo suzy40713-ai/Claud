@@ -12,6 +12,7 @@ import { trainingPlanRouter } from "./modules/training-plan/training-plan.routes
 import { pushRouter } from "./modules/push/push.routes.js";
 import { stravaRouter } from "./modules/strava/strava.routes.js";
 import { startOverloadAlertScheduler } from "./lib/scheduler.js";
+import { apiRateLimiter } from "./lib/rate-limit.js";
 
 // Filet de securite : une exception non geree ne doit jamais faire tomber
 // tout le serveur pour tous les utilisateurs. On logge et on continue plutot
@@ -33,6 +34,8 @@ app.use(cookieParser());
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
+
+app.use("/api", apiRateLimiter);
 
 app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
