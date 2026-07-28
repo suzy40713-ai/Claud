@@ -2,6 +2,8 @@ import { Router, type RequestHandler } from "express";
 import { z } from "zod";
 import { prisma } from "../../lib/prisma.js";
 import { requireAuth } from "../../middleware/auth.js";
+import { requirePremium } from "../../middleware/premium.js";
+import { isPremium } from "../billing/billing.service.js";
 import {
   buildAuthorizeUrl,
   deauthorize,
@@ -34,16 +36,17 @@ stravaRouter.get("/status", async (req, res) => {
     configured: isStravaConfigured(),
     connected: Boolean(user.stravaAthleteId && user.stravaAccessToken),
     lastSyncAt: user.stravaLastSyncAt?.toISOString() ?? null,
+    premium: isPremium(user),
   });
 });
 
-stravaRouter.get("/authorize-url", withConfigCheck(async (_req, res) => {
+stravaRouter.get("/authorize-url", requirePremium, withConfigCheck(async (_req, res) => {
   res.json({ url: buildAuthorizeUrl() });
 }));
 
 const callbackSchema = z.object({ code: z.string().min(1) });
 
-stravaRouter.post("/callback", withConfigCheck(async (req, res) => {
+stravaRouter.post("/callback", requirePremium, withConfigCheck(async (req, res) => {
   const parsed = callbackSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "Code d'autorisation manquant" });
@@ -87,7 +90,7 @@ async function ensureValidAccessToken(userId: string): Promise<string> {
   return refreshed.accessToken;
 }
 
-stravaRouter.post("/sync", withConfigCheck(async (req, res) => {
+stravaRouter.post("/sync", requirePremium, withConfigCheck(async (req, res) => {
   const userId = req.userId!;
   let accessToken: string;
   try {

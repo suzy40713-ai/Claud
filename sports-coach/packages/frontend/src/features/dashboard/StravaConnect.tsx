@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { api, ApiError } from "../../lib/api";
 import { Button } from "../../components/ui/Button";
 
 export function StravaConnect({ onSynced }: { onSynced?: () => void }) {
-  const [status, setStatus] = useState<{ configured: boolean; connected: boolean; lastSyncAt: string | null } | null>(
-    null
-  );
+  const [status, setStatus] = useState<{
+    configured: boolean;
+    connected: boolean;
+    lastSyncAt: string | null;
+    premium: boolean;
+  } | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -15,6 +19,17 @@ export function StravaConnect({ onSynced }: { onSynced?: () => void }) {
   }, []);
 
   if (!status || !status.configured) return null;
+
+  if (!status.premium) {
+    return (
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-indigo-200 bg-indigo-50/50 px-3 py-2 text-sm">
+        <span className="text-slate-600">Importe automatiquement tes seances depuis Strava (fonctionnalite premium)</span>
+        <Link to="/abonnement">
+          <Button variant="secondary">Passer premium</Button>
+        </Link>
+      </div>
+    );
+  }
 
   async function handleConnect() {
     setBusy(true);

@@ -1,6 +1,7 @@
 import { prisma } from "../../lib/prisma.js";
 import { isPushConfigured, sendPushNotification } from "../../lib/push.js";
 import { computeAcwr } from "../training-plan/acwr.js";
+import { isPremium } from "../billing/billing.service.js";
 
 const ACTIVITY_LOOKBACK_DAYS = 28;
 const ALERT_THROTTLE_MS = 24 * 60 * 60 * 1000;
@@ -22,6 +23,7 @@ export async function checkAndNotifyOverloadRisk(
     prisma.user.findUnique({ where: { id: userId } }),
   ]);
   if (subscriptions.length === 0 || !user) return false;
+  if (!isPremium(user)) return false;
 
   if (
     !options.ignoreThrottle &&

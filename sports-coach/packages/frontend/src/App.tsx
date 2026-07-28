@@ -8,6 +8,7 @@ import { DashboardPage } from "./features/dashboard/DashboardPage";
 import { CoachPage } from "./features/coach/CoachPage";
 import { TrainingPlanPage } from "./features/training-plan/TrainingPlanPage";
 import { StravaCallbackPage } from "./features/dashboard/StravaCallbackPage";
+import { BillingPage } from "./features/billing/BillingPage";
 
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, logout } = useAuth();
@@ -28,6 +29,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
             <Link to="/dashboard">Seances</Link>
             <Link to="/plan">Plan</Link>
             <Link to="/coach">Coach</Link>
+            <Link to="/abonnement">Abonnement</Link>
           </div>
           <button onClick={() => logout()} className="text-sm text-slate-400 hover:text-slate-600">
             Deconnexion
@@ -89,6 +91,14 @@ export default function App() {
         element={
           <ProtectedLayout>
             <StravaCallbackPage />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/abonnement"
+        element={
+          <ProtectedLayout>
+            <BillingPage />
           </ProtectedLayout>
         }
       />

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router";
 import type { CoachMessageDTO } from "@sports-coach/shared";
 import { api, ApiError, streamCoachMessage } from "../../lib/api";
 import { Button } from "../../components/ui/Button";
@@ -9,6 +10,7 @@ export function CoachPage() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [premium, setPremium] = useState<boolean | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -16,6 +18,7 @@ export function CoachPage() {
       .getCoachMessages()
       .then(({ messages }) => setMessages(messages))
       .finally(() => setLoading(false));
+    api.getBillingStatus().then((s) => setPremium(s.premium));
   }, []);
 
   useEffect(() => {
@@ -51,7 +54,11 @@ export function CoachPage() {
         }
       });
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Le coach IA est indisponible");
+      if (err instanceof ApiError && err.status === 403) {
+        setPremium(false);
+      } else {
+        setError(err instanceof ApiError ? err.message : "Le coach IA est indisponible");
+      }
     } finally {
       setSending(false);
     }
@@ -99,19 +106,28 @@ export function CoachPage() {
 
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
 
-      <div className="mt-3 flex gap-2">
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ecris ton message..."
-          rows={1}
-          className="flex-1 resize-none rounded-lg border border-slate-300 px-3 py-2.5"
-        />
-        <Button disabled={sending || !input.trim()} onClick={handleSend}>
-          {sending ? "..." : "Envoyer"}
-        </Button>
-      </div>
+      {premium === false ? (
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-indigo-200 bg-indigo-50/50 px-3 py-2 text-sm">
+          <span className="text-slate-600">Le coach IA conversationnel est une fonctionnalite premium.</span>
+          <Link to="/abonnement">
+            <Button variant="secondary">Passer premium</Button>
+          </Link>
+        </div>
+      ) : (
+        <div className="mt-3 flex gap-2">
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ecris ton message..."
+            rows={1}
+            className="flex-1 resize-none rounded-lg border border-slate-300 px-3 py-2.5"
+          />
+          <Button disabled={sending || !input.trim() || premium === null} onClick={handleSend}>
+            {sending ? "..." : "Envoyer"}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

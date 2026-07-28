@@ -3,6 +3,7 @@ import { z } from "zod";
 import type Anthropic from "@anthropic-ai/sdk";
 import { prisma } from "../../lib/prisma.js";
 import { requireAuth } from "../../middleware/auth.js";
+import { requirePremium } from "../../middleware/premium.js";
 import { buildUserContext } from "./coach.context.js";
 import { buildSystemBlocks, streamCoachReply } from "./coach.service.js";
 import { toCoachMessageDTO } from "./coach.mapper.js";
@@ -25,7 +26,7 @@ coachRouter.get("/", async (req, res) => {
   res.json({ messages: messages.map(toCoachMessageDTO) });
 });
 
-coachRouter.post("/", async (req, res) => {
+coachRouter.post("/", requirePremium, async (req, res) => {
   const parsed = sendMessageSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.issues[0]?.message ?? "Requete invalide" });

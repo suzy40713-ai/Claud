@@ -153,3 +153,13 @@ export interface TrainingPlanResponse {
   plan: TrainingPlanDTO;
   acwr: AcwrDTO;
 }
+
+export const SUBSCRIPTION_STATUSES = ["aucun", "actif", "impaye", "annule"] as const;
+export type SubscriptionStatus = (typeof SUBSCRIPTION_STATUSES)[number];
+
+export interface BillingStatusDTO {
+  configured: boolean;
+  premium: boolean;
+  subscriptionStatus: SubscriptionStatus;
+  currentPeriodEnd: string | null;
+}

@@ -4,6 +4,7 @@ import { env } from "../../lib/env.js";
 import { isPushConfigured } from "../../lib/push.js";
 import { prisma } from "../../lib/prisma.js";
 import { requireAuth } from "../../middleware/auth.js";
+import { requirePremium } from "../../middleware/premium.js";
 import { checkAndNotifyOverloadRisk } from "./overload-check.js";
 
 export const pushRouter = Router();
@@ -22,7 +23,7 @@ const subscriptionSchema = z.object({
   keys: z.object({ p256dh: z.string().min(1), auth: z.string().min(1) }),
 });
 
-pushRouter.post("/subscribe", async (req, res) => {
+pushRouter.post("/subscribe", requirePremium, async (req, res) => {
   const parsed = subscriptionSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.issues[0]?.message ?? "Abonnement invalide" });
@@ -53,7 +54,7 @@ pushRouter.delete("/subscribe", async (req, res) => {
   res.status(204).send();
 });
 
-pushRouter.post("/check-now", async (req, res) => {
+pushRouter.post("/check-now", requirePremium, async (req, res) => {
   if (!isPushConfigured()) {
     res.status(503).json({ error: "Les notifications push ne sont pas configurees sur ce serveur." });
     return;

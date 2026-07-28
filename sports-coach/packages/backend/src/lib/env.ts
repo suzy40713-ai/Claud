@@ -23,4 +23,8 @@ export const env = {
   stravaClientSecret: process.env.STRAVA_CLIENT_SECRET,
   stravaRedirectUri:
     process.env.STRAVA_REDIRECT_URI ?? `${process.env.FRONTEND_ORIGIN ?? "http://localhost:5173"}/strava/callback`,
+
+  stripeSecretKey: process.env.STRIPE_SECRET_KEY,
+  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+  stripePremiumPriceId: process.env.STRIPE_PREMIUM_PRICE_ID,
 };

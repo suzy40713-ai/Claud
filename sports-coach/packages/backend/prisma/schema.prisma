@@ -45,6 +45,13 @@ enum CoachRole {
   assistant
 }
 
+enum SubscriptionStatus {
+  aucun
+  actif
+  impaye
+  annule
+}
+
 model User {
   id                 String   @id @default(uuid())
   email              String   @unique
@@ -62,6 +69,11 @@ model User {
   stravaRefreshToken   String?   @map("strava_refresh_token")
   stravaTokenExpiresAt DateTime? @map("strava_token_expires_at")
   stravaLastSyncAt     DateTime? @map("strava_last_sync_at")
+
+  stripeCustomerId              String?            @unique @map("stripe_customer_id")
+  stripeSubscriptionId          String?            @unique @map("stripe_subscription_id")
+  subscriptionStatus            SubscriptionStatus @default(aucun) @map("subscription_status")
+  subscriptionCurrentPeriodEnd  DateTime?           @map("subscription_current_period_end")
 
   injuryHistory     InjuryHistory[]
   activities        Activity[]

@@ -1,6 +1,7 @@
 import type {
   ActivityDTO,
   AuthResponse,
+  BillingStatusDTO,
   CoachMessageDTO,
   DailyLogDTO,
   DailyLogPayload,
@@ -133,12 +134,18 @@ export const api = {
   checkOverloadNow: () => request<{ sent: boolean }>("/push/check-now", { method: "POST" }),
 
   getStravaStatus: () =>
-    request<{ configured: boolean; connected: boolean; lastSyncAt: string | null }>("/strava/status"),
+    request<{ configured: boolean; connected: boolean; lastSyncAt: string | null; premium: boolean }>(
+      "/strava/status"
+    ),
   getStravaAuthorizeUrl: () => request<{ url: string }>("/strava/authorize-url"),
   submitStravaCode: (code: string) =>
     request<{ connected: true }>("/strava/callback", { method: "POST", body: JSON.stringify({ code }) }),
   syncStrava: () => request<{ imported: number; totalFetched: number }>("/strava/sync", { method: "POST" }),
   disconnectStrava: () => request<void>("/strava/disconnect", { method: "DELETE" }),
+
+  getBillingStatus: () => request<BillingStatusDTO>("/billing/status"),
+  createCheckoutSession: () => request<{ url: string }>("/billing/create-checkout-session", { method: "POST" }),
+  createPortalSession: () => request<{ url: string }>("/billing/create-portal-session", { method: "POST" }),
 };
 
 export { ApiError };

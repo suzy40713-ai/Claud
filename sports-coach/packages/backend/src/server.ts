@@ -11,6 +11,8 @@ import { coachRouter } from "./modules/coach/coach.routes.js";
 import { trainingPlanRouter } from "./modules/training-plan/training-plan.routes.js";
 import { pushRouter } from "./modules/push/push.routes.js";
 import { stravaRouter } from "./modules/strava/strava.routes.js";
+import { billingRouter } from "./modules/billing/billing.routes.js";
+import { billingWebhookRouter } from "./modules/billing/billing.webhook.js";
 import { startOverloadAlertScheduler } from "./lib/scheduler.js";
 import { apiRateLimiter } from "./lib/rate-limit.js";
 
@@ -28,6 +30,12 @@ process.on("uncaughtException", (error) => {
 const app = express();
 
 app.use(cors({ origin: env.frontendOrigin, credentials: true }));
+
+// Le webhook Stripe doit etre monte AVANT express.json() : Stripe signe le
+// corps brut de la requete, et le parser JSON le remplacerait par un objet
+// deja desserialise avant qu'on puisse verifier la signature.
+app.use("/api/billing/webhook", billingWebhookRouter);
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -45,6 +53,7 @@ app.use("/api/coach/messages", coachRouter);
 app.use("/api/training-plan", trainingPlanRouter);
 app.use("/api/push", pushRouter);
 app.use("/api/strava", stravaRouter);
+app.use("/api/billing", billingRouter);
 
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err);
