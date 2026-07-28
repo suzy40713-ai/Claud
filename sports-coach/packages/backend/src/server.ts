@@ -7,6 +7,7 @@ import { usersRouter } from "./modules/users/users.routes.js";
 import { dailyLogRouter } from "./modules/daily-log/daily-log.routes.js";
 import { activitiesRouter } from "./modules/activities/activities.routes.js";
 import { coachRouter } from "./modules/coach/coach.routes.js";
+import { trainingPlanRouter } from "./modules/training-plan/training-plan.routes.js";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/daily-logs", dailyLogRouter);
 app.use("/api/activities", activitiesRouter);
 app.use("/api/coach/messages", coachRouter);
+app.use("/api/training-plan", trainingPlanRouter);
 
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err);

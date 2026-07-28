@@ -128,6 +128,7 @@ model PlannedSession {
   planId            String        @map("plan_id")
   plan              TrainingPlan  @relation(fields: [planId], references: [id], onDelete: Cascade)
   date              DateTime      @db.Date
+  sport             Sport
   type              String
   dureeCible        Int           @map("duree_cible") // secondes
   intensiteCible    String        @map("intensite_cible")

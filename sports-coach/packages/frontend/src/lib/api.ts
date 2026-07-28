@@ -5,6 +5,9 @@ import type {
   DailyLogDTO,
   DailyLogPayload,
   OnboardingPayload,
+  PlannedSessionDTO,
+  SessionStatut,
+  TrainingPlanResponse,
   UserProfileDTO,
   WeeklyVolumePoint,
 } from "@sports-coach/shared";
@@ -110,6 +113,17 @@ export const api = {
     form.append("sport", sport);
     return request<{ activity: ActivityDTO }>("/activities/import", { method: "POST", body: form });
   },
+
+  getTrainingPlan: () => request<TrainingPlanResponse>("/training-plan"),
+  updateSessionStatut: (sessionId: string, statut: SessionStatut) =>
+    request<{ seance: PlannedSessionDTO }>(`/training-plan/sessions/${sessionId}`, {
+      method: "PATCH",
+      body: JSON.stringify({ statut }),
+    }),
+  applySuggestion: (sessionId: string) =>
+    request<{ seance: PlannedSessionDTO }>(`/training-plan/sessions/${sessionId}/apply-suggestion`, {
+      method: "POST",
+    }),
 };
 
 export { ApiError };

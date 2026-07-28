@@ -95,3 +95,61 @@ export interface CoachMessageDTO {
   content: string;
   createdAt: string;
 }
+
+export const PLANNED_SESSION_TYPES = [
+  "endurance_fondamentale",
+  "fractionne",
+  "seuil",
+  "sortie_longue",
+  "recuperation",
+] as const;
+export type PlannedSessionType = (typeof PLANNED_SESSION_TYPES)[number];
+
+export const INTENSITES = ["faible", "moderee", "elevee"] as const;
+export type Intensite = (typeof INTENSITES)[number];
+
+export interface PlannedSessionSuggestionDTO {
+  raison: string;
+  dureeCibleProposee: number; // secondes
+  intensiteCibleProposee: Intensite;
+}
+
+export interface PlannedSessionDTO {
+  id: string;
+  date: string; // YYYY-MM-DD
+  sport: Sport;
+  type: PlannedSessionType;
+  dureeCible: number; // secondes
+  intensiteCible: Intensite;
+  statut: SessionStatut;
+  raisonAjustement: string | null;
+  suggestion: PlannedSessionSuggestionDTO | null;
+}
+
+export interface TrainingPlanDTO {
+  id: string;
+  semaineDebut: string; // YYYY-MM-DD (lundi)
+  seances: PlannedSessionDTO[];
+}
+
+export const ACWR_NIVEAUX_RISQUE = [
+  "donnees_insuffisantes",
+  "sous_charge",
+  "optimal",
+  "modere",
+  "eleve",
+] as const;
+export type AcwrNiveauRisque = (typeof ACWR_NIVEAUX_RISQUE)[number];
+
+export interface AcwrDTO {
+  chargeAigueMin: number; // minutes, 7 derniers jours
+  chargeChroniqueMin: number; // minutes/semaine, moyenne sur 28 jours
+  ratio: number | null;
+  niveauRisque: AcwrNiveauRisque;
+  explication: string;
+}
+
+export interface TrainingPlanResponse {
+  plan: TrainingPlanDTO;
+  acwr: AcwrDTO;
+}
