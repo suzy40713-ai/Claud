@@ -5,6 +5,7 @@ import { RegisterPage } from "./features/auth/RegisterPage";
 import { OnboardingPage } from "./features/onboarding/OnboardingPage";
 import { DailyLogPage } from "./features/daily-log/DailyLogPage";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
+import { CoachPage } from "./features/coach/CoachPage";
 
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, logout } = useAuth();
@@ -23,6 +24,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
           <div className="flex gap-4 text-sm font-medium text-slate-600">
             <Link to="/">Journal</Link>
             <Link to="/dashboard">Seances</Link>
+            <Link to="/coach">Coach</Link>
           </div>
           <button onClick={() => logout()} className="text-sm text-slate-400 hover:text-slate-600">
             Deconnexion
@@ -60,6 +62,14 @@ export default function App() {
         element={
           <ProtectedLayout>
             <DashboardPage />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/coach"
+        element={
+          <ProtectedLayout>
+            <CoachPage />
           </ProtectedLayout>
         }
       />

@@ -85,3 +85,13 @@ export interface WeeklyVolumePoint {
 export interface AuthResponse {
   user: UserProfileDTO;
 }
+
+export const COACH_ROLES = ["user", "assistant"] as const;
+export type CoachRole = (typeof COACH_ROLES)[number];
+
+export interface CoachMessageDTO {
+  id: string;
+  role: CoachRole;
+  content: string;
+  createdAt: string;
+}

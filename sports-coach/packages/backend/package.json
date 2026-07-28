@@ -12,6 +12,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.68.0",
     "@prisma/client": "^5.20.0",
     "@sports-coach/shared": "0.1.0",
     "bcryptjs": "^2.4.3",

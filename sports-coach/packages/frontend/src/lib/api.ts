@@ -1,6 +1,7 @@
 import type {
   ActivityDTO,
   AuthResponse,
+  CoachMessageDTO,
   DailyLogDTO,
   DailyLogPayload,
   OnboardingPayload,
@@ -38,6 +39,48 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return data as T;
 }
 
+export type CoachStreamEvent =
+  | { type: "user_message"; message: CoachMessageDTO }
+  | { type: "delta"; text: string }
+  | { type: "done"; message: CoachMessageDTO }
+  | { type: "error"; error: string };
+
+export async function streamCoachMessage(
+  content: string,
+  onEvent: (event: CoachStreamEvent) => void
+): Promise<void> {
+  const res = await fetch("/api/coach/messages", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content }),
+  });
+
+  if (!res.ok || !res.body) {
+    const data = await res.json().catch(() => ({}));
+    throw new ApiError(data.error ?? "Le coach IA est indisponible", res.status);
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+
+    let separatorIndex: number;
+    while ((separatorIndex = buffer.indexOf("\n\n")) !== -1) {
+      const chunk = buffer.slice(0, separatorIndex);
+      buffer = buffer.slice(separatorIndex + 2);
+      const line = chunk.split("\n").find((l) => l.startsWith("data: "));
+      if (!line) continue;
+      onEvent(JSON.parse(line.slice("data: ".length)) as CoachStreamEvent);
+    }
+  }
+}
+
 export const api = {
   register: (email: string, password: string) =>
     request<AuthResponse>("/auth/register", { method: "POST", body: JSON.stringify({ email, password }) }),
@@ -56,6 +99,8 @@ export const api = {
     request<{ log: DailyLogDTO }>("/daily-logs", { method: "POST", body: JSON.stringify(payload) }),
   getDailyLogs: (days = 14) => request<{ logs: DailyLogDTO[] }>(`/daily-logs?days=${days}`),
   getTodayLog: () => request<{ log: DailyLogDTO | null }>("/daily-logs/today"),
+
+  getCoachMessages: () => request<{ messages: CoachMessageDTO[] }>("/coach/messages"),
 
   getActivities: () => request<{ activities: ActivityDTO[] }>("/activities"),
   getWeeklyVolume: () => request<{ weeklyVolume: WeeklyVolumePoint[] }>("/activities/weekly-volume"),
