@@ -10,6 +10,17 @@ export const env = {
   port: Number(process.env.PORT ?? 4000),
   jwtSecret: required("JWT_SECRET"),
   frontendOrigin: process.env.FRONTEND_ORIGIN ?? "http://localhost:5173",
+  // Origines supplementaires autorisees en CORS (ex: "https://localhost" pour
+  // l'app mobile Capacitor), separees par des virgules.
+  additionalCorsOrigins: (process.env.ADDITIONAL_CORS_ORIGINS ?? "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean),
+  // "lax" convient au web (front et back sur le meme "site"). L'app mobile
+  // packagee (Capacitor) tourne sur une origine differente du backend
+  // deploye : il faut alors "none" (+ Secure, cf. auth.routes.ts) pour que
+  // le cookie de session soit envoye.
+  cookieSameSite: (process.env.COOKIE_SAME_SITE as "lax" | "none" | "strict" | undefined) ?? "lax",
   nodeEnv: process.env.NODE_ENV ?? "development",
   anthropicApiKey: process.env.ANTHROPIC_API_KEY,
   coachModel: process.env.COACH_MODEL ?? "claude-sonnet-5",

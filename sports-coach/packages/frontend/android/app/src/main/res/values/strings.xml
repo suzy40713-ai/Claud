@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Coach Sportif IA</string>
+    <string name="title_activity_main">Coach Sportif IA</string>
+    <string name="package_name">com.sportscoach.app</string>
+    <string name="custom_url_scheme">com.sportscoach.app</string>
+</resources>

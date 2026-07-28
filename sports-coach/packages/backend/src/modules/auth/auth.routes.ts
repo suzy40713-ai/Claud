@@ -24,8 +24,10 @@ const credentialsSchema = z.object({
 function setSessionCookie(res: import("express").Response, token: string) {
   res.cookie(AUTH_COOKIE_NAME, token, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: env.nodeEnv === "production",
+    sameSite: env.cookieSameSite,
+    // SameSite=None est refuse par les navigateurs sans Secure : on force
+    // Secure des que ce mode est utilise (deploiement mobile/cross-site).
+    secure: env.nodeEnv === "production" || env.cookieSameSite === "none",
     maxAge: AUTH_COOKIE_MAX_AGE_MS,
   });
 }

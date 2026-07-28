@@ -22,8 +22,14 @@ class ApiError extends Error {
   }
 }
 
+// En web, l'API est appelee en relatif (meme origine, proxy Vite en dev).
+// Dans l'app mobile packagee (Capacitor), il n'y a pas de backend sur la
+// meme origine : VITE_API_URL doit pointer vers le backend deploye a la
+// compilation (ex: VITE_API_URL=https://api.mon-domaine.com).
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? "";
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${API_BASE_URL}/api${path}`, {
     ...options,
     credentials: "include",
     headers: {
@@ -53,7 +59,7 @@ export async function streamCoachMessage(
   content: string,
   onEvent: (event: CoachStreamEvent) => void
 ): Promise<void> {
-  const res = await fetch("/api/coach/messages", {
+  const res = await fetch(`${API_BASE_URL}/api/coach/messages`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },

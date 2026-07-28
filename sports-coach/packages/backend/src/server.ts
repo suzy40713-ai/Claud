@@ -29,7 +29,19 @@ process.on("uncaughtException", (error) => {
 
 const app = express();
 
-app.use(cors({ origin: env.frontendOrigin, credentials: true }));
+const allowedOrigins = [env.frontendOrigin, ...env.additionalCorsOrigins];
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Origine non autorisee"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 // Le webhook Stripe doit etre monte AVANT express.json() : Stripe signe le
 // corps brut de la requete, et le parser JSON le remplacerait par un objet

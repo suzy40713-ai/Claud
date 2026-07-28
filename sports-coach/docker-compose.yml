@@ -29,6 +29,8 @@ services:
       JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
       PORT: 4000
       FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:5173}
+      ADDITIONAL_CORS_ORIGINS: ${ADDITIONAL_CORS_ORIGINS:-}
+      COOKIE_SAME_SITE: ${COOKIE_SAME_SITE:-lax}
       NODE_ENV: development
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       COACH_MODEL: ${COACH_MODEL:-claude-sonnet-5}
