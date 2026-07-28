@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Sport {
+  course_a_pied
+  velo
+}
+
+enum Niveau {
+  debutant
+  intermediaire
+  avance
+}
+
+enum Objectif {
+  perte_de_poids
+  preparation_course
+  regularite
+  performance
+}
+
+enum ActivitySource {
+  fit
+  gpx
+  tcx
+  manuel
+}
+
+enum SessionStatut {
+  a_faire
+  fait
+  ajuste
+  skip
+}
+
+enum CoachRole {
+  user
+  assistant
+}
+
+model User {
+  id                 String   @id @default(uuid())
+  email              String   @unique
+  passwordHash       String   @map("password_hash")
+  objectif           Objectif?
+  sportsPratiques    Sport[]  @map("sports_pratiques")
+  niveau             Niveau?
+  onboardingComplete Boolean  @default(false) @map("onboarding_complete")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  injuryHistory  InjuryHistory[]
+  activities     Activity[]
+  dailyLogs      DailyLog[]
+  trainingPlans  TrainingPlan[]
+  coachMessages  CoachMessage[]
+
+  @@map("users")
+}
+
+model InjuryHistory {
+  id         String    @id @default(uuid())
+  userId     String    @map("user_id")
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  zone       String
+  type       String
+  dateApprox DateTime? @map("date_approx")
+  notes      String?
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  @@map("injury_history")
+}
+
+model Activity {
+  id            String         @id @default(uuid())
+  userId        String         @map("user_id")
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date          DateTime
+  sport         Sport
+  duree         Int // secondes
+  distance      Float // metres
+  denivele      Float?
+  fcMoyenne     Int?           @map("fc_moyenne")
+  allureMoyenne Float?         @map("allure_moyenne") // secondes/km
+  sourceFormat  ActivitySource @map("source_format")
+  sourceFile    String?        @map("source_file")
+  rawData       Json?          @map("raw_data")
+  createdAt     DateTime       @default(now()) @map("created_at")
+
+  @@index([userId, date])
+  @@map("activities")
+}
+
+model DailyLog {
+  id       String   @id @default(uuid())
+  userId   String   @map("user_id")
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date     DateTime @db.Date
+  sommeil  Int
+  fatigue  Int
+  stress   Int
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, date])
+  @@map("daily_logs")
+}
+
+model TrainingPlan {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  semaineDebut  DateTime @map("semaine_debut") @db.Date
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  seances PlannedSession[]
+
+  @@unique([userId, semaineDebut])
+  @@map("training_plans")
+}
+
+model PlannedSession {
+  id                String        @id @default(uuid())
+  planId            String        @map("plan_id")
+  plan              TrainingPlan  @relation(fields: [planId], references: [id], onDelete: Cascade)
+  date              DateTime      @db.Date
+  type              String
+  dureeCible        Int           @map("duree_cible") // secondes
+  intensiteCible    String        @map("intensite_cible")
+  statut            SessionStatut @default(a_faire)
+  raisonAjustement  String?       @map("raison_ajustement")
+  createdAt         DateTime      @default(now()) @map("created_at")
+
+  @@index([planId, date])
+  @@map("planned_sessions")
+}
+
+model CoachMessage {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      CoachRole
+  content   String
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@map("coach_messages")
+}

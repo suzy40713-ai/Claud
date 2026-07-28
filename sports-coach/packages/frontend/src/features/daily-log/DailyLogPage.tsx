@@ -1,0 +1,114 @@
+import { useEffect, useState } from "react";
+import type { DailyLogDTO } from "@sports-coach/shared";
+import { api, ApiError } from "../../lib/api";
+import { Button } from "../../components/ui/Button";
+import { ScaleSelector } from "../../components/ui/ScaleSelector";
+
+function todayIso(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+export function DailyLogPage() {
+  const [sommeil, setSommeil] = useState<number | null>(null);
+  const [fatigue, setFatigue] = useState<number | null>(null);
+  const [stress, setStress] = useState<number | null>(null);
+  const [history, setHistory] = useState<DailyLogDTO[]>([]);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([api.getTodayLog(), api.getDailyLogs(7)])
+      .then(([today, past]) => {
+        if (today.log) {
+          setSommeil(today.log.sommeil);
+          setFatigue(today.log.fatigue);
+          setStress(today.log.stress);
+          setSaved(true);
+        }
+        setHistory(past.logs);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  async function handleSubmit() {
+    if (sommeil === null || fatigue === null || stress === null) return;
+    setError(null);
+    setSubmitting(true);
+    try {
+      const { log } = await api.saveDailyLog({ date: todayIso(), sommeil, fatigue, stress });
+      setSaved(true);
+      setHistory((prev) => [log, ...prev.filter((l) => l.date !== log.date)]);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Impossible d'enregistrer");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  const canSubmit = sommeil !== null && fatigue !== null && stress !== null;
+
+  if (loading) return null;
+
+  return (
+    <div className="mx-auto flex max-w-lg flex-col gap-8 px-4 py-8">
+      <div>
+        <h1 className="text-xl font-semibold">Journal du jour</h1>
+        <p className="text-sm text-slate-500">Trois questions, 15 secondes.</p>
+      </div>
+
+      <div className="flex flex-col gap-6 rounded-xl border border-slate-200 bg-white p-5">
+        <ScaleSelector
+          label="Qualite du sommeil"
+          value={sommeil}
+          onChange={setSommeil}
+          lowLabel="Tres mauvais"
+          highLabel="Excellent"
+        />
+        <ScaleSelector
+          label="Niveau de fatigue"
+          value={fatigue}
+          onChange={setFatigue}
+          lowLabel="Pas fatigue"
+          highLabel="Epuise"
+        />
+        <ScaleSelector
+          label="Stress percu"
+          value={stress}
+          onChange={setStress}
+          lowLabel="Zen"
+          highLabel="Tres stresse"
+        />
+
+        {error && <p className="text-sm text-red-600">{error}</p>}
+        {saved && !error && <p className="text-sm text-emerald-600">Journal enregistre pour aujourd'hui.</p>}
+
+        <Button disabled={!canSubmit || submitting} onClick={handleSubmit}>
+          {submitting ? "Enregistrement..." : saved ? "Mettre a jour" : "Valider"}
+        </Button>
+      </div>
+
+      {history.length > 0 && (
+        <div>
+          <h2 className="mb-3 text-sm font-medium text-slate-700">7 derniers jours</h2>
+          <div className="flex flex-col gap-2">
+            {history.map((log) => (
+              <div
+                key={log.id}
+                className="flex items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2 text-sm"
+              >
+                <span className="text-slate-500">{log.date}</span>
+                <span className="flex gap-4 text-slate-700">
+                  <span>Sommeil {log.sommeil}/5</span>
+                  <span>Fatigue {log.fatigue}/5</span>
+                  <span>Stress {log.stress}/5</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
