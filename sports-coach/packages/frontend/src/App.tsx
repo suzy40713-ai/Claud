@@ -7,6 +7,7 @@ import { DailyLogPage } from "./features/daily-log/DailyLogPage";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
 import { CoachPage } from "./features/coach/CoachPage";
 import { TrainingPlanPage } from "./features/training-plan/TrainingPlanPage";
+import { StravaCallbackPage } from "./features/dashboard/StravaCallbackPage";
 
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, logout } = useAuth();
@@ -80,6 +81,14 @@ export default function App() {
         element={
           <ProtectedLayout>
             <TrainingPlanPage />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/strava/callback"
+        element={
+          <ProtectedLayout>
+            <StravaCallbackPage />
           </ProtectedLayout>
         }
       />

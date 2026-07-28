@@ -7,6 +7,7 @@ import { computeAcwr } from "./acwr.js";
 import { generateWeeklySessions, mondayOfCurrentWeek } from "./plan-generator.js";
 import { computeSuggestion } from "./suggestion.js";
 import { toPlannedSessionDTO, toTrainingPlanDTO } from "./training-plan.mapper.js";
+import { checkAndNotifyOverloadRisk } from "../push/overload-check.js";
 
 export const trainingPlanRouter = Router();
 trainingPlanRouter.use(requireAuth);
@@ -72,6 +73,10 @@ trainingPlanRouter.get("/", async (req, res) => {
   res.json({
     plan: toTrainingPlanDTO(plan, recentLogs),
     acwr: computeAcwr(recentActivities),
+  });
+
+  checkAndNotifyOverloadRisk(userId).catch((error) => {
+    console.error("Erreur lors de la verification de surcharge:", error);
   });
 });
 

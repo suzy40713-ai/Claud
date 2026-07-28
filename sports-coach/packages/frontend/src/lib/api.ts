@@ -124,6 +124,21 @@ export const api = {
     request<{ seance: PlannedSessionDTO }>(`/training-plan/sessions/${sessionId}/apply-suggestion`, {
       method: "POST",
     }),
+
+  getVapidPublicKey: () => request<{ publicKey: string }>("/push/vapid-public-key"),
+  subscribeToPush: (subscription: { endpoint: string; keys: { p256dh: string; auth: string } }) =>
+    request<{ ok: true }>("/push/subscribe", { method: "POST", body: JSON.stringify(subscription) }),
+  unsubscribeFromPush: (endpoint: string) =>
+    request<void>("/push/subscribe", { method: "DELETE", body: JSON.stringify({ endpoint }) }),
+  checkOverloadNow: () => request<{ sent: boolean }>("/push/check-now", { method: "POST" }),
+
+  getStravaStatus: () =>
+    request<{ configured: boolean; connected: boolean; lastSyncAt: string | null }>("/strava/status"),
+  getStravaAuthorizeUrl: () => request<{ url: string }>("/strava/authorize-url"),
+  submitStravaCode: (code: string) =>
+    request<{ connected: true }>("/strava/callback", { method: "POST", body: JSON.stringify({ code }) }),
+  syncStrava: () => request<{ imported: number; totalFetched: number }>("/strava/sync", { method: "POST" }),
+  disconnectStrava: () => request<void>("/strava/disconnect", { method: "DELETE" }),
 };
 
 export { ApiError };

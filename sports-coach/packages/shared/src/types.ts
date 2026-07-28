@@ -12,7 +12,7 @@ export const OBJECTIFS = [
 ] as const;
 export type Objectif = (typeof OBJECTIFS)[number];
 
-export const ACTIVITY_SOURCES = ["fit", "gpx", "tcx", "manuel"] as const;
+export const ACTIVITY_SOURCES = ["fit", "gpx", "tcx", "manuel", "strava"] as const;
 export type ActivitySource = (typeof ACTIVITY_SOURCES)[number];
 
 export const SESSION_STATUTS = ["a_faire", "fait", "ajuste", "skip"] as const;

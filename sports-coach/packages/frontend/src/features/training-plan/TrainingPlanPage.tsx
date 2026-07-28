@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { AcwrDTO, PlannedSessionDTO, Sport, TrainingPlanDTO } from "@sports-coach/shared";
 import { api, ApiError } from "../../lib/api";
 import { Button } from "../../components/ui/Button";
+import { PushAlertToggle } from "./PushAlertToggle";
 
 const TYPE_LABELS: Record<PlannedSessionDTO["type"], string> = {
   endurance_fondamentale: "Endurance fondamentale",
@@ -119,6 +120,8 @@ export function TrainingPlanPage() {
           <p className="mt-1 text-sm">{acwr.explication}</p>
         </div>
       )}
+
+      <PushAlertToggle />
 
       {error && plan && <p className="text-sm text-red-600">{error}</p>}
 

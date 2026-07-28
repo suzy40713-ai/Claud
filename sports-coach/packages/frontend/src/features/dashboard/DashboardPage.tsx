@@ -3,6 +3,7 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import type { ActivityDTO, Sport, WeeklyVolumePoint } from "@sports-coach/shared";
 import { api, ApiError } from "../../lib/api";
 import { Button } from "../../components/ui/Button";
+import { StravaConnect } from "./StravaConnect";
 
 function formatDuree(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -97,6 +98,8 @@ export function DashboardPage() {
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
+
+      <StravaConnect onSynced={loadData} />
 
       <div className="rounded-xl border border-slate-200 bg-white p-4">
         <h2 className="mb-3 text-sm font-medium text-slate-700">Volume hebdomadaire</h2>

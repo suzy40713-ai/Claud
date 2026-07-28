@@ -30,6 +30,7 @@ enum ActivitySource {
   gpx
   tcx
   manuel
+  strava
 }
 
 enum SessionStatut {
@@ -54,13 +55,34 @@ model User {
   onboardingComplete Boolean  @default(false) @map("onboarding_complete")
   createdAt          DateTime @default(now()) @map("created_at")
 
-  injuryHistory  InjuryHistory[]
-  activities     Activity[]
-  dailyLogs      DailyLog[]
-  trainingPlans  TrainingPlan[]
-  coachMessages  CoachMessage[]
+  lastAcwrAlertAt DateTime? @map("last_acwr_alert_at")
+
+  stravaAthleteId      String?   @unique @map("strava_athlete_id")
+  stravaAccessToken    String?   @map("strava_access_token")
+  stravaRefreshToken   String?   @map("strava_refresh_token")
+  stravaTokenExpiresAt DateTime? @map("strava_token_expires_at")
+  stravaLastSyncAt     DateTime? @map("strava_last_sync_at")
+
+  injuryHistory     InjuryHistory[]
+  activities        Activity[]
+  dailyLogs         DailyLog[]
+  trainingPlans     TrainingPlan[]
+  coachMessages     CoachMessage[]
+  pushSubscriptions PushSubscription[]
 
   @@map("users")
+}
+
+model PushSubscription {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("push_subscriptions")
 }
 
 model InjuryHistory {
@@ -89,6 +111,7 @@ model Activity {
   allureMoyenne Float?         @map("allure_moyenne") // secondes/km
   sourceFormat  ActivitySource @map("source_format")
   sourceFile    String?        @map("source_file")
+  stravaId      String?        @unique @map("strava_id")
   rawData       Json?          @map("raw_data")
   createdAt     DateTime       @default(now()) @map("created_at")
 

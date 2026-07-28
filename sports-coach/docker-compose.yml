@@ -32,6 +32,13 @@ services:
       NODE_ENV: development
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       COACH_MODEL: ${COACH_MODEL:-claude-sonnet-5}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:contact@example.com}
+      OVERLOAD_CHECK_INTERVAL_MS: ${OVERLOAD_CHECK_INTERVAL_MS:-21600000}
+      STRAVA_CLIENT_ID: ${STRAVA_CLIENT_ID:-}
+      STRAVA_CLIENT_SECRET: ${STRAVA_CLIENT_SECRET:-}
+      STRAVA_REDIRECT_URI: ${STRAVA_REDIRECT_URI:-http://localhost:5173/strava/callback}
     ports:
       - "4000:4000"
     volumes:
