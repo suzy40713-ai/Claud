@@ -54,7 +54,7 @@ jobs:
 
       - name: Decode signing keystore (if configured)
         if: ${{ env.ANDROID_KEYSTORE_BASE64 != '' }}
-        working-directory: sports-coach/packages/frontend/android
+        working-directory: sports-coach/packages/frontend/android/app
         run: echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > release.keystore
 
       - name: Build debug APK
