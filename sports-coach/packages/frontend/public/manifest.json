@@ -1,6 +1,6 @@
 {
-  "name": "Sports Coach IA",
-  "short_name": "Sports Coach",
+  "name": "Vory",
+  "short_name": "Vory",
   "description": "Coaching sportif personnalise base sur tes donnees d'entrainement et ton etat de forme.",
   "start_url": ".",
   "display": "standalone",
