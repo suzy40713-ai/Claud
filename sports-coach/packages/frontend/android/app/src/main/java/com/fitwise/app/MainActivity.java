@@ -1,4 +1,4 @@
-package com.sportscoach.app;
+package com.fitwise.app;
 
 import com.getcapacitor.BridgeActivity;
 

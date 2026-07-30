@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.sportscoach.app",
-  appName: "Coach Sportif IA",
+  appId: "com.fitwise.app",
+  appName: "Fitwise",
   webDir: "dist",
 };
 
