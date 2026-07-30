@@ -1,4 +1,4 @@
-package com.fitwise.app;
+package com.vory.app;
 
 import com.getcapacitor.BridgeActivity;
 
