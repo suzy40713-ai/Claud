@@ -1,0 +1,63 @@
+name: Deploy web app to GitHub Pages
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - claude/ai-sports-coaching-app-qome53
+    paths:
+      - "sports-coach/packages/frontend/**"
+      - "sports-coach/packages/shared/**"
+      - ".github/workflows/deploy-web.yml"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sports-coach
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build shared package
+        run: npm run build -w @sports-coach/shared
+
+      - name: Build frontend (web assets)
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL || 'https://tiktok-ai-studio-production-80d5.up.railway.app' }}
+          # Repo public "Claud" -> servi sous https://<owner>.github.io/Claud/
+          VITE_BASE_PATH: /Claud/
+        run: npm run build -w @sports-coach/frontend
+
+      - name: SPA fallback for GitHub Pages (pas de rewrite serveur)
+        run: cp packages/frontend/dist/index.html packages/frontend/dist/404.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: sports-coach/packages/frontend/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
