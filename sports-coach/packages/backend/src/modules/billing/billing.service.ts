@@ -65,6 +65,10 @@ export async function createCheckoutSessionUrl(
     cancel_url: `${frontendOrigin}/abonnement?checkout=annule`,
     client_reference_id: userId,
     subscription_data: { metadata: { userId } },
+    // Affiche le champ "code promo" sur la page Stripe Checkout (ex: COACH
+    // pour -40% sur le premier mois). Le code lui-meme est cree cote
+    // Stripe Dashboard, pas dans ce code.
+    allow_promotion_codes: true,
   });
 
   if (!session.url) {
