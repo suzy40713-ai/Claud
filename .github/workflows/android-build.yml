@@ -13,6 +13,10 @@ on:
 jobs:
   build-android:
     runs-on: ubuntu-latest
+    env:
+      # Expose au niveau du job : le contexte "secrets" n'est pas accessible
+      # dans les conditions "if:" des steps, seul "env" l'est.
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
     defaults:
       run:
         working-directory: sports-coach
@@ -49,9 +53,9 @@ jobs:
         run: npx cap sync android
 
       - name: Decode signing keystore (if configured)
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        if: ${{ env.ANDROID_KEYSTORE_BASE64 != '' }}
         working-directory: sports-coach/packages/frontend/android
-        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+        run: echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > release.keystore
 
       - name: Build debug APK
         working-directory: sports-coach/packages/frontend/android
@@ -60,7 +64,7 @@ jobs:
       - name: Build release AAB
         working-directory: sports-coach/packages/frontend/android
         env:
-          ANDROID_KEYSTORE_PATH: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && 'release.keystore' || '' }}
+          ANDROID_KEYSTORE_PATH: ${{ env.ANDROID_KEYSTORE_BASE64 != '' && 'release.keystore' || '' }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
