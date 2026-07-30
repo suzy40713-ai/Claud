@@ -84,6 +84,12 @@ export interface WeeklyVolumePoint {
 
 export interface AuthResponse {
   user: UserProfileDTO;
+  // Present sur /register et /login uniquement (absent sur /me, qui ne fait
+  // que confirmer une session existante). Le cookie de session reste pose,
+  // mais Safari/iOS bloque les cookies cross-site meme corrects
+  // (SameSite=None) : ce token permet au client de s'authentifier via un
+  // header Authorization en secours fiable partout.
+  token?: string;
 }
 
 export const COACH_ROLES = ["user", "assistant"] as const;

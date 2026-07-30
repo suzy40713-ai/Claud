@@ -10,8 +10,21 @@ declare global {
   }
 }
 
+function extractToken(req: Request): string | undefined {
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith("Bearer ")) {
+    return authHeader.slice("Bearer ".length);
+  }
+  return req.cookies?.[AUTH_COOKIE_NAME];
+}
+
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
-  const token = req.cookies?.[AUTH_COOKIE_NAME];
+  // Le cookie de session ne fonctionne pas de maniere fiable en cross-site
+  // sur Safari/iOS (Intelligent Tracking Prevention bloque les cookies
+  // SameSite=None meme correctement configures). Le header Authorization
+  // est verifie en priorite, le cookie reste un filet de secours pour les
+  // clients qui ne l'envoient pas explicitement.
+  const token = extractToken(req);
   if (!token) {
     res.status(401).json({ error: "Non authentifie" });
     return;

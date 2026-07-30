@@ -53,7 +53,7 @@ authRouter.post("/register", async (req, res) => {
 
   const token = signSessionToken(user.id);
   setSessionCookie(res, token);
-  res.status(201).json({ user: toUserProfileDTO(user) });
+  res.status(201).json({ user: toUserProfileDTO(user), token });
 });
 
 authRouter.post("/login", async (req, res) => {
@@ -72,7 +72,7 @@ authRouter.post("/login", async (req, res) => {
 
   const token = signSessionToken(user.id);
   setSessionCookie(res, token);
-  res.json({ user: toUserProfileDTO(user) });
+  res.json({ user: toUserProfileDTO(user), token });
 });
 
 authRouter.post("/logout", (_req, res) => {

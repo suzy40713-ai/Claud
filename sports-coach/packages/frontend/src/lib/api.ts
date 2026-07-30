@@ -28,12 +28,36 @@ class ApiError extends Error {
 // compilation (ex: VITE_API_URL=https://api.mon-domaine.com).
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? "";
 
+// Le cookie de session ne suffit pas partout : Safari/iOS bloque les
+// cookies cross-site meme corrects (SameSite=None + Secure). Un token
+// stocke cote client et envoye via un header Authorization fonctionne de
+// maniere fiable sur tous les navigateurs et dans l'app mobile.
+const AUTH_TOKEN_KEY = "vory_auth_token";
+
+function getAuthToken(): string | null {
+  return localStorage.getItem(AUTH_TOKEN_KEY);
+}
+
+function setAuthToken(token: string): void {
+  localStorage.setItem(AUTH_TOKEN_KEY, token);
+}
+
+function clearAuthToken(): void {
+  localStorage.removeItem(AUTH_TOKEN_KEY);
+}
+
+function authHeader(): Record<string, string> {
+  const token = getAuthToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${API_BASE_URL}/api${path}`, {
     ...options,
     credentials: "include",
     headers: {
       ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
+      ...authHeader(),
       ...options.headers,
     },
   });
@@ -62,7 +86,7 @@ export async function streamCoachMessage(
   const res = await fetch(`${API_BASE_URL}/api/coach/messages`, {
     method: "POST",
     credentials: "include",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeader() },
     body: JSON.stringify({ content }),
   });
 
@@ -92,11 +116,29 @@ export async function streamCoachMessage(
 }
 
 export const api = {
-  register: (email: string, password: string) =>
-    request<AuthResponse>("/auth/register", { method: "POST", body: JSON.stringify({ email, password }) }),
-  login: (email: string, password: string) =>
-    request<AuthResponse>("/auth/login", { method: "POST", body: JSON.stringify({ email, password }) }),
-  logout: () => request<void>("/auth/logout", { method: "POST" }),
+  register: async (email: string, password: string) => {
+    const data = await request<AuthResponse>("/auth/register", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    });
+    if (data.token) setAuthToken(data.token);
+    return data;
+  },
+  login: async (email: string, password: string) => {
+    const data = await request<AuthResponse>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    });
+    if (data.token) setAuthToken(data.token);
+    return data;
+  },
+  logout: async () => {
+    try {
+      await request<void>("/auth/logout", { method: "POST" });
+    } finally {
+      clearAuthToken();
+    }
+  },
   me: () => request<AuthResponse>("/auth/me"),
 
   submitOnboarding: (payload: OnboardingPayload) =>
