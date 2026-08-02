@@ -1,12 +1,12 @@
 // Les valeurs collees depuis un dashboard (Stripe, etc.) embarquent parfois un
-// espace ou retour a la ligne parasite, y compris au milieu de la valeur : sur
-// mobile, une selection tactile d'un texte affiche replie sur plusieurs lignes
-// peut inserer un saut de ligne a chaque retour visuel. Un en-tete HTTP
-// contenant ce caractere fait planter Node (ERR_INVALID_CHAR). Ces valeurs
-// (cles API, secrets) ne contiennent jamais d'espace legitime : on les
-// supprime tous, pas seulement en debut/fin.
-function stripWhitespace(value: string): string {
-  return value.replace(/\s+/g, "");
+// caractere invisible parasite (espace insecable, caractere de largeur nulle,
+// marque de direction...) suite a une selection tactile sur mobile d'un texte
+// affiche replie sur plusieurs lignes. \s ne capture pas toutes ces variantes.
+// Un en-tete HTTP contenant un tel caractere fait planter Node
+// (ERR_INVALID_CHAR). Ces valeurs (cles API, secrets) ne sont jamais composees
+// que de lettres, chiffres, "_" et "-" : on ne garde que ces caracteres.
+function sanitizeToken(value: string): string {
+  return value.replace(/[^A-Za-z0-9_-]/g, "");
 }
 
 function required(name: string): string {
@@ -14,12 +14,12 @@ function required(name: string): string {
   if (!value) {
     throw new Error(`Missing required environment variable: ${name}`);
   }
-  return stripWhitespace(value);
+  return value.trim();
 }
 
 function optional(name: string): string | undefined {
   const value = process.env[name];
-  return value ? stripWhitespace(value) : undefined;
+  return value ? sanitizeToken(value) : undefined;
 }
 
 export const env = {
