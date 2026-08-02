@@ -29,6 +29,10 @@ process.on("uncaughtException", (error) => {
 
 const app = express();
 
+// Railway place l'app derriere un reverse proxy : sans ceci, express-rate-limit
+// rejette les requetes portant un en-tete X-Forwarded-For (IP client illisible).
+app.set("trust proxy", 1);
+
 const allowedOrigins = [env.frontendOrigin, ...env.additionalCorsOrigins];
 app.use(
   cors({
