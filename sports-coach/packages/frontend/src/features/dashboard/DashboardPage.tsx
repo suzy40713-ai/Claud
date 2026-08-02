@@ -27,6 +27,11 @@ const SPORT_LABEL: Record<Sport, string> = {
   velo: "Velo",
 };
 
+const SPORT_ICON: Record<Sport, string> = {
+  course_a_pied: "🏃",
+  velo: "🚴",
+};
+
 export function DashboardPage() {
   const [activities, setActivities] = useState<ActivityDTO[]>([]);
   const [weeklyVolume, setWeeklyVolume] = useState<WeeklyVolumePoint[]>([]);
@@ -69,15 +74,15 @@ export function DashboardPage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">Mes seances</h1>
+        <h1 className="text-2xl font-bold">🏃 Mes seances</h1>
         <div className="flex items-center gap-2">
           <select
             value={sport}
             onChange={(e) => setSport(e.target.value as Sport)}
-            className="rounded-lg border border-slate-300 px-2 py-2 text-sm"
+            className="rounded-xl border border-slate-300 px-3 py-2.5 text-sm"
           >
-            <option value="course_a_pied">Course a pied</option>
-            <option value="velo">Velo</option>
+            <option value="course_a_pied">🏃 Course a pied</option>
+            <option value="velo">🚴 Velo</option>
           </select>
           <input
             ref={fileInputRef}
@@ -101,8 +106,8 @@ export function DashboardPage() {
 
       <StravaConnect onSynced={loadData} />
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4">
-        <h2 className="mb-3 text-sm font-medium text-slate-700">Volume hebdomadaire</h2>
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="mb-3 text-base font-semibold text-slate-700">📊 Volume hebdomadaire</h2>
         {chartData.length === 0 ? (
           <p className="text-sm text-slate-400">Importe des seances pour voir ta charge d'entrainement.</p>
         ) : (
@@ -125,11 +130,16 @@ export function DashboardPage() {
         {activities.map((activity) => (
           <div
             key={activity.id}
-            className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-100 bg-white px-4 py-3 text-sm"
+            className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-100 bg-white px-4 py-3 text-sm shadow-sm"
           >
-            <div>
-              <p className="font-medium text-slate-800">{SPORT_LABEL[activity.sport]}</p>
-              <p className="text-xs text-slate-400">{new Date(activity.date).toLocaleDateString("fr-FR")}</p>
+            <div className="flex items-center gap-3">
+              <span className="text-2xl" aria-hidden>
+                {SPORT_ICON[activity.sport]}
+              </span>
+              <div>
+                <p className="font-semibold text-slate-800">{SPORT_LABEL[activity.sport]}</p>
+                <p className="text-xs text-slate-400">{new Date(activity.date).toLocaleDateString("fr-FR")}</p>
+              </div>
             </div>
             <div className="flex gap-4 text-slate-600">
               <span>{formatDistance(activity.distance)}</span>

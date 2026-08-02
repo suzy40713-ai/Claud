@@ -76,13 +76,13 @@ export function CoachPage() {
   return (
     <div className="mx-auto flex h-[calc(100vh-57px)] max-w-2xl flex-col px-4 py-4">
       <div className="mb-2">
-        <h1 className="text-xl font-semibold">Coach IA</h1>
-        <p className="text-xs text-slate-400">
+        <h1 className="text-2xl font-bold">🤖 Coach IA</h1>
+        <p className="text-sm text-slate-400">
           Pose une question sur ton entrainement. Pour toute douleur ou symptome, consulte un professionnel de sante.
         </p>
       </div>
 
-      <div className="flex-1 overflow-y-auto rounded-xl border border-slate-200 bg-white p-4">
+      <div className="flex-1 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         {messages.length === 0 && (
           <p className="text-sm text-slate-400">
             Exemple : "Pourquoi je stagne sur mon 10k ?" ou "Je suis fatigue, je fais quand meme ma seance prevue ?"
@@ -92,8 +92,8 @@ export function CoachPage() {
           {messages.map((m) => (
             <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
-                className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-4 py-2 text-sm ${
-                  m.role === "user" ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-800"
+                className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-base ${
+                  m.role === "user" ? "bg-indigo-600 text-white shadow-sm" : "bg-slate-100 text-slate-800"
                 }`}
               >
                 {m.content || (m.role === "assistant" && sending ? "..." : "")}

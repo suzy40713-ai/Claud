@@ -27,8 +27,13 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4">
-      <h1 className="text-2xl font-semibold text-slate-900">Creer un compte</h1>
+    <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4 py-10">
+      <img
+        src={`${import.meta.env.BASE_URL}images/hero-auth.png`}
+        alt="Vory"
+        className="w-full rounded-2xl shadow-lg shadow-indigo-900/10"
+      />
+      <h1 className="text-3xl font-bold text-slate-900">Creer un compte</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="email"
@@ -36,7 +41,7 @@ export function RegisterPage() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded-lg border border-slate-300 px-3 py-2.5"
+          className="rounded-xl border border-slate-300 px-4 py-3 text-base"
         />
         <input
           type="password"
@@ -45,16 +50,16 @@ export function RegisterPage() {
           placeholder="Mot de passe (8 caracteres min.)"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="rounded-lg border border-slate-300 px-3 py-2.5"
+          className="rounded-xl border border-slate-300 px-4 py-3 text-base"
         />
         {error && <p className="text-sm text-red-600">{error}</p>}
         <Button type="submit" disabled={submitting}>
           {submitting ? "Creation..." : "Creer mon compte"}
         </Button>
       </form>
-      <p className="text-sm text-slate-500">
+      <p className="text-base text-slate-500">
         Deja un compte ?{" "}
-        <Link to="/login" className="font-medium text-indigo-600">
+        <Link to="/login" className="font-semibold text-indigo-600">
           Se connecter
         </Link>
       </p>

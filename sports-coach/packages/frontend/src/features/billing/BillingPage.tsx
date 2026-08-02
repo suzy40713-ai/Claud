@@ -57,7 +57,7 @@ export function BillingPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6">
-      <h1 className="text-xl font-semibold">Abonnement</h1>
+      <h1 className="text-2xl font-bold">👑 Abonnement</h1>
 
       {checkoutParam === "succes" && (
         <p className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
@@ -75,19 +75,25 @@ export function BillingPage() {
       )}
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <h2 className="font-medium">Gratuit</h2>
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-semibold">🆓 Gratuit</h2>
           <ul className="mt-2 flex flex-col gap-1.5 text-sm text-slate-600">
             {FREE_FEATURES.map((f) => (
-              <li key={f}>- {f}</li>
+              <li key={f} className="flex gap-2">
+                <span aria-hidden>✅</span>
+                {f}
+              </li>
             ))}
           </ul>
         </div>
-        <div className="rounded-xl border border-indigo-200 bg-indigo-50/50 p-4">
-          <h2 className="font-medium text-indigo-700">Premium</h2>
+        <div className="rounded-2xl border border-indigo-200 bg-indigo-50/50 p-5 shadow-sm shadow-indigo-900/5">
+          <h2 className="text-lg font-semibold text-indigo-700">👑 Premium</h2>
           <ul className="mt-2 flex flex-col gap-1.5 text-sm text-slate-700">
             {PREMIUM_FEATURES.map((f) => (
-              <li key={f}>- {f}</li>
+              <li key={f} className="flex gap-2">
+                <span aria-hidden>✨</span>
+                {f}
+              </li>
             ))}
           </ul>
         </div>

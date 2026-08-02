@@ -11,22 +11,22 @@ interface InjuryDraft {
   notes: string;
 }
 
-const SPORT_OPTIONS: { value: Sport; label: string }[] = [
-  { value: "course_a_pied", label: "Course a pied" },
-  { value: "velo", label: "Velo" },
+const SPORT_OPTIONS: { value: Sport; label: string; icon: string }[] = [
+  { value: "course_a_pied", label: "Course a pied", icon: "🏃" },
+  { value: "velo", label: "Velo", icon: "🚴" },
 ];
 
-const NIVEAU_OPTIONS: { value: Niveau; label: string }[] = [
-  { value: "debutant", label: "Debutant" },
-  { value: "intermediaire", label: "Intermediaire" },
-  { value: "avance", label: "Avance" },
+const NIVEAU_OPTIONS: { value: Niveau; label: string; icon: string }[] = [
+  { value: "debutant", label: "Debutant", icon: "🌱" },
+  { value: "intermediaire", label: "Intermediaire", icon: "🔥" },
+  { value: "avance", label: "Avance", icon: "🏆" },
 ];
 
-const OBJECTIF_OPTIONS: { value: Objectif; label: string }[] = [
-  { value: "perte_de_poids", label: "Perte de poids" },
-  { value: "preparation_course", label: "Preparation d'une course" },
-  { value: "regularite", label: "Regularite / reprise en douceur" },
-  { value: "performance", label: "Performance / battre mon record" },
+const OBJECTIF_OPTIONS: { value: Objectif; label: string; icon: string }[] = [
+  { value: "perte_de_poids", label: "Perte de poids", icon: "⚖️" },
+  { value: "preparation_course", label: "Preparation d'une course", icon: "🏁" },
+  { value: "regularite", label: "Regularite / reprise en douceur", icon: "🔄" },
+  { value: "performance", label: "Performance / battre mon record", icon: "🚀" },
 ];
 
 const TOTAL_STEPS = 4;
@@ -123,15 +123,20 @@ export function OnboardingPage() {
 
       {step === 1 && (
         <section className="flex flex-col gap-4">
-          <h1 className="text-xl font-semibold">Quel(s) sport(s) pratiques-tu ?</h1>
+          <h1 className="text-2xl font-bold">Quel(s) sport(s) pratiques-tu ?</h1>
           <div className="flex flex-col gap-3">
             {SPORT_OPTIONS.map((opt) => (
               <label
                 key={opt.value}
-                className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 ${
-                  sports.includes(opt.value) ? "border-indigo-600 bg-indigo-50" : "border-slate-200"
+                className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-4 text-base transition-colors ${
+                  sports.includes(opt.value)
+                    ? "border-indigo-600 bg-indigo-50 shadow-sm"
+                    : "border-slate-200 hover:border-slate-300"
                 }`}
               >
+                <span className="text-2xl" aria-hidden>
+                  {opt.icon}
+                </span>
                 <input
                   type="checkbox"
                   checked={sports.includes(opt.value)}
@@ -146,15 +151,18 @@ export function OnboardingPage() {
 
       {step === 2 && (
         <section className="flex flex-col gap-4">
-          <h1 className="text-xl font-semibold">Quel est ton niveau ?</h1>
+          <h1 className="text-2xl font-bold">Quel est ton niveau ?</h1>
           <div className="flex flex-col gap-3">
             {NIVEAU_OPTIONS.map((opt) => (
               <label
                 key={opt.value}
-                className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 ${
-                  niveau === opt.value ? "border-indigo-600 bg-indigo-50" : "border-slate-200"
+                className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-4 text-base transition-colors ${
+                  niveau === opt.value ? "border-indigo-600 bg-indigo-50 shadow-sm" : "border-slate-200 hover:border-slate-300"
                 }`}
               >
+                <span className="text-2xl" aria-hidden>
+                  {opt.icon}
+                </span>
                 <input
                   type="radio"
                   name="niveau"
@@ -170,15 +178,20 @@ export function OnboardingPage() {
 
       {step === 3 && (
         <section className="flex flex-col gap-4">
-          <h1 className="text-xl font-semibold">Quel est ton objectif principal ?</h1>
+          <h1 className="text-2xl font-bold">Quel est ton objectif principal ?</h1>
           <div className="flex flex-col gap-3">
             {OBJECTIF_OPTIONS.map((opt) => (
               <label
                 key={opt.value}
-                className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 ${
-                  objectif === opt.value ? "border-indigo-600 bg-indigo-50" : "border-slate-200"
+                className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-4 text-base transition-colors ${
+                  objectif === opt.value
+                    ? "border-indigo-600 bg-indigo-50 shadow-sm"
+                    : "border-slate-200 hover:border-slate-300"
                 }`}
               >
+                <span className="text-2xl" aria-hidden>
+                  {opt.icon}
+                </span>
                 <input
                   type="radio"
                   name="objectif"
@@ -194,8 +207,8 @@ export function OnboardingPage() {
 
       {step === 4 && (
         <section className="flex flex-col gap-4">
-          <h1 className="text-xl font-semibold">As-tu deja eu des blessures ?</h1>
-          <p className="text-sm text-slate-500">
+          <h1 className="text-2xl font-bold">🩹 As-tu deja eu des blessures ?</h1>
+          <p className="text-base text-slate-500">
             Facultatif. Ceci ne remplace pas un avis medical, mais nous aide a adapter les charges
             d'entrainement.
           </p>

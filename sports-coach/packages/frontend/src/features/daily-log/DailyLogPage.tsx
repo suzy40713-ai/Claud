@@ -54,12 +54,13 @@ export function DailyLogPage() {
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-8 px-4 py-8">
       <div>
-        <h1 className="text-xl font-semibold">Journal du jour</h1>
-        <p className="text-sm text-slate-500">Trois questions, 15 secondes.</p>
+        <h1 className="text-2xl font-bold">📓 Journal du jour</h1>
+        <p className="text-base text-slate-500">Trois questions, 15 secondes.</p>
       </div>
 
-      <div className="flex flex-col gap-6 rounded-xl border border-slate-200 bg-white p-5">
+      <div className="flex flex-col gap-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <ScaleSelector
+          icon="😴"
           label="Qualite du sommeil"
           value={sommeil}
           onChange={setSommeil}
@@ -67,6 +68,7 @@ export function DailyLogPage() {
           highLabel="Excellent"
         />
         <ScaleSelector
+          icon="🔋"
           label="Niveau de fatigue"
           value={fatigue}
           onChange={setFatigue}
@@ -74,6 +76,7 @@ export function DailyLogPage() {
           highLabel="Epuise"
         />
         <ScaleSelector
+          icon="😌"
           label="Stress percu"
           value={stress}
           onChange={setStress}
@@ -91,18 +94,18 @@ export function DailyLogPage() {
 
       {history.length > 0 && (
         <div>
-          <h2 className="mb-3 text-sm font-medium text-slate-700">7 derniers jours</h2>
+          <h2 className="mb-3 text-base font-semibold text-slate-700">7 derniers jours</h2>
           <div className="flex flex-col gap-2">
             {history.map((log) => (
               <div
                 key={log.id}
-                className="flex items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2 text-sm"
+                className="flex items-center justify-between rounded-xl border border-slate-100 bg-white px-4 py-3 text-sm shadow-sm"
               >
                 <span className="text-slate-500">{log.date}</span>
                 <span className="flex gap-4 text-slate-700">
-                  <span>Sommeil {log.sommeil}/5</span>
-                  <span>Fatigue {log.fatigue}/5</span>
-                  <span>Stress {log.stress}/5</span>
+                  <span>😴 {log.sommeil}/5</span>
+                  <span>🔋 {log.fatigue}/5</span>
+                  <span>😌 {log.stress}/5</span>
                 </span>
               </div>
             ))}

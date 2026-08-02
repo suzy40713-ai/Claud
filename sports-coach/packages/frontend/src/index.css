@@ -4,6 +4,16 @@
   color-scheme: light dark;
 }
 
+html {
+  font-size: 17.5px;
+}
+
 body {
   @apply bg-slate-50 text-slate-900 antialiased;
+}
+
+h1,
+h2,
+h3 {
+  @apply tracking-tight;
 }

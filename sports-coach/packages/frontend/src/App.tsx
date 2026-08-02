@@ -10,6 +10,14 @@ import { TrainingPlanPage } from "./features/training-plan/TrainingPlanPage";
 import { StravaCallbackPage } from "./features/dashboard/StravaCallbackPage";
 import { BillingPage } from "./features/billing/BillingPage";
 
+const NAV_LINKS = [
+  { to: "/", label: "Journal", icon: "📓" },
+  { to: "/dashboard", label: "Seances", icon: "🏃" },
+  { to: "/plan", label: "Plan", icon: "📅" },
+  { to: "/coach", label: "Coach", icon: "🤖" },
+  { to: "/abonnement", label: "Abonnement", icon: "👑" },
+];
+
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, logout } = useAuth();
   const location = useLocation();
@@ -23,15 +31,31 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen">
       {user.onboardingComplete && (
-        <nav className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
-          <div className="flex gap-4 text-sm font-medium text-slate-600">
-            <Link to="/">Journal</Link>
-            <Link to="/dashboard">Seances</Link>
-            <Link to="/plan">Plan</Link>
-            <Link to="/coach">Coach</Link>
-            <Link to="/abonnement">Abonnement</Link>
+        <nav className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/85 px-4 py-3 backdrop-blur-md">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <span className="mr-2 hidden text-lg font-extrabold tracking-tight text-slate-900 sm:inline">
+              👑 Vory
+            </span>
+            {NAV_LINKS.map((link) => {
+              const active = location.pathname === link.to;
+              return (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition-colors ${
+                    active ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  <span aria-hidden>{link.icon}</span>
+                  <span className="hidden sm:inline">{link.label}</span>
+                </Link>
+              );
+            })}
           </div>
-          <button onClick={() => logout()} className="text-sm text-slate-400 hover:text-slate-600">
+          <button
+            onClick={() => logout()}
+            className="rounded-full px-3 py-2 text-sm font-medium text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          >
             Deconnexion
           </button>
         </nav>

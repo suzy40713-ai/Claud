@@ -22,7 +22,7 @@ export function StravaConnect({ onSynced }: { onSynced?: () => void }) {
 
   if (!status.premium) {
     return (
-      <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-indigo-200 bg-indigo-50/50 px-3 py-2 text-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-indigo-200 bg-indigo-50/50 px-4 py-3 text-sm shadow-sm">
         <span className="text-slate-600">Importe automatiquement tes seances depuis Strava (fonctionnalite premium)</span>
         <Link to="/abonnement">
           <Button variant="secondary">Passer premium</Button>

@@ -39,6 +39,14 @@ const ACWR_TITLES: Record<AcwrDTO["niveauRisque"], string> = {
   eleve: "Risque de surcharge eleve",
 };
 
+const ACWR_ICONS: Record<AcwrDTO["niveauRisque"], string> = {
+  donnees_insuffisantes: "📊",
+  sous_charge: "💤",
+  optimal: "✅",
+  modere: "⚠️",
+  eleve: "🔥",
+};
+
 function formatDuree(seconds: number): string {
   const minutes = Math.round(seconds / 60);
   return `${minutes} min`;
@@ -110,13 +118,16 @@ export function TrainingPlanPage() {
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-8">
       <div>
-        <h1 className="text-xl font-semibold">Mon plan de la semaine</h1>
-        <p className="text-xs text-slate-400">Genere selon ton objectif et ton niveau. Chaque ajustement reste ton choix.</p>
+        <h1 className="text-2xl font-bold">📅 Mon plan de la semaine</h1>
+        <p className="text-sm text-slate-400">Genere selon ton objectif et ton niveau. Chaque ajustement reste ton choix.</p>
       </div>
 
       {acwr && (
-        <div className={`rounded-xl border p-4 ${ACWR_STYLES[acwr.niveauRisque]}`}>
-          <p className="font-medium">{ACWR_TITLES[acwr.niveauRisque]}</p>
+        <div className={`rounded-2xl border p-5 shadow-sm ${ACWR_STYLES[acwr.niveauRisque]}`}>
+          <p className="flex items-center gap-2 text-base font-semibold">
+            <span aria-hidden>{ACWR_ICONS[acwr.niveauRisque]}</span>
+            {ACWR_TITLES[acwr.niveauRisque]}
+          </p>
           <p className="mt-1 text-sm">{acwr.explication}</p>
         </div>
       )}
@@ -131,11 +142,11 @@ export function TrainingPlanPage() {
           const busy = busySessionId === seance.id;
 
           return (
-            <div key={seance.id} className="rounded-xl border border-slate-200 bg-white p-4">
+            <div key={seance.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-400">{formatDate(seance.date)}</p>
-                  <p className="font-medium text-slate-800">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{formatDate(seance.date)}</p>
+                  <p className="text-base font-semibold text-slate-800">
                     {TYPE_LABELS[seance.type]} - {SPORT_LABELS[seance.sport]}
                   </p>
                   <p className="text-sm text-slate-500">
