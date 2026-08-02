@@ -1,18 +1,25 @@
 // Les valeurs collees depuis un dashboard (Stripe, etc.) embarquent parfois un
-// retour a la ligne ou un espace parasite (clavier mobile, copier-coller) :
-// un en-tete HTTP contenant ce caractere fait planter Node (ERR_INVALID_CHAR).
-// On nettoie systematiquement pour eviter cette classe d'erreur.
+// espace ou retour a la ligne parasite, y compris au milieu de la valeur : sur
+// mobile, une selection tactile d'un texte affiche replie sur plusieurs lignes
+// peut inserer un saut de ligne a chaque retour visuel. Un en-tete HTTP
+// contenant ce caractere fait planter Node (ERR_INVALID_CHAR). Ces valeurs
+// (cles API, secrets) ne contiennent jamais d'espace legitime : on les
+// supprime tous, pas seulement en debut/fin.
+function stripWhitespace(value: string): string {
+  return value.replace(/\s+/g, "");
+}
+
 function required(name: string): string {
   const value = process.env[name];
   if (!value) {
     throw new Error(`Missing required environment variable: ${name}`);
   }
-  return value.trim();
+  return stripWhitespace(value);
 }
 
 function optional(name: string): string | undefined {
   const value = process.env[name];
-  return value ? value.trim() : undefined;
+  return value ? stripWhitespace(value) : undefined;
 }
 
 export const env = {
