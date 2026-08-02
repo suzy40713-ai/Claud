@@ -1,9 +1,18 @@
+// Les valeurs collees depuis un dashboard (Stripe, etc.) embarquent parfois un
+// retour a la ligne ou un espace parasite (clavier mobile, copier-coller) :
+// un en-tete HTTP contenant ce caractere fait planter Node (ERR_INVALID_CHAR).
+// On nettoie systematiquement pour eviter cette classe d'erreur.
 function required(name: string): string {
   const value = process.env[name];
   if (!value) {
     throw new Error(`Missing required environment variable: ${name}`);
   }
-  return value;
+  return value.trim();
+}
+
+function optional(name: string): string | undefined {
+  const value = process.env[name];
+  return value ? value.trim() : undefined;
 }
 
 export const env = {
@@ -22,20 +31,20 @@ export const env = {
   // le cookie de session soit envoye.
   cookieSameSite: (process.env.COOKIE_SAME_SITE as "lax" | "none" | "strict" | undefined) ?? "lax",
   nodeEnv: process.env.NODE_ENV ?? "development",
-  anthropicApiKey: process.env.ANTHROPIC_API_KEY,
+  anthropicApiKey: optional("ANTHROPIC_API_KEY"),
   coachModel: process.env.COACH_MODEL ?? "claude-sonnet-5",
 
-  vapidPublicKey: process.env.VAPID_PUBLIC_KEY,
-  vapidPrivateKey: process.env.VAPID_PRIVATE_KEY,
+  vapidPublicKey: optional("VAPID_PUBLIC_KEY"),
+  vapidPrivateKey: optional("VAPID_PRIVATE_KEY"),
   vapidSubject: process.env.VAPID_SUBJECT ?? "mailto:contact@sports-coach.example",
   overloadCheckIntervalMs: Number(process.env.OVERLOAD_CHECK_INTERVAL_MS ?? 6 * 60 * 60 * 1000),
 
-  stravaClientId: process.env.STRAVA_CLIENT_ID,
-  stravaClientSecret: process.env.STRAVA_CLIENT_SECRET,
+  stravaClientId: optional("STRAVA_CLIENT_ID"),
+  stravaClientSecret: optional("STRAVA_CLIENT_SECRET"),
   stravaRedirectUri:
     process.env.STRAVA_REDIRECT_URI ?? `${process.env.FRONTEND_ORIGIN ?? "http://localhost:5173"}/strava/callback`,
 
-  stripeSecretKey: process.env.STRIPE_SECRET_KEY,
-  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
-  stripePremiumPriceId: process.env.STRIPE_PREMIUM_PRICE_ID,
+  stripeSecretKey: optional("STRIPE_SECRET_KEY"),
+  stripeWebhookSecret: optional("STRIPE_WEBHOOK_SECRET"),
+  stripePremiumPriceId: optional("STRIPE_PREMIUM_PRICE_ID"),
 };
