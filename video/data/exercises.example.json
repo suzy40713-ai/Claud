@@ -1,0 +1,63 @@
+{
+  "hookTitle": "TOP 7 EXERCICES POUR UN CORPS DE CALISTHENIE",
+  "watermarkHandle": "kairo",
+  "ctaText": "Abonne-toi pour plus de programmes",
+  "exercises": [
+    {
+      "rank": 7,
+      "name": "SQUATS",
+      "image": "characters/squat.webp",
+      "instructionSequence": ["EN RESPIRANT", "PROFONDEMENT"],
+      "dureeSecondes": 4,
+      "arrowDirection": "down"
+    },
+    {
+      "rank": 6,
+      "name": "FENTES",
+      "image": "characters/lunge.webp",
+      "instructionSequence": ["GARDE LE DOS", "DROIT"],
+      "dureeSecondes": 4,
+      "arrowDirection": "down"
+    },
+    {
+      "rank": 5,
+      "name": "POMPES",
+      "image": "characters/pushup.webp",
+      "instructionSequence": ["COUDES PRES", "DU CORPS"],
+      "dureeSecondes": 4,
+      "arrowDirection": "up-down"
+    },
+    {
+      "rank": 4,
+      "name": "MOUNTAIN CLIMBERS",
+      "image": "characters/mountain-climber.webp",
+      "instructionSequence": ["LE PLUS VITE", "POSSIBLE"],
+      "dureeSecondes": 4,
+      "arrowDirection": "left-right"
+    },
+    {
+      "rank": 3,
+      "name": "CRUNCHS",
+      "image": "characters/situp.png",
+      "instructionSequence": ["CONTRACTE", "LES ABDOS"],
+      "dureeSecondes": 4,
+      "arrowDirection": "up"
+    },
+    {
+      "rank": 2,
+      "name": "RELEVES DE JAMBES",
+      "image": "characters/v-up.webp",
+      "instructionSequence": ["SANS", "TE CAMBRER"],
+      "dureeSecondes": 4,
+      "arrowDirection": "up"
+    },
+    {
+      "rank": 1,
+      "name": "SAUTS",
+      "image": "characters/jump.webp",
+      "instructionSequence": ["EXPLOSE", "VERS LE HAUT"],
+      "dureeSecondes": 4.5,
+      "arrowDirection": "up"
+    }
+  ]
+}

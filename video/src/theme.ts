@@ -28,6 +28,11 @@ export const theme = {
     height: 1920,
     safeMarginX: 60,
   },
+  timing: {
+    fps: 30,
+    hookSeconds: 2.5,
+    ctaSeconds: 3,
+  },
 } as const;
 
 export type Theme = typeof theme;
