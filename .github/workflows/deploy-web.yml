@@ -41,9 +41,10 @@ jobs:
       - name: Build frontend (web assets)
         env:
           VITE_API_URL: ${{ vars.VITE_API_URL || 'https://tiktok-ai-studio-production-80d5.up.railway.app' }}
-          # Domaine personnalise (vory.com, via public/CNAME) servi a la
-          # racine : pas de sous-chemin, contrairement a <owner>.github.io/Claud/.
-          VITE_BASE_PATH: /
+          # Tant que vory.com n'est pas actif (DNS en attente), le site reste
+          # servi sous https://<owner>.github.io/Claud/ : on garde le
+          # sous-chemin. A remettre a "/" une fois le domaine bascule.
+          VITE_BASE_PATH: /Claud/
         run: npm run build -w @sports-coach/frontend
 
       - name: SPA fallback for GitHub Pages (pas de rewrite serveur)
