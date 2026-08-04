@@ -41,8 +41,9 @@ jobs:
       - name: Build frontend (web assets)
         env:
           VITE_API_URL: ${{ vars.VITE_API_URL || 'https://tiktok-ai-studio-production-80d5.up.railway.app' }}
-          # Repo public "Claud" -> servi sous https://<owner>.github.io/Claud/
-          VITE_BASE_PATH: /Claud/
+          # Domaine personnalise (vory.com, via public/CNAME) servi a la
+          # racine : pas de sous-chemin, contrairement a <owner>.github.io/Claud/.
+          VITE_BASE_PATH: /
         run: npm run build -w @sports-coach/frontend
 
       - name: SPA fallback for GitHub Pages (pas de rewrite serveur)
