@@ -1,53 +1,15 @@
+const demoForm = document.getElementById('demoForm');
 const promptEl = document.getElementById('prompt');
-const charCountEl = document.getElementById('charCount');
-const modeSwitch = document.getElementById('modeSwitch');
 const styleEl = document.getElementById('style');
-const sceneCountEl = document.getElementById('sceneCount');
-const sceneCountValueEl = document.getElementById('sceneCountValue');
-const durationValueEl = document.getElementById('durationValue');
-const withCaptionsEl = document.getElementById('withCaptions');
-const withMusicEl = document.getElementById('withMusic');
 const generateBtn = document.getElementById('generateBtn');
+const demoStatus = document.getElementById('demoStatus');
 const errorBox = document.getElementById('errorBox');
-const placeholder = document.getElementById('placeholder');
 const resultImage = document.getElementById('resultImage');
 const resultVideo = document.getElementById('resultVideo');
 const loading = document.getElementById('loading');
 const loadingText = document.getElementById('loadingText');
 const downloadBtn = document.getElementById('downloadBtn');
-const historySection = document.getElementById('historySection');
-const historyGrid = document.getElementById('historyGrid');
-const videoOnlyEls = document.querySelectorAll('.video-only');
-
-const SCENE_DURATION_SEC = 3.5;
-let mode = 'image';
-
-promptEl.addEventListener('input', () => {
-  charCountEl.textContent = String(promptEl.value.length);
-});
-
-modeSwitch.addEventListener('click', (event) => {
-  const btn = event.target.closest('.segment');
-  if (!btn) return;
-  mode = btn.dataset.mode;
-  for (const el of modeSwitch.querySelectorAll('.segment')) {
-    el.classList.toggle('active', el === btn);
-  }
-  for (const el of videoOnlyEls) {
-    el.style.display = mode === 'video' ? '' : 'none';
-  }
-});
-for (const el of videoOnlyEls) {
-  el.style.display = mode === 'video' ? '' : 'none';
-}
-
-function updateSceneDuration() {
-  const scenes = Number(sceneCountEl.value);
-  sceneCountValueEl.textContent = String(scenes);
-  durationValueEl.textContent = String(Math.round(scenes * SCENE_DURATION_SEC));
-}
-sceneCountEl.addEventListener('input', updateSceneDuration);
-updateSceneDuration();
+const explainRevealImg = document.getElementById('explainRevealImg');
 
 function showError(message) {
   errorBox.textContent = message;
@@ -63,100 +25,89 @@ function setLoading(isLoading, text) {
   loading.hidden = !isLoading;
   if (text) loadingText.textContent = text;
   generateBtn.disabled = isLoading;
-  generateBtn.textContent = isLoading ? 'Generation…' : 'Generer';
+  generateBtn.textContent = isLoading ? 'Génération…' : 'Générer';
 }
 
-function showResult(type, url) {
-  placeholder.hidden = true;
-  if (type === 'image') {
-    resultVideo.hidden = true;
-    resultVideo.removeAttribute('src');
-    resultImage.src = url;
-    resultImage.hidden = false;
-  } else {
-    resultImage.hidden = true;
-    resultImage.removeAttribute('src');
-    resultVideo.src = url;
-    resultVideo.hidden = false;
-    resultVideo.play().catch(() => {});
-  }
+function showResult(url) {
+  resultImage.dataset.sample = 'false';
+  resultVideo.hidden = true;
+  resultVideo.removeAttribute('src');
+  resultImage.src = url;
+  resultImage.hidden = false;
+  resultImage.alt = 'Image générée à partir de ton prompt';
   downloadBtn.href = url;
   downloadBtn.hidden = false;
-  addToHistory(type, url);
+  demoStatus.innerHTML = 'C’est ton résultat. Modifie le prompt et relance quand tu veux.';
+  explainRevealImg.src = url;
 }
 
-function addToHistory(type, url) {
-  historySection.hidden = false;
-  const link = document.createElement('a');
-  link.href = url;
-  link.target = '_blank';
-  link.rel = 'noopener';
-  if (type === 'image') {
-    const img = document.createElement('img');
-    img.src = url;
-    link.appendChild(img);
-  } else {
-    const video = document.createElement('video');
-    video.src = url;
-    video.muted = true;
-    video.loop = true;
-    video.addEventListener('mouseenter', () => video.play());
-    video.addEventListener('mouseleave', () => video.pause());
-    link.appendChild(video);
-  }
-  historyGrid.prepend(link);
-}
-
-async function generate() {
+async function generate(event) {
+  event.preventDefault();
   clearError();
+
   const prompt = promptEl.value.trim();
   if (!prompt) {
-    showError('Ecris un prompt avant de generer.');
+    showError('Écris un prompt avant de générer.');
     return;
   }
 
-  const style = styleEl.value;
+  setLoading(true, 'Génération de l’image…');
+  demoStatus.textContent = 'Ta phrase part vers l’IA…';
 
-  if (mode === 'image') {
-    setLoading(true, 'Generation de l\'image…');
-    try {
-      const res = await fetch('/api/generate/image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, style }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erreur inconnue');
-      showResult('image', data.url);
-    } catch (err) {
-      showError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  } else {
-    const sceneCount = Number(sceneCountEl.value);
-    setLoading(true, `Generation de ${sceneCount} scenes puis montage video…`);
-    try {
-      const res = await fetch('/api/generate/video', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt,
-          style,
-          sceneCount,
-          withCaptions: withCaptionsEl.checked,
-          withMusic: withMusicEl.checked,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erreur inconnue');
-      showResult('video', data.url);
-    } catch (err) {
-      showError(err.message);
-    } finally {
-      setLoading(false);
-    }
+  try {
+    const res = await fetch('/api/generate/image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, style: styleEl.value }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erreur inconnue');
+    showResult(data.url);
+  } catch (err) {
+    showError(err.message);
+    demoStatus.textContent = 'Exemple prêt ci-contre — appuie sur Générer pour créer le tien.';
+  } finally {
+    setLoading(false);
   }
 }
 
-generateBtn.addEventListener('click', generate);
+demoForm.addEventListener('submit', generate);
+
+/* Scroll-linked clip-path reveal: the demo's output image "wipes"
+   into view as chapter 1 scrolls into the viewport. */
+const revealTarget = document.getElementById('explainReveal');
+const explainSection = document.getElementById('explain');
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let ticking = false;
+
+function updateReveal() {
+  ticking = false;
+  if (prefersReducedMotion || !explainSection || !revealTarget) return;
+
+  const rect = explainSection.getBoundingClientRect();
+  const vh = window.innerHeight || document.documentElement.clientHeight;
+
+  // Progress: 0 when the section top is at the bottom of the viewport,
+  // 1 once the section top has scrolled to the vertical center.
+  const start = vh;
+  const end = vh * 0.4;
+  let progress = (start - rect.top) / (start - end);
+  progress = Math.min(1, Math.max(0, progress));
+
+  const hiddenPercent = 100 - progress * 100;
+  revealTarget.style.clipPath = `inset(0 0 ${hiddenPercent}% 0)`;
+}
+
+function onScroll() {
+  if (!ticking) {
+    ticking = true;
+    requestAnimationFrame(updateReveal);
+  }
+}
+
+if (!prefersReducedMotion) {
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  updateReveal();
+}

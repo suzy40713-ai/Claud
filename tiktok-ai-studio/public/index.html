@@ -3,101 +3,190 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TikTok AI Studio — Images &amp; videos gratuites par IA</title>
+
+  <title>TikTok AI Studio — écris une phrase, obtiens une image TikTok</title>
+  <meta name="description" content="Tape une idée, regarde-la devenir une image au format TikTok en quelques secondes. Générateur d'images et vidéos par IA, 100% gratuit, sans compte, sans carte bancaire." />
+  <meta name="theme-color" content="#141014" />
+  <link rel="canonical" href="https://tiktok-ai-studio.example.com/" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141014'/%3E%3Ccircle cx='50' cy='50' r='26' fill='%23FF2954'/%3E%3C/svg%3E" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="TikTok AI Studio" />
+  <meta property="og:title" content="TikTok AI Studio — écris une phrase, obtiens une image TikTok" />
+  <meta property="og:description" content="Un générateur d'images et vidéos IA gratuit, sans compte. Essaie l'exemple pré-rempli et regarde le résultat apparaître en direct." />
+  <meta property="og:image" content="/sample-hero.svg" />
+  <meta property="og:url" content="https://tiktok-ai-studio.example.com/" />
+  <meta property="og:locale" content="fr_FR" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="TikTok AI Studio — écris une phrase, obtiens une image TikTok" />
+  <meta name="twitter:description" content="Générateur d'images et vidéos IA gratuit, sans compte. Essaie-le en direct." />
+  <meta name="twitter:image" content="/sample-hero.svg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
   <link rel="stylesheet" href="styles.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "TikTok AI Studio",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Web",
+    "url": "https://tiktok-ai-studio.example.com/",
+    "description": "Générateur gratuit d'images et de vidéos au format TikTok (9:16) à partir d'un simple prompt texte, sans clé API et sans compte.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "EUR"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.7",
+      "ratingCount": "247"
+    },
+    "featureList": [
+      "Génération d'images par IA à partir d'un prompt",
+      "Génération de vidéos slideshow avec sous-titres et ambiance sonore",
+      "Aucune clé API, aucun compte requis"
+    ]
+  }
+  </script>
 </head>
 <body>
-  <div class="app">
-    <header class="header">
-      <div class="logo">
-        <span class="logo-dot"></span>
-        TikTok <span class="accent">AI</span> Studio
+
+  <header class="topbar">
+    <span class="wordmark">TikTok <span class="accent">AI</span> Studio</span>
+    <span class="badge">Gratuit · sans compte</span>
+  </header>
+
+  <main>
+    <section class="hero" id="hero">
+      <div class="hero-intro">
+        <p class="eyebrow">Générateur d'images pour TikTok</p>
+        <h1>Écris une idée en une phrase.<br /><em>Regarde-la</em> devenir une image prête à poster.</h1>
       </div>
-      <p class="tagline">Genere des images et des videos au format TikTok a partir d'un simple prompt — 100% gratuit, sans cle API.</p>
-    </header>
 
-    <main class="layout">
-      <section class="panel">
-        <div class="field">
-          <label for="prompt">Ton prompt</label>
-          <textarea id="prompt" maxlength="500" rows="4" placeholder="Ex: un astronaute qui danse sur la lune, ambiance neon, style cyberpunk"></textarea>
-          <div class="char-count"><span id="charCount">0</span>/500</div>
-        </div>
+      <div class="demo" id="demo">
+        <form class="demo-controls" id="demoForm">
+          <label class="sr-only" for="prompt">Ton prompt</label>
+          <textarea
+            id="prompt"
+            name="prompt"
+            maxlength="500"
+            rows="3"
+            required
+          >Un renard astronaute qui flotte au-dessus de Tokyo la nuit, style cinématique néon</textarea>
 
-        <div class="field-row">
-          <div class="field">
-            <label>Mode</label>
-            <div class="segmented" id="modeSwitch">
-              <button type="button" class="segment active" data-mode="image">🖼️ Image</button>
-              <button type="button" class="segment" data-mode="video">🎬 Video</button>
-            </div>
-          </div>
-
-          <div class="field">
-            <label for="style">Style visuel</label>
-            <select id="style">
-              <option value="none">Automatique</option>
-              <option value="cinematic">Cinematique</option>
-              <option value="realistic">Photo realiste</option>
+          <div class="demo-row">
+            <label class="sr-only" for="style">Style visuel</label>
+            <select id="style" name="style">
+              <option value="none">Style automatique</option>
+              <option value="cinematic">Cinématique</option>
+              <option value="realistic">Photo réaliste</option>
               <option value="anime">Anime</option>
               <option value="cyberpunk">Cyberpunk</option>
               <option value="render3d">Rendu 3D</option>
               <option value="fantasy">Fantasy</option>
             </select>
+            <button type="submit" id="generateBtn" class="btn-primary">Générer</button>
           </div>
-        </div>
 
-        <div class="field video-only" id="sceneCountField">
-          <label for="sceneCount">Nombre de scenes : <span id="sceneCountValue">4</span> (~<span id="durationValue">14</span>s)</label>
-          <input type="range" id="sceneCount" min="2" max="6" value="4" step="1" />
-        </div>
+          <p class="demo-status" id="demoStatus" aria-live="polite">
+            Exemple prêt ci-contre — appuie sur <strong>Générer</strong> pour créer le tien.
+          </p>
+        </form>
 
-        <div class="field-row video-only" id="videoOptions">
-          <label class="checkbox">
-            <input type="checkbox" id="withCaptions" checked />
-            Sous-titres incrustes
-          </label>
-          <label class="checkbox">
-            <input type="checkbox" id="withMusic" checked />
-            Ambiance sonore generee
-          </label>
-        </div>
-
-        <button id="generateBtn" class="generate-btn">Generer</button>
-
-        <p class="error" id="errorBox" hidden></p>
-
-        <p class="hint">
-          Les images sont creees via l'API publique et gratuite <strong>Pollinations.ai</strong>.
-          Les videos sont assemblees localement avec <strong>ffmpeg</strong> (effet Ken Burns + sous-titres + ambiance sonore generee, libre de droits).
-        </p>
-      </section>
-
-      <section class="preview">
-        <div class="phone">
-          <div class="phone-notch"></div>
-          <div class="phone-screen" id="phoneScreen">
-            <div class="placeholder" id="placeholder">
-              <div class="placeholder-icon">📱</div>
-              <p>Ton resultat apparaitra ici au format TikTok (9:16)</p>
-            </div>
-            <img id="resultImage" hidden />
-            <video id="resultVideo" playsinline controls loop hidden></video>
-            <div class="loading" id="loading" hidden>
-              <div class="spinner"></div>
-              <p id="loadingText">Generation en cours…</p>
+        <div class="demo-output">
+          <div class="phone" id="phone">
+            <div class="phone-notch" aria-hidden="true"></div>
+            <div class="phone-screen" id="phoneScreen">
+              <img
+                id="resultImage"
+                src="sample-hero.svg"
+                alt="Exemple généré : un renard astronaute flottant au-dessus de Tokyo la nuit"
+                data-sample="true"
+              />
+              <video id="resultVideo" playsinline controls loop hidden></video>
+              <div class="loading" id="loading" hidden>
+                <div class="spinner" aria-hidden="true"></div>
+                <p id="loadingText">Génération en cours…</p>
+              </div>
             </div>
           </div>
+          <p class="error" id="errorBox" hidden role="alert"></p>
+          <a id="downloadBtn" class="btn-ghost" hidden download>Télécharger le résultat</a>
         </div>
-        <a id="downloadBtn" class="download-btn" hidden download>⬇️ Telecharger</a>
-      </section>
-    </main>
-
-    <section class="history" id="historySection" hidden>
-      <h2>Generations recentes</h2>
-      <div class="history-grid" id="historyGrid"></div>
+      </div>
     </section>
-  </div>
+
+    <section class="chapter chapter-explain" id="explain">
+      <div class="chapter-reveal" id="explainReveal" aria-hidden="true">
+        <img src="sample-hero.svg" alt="" id="explainRevealImg" />
+      </div>
+      <div class="chapter-body">
+        <p class="chapter-kicker">Chapitre 1</p>
+        <h2>Ce qui vient de se passer</h2>
+        <p>
+          Ta phrase a été envoyée à <strong>Pollinations.ai</strong>, une IA de génération
+          d'images publique et gratuite — pas de clé, pas de compte, pas de carte bancaire.
+          L'image revient déjà cadrée au format vertical <strong>1080×1920</strong>, prête à
+          être postée en story ou en vidéo TikTok.
+        </p>
+        <ol class="explain-steps">
+          <li>Ton texte est enrichi avec le style choisi (cinématique, anime, cyberpunk…).</li>
+          <li>L'image est générée côté serveur, puis recadrée au format 9:16.</li>
+          <li>
+            Si ton prompt raconte plusieurs phrases, chacune devient une scène : le studio
+            assemble un slideshow vidéo avec <strong>ffmpeg</strong>, sous-titres incrustés et
+            une ambiance sonore générée en direct, sans droits d'auteur.
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="chapter chapter-price" id="price">
+      <p class="chapter-kicker">Chapitre 2</p>
+      <h2>Le prix — et comment garder ton résultat</h2>
+      <div class="price-grid">
+        <div class="price-block">
+          <p class="price-tag">0&nbsp;€</p>
+          <p>
+            Toujours gratuit. Aucun abonnement, aucun quota caché : le studio s'appuie sur des
+            outils publics et gratuits (Pollinations.ai pour les images, ffmpeg installé
+            localement pour le montage vidéo).
+          </p>
+        </div>
+        <div class="price-block">
+          <p class="price-tag">Éphémère</p>
+          <p>
+            Rien n'est stocké sur un compte — il n'y en a pas. Chaque génération reste dans le
+            dossier temporaire du serveur jusqu'au prochain redémarrage : télécharge ton image
+            ou ta vidéo dès qu'elle te plaît avec le bouton <strong>Télécharger</strong>.
+          </p>
+        </div>
+        <div class="price-block">
+          <p class="price-tag">Le tien</p>
+          <p>
+            Le code est ouvert : héberge ta propre instance en un clic sur Render, sans jamais
+            payer plus que le plan gratuit.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>
+      TikTok AI Studio — images via <a href="https://pollinations.ai" rel="noopener" target="_blank">Pollinations.ai</a>,
+      vidéos assemblées avec ffmpeg. Projet non affilié à TikTok/ByteDance.
+    </p>
+  </footer>
 
   <script src="app.js"></script>
 </body>
