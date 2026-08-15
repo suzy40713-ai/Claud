@@ -10,6 +10,7 @@ import { TrainingPlanPage } from "./features/training-plan/TrainingPlanPage";
 import { StravaCallbackPage } from "./features/dashboard/StravaCallbackPage";
 import { BillingPage } from "./features/billing/BillingPage";
 import { EbookPage } from "./features/ebook/EbookPage";
+import { PrivacyPage } from "./features/legal/PrivacyPage";
 
 const NAV_LINKS = [
   { to: "/", label: "Journal", icon: "📓" },
@@ -73,6 +74,7 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/ebook" element={<EbookPage />} />
+      <Route path="/confidentialite" element={<PrivacyPage />} />
       <Route
         path="/onboarding"
         element={
