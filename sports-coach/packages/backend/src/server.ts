@@ -13,6 +13,7 @@ import { pushRouter } from "./modules/push/push.routes.js";
 import { stravaRouter } from "./modules/strava/strava.routes.js";
 import { billingRouter } from "./modules/billing/billing.routes.js";
 import { billingWebhookRouter } from "./modules/billing/billing.webhook.js";
+import { ebookRouter } from "./modules/ebook/ebook.routes.js";
 import { startOverloadAlertScheduler } from "./lib/scheduler.js";
 import { apiRateLimiter } from "./lib/rate-limit.js";
 
@@ -70,6 +71,7 @@ app.use("/api/training-plan", trainingPlanRouter);
 app.use("/api/push", pushRouter);
 app.use("/api/strava", stravaRouter);
 app.use("/api/billing", billingRouter);
+app.use("/api/ebook", ebookRouter);
 
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err);

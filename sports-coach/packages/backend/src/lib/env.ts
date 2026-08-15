@@ -54,4 +54,16 @@ export const env = {
   stripeSecretKey: optional("STRIPE_SECRET_KEY"),
   stripeWebhookSecret: optional("STRIPE_WEBHOOK_SECRET"),
   stripePremiumPriceId: optional("STRIPE_PREMIUM_PRICE_ID"),
+
+  // Prix de l'ebook "Transformation 90 Jours", en centimes. Pas besoin de
+  // creer un Price cote Stripe Dashboard : la session Checkout est creee
+  // avec un price_data inline (montant defini ici).
+  ebookPriceCents: Number(process.env.EBOOK_PRICE_CENTS ?? 2999),
+  ebookCompareAtPriceCents: Number(process.env.EBOOK_COMPARE_AT_PRICE_CENTS ?? 4999),
+
+  resendApiKey: optional("RESEND_API_KEY"),
+  // "onboarding@resend.dev" fonctionne sans domaine verifie mais avec des
+  // limitations d'envoi (volume/destinataires) cote Resend : a remplacer par
+  // une adresse sur un domaine verifie des que possible.
+  ebookSenderEmail: process.env.EBOOK_SENDER_EMAIL ?? "Kadence <onboarding@resend.dev>",
 };

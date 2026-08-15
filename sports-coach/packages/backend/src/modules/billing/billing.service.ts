@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { env } from "../../lib/env.js";
 import { prisma } from "../../lib/prisma.js";
 import type { User } from "@prisma/client";
+import { handleEbookCheckoutCompleted, isEbookCheckoutSession } from "../ebook/ebook.service.js";
 
 let stripeClient: Stripe | null = null;
 
@@ -147,6 +148,10 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<void> {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
+      if (isEbookCheckoutSession(session)) {
+        await handleEbookCheckoutCompleted(session);
+        break;
+      }
       if (typeof session.subscription === "string") {
         const stripe = getStripe();
         const subscription = await stripe.subscriptions.retrieve(session.subscription);

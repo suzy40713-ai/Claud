@@ -52,6 +52,12 @@ enum SubscriptionStatus {
   annule
 }
 
+enum EbookDeliveryStatus {
+  en_attente
+  envoye
+  echec
+}
+
 model User {
   id                 String   @id @default(uuid())
   email              String   @unique
@@ -83,6 +89,22 @@ model User {
   pushSubscriptions PushSubscription[]
 
   @@map("users")
+}
+
+// Achat unitaire de l'ebook "Transformation 90 Jours", independant d'un
+// compte utilisateur (achat possible sans connexion, juste avec un email).
+model EbookPurchase {
+  id                    String              @id @default(uuid())
+  email                 String
+  stripeSessionId       String              @unique @map("stripe_session_id")
+  stripePaymentIntentId String?             @map("stripe_payment_intent_id")
+  amountTotal           Int                 @map("amount_total") // centimes
+  deliveryStatus        EbookDeliveryStatus @default(en_attente) @map("delivery_status")
+  deliveryError         String?             @map("delivery_error")
+  createdAt             DateTime            @default(now()) @map("created_at")
+  deliveredAt           DateTime?           @map("delivered_at")
+
+  @@map("ebook_purchases")
 }
 
 model PushSubscription {

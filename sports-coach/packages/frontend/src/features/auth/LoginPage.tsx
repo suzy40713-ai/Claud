@@ -62,6 +62,12 @@ export function LoginPage() {
           Cree un compte
         </Link>
       </p>
+      <Link
+        to="/ebook"
+        className="rounded-2xl border border-pink-200 bg-pink-50 px-4 py-3 text-sm font-semibold text-pink-700"
+      >
+        📖 Nouveau : notre ebook "Transformation 90 Jours" →
+      </Link>
     </div>
   );
 }

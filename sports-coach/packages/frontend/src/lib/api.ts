@@ -194,6 +194,11 @@ export const api = {
   getBillingStatus: () => request<BillingStatusDTO>("/billing/status"),
   createCheckoutSession: () => request<{ url: string }>("/billing/create-checkout-session", { method: "POST" }),
   createPortalSession: () => request<{ url: string }>("/billing/create-portal-session", { method: "POST" }),
+
+  getEbookStatus: () =>
+    request<{ configured: boolean; priceCents: number; compareAtPriceCents: number }>("/ebook/status"),
+  createEbookCheckoutSession: () =>
+    request<{ url: string }>("/ebook/create-checkout-session", { method: "POST" }),
 };
 
 export { ApiError };
