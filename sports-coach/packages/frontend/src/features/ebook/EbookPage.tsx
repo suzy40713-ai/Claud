@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { api, ApiError } from "../../lib/api";
 import { Button } from "../../components/ui/Button";
+import { useAuth } from "../../context/AuthContext";
 
 const CONTENU = [
   "Un programme d'entrainement complet et progressif sur 12 semaines (3 phases), avec 4 seances par semaine detaillees serie par serie",
@@ -37,6 +38,7 @@ function formatPrice(cents: number): string {
 
 export function EbookPage() {
   const location = useLocation();
+  const { user } = useAuth();
   const [status, setStatus] = useState<{ configured: boolean; priceCents: number; compareAtPriceCents: number } | null>(
     null
   );
@@ -67,7 +69,7 @@ export function EbookPage() {
   return (
     <div className="min-h-screen bg-white">
       <header className="border-b border-slate-100 px-4 py-4">
-        <Link to="/login" className="text-lg font-extrabold tracking-tight text-slate-900">
+        <Link to={user ? "/" : "/login"} className="text-lg font-extrabold tracking-tight text-slate-900">
           👑 Kadence
         </Link>
       </header>

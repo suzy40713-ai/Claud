@@ -16,6 +16,7 @@ const NAV_LINKS = [
   { to: "/dashboard", label: "Seances", icon: "🏃" },
   { to: "/plan", label: "Plan", icon: "📅" },
   { to: "/coach", label: "Coach", icon: "🤖" },
+  { to: "/ebook", label: "Ebook", icon: "📖" },
   { to: "/abonnement", label: "Abonnement", icon: "👑" },
 ];
 
