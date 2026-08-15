@@ -1,4 +1,4 @@
-package com.vory.app;
+package com.kadence.app;
 
 import com.getcapacitor.BridgeActivity;
 
