@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Vory</string>
-    <string name="title_activity_main">Vory</string>
-    <string name="package_name">com.vory.app</string>
-    <string name="custom_url_scheme">com.vory.app</string>
+    <string name="app_name">Kadence</string>
+    <string name="title_activity_main">Kadence</string>
+    <string name="package_name">com.kadence.app</string>
+    <string name="custom_url_scheme">com.kadence.app</string>
 </resources>

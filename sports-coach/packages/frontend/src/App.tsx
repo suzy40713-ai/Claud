@@ -34,7 +34,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
         <nav className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/85 px-4 py-3 backdrop-blur-md">
           <div className="flex items-center gap-1 sm:gap-2">
             <span className="mr-2 hidden text-lg font-extrabold tracking-tight text-slate-900 sm:inline">
-              👑 Vory
+              👑 Kadence
             </span>
             {NAV_LINKS.map((link) => {
               const active = location.pathname === link.to;

@@ -30,7 +30,7 @@ export function LoginPage() {
     <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4 py-10">
       <img
         src={`${import.meta.env.BASE_URL}images/hero-auth.png`}
-        alt="Vory"
+        alt="Kadence"
         className="w-full rounded-2xl shadow-lg shadow-indigo-900/10"
       />
       <h1 className="text-3xl font-bold text-slate-900">Connexion</h1>

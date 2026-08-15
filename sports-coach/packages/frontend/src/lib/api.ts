@@ -32,7 +32,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL ?? "";
 // cookies cross-site meme corrects (SameSite=None + Secure). Un token
 // stocke cote client et envoye via un header Authorization fonctionne de
 // maniere fiable sur tous les navigateurs et dans l'app mobile.
-const AUTH_TOKEN_KEY = "vory_auth_token";
+const AUTH_TOKEN_KEY = "kadence_auth_token";
 
 function getAuthToken(): string | null {
   return localStorage.getItem(AUTH_TOKEN_KEY);
