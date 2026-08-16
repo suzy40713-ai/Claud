@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router";
+import { motion } from "framer-motion";
 import { api, ApiError } from "../../lib/api";
 import { Button } from "../../components/ui/Button";
 import { useAuth } from "../../context/AuthContext";
@@ -36,6 +37,11 @@ function formatPrice(cents: number): string {
   return (cents / 100).toFixed(2).replace(".", ",") + " €";
 }
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0 },
+};
+
 export function EbookPage() {
   const location = useLocation();
   const { user } = useAuth();
@@ -44,11 +50,20 @@ export function EbookPage() {
   );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showStickyBar, setShowStickyBar] = useState(false);
 
   const checkoutParam = new URLSearchParams(location.search).get("checkout");
 
   useEffect(() => {
     api.getEbookStatus().then(setStatus);
+  }, []);
+
+  useEffect(() => {
+    function onScroll() {
+      setShowStickyBar(window.scrollY > 640);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   async function handleBuy() {
@@ -68,7 +83,7 @@ export function EbookPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="border-b border-slate-100 px-4 py-4">
+      <header className="glass-card sticky top-0 z-20 px-4 py-4">
         <Link to={user ? "/" : "/login"} className="text-lg font-extrabold tracking-tight text-slate-900">
           👑 Kadence
         </Link>
@@ -92,13 +107,22 @@ export function EbookPage() {
           </p>
         )}
 
-        <div className="grid gap-10 sm:grid-cols-2 sm:items-center">
-          <img
+        <div className="relative grid gap-10 sm:grid-cols-2 sm:items-center">
+          <div className="bg-gradient-kadence pointer-events-none absolute -left-10 -top-10 h-72 w-72 rounded-full opacity-20 blur-3xl" />
+          <motion.img
+            initial={{ opacity: 0, scale: 0.94 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6 }}
             src={`${import.meta.env.BASE_URL}images/ebook-product.png`}
             alt="Ebook Kadence — Transformation 90 Jours"
-            className="w-full rounded-2xl"
+            className="animate-float-slow relative w-full rounded-2xl drop-shadow-2xl"
           />
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="relative"
+          >
             <p className="text-xs font-bold uppercase tracking-widest text-pink-600">Ebook · PDF · 87 pages</p>
             <h1 className="mt-2 text-3xl font-extrabold leading-tight text-slate-900 sm:text-4xl">
               Transformation 90 Jours
@@ -111,8 +135,8 @@ export function EbookPage() {
 
             <div className="mt-6 flex items-baseline gap-3">
               <span className="text-lg text-slate-400 line-through">{compareAtPrice}</span>
-              <span className="text-3xl font-extrabold text-slate-900">{price}</span>
-              <span className="rounded-full bg-pink-100 px-2.5 py-1 text-xs font-bold text-pink-700">
+              <span className="text-gradient-kadence text-3xl font-extrabold">{price}</span>
+              <span className="animate-pulse-glow rounded-full bg-pink-100 px-2.5 py-1 text-xs font-bold text-pink-700">
                 -40% aujourd'hui
               </span>
             </div>
@@ -127,46 +151,90 @@ export function EbookPage() {
               <li>📩 Livraison immediate par email, en PDF</li>
               <li>📖 Lisible sur telephone, tablette ou ordinateur</li>
             </ul>
-          </div>
+          </motion.div>
         </div>
 
-        <section className="mt-16">
+        <motion.section
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-80px" }}
+          variants={fadeUp}
+          transition={{ duration: 0.5 }}
+          className="mt-16"
+        >
           <h2 className="text-2xl font-bold text-slate-900">
             Pourquoi la plupart des transformations physiques echouent
           </h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
-            {RAISONS_ECHEC.map((r) => (
-              <div key={r.titre} className="rounded-2xl border border-slate-200 p-5">
+            {RAISONS_ECHEC.map((r, i) => (
+              <motion.div
+                key={r.titre}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: "-60px" }}
+                variants={fadeUp}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                className="rounded-2xl border border-slate-200 p-5 transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/5"
+              >
                 <h3 className="font-semibold text-slate-900">{r.titre}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-slate-600">{r.texte}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        <section className="mt-16">
+        <motion.section
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-80px" }}
+          variants={fadeUp}
+          transition={{ duration: 0.5 }}
+          className="mt-16"
+        >
           <h2 className="text-2xl font-bold text-slate-900">Ce que tu vas recevoir</h2>
           <ul className="mt-6 flex flex-col gap-3">
-            {CONTENU.map((c) => (
-              <li key={c} className="flex gap-3 text-slate-700">
+            {CONTENU.map((c, i) => (
+              <motion.li
+                key={c}
+                initial={{ opacity: 0, x: -12 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.35, delay: i * 0.05 }}
+                className="flex gap-3 text-slate-700"
+              >
                 <span aria-hidden className="mt-0.5 text-pink-600">
                   ✓
                 </span>
                 <span className="leading-relaxed">{c}</span>
-              </li>
+              </motion.li>
             ))}
           </ul>
-        </section>
+        </motion.section>
 
-        <section className="mt-16 rounded-2xl bg-slate-900 px-6 py-8 text-white sm:px-10">
-          <p className="text-lg italic leading-relaxed text-slate-200">
+        <motion.section
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-80px" }}
+          variants={fadeUp}
+          transition={{ duration: 0.5 }}
+          className="relative mt-16 overflow-hidden rounded-2xl bg-slate-900 px-6 py-8 text-white sm:px-10"
+        >
+          <div className="bg-gradient-kadence pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full opacity-20 blur-3xl" />
+          <p className="relative text-lg italic leading-relaxed text-slate-200">
             "On a ecrit ce livre comme on aurait aime en recevoir un le premier jour : sans detour, sans te
             vendre du reve, juste un plan clair qui tient la route sur 90 jours."
           </p>
-          <p className="mt-4 text-sm font-semibold text-slate-400">— L'equipe Kadence</p>
-        </section>
+          <p className="relative mt-4 text-sm font-semibold text-slate-400">— L'equipe Kadence</p>
+        </motion.section>
 
-        <section className="mt-16 text-center">
+        <motion.section
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-80px" }}
+          variants={fadeUp}
+          transition={{ duration: 0.5 }}
+          className="mt-16 text-center"
+        >
           <h2 className="text-2xl font-bold text-slate-900">Prete a commencer ?</h2>
           <p className="mx-auto mt-3 max-w-md text-slate-600">
             Le prochain lot de 90 jours va passer, que tu commences ou non. Autant que ce soit ceux qui te font
@@ -174,13 +242,28 @@ export function EbookPage() {
           </p>
           <div className="mt-5 flex items-baseline justify-center gap-3">
             <span className="text-lg text-slate-400 line-through">{compareAtPrice}</span>
-            <span className="text-3xl font-extrabold text-slate-900">{price}</span>
+            <span className="text-gradient-kadence text-3xl font-extrabold">{price}</span>
           </div>
           <Button disabled={busy || !status?.configured} onClick={handleBuy} className="mt-5">
             {busy ? "Redirection..." : "Je recois mon ebook maintenant"}
           </Button>
-        </section>
+        </motion.section>
       </main>
+
+      <motion.div
+        initial={{ y: 100, opacity: 0 }}
+        animate={showStickyBar ? { y: 0, opacity: 1 } : { y: 100, opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        className="glass-card fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-3 px-4 py-3 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] sm:hidden"
+      >
+        <div>
+          <p className="text-xs text-slate-500">Transformation 90 Jours</p>
+          <p className="text-gradient-kadence text-lg font-extrabold">{price}</p>
+        </div>
+        <Button disabled={busy || !status?.configured} onClick={handleBuy} className="shrink-0">
+          {busy ? "..." : "Acheter"}
+        </Button>
+      </motion.div>
     </div>
   );
 }

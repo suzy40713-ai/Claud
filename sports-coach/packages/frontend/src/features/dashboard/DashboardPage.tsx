@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { motion } from "framer-motion";
 import type { ActivityDTO, Sport, WeeklyVolumePoint } from "@sports-coach/shared";
 import { api, ApiError } from "../../lib/api";
 import { Button } from "../../components/ui/Button";
 import { StravaConnect } from "./StravaConnect";
+import { PremiumPromoBanner } from "../../components/ui/PromoBanner";
 
 function formatDuree(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -72,7 +74,12 @@ export function DashboardPage() {
   }));
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-8">
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-8"
+    >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">🏃 Mes seances</h1>
         <div className="flex items-center gap-2">
@@ -106,6 +113,8 @@ export function DashboardPage() {
 
       <StravaConnect onSynced={loadData} />
 
+      <PremiumPromoBanner />
+
       <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 className="mb-3 text-base font-semibold text-slate-700">📊 Volume hebdomadaire</h2>
         {chartData.length === 0 ? (
@@ -130,7 +139,7 @@ export function DashboardPage() {
         {activities.map((activity) => (
           <div
             key={activity.id}
-            className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-100 bg-white px-4 py-3 text-sm shadow-sm"
+            className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-100 bg-white px-4 py-3 text-sm shadow-sm transition-shadow hover:shadow-md"
           >
             <div className="flex items-center gap-3">
               <span className="text-2xl" aria-hidden>
@@ -151,6 +160,6 @@ export function DashboardPage() {
           </div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import type { DailyLogDTO } from "@sports-coach/shared";
 import { api, ApiError } from "../../lib/api";
 import { Button } from "../../components/ui/Button";
 import { ScaleSelector } from "../../components/ui/ScaleSelector";
+import { EbookPromoBanner } from "../../components/ui/PromoBanner";
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
@@ -52,13 +54,18 @@ export function DailyLogPage() {
   if (loading) return null;
 
   return (
-    <div className="mx-auto flex max-w-lg flex-col gap-8 px-4 py-8">
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="mx-auto flex max-w-lg flex-col gap-8 px-4 py-8"
+    >
       <div>
         <h1 className="text-2xl font-bold">📓 Journal du jour</h1>
         <p className="text-base text-slate-500">Trois questions, 15 secondes.</p>
       </div>
 
-      <div className="flex flex-col gap-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="flex flex-col gap-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
         <ScaleSelector
           icon="😴"
           label="Qualite du sommeil"
@@ -92,6 +99,8 @@ export function DailyLogPage() {
         </Button>
       </div>
 
+      <EbookPromoBanner />
+
       {history.length > 0 && (
         <div>
           <h2 className="mb-3 text-base font-semibold text-slate-700">7 derniers jours</h2>
@@ -112,6 +121,6 @@ export function DailyLogPage() {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
