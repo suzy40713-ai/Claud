@@ -77,9 +77,9 @@ Santé et remise en forme
 
 ## Email de contact développeur
 
-À définir — voir avec l'équipe quelle adresse utiliser (doit être une boîte
-mail réellement surveillée, Google Play l'utilise pour contacter le
-développeur).
+```
+suzy40713@gmail.com
+```
 
 ## URL de la politique de confidentialité
 

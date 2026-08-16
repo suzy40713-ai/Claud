@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-const CONTACT_EMAIL = "contact@kadence-app.fr";
+const CONTACT_EMAIL = "suzy40713@gmail.com";
 
 export function PrivacyPage() {
   return (
