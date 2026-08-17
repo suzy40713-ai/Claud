@@ -1,4 +1,4 @@
-import type { Archetype, Division, Poste, Region, Langue } from "@/types";
+import type { Archetype, Division, Poste, PlayStyle, Region, Langue } from "@/types";
 
 export const POSTES: Poste[] = ["GB", "DC", "DD", "DG", "MDC", "MC", "MOC", "AD", "AG", "BU"];
 
@@ -15,47 +15,165 @@ export const POSTE_LABELS: Record<Poste, string> = {
   BU: "Buteur",
 };
 
-export const ARCHETYPES_PAR_POSTE: Record<Poste, Archetype[]> = {
-  BU: ["Finisseur", "Faux 9", "Attaquant Cible", "Poacher"],
-  AD: ["Ailier Rapide", "Ailier Créatif", "Élimination"],
-  AG: ["Ailier Rapide", "Ailier Créatif", "Élimination"],
-  MOC: ["Meneur de Jeu Avancé", "Le Dix", "Box-to-Box"],
-  MDC: ["Sentinelle", "Meneur de Jeu Profond", "Milieu Destructeur"],
-  MC: ["Box-to-Box", "Meneur de Jeu Profond", "Milieu Destructeur"],
-  DD: ["Latéral Offensif", "Latéral Défensif", "Ailier Piston"],
-  DG: ["Latéral Offensif", "Latéral Défensif", "Ailier Piston"],
-  DC: ["Stopper", "Défenseur Relanceur", "Défenseur Physique"],
-  GB: ["Gardien Classique", "Gardien Libéro", "Gardien Réflexes"],
-};
+export interface ArchetypeDef {
+  id: Archetype;
+  nomEn?: string;
+  categorie: "Gardien" | "Défenseur" | "Milieu" | "Attaquant";
+  postes: Poste[];
+  playstyles: [PlayStyle, PlayStyle];
+  icon: string;
+}
 
-export const TOUS_ARCHETYPES: Archetype[] = Array.from(
-  new Set(Object.values(ARCHETYPES_PAR_POSTE).flat())
-);
+// Archétypes officiels FC 27 Pro Clubs (2 Gardiens, 4 Défenseurs, 4 Milieux, 3 Attaquants)
+export const ARCHETYPES: ArchetypeDef[] = [
+  {
+    id: "Gardien pur",
+    nomEn: "Shot Stopper",
+    categorie: "Gardien",
+    postes: ["GB"],
+    playstyles: [
+      { fr: "Arrêt du pied", en: "Footwork" },
+      { fr: "Classe de loin", en: "Far Reach" },
+    ],
+    icon: "Hand",
+  },
+  {
+    id: "Gardien-libéro",
+    nomEn: "Sweeper Keeper",
+    categorie: "Gardien",
+    postes: ["GB"],
+    playstyles: [
+      { fr: "Sortie sur les centres", en: "Cross Claimer" },
+      { fr: "1 contre 1", en: "1v1 Close Down" },
+    ],
+    icon: "MoveHorizontal",
+  },
+  {
+    id: "Boss",
+    categorie: "Défenseur",
+    postes: ["DC"],
+    playstyles: [
+      { fr: "Agressif", en: "Bruiser" },
+      { fr: "Forteresse aérienne", en: "Aerial Fortress" },
+    ],
+    icon: "ShieldBan",
+  },
+  {
+    id: "Progresseur DC",
+    categorie: "Défenseur",
+    postes: ["DC"],
+    playstyles: [
+      { fr: "Passe longue", en: "Long Ball Pass" },
+      { fr: "Anticipation", en: "Anticipate" },
+    ],
+    icon: "SendHorizontal",
+  },
+  {
+    id: "Moteur",
+    categorie: "Défenseur",
+    postes: ["DD", "DG"],
+    playstyles: [
+      { fr: "Jockey", en: "Jockey" },
+      { fr: "Infatigable", en: "Relentless" },
+    ],
+    icon: "GaugeCircle",
+  },
+  {
+    id: "Maraudeur",
+    categorie: "Défenseur",
+    postes: ["DD", "DG"],
+    playstyles: [
+      { fr: "Centre fouetté", en: "Whipped Pass" },
+      { fr: "Foulée rapide", en: "Quick Step" },
+    ],
+    icon: "ArrowUpRight",
+  },
+  {
+    id: "Recycler",
+    categorie: "Milieu",
+    postes: ["MDC", "MC"],
+    playstyles: [
+      { fr: "Press Proven", en: "Press Proven" },
+      { fr: "Interception", en: "Interception" },
+    ],
+    icon: "ShieldAlert",
+  },
+  {
+    id: "Maestro",
+    categorie: "Milieu",
+    postes: ["MC"],
+    playstyles: [
+      { fr: "Tiki Taka", en: "Tiki Taka" },
+      { fr: "Passe longue tendue", en: "Pinged Pass" },
+    ],
+    icon: "Compass",
+  },
+  {
+    id: "Créateur",
+    categorie: "Milieu",
+    postes: ["MOC"],
+    playstyles: [
+      { fr: "Passe incisive", en: "Incisive Pass" },
+      { fr: "Passe inventive", en: "Inventive Pass" },
+    ],
+    icon: "Wand2",
+  },
+  {
+    id: "Étincelle",
+    nomEn: "Spark",
+    categorie: "Milieu",
+    postes: ["MOC", "AG", "AD"],
+    playstyles: [
+      { fr: "Rapide", en: "Rapid" },
+      { fr: "Trickster", en: "Trickster" },
+    ],
+    icon: "Zap",
+  },
+  {
+    id: "Magicien",
+    categorie: "Attaquant",
+    postes: ["AG", "AD", "BU"],
+    playstyles: [
+      { fr: "Technique", en: "Technical" },
+      { fr: "Tir en finesse", en: "Finesse Shot" },
+    ],
+    icon: "Sparkles",
+  },
+  {
+    id: "Finisseur",
+    categorie: "Attaquant",
+    postes: ["BU"],
+    playstyles: [
+      { fr: "Tir à ras de terre", en: "Low Driven Shot" },
+      { fr: "Premier contact", en: "First Touch" },
+    ],
+    icon: "Crosshair",
+  },
+  {
+    id: "Cible",
+    categorie: "Attaquant",
+    postes: ["BU"],
+    playstyles: [
+      { fr: "Jeu de tête précis", en: "Precision Header" },
+      { fr: "Protection du ballon", en: "Press Proven" },
+    ],
+    icon: "Target",
+  },
+];
 
-export const ARCHETYPE_ICONS: Record<Archetype, string> = {
-  Finisseur: "Crosshair",
-  "Faux 9": "Sparkles",
-  "Attaquant Cible": "Target",
-  Poacher: "Zap",
-  "Ailier Rapide": "Wind",
-  "Ailier Créatif": "Wand2",
-  Élimination: "Swords",
-  "Meneur de Jeu Avancé": "Compass",
-  "Le Dix": "Star",
-  "Box-to-Box": "RefreshCw",
-  Sentinelle: "ShieldAlert",
-  "Meneur de Jeu Profond": "Radar",
-  "Milieu Destructeur": "Hammer",
-  "Latéral Offensif": "ArrowUpRight",
-  "Latéral Défensif": "ArrowDownRight",
-  "Ailier Piston": "GaugeCircle",
-  Stopper: "ShieldBan",
-  "Défenseur Relanceur": "SendHorizontal",
-  "Défenseur Physique": "Dumbbell",
-  "Gardien Classique": "Hand",
-  "Gardien Libéro": "MoveHorizontal",
-  "Gardien Réflexes": "Timer",
-};
+export const ARCHETYPE_PAR_ID: Record<Archetype, ArchetypeDef> = Object.fromEntries(
+  ARCHETYPES.map((a) => [a.id, a])
+) as Record<Archetype, ArchetypeDef>;
+
+export const ARCHETYPES_PAR_POSTE: Record<Poste, Archetype[]> = Object.fromEntries(
+  POSTES.map((p) => [p, ARCHETYPES.filter((a) => a.postes.includes(p)).map((a) => a.id)])
+) as Record<Poste, Archetype[]>;
+
+export const TOUS_ARCHETYPES: Archetype[] = ARCHETYPES.map((a) => a.id);
+
+export const ARCHETYPE_ICONS: Record<Archetype, string> = Object.fromEntries(
+  ARCHETYPES.map((a) => [a.id, a.icon])
+) as Record<Archetype, string>;
 
 export const DIVISIONS: Division[] = [
   "Division 10",

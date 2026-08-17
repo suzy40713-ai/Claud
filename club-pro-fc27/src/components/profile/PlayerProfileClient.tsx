@@ -11,6 +11,7 @@ import {
   MessageCircle,
   PlayCircle,
   Plus,
+  Sparkles,
   UserPlus,
 } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
@@ -28,7 +29,7 @@ import Reveal from "@/components/ui/Reveal";
 import DynamicIcon from "@/components/ui/DynamicIcon";
 import Confetti from "@/components/ui/Confetti";
 import type { Joueur, Evaluation } from "@/types";
-import { POSTE_LABELS } from "@/lib/constants";
+import { ARCHETYPE_PAR_ID, POSTE_LABELS } from "@/lib/constants";
 import { formatNombre, tempsRelatif } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +40,7 @@ const STATUT_TONE = {
 } as const;
 
 export default function PlayerProfileClient({ joueur }: { joueur: Joueur }) {
+  const archetypeDef = ARCHETYPE_PAR_ID[joueur.archetype];
   const [tab, setTab] = useState("apercu");
   const [following, setFollowing] = useState(false);
   const [followers, setFollowers] = useState(joueur.followers);
@@ -159,6 +161,26 @@ export default function PlayerProfileClient({ joueur }: { joueur: Joueur }) {
             <Card className="p-4">
               <h3 className="mb-2 font-display font-bold">Style de jeu</h3>
               <p className="text-sm text-muted">{joueur.styleDeJeu}</p>
+            </Card>
+            <Card className="p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="font-display font-bold">PlayStyles Signature</h3>
+                <ArchetypeBadge archetype={joueur.archetype} size="sm" />
+              </div>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {archetypeDef?.playstyles.map((p) => (
+                  <div
+                    key={p.en}
+                    className="flex items-center gap-2 rounded-xl border border-accent/20 bg-accent/5 px-3 py-2"
+                  >
+                    <Sparkles className="h-3.5 w-3.5 shrink-0 text-accent" />
+                    <div>
+                      <p className="text-sm font-semibold">{p.fr}</p>
+                      <p className="text-[11px] text-muted">{p.en}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </Card>
             <Card className="p-4">
               <h3 className="mb-3 font-display font-bold">Badges & certifications</h3>

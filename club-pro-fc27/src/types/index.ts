@@ -13,35 +13,28 @@ export type Poste =
   | "BU";
 
 export type Archetype =
-  // Attaquant
+  // Gardiens
+  | "Gardien pur"
+  | "Gardien-libéro"
+  // Défenseurs
+  | "Boss"
+  | "Progresseur DC"
+  | "Moteur"
+  | "Maraudeur"
+  // Milieux
+  | "Recycler"
+  | "Maestro"
+  | "Créateur"
+  | "Étincelle"
+  // Attaquants
+  | "Magicien"
   | "Finisseur"
-  | "Faux 9"
-  | "Attaquant Cible"
-  | "Poacher"
-  // Ailier
-  | "Ailier Rapide"
-  | "Ailier Créatif"
-  | "Élimination"
-  // Milieu offensif
-  | "Meneur de Jeu Avancé"
-  | "Le Dix"
-  | "Box-to-Box"
-  // Milieu défensif
-  | "Sentinelle"
-  | "Meneur de Jeu Profond"
-  | "Milieu Destructeur"
-  // Latéral
-  | "Latéral Offensif"
-  | "Latéral Défensif"
-  | "Ailier Piston"
-  // Défenseur central
-  | "Stopper"
-  | "Défenseur Relanceur"
-  | "Défenseur Physique"
-  // Gardien
-  | "Gardien Classique"
-  | "Gardien Libéro"
-  | "Gardien Réflexes";
+  | "Cible";
+
+export interface PlayStyle {
+  fr: string;
+  en: string;
+}
 
 export type Division =
   | "Division 10"
