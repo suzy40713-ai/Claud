@@ -1,0 +1,55 @@
+name: Deploy Club Pro FC 27 to GitHub Pages
+
+on:
+  push:
+    branches: [claude/club-pro-fc-27-cbnfkt]
+    paths:
+      - "club-pro-fc27/**"
+      - ".github/workflows/deploy-club-pro-fc27.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: club-pro-fc27
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: club-pro-fc27/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run build
+        env:
+          NEXT_STATIC_EXPORT: "true"
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: club-pro-fc27/out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
