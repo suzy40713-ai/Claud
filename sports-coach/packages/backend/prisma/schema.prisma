@@ -87,8 +87,41 @@ model User {
   trainingPlans     TrainingPlan[]
   coachMessages     CoachMessage[]
   pushSubscriptions PushSubscription[]
+  groceryLists      GroceryList[]
+  mealScans         MealScan[]
 
   @@map("users")
+}
+
+// Liste de courses generee par l'IA a partir du profil de l'utilisateur
+// (objectif, niveau, sports pratiques). Fonctionnalite premium.
+model GroceryList {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     Json // [{ categorie: string, nom: string, quantite: string }]
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@map("grocery_lists")
+}
+
+// Analyse d'une photo de plat par l'IA (calories/macros estimes). L'image
+// elle-meme n'est jamais stockee, seul le resultat de l'analyse l'est.
+model MealScan {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  description String
+  calories    Int
+  proteinesG  Int      @map("proteines_g")
+  glucidesG   Int      @map("glucides_g")
+  lipidesG    Int      @map("lipides_g")
+  confiance   String // "faible" | "moyenne" | "haute"
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@map("meal_scans")
 }
 
 // Achat unitaire de l'ebook "Transformation 90 Jours", independant d'un

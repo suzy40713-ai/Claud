@@ -54,6 +54,12 @@ export function PrivacyPage() {
             <strong>Messages avec le coach IA</strong> : le contenu de tes échanges avec le coach conversationnel.
           </li>
           <li>
+            <strong>Nutrition (fonctionnalité premium)</strong> : les photos de repas que tu prends sont envoyées à
+            Anthropic pour analyse (calories et macronutriments) puis <strong>immédiatement supprimées</strong> —
+            seul le résultat de l'analyse (description, valeurs nutritionnelles) est conservé, jamais l'image
+            elle-même. Les listes de courses générées sont conservées pour que tu puisses les retrouver.
+          </li>
+          <li>
             <strong>Abonnement et achats</strong> : le statut de ton abonnement et, si tu achètes l'ebook, l'adresse
             email utilisée pour te l'envoyer. Les données de carte bancaire ne transitent jamais par nos serveurs :
             elles sont gérées directement par Stripe.

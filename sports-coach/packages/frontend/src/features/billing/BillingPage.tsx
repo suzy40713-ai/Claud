@@ -14,6 +14,8 @@ const FREE_FEATURES = [
 
 const PREMIUM_FEATURES = [
   "Coach IA conversationnel illimite",
+  "🛒 Liste de courses generee par IA, adaptee a ton objectif",
+  "📸 Scanner un plat et connaitre ses calories et macros instantanement",
   "Import automatique des seances depuis Strava",
   "Alertes push proactives en cas de risque de surcharge",
 ];

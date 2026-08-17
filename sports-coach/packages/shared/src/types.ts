@@ -169,3 +169,26 @@ export interface BillingStatusDTO {
   subscriptionStatus: SubscriptionStatus;
   currentPeriodEnd: string | null;
 }
+
+export interface GroceryItemDTO {
+  categorie: string;
+  nom: string;
+  quantite: string;
+}
+
+export interface GroceryListDTO {
+  id: string;
+  items: GroceryItemDTO[];
+  createdAt: string;
+}
+
+export interface MealScanDTO {
+  id: string;
+  description: string;
+  calories: number;
+  proteinesG: number;
+  glucidesG: number;
+  lipidesG: number;
+  confiance: "faible" | "moyenne" | "haute";
+  createdAt: string;
+}

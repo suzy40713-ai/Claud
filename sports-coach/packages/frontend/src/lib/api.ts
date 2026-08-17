@@ -5,6 +5,8 @@ import type {
   CoachMessageDTO,
   DailyLogDTO,
   DailyLogPayload,
+  GroceryListDTO,
+  MealScanDTO,
   OnboardingPayload,
   PlannedSessionDTO,
   SessionStatut,
@@ -199,6 +201,16 @@ export const api = {
     request<{ configured: boolean; priceCents: number; compareAtPriceCents: number }>("/ebook/status"),
   createEbookCheckoutSession: () =>
     request<{ url: string }>("/ebook/create-checkout-session", { method: "POST" }),
+
+  getGroceryList: () => request<{ list: GroceryListDTO | null }>("/nutrition/grocery-list"),
+  generateGroceryList: () => request<{ list: GroceryListDTO }>("/nutrition/grocery-list", { method: "POST" }),
+
+  getMealScans: () => request<{ scans: MealScanDTO[] }>("/nutrition/meal-scans"),
+  scanMeal: (file: File) => {
+    const form = new FormData();
+    form.append("photo", file);
+    return request<{ scan: MealScanDTO }>("/nutrition/scan-meal", { method: "POST", body: form });
+  },
 };
 
 export { ApiError };

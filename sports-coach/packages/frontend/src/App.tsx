@@ -12,12 +12,14 @@ import { StravaCallbackPage } from "./features/dashboard/StravaCallbackPage";
 import { BillingPage } from "./features/billing/BillingPage";
 import { EbookPage } from "./features/ebook/EbookPage";
 import { PrivacyPage } from "./features/legal/PrivacyPage";
+import { NutritionPage } from "./features/nutrition/NutritionPage";
 
 const NAV_LINKS = [
   { to: "/", label: "Journal", icon: "📓" },
   { to: "/dashboard", label: "Seances", icon: "🏃" },
   { to: "/plan", label: "Plan", icon: "📅" },
   { to: "/coach", label: "Coach", icon: "🤖" },
+  { to: "/nutrition", label: "Nutrition", icon: "🥗", highlight: true },
   { to: "/ebook", label: "Ebook", icon: "📖", highlight: true },
   { to: "/abonnement", label: "Abonnement", icon: "👑", highlight: true },
 ];
@@ -35,11 +37,11 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen">
       {user.onboardingComplete && (
-        <nav className="glass-card sticky top-0 z-10 flex items-center justify-between px-4 py-3 shadow-sm shadow-slate-900/5">
-          <div className="flex items-center gap-1 sm:gap-2">
-            <span className="mr-2 hidden text-lg font-extrabold tracking-tight text-slate-900 sm:inline">
-              👑 Kadence
-            </span>
+        <nav className="glass-card sticky top-0 z-10 flex items-center gap-2 px-2 py-3 shadow-sm shadow-slate-900/5 sm:px-4">
+          <span className="hidden shrink-0 pl-2 text-lg font-extrabold tracking-tight text-slate-900 sm:inline">
+            👑 Kadence
+          </span>
+          <div className="flex flex-1 items-center gap-1 overflow-x-auto sm:gap-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {NAV_LINKS.map((link) => {
               const active = location.pathname === link.to;
               return (
@@ -73,9 +75,13 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
           </div>
           <button
             onClick={() => logout()}
-            className="rounded-full px-3 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+            aria-label="Deconnexion"
+            className="shrink-0 rounded-full px-2.5 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 sm:px-3"
           >
-            Deconnexion
+            <span aria-hidden className="sm:hidden">
+              🚪
+            </span>
+            <span className="hidden sm:inline">Deconnexion</span>
           </button>
         </nav>
       )}
@@ -120,6 +126,14 @@ export default function App() {
         element={
           <ProtectedLayout>
             <CoachPage />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/nutrition"
+        element={
+          <ProtectedLayout>
+            <NutritionPage />
           </ProtectedLayout>
         }
       />
