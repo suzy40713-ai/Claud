@@ -9,3 +9,15 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+
+  - type: web
+    name: club-pro-fc27
+    runtime: node
+    rootDir: club-pro-fc27
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
