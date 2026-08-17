@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+:root {
+  --background: #06080a;
+  --surface: #0d1116;
+  --surface-2: #131922;
+  --surface-border: rgba(255, 255, 255, 0.07);
+  --foreground: #f2f5f7;
+  --muted: #8b96a3;
+  --accent: #17e58a;
+  --accent-dim: #0f9d58;
+  --gold: #f2c14e;
+  --gold-dim: #b8902f;
+  --danger: #ef4444;
+  --live: #ff3b3b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-dim: var(--accent-dim);
+  --color-gold: var(--gold);
+  --color-gold-dim: var(--gold-dim);
+  --color-danger: var(--danger);
+  --color-live: var(--live);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  min-height: 100dvh;
+}
+
+* {
+  border-color: var(--surface-border);
+}
+
+::selection {
+  background: var(--accent);
+  color: #04150c;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.font-display {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+}
+
+.text-gradient-accent {
+  background: linear-gradient(90deg, var(--accent), #6ee7b7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(90deg, var(--gold), #fde68a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glass {
+  background: rgba(13, 17, 22, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.bg-noise {
+  background-image: radial-gradient(circle at 20% 20%, rgba(23, 229, 138, 0.08), transparent 40%),
+    radial-gradient(circle at 80% 0%, rgba(242, 193, 78, 0.06), transparent 35%);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes pulse-live {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 59, 59, 0.55); }
+  70% { box-shadow: 0 0 0 8px rgba(255, 59, 59, 0); }
+}
+.animate-pulse-live {
+  animation: pulse-live 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-cta {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(242, 193, 78, 0.45); }
+  70% { box-shadow: 0 0 0 10px rgba(242, 193, 78, 0); }
+}
+.animate-pulse-cta {
+  animation: pulse-cta 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 0px,
+    rgba(255, 255, 255, 0.06) 40px,
+    var(--surface-2) 80px
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+@keyframes radar-sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-radar {
+  animation: radar-sweep 2.5s linear infinite;
+}
