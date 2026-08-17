@@ -14,7 +14,7 @@ export default function FloatingCTA() {
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: 0.6, type: "spring", stiffness: 260, damping: 20 }}
-      className="fixed right-4 bottom-20 z-40 lg:bottom-6"
+      className="fixed right-4 bottom-20 z-40 lg:hidden"
     >
       <Link href="/african-fc#postuler">
         <motion.span

@@ -20,7 +20,7 @@ export default function TournoisPage() {
 
   return (
     <div>
-      <div className="glass sticky top-0 z-30 flex items-center justify-between border-b border-surface-border px-4 py-3">
+      <div className="glass sticky top-14 z-30 flex items-center justify-between border-b border-surface-border px-4 py-3">
         <h1 className="flex items-center gap-2 font-display text-lg font-bold">
           <Trophy className="h-5 w-5 text-gold" /> Tournois
         </h1>

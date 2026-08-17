@@ -1,19 +1,56 @@
 import Link from "next/link";
-import { Flame, TrendingUp, Trophy } from "lucide-react";
+import { Flame, Radio, TrendingUp, Trophy } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import DivisionBadge from "@/components/ui/DivisionBadge";
-import { clubs, joueurs, tournois } from "@/lib/mock-data";
+import LiveBadge from "@/components/ui/LiveBadge";
+import { clubs, joueurs, liveMatches, tournois } from "@/lib/mock-data";
 import { formatNombre } from "@/lib/utils";
 
 export default function TrendingSidebar() {
   const afc = clubs[0];
   const suggestions = joueurs.filter((j) => j.id !== "moi").slice(3, 6);
   const upcoming = tournois.filter((t) => t.statut === "À venir").slice(0, 2);
+  const enDirect = liveMatches.filter((m) => m.isLive).slice(0, 3);
 
   return (
-    <aside className="sticky top-0 hidden h-dvh w-80 shrink-0 space-y-4 overflow-y-auto px-4 py-5 xl:block">
+    <aside className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] w-80 shrink-0 space-y-4 overflow-y-auto px-4 py-5 xl:block">
+      <Card className="p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm font-bold">
+            <Radio className="h-4 w-4 text-live" /> Matches en direct
+          </div>
+          <Link href="/live" className="text-xs font-semibold text-accent hover:underline">
+            Voir tout
+          </Link>
+        </div>
+        <div className="space-y-3">
+          {enDirect.map((m) => (
+            <Link key={m.id} href="/live" className="block group">
+              <div className="flex items-center gap-2">
+                <Avatar type="club" nom={m.clubDomicile} seed={m.clubDomicileLogo} size="xs" />
+                <p className="min-w-0 flex-1 truncate text-xs font-semibold group-hover:text-accent">
+                  {m.clubDomicile}
+                </p>
+                <span className="font-display text-sm font-bold">{m.scoreDomicile}</span>
+              </div>
+              <div className="mt-1 flex items-center gap-2">
+                <Avatar type="club" nom={m.clubExterieur} seed={m.clubExterieurLogo} size="xs" />
+                <p className="min-w-0 flex-1 truncate text-xs font-semibold group-hover:text-accent">
+                  {m.clubExterieur}
+                </p>
+                <span className="font-display text-sm font-bold">{m.scoreExterieur}</span>
+              </div>
+              <div className="mt-1.5 flex items-center gap-2">
+                <LiveBadge />
+                <span className="text-[11px] text-muted">{m.minute}&apos;</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </Card>
+
       <Card id="postuler" className="overflow-hidden border-gold/25 bg-gradient-to-br from-gold/10 via-surface to-surface p-4">
         <div className="mb-3 flex items-center gap-2">
           <Flame className="h-4 w-4 text-gold" />

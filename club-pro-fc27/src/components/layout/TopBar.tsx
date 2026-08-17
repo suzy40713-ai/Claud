@@ -5,7 +5,7 @@ import { Bell, Search, Shield } from "lucide-react";
 
 export default function TopBar() {
   return (
-    <header className="glass sticky top-0 z-40 flex items-center justify-between border-b border-surface-border px-4 py-3 lg:hidden">
+    <header className="glass sticky top-0 z-40 flex h-14 items-center justify-between border-b border-surface-border px-4 lg:hidden">
       <Link href="/" className="flex items-center gap-2">
         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-accent to-accent-dim text-[#04150c]">
           <Shield className="h-4 w-4" fill="currentColor" strokeWidth={0} />

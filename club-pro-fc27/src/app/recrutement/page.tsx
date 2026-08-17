@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Bell, BellRing, ListFilter, SlidersHorizontal } from "lucide-react";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Bell, BellRing, ListFilter, Search, SlidersHorizontal } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import Card from "@/components/ui/Card";
 import Reveal from "@/components/ui/Reveal";
@@ -20,30 +21,46 @@ const TYPE_OPTIONS = [
 ];
 
 export default function RecrutementPage() {
+  return (
+    <Suspense fallback={null}>
+      <RecrutementContent />
+    </Suspense>
+  );
+}
+
+function RecrutementContent() {
+  const searchParams = useSearchParams();
   const [tab, setTab] = useState("annonces");
   const [type, setType] = useState<"tous" | "club" | "joueur">("tous");
   const [poste, setPoste] = useState<Poste | "tous">("tous");
   const [region, setRegion] = useState<Region | "tous">("tous");
   const [langue, setLangue] = useState<Langue | "tous">("tous");
   const [niveauMin, setNiveauMin] = useState(0);
+  const [q, setQ] = useState(searchParams.get("q") ?? "");
   const [showFilters, setShowFilters] = useState(false);
   const [alertes, setAlertes] = useState(false);
   const [essaiCible, setEssaiCible] = useState<AnnonceRecrutement | null>(null);
 
   const filtered = useMemo(() => {
+    const needle = q.trim().toLowerCase();
     return annonces.filter((a) => {
       if (type !== "tous" && a.type !== type) return false;
       if (poste !== "tous" && a.poste !== poste) return false;
       if (region !== "tous" && a.region !== region) return false;
       if (langue !== "tous" && !a.langues.includes(langue)) return false;
       if (a.niveauMin < niveauMin) return false;
+      if (
+        needle &&
+        !`${a.titre} ${a.auteurNom} ${a.description}`.toLowerCase().includes(needle)
+      )
+        return false;
       return true;
     });
-  }, [type, poste, region, langue, niveauMin]);
+  }, [type, poste, region, langue, niveauMin, q]);
 
   return (
     <div>
-      <div className="glass sticky top-0 z-30 border-b border-surface-border px-4 py-3">
+      <div className="glass sticky top-14 z-30 border-b border-surface-border px-4 py-3">
         <div className="flex items-center justify-between">
           <h1 className="font-display text-lg font-bold">Recrutement</h1>
           <button
@@ -71,6 +88,15 @@ export default function RecrutementPage() {
 
       {tab === "annonces" && (
         <div className="p-4">
+          <div className="mb-3 flex items-center gap-2 rounded-full border border-surface-border bg-surface-2 px-3.5 py-2 text-sm">
+            <Search className="h-4 w-4 shrink-0 text-muted" />
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Rechercher une annonce, un club, un pseudo..."
+              className="w-full bg-transparent placeholder:text-muted focus:outline-none"
+            />
+          </div>
           <div className="mb-4 flex flex-wrap items-center gap-2">
             {TYPE_OPTIONS.map((o) => (
               <button

@@ -222,12 +222,17 @@ export const LANGUES: Langue[] = ["Français", "Anglais", "Arabe", "Espagnol"];
 
 export const NAV_LINKS = [
   { href: "/", label: "Accueil", icon: "Home" },
+  { href: "/explorer", label: "Explorer", icon: "Compass" },
   { href: "/recrutement", label: "Recrutement", icon: "Briefcase" },
-  { href: "/live", label: "Live", icon: "Radio" },
+  { href: "/clubs", label: "Clubs", icon: "Shield" },
   { href: "/tournois", label: "Tournois", icon: "Trophy" },
+  { href: "/live", label: "Matchs en direct", icon: "Radio" },
+  { href: "/classement", label: "Classements", icon: "BarChart3" },
   { href: "/matchmaking", label: "Matchmaking", icon: "Swords" },
-  { href: "/classement", label: "Classement", icon: "BarChart3" },
   { href: "/messages", label: "Messages", icon: "MessageCircle" },
+  { href: "/notifications", label: "Notifications", icon: "Bell" },
+  { href: "/joueur/moi", label: "Profil", icon: "User" },
+  { href: "/parametres", label: "Paramètres", icon: "Settings" },
   { href: "/african-fc", label: "African FC", icon: "Flame" },
 ];
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { BadgeCheck, Heart, MessageCircle, PlayCircle, Repeat2, Share, Zap } from "lucide-react";
+import { BadgeCheck, Heart, MessageCircle, PlayCircle, Share, Zap } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import type { Post } from "@/types";
 import { formatNombre, tempsRelatif } from "@/lib/utils";
@@ -69,22 +69,7 @@ export default function PostCard({ post }: { post: Post }) {
             <div className="mt-3 aspect-video rounded-xl border border-surface-border bg-gradient-to-br from-surface-2 to-black" />
           )}
 
-          <div className="mt-3 flex max-w-md items-center justify-between text-muted">
-            <button className="group flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs hover:text-sky-400 cursor-pointer">
-              <MessageCircle className="h-4 w-4 group-hover:scale-110 transition-transform" />
-              {formatNombre(post.commentaires)}
-            </button>
-            <motion.button
-              onClick={() => setShared((v) => !v)}
-              whileTap={{ scale: 0.9 }}
-              className={cn(
-                "group flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs hover:text-emerald-400 cursor-pointer",
-                shared && "text-emerald-400"
-              )}
-            >
-              <Repeat2 className="h-4 w-4 group-hover:scale-110 transition-transform" />
-              {formatNombre(post.partages + (shared ? 1 : 0))}
-            </motion.button>
+          <div className="mt-3 flex max-w-xs items-center justify-between text-muted">
             <button
               onClick={toggleLike}
               className={cn(
@@ -110,9 +95,21 @@ export default function PostCard({ post }: { post: Post }) {
               </motion.span>
               {formatNombre(likes)}
             </button>
-            <button className="rounded-lg px-2 py-1 hover:text-foreground cursor-pointer">
-              <Share className="h-4 w-4" />
+            <button className="group flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs hover:text-sky-400 cursor-pointer">
+              <MessageCircle className="h-4 w-4 group-hover:scale-110 transition-transform" />
+              {formatNombre(post.commentaires)}
             </button>
+            <motion.button
+              onClick={() => setShared((v) => !v)}
+              whileTap={{ scale: 0.9 }}
+              className={cn(
+                "group flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs hover:text-emerald-400 cursor-pointer",
+                shared && "text-emerald-400"
+              )}
+            >
+              <Share className="h-4 w-4 group-hover:scale-110 transition-transform" />
+              {formatNombre(post.partages + (shared ? 1 : 0))}
+            </motion.button>
           </div>
         </div>
       </div>

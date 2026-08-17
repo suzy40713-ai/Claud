@@ -31,7 +31,7 @@ export default function Home() {
   return (
     <div className="flex">
       <div className="min-w-0 flex-1">
-        <div className="glass sticky top-0 z-30 hidden border-b border-surface-border px-4 py-3 lg:block">
+        <div className="glass sticky top-14 z-30 hidden border-b border-surface-border px-4 py-3 lg:block">
           <h1 className="font-display text-lg font-bold">Accueil</h1>
         </div>
         <StoriesRow />
