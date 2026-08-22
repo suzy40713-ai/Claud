@@ -7,7 +7,7 @@ export function PrivacyPage() {
     <div className="min-h-screen bg-white">
       <header className="border-b border-slate-100 px-4 py-4">
         <Link to="/login" className="text-lg font-extrabold tracking-tight text-slate-900">
-          👑 Kadence
+          👑 Kadence IA
         </Link>
       </header>
 
@@ -16,13 +16,13 @@ export function PrivacyPage() {
         <p className="mt-1 text-sm text-slate-500">Dernière mise à jour : 15 août 2026</p>
 
         <p className="mt-6 leading-relaxed">
-          Kadence est une application de coaching sportif. Cette page explique simplement quelles données sont
+          Kadence IA est une application de coaching sportif. Cette page explique simplement quelles données sont
           collectées, pourquoi, et comment tu peux les contrôler.
         </p>
 
         <h2 className="mt-8 text-lg font-semibold text-slate-900">Qui est responsable de ces données ?</h2>
         <p className="mt-2 leading-relaxed">
-          Kadence en est responsable. Pour toute question ou demande concernant tes données, écris à{" "}
+          Kadence IA en est responsable. Pour toute question ou demande concernant tes données, écris à{" "}
           <a href={`mailto:${CONTACT_EMAIL}`} className="font-semibold text-indigo-600">
             {CONTACT_EMAIL}
           </a>
@@ -125,7 +125,7 @@ export function PrivacyPage() {
 
         <h2 className="mt-8 text-lg font-semibold text-slate-900">Âge minimum</h2>
         <p className="mt-2 leading-relaxed">
-          Kadence s'adresse à des utilisateurs de 16 ans et plus.
+          Kadence IA s'adresse à des utilisateurs de 16 ans et plus.
         </p>
 
         <h2 className="mt-8 text-lg font-semibold text-slate-900">Modifications</h2>

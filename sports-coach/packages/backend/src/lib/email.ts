@@ -35,12 +35,12 @@ export async function sendEbookEmail(toEmail: string): Promise<void> {
     subject: "Ton ebook Transformation 90 Jours est arrive 👑",
     html: `
       <div style="font-family: -apple-system, Helvetica, Arial, sans-serif; max-width: 520px; margin: 0 auto; color: #1c1c22;">
-        <p style="font-size: 22px; margin-bottom: 4px;">👑 <strong>Kadence</strong></p>
+        <p style="font-size: 22px; margin-bottom: 4px;">👑 <strong>Kadence IA</strong></p>
         <h1 style="font-size: 20px; color: #14121f;">Merci pour ton achat !</h1>
         <p>Ton ebook <strong>Transformation 90 Jours</strong> est en piece jointe de cet email, pret a etre lu des maintenant.</p>
         <p>Une astuce avant de commencer : imprime (ou garde ouvertes) les pages du carnet de suivi a la fin du livre. C'est cet outil, rempli chaque semaine, qui fait la plus grande difference sur la duree.</p>
         <p style="margin-top: 24px;">On croit en toi. Bonne transformation.</p>
-        <p style="color:#6a6680;">&mdash; L'equipe Kadence</p>
+        <p style="color:#6a6680;">&mdash; L'equipe Kadence IA</p>
       </div>
     `,
     attachments: [

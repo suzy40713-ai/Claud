@@ -33,7 +33,7 @@ export async function createEbookCheckoutSessionUrl(frontendOrigin: string): Pro
           currency: "eur",
           unit_amount: env.ebookPriceCents,
           product_data: {
-            name: "Ebook Kadence — Transformation 90 Jours",
+            name: "Ebook Kadence IA — Transformation 90 Jours",
             description:
               "87 pages : programme d'entrainement complet, nutrition, mental et carnet de suivi, pour transformer ton physique en 3 mois.",
           },

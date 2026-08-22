@@ -47,7 +47,7 @@ services:
       EBOOK_PRICE_CENTS: ${EBOOK_PRICE_CENTS:-2999}
       EBOOK_COMPARE_AT_PRICE_CENTS: ${EBOOK_COMPARE_AT_PRICE_CENTS:-4999}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
-      EBOOK_SENDER_EMAIL: ${EBOOK_SENDER_EMAIL:-Kadence <onboarding@resend.dev>}
+      EBOOK_SENDER_EMAIL: ${EBOOK_SENDER_EMAIL:-Kadence IA <onboarding@resend.dev>}
     ports:
       - "4000:4000"
     volumes:

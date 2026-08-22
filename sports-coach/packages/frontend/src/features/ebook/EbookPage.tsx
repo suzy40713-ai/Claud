@@ -85,7 +85,7 @@ export function EbookPage() {
     <div className="min-h-screen bg-white">
       <header className="glass-card sticky top-0 z-20 px-4 py-4">
         <Link to={user ? "/" : "/login"} className="text-lg font-extrabold tracking-tight text-slate-900">
-          👑 Kadence
+          👑 Kadence IA
         </Link>
       </header>
 
@@ -114,7 +114,7 @@ export function EbookPage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
             src={`${import.meta.env.BASE_URL}images/ebook-product.png`}
-            alt="Ebook Kadence — Transformation 90 Jours"
+            alt="Ebook Kadence IA — Transformation 90 Jours"
             className="animate-float-slow relative w-full rounded-2xl drop-shadow-2xl"
           />
           <motion.div
@@ -224,7 +224,7 @@ export function EbookPage() {
             "On a ecrit ce livre comme on aurait aime en recevoir un le premier jour : sans detour, sans te
             vendre du reve, juste un plan clair qui tient la route sur 90 jours."
           </p>
-          <p className="relative mt-4 text-sm font-semibold text-slate-400">— L'equipe Kadence</p>
+          <p className="relative mt-4 text-sm font-semibold text-slate-400">— L'equipe Kadence IA</p>
         </motion.section>
 
         <motion.section
