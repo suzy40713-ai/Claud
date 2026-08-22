@@ -1,0 +1,42 @@
+{
+  "data": {
+    "hookTitle": "3 SIGNES QUE TA TRANSFORMATION EST BLOQUEE",
+    "watermarkHandle": "kairo",
+    "ctaText": "Le guide complet est dans ma bio",
+    "exercises": [
+      {
+        "rank": 3,
+        "name": "AUCUN PLAN",
+        "image": "characters/squat.webp",
+        "instructionSequence": [
+          "TU RECOMMENCES",
+          "A ZERO CHAQUE MOIS"
+        ],
+        "dureeSecondes": 5,
+        "arrowDirection": "none"
+      },
+      {
+        "rank": 2,
+        "name": "ZERO SUIVI",
+        "image": "characters/mountain-climber.webp",
+        "instructionSequence": [
+          "TU NE SAIS JAMAIS",
+          "SI TU MANGES ASSEZ"
+        ],
+        "dureeSecondes": 5,
+        "arrowDirection": "none"
+      },
+      {
+        "rank": 1,
+        "name": "PAS DE CAP",
+        "image": "characters/pushup.webp",
+        "instructionSequence": [
+          "PAS DE PLAN POUR",
+          "LES 90 PROCHAINS JOURS"
+        ],
+        "dureeSecondes": 5,
+        "arrowDirection": "none"
+      }
+    ]
+  }
+}
