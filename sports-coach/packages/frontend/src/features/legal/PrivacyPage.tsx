@@ -102,11 +102,25 @@ export function PrivacyPage() {
 
         <h2 className="mt-8 text-lg font-semibold text-slate-900">Combien de temps ces données sont-elles gardées ?</h2>
         <p className="mt-2 leading-relaxed">
-          Tant que ton compte existe. Si tu souhaites la suppression de ton compte et de tes données, écris-nous à{" "}
-          <a href={`mailto:${CONTACT_EMAIL}`} className="font-semibold text-indigo-600">
+          Tant que ton compte existe. Si tu souhaites la suppression de ton compte et de tes données, consulte la
+          section ci-dessous.
+        </p>
+
+        <h2 id="suppression-compte" className="mt-8 scroll-mt-4 text-lg font-semibold text-slate-900">
+          Suppression de ton compte Kadence IA
+        </h2>
+        <p className="mt-2 leading-relaxed">
+          Pour demander la suppression de ton compte Kadence IA et de tes données, envoie un email à{" "}
+          <a href={`mailto:${CONTACT_EMAIL}?subject=Suppression%20de%20compte`} className="font-semibold text-indigo-600">
             {CONTACT_EMAIL}
           </a>{" "}
-          : nous traiterons la demande sous 30 jours.
+          avec pour objet « Suppression de compte », depuis l'adresse email associée à ton compte.
+        </p>
+        <p className="mt-2 leading-relaxed">
+          Ta demande est traitée sous 30 jours maximum. Sont supprimés : ton profil, ton historique de blessures,
+          ton journal quotidien, tes activités sportives, ton plan d'entraînement, tes messages avec le coach IA,
+          tes listes de courses et scans de repas. Les données liées à un paiement déjà effectué (factures) peuvent
+          être conservées plus longtemps si la loi nous y oblige (obligations comptables et fiscales).
         </p>
 
         <h2 className="mt-8 text-lg font-semibold text-slate-900">Tes droits</h2>
