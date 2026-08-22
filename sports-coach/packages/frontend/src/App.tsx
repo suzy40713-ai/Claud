@@ -35,41 +35,42 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="flex h-dvh flex-col">
       {user.onboardingComplete && (
-        <>
-          <nav className="glass-card sticky top-0 z-20 flex items-center justify-between gap-2 px-3 py-3 shadow-sm shadow-slate-900/5 sm:px-4">
-            <span className="flex shrink-0 items-center gap-1.5 text-lg font-extrabold tracking-tight text-slate-900">
-              <span aria-hidden className="text-xl leading-none">
-                👑
-              </span>
-              <span className="hidden sm:inline">Kadence</span>
+        <nav className="glass-card z-20 flex shrink-0 items-center justify-between gap-2 px-3 py-3 shadow-sm shadow-slate-900/5 sm:px-4">
+          <span className="flex shrink-0 items-center gap-1.5 text-lg font-extrabold tracking-tight text-slate-900">
+            <span aria-hidden className="text-xl leading-none">
+              👑
             </span>
-            <div className="hidden flex-1 items-center gap-1 sm:flex sm:gap-2">
-              {NAV_LINKS.map((link) => (
-                <NavItem key={link.to} link={link} active={location.pathname === link.to} />
-              ))}
-            </div>
-            <button
-              onClick={() => logout()}
-              aria-label="Deconnexion"
-              className="shrink-0 rounded-full px-2.5 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 sm:px-3"
-            >
-              <span aria-hidden className="text-lg sm:hidden">
-                🚪
-              </span>
-              <span className="hidden sm:inline">Deconnexion</span>
-            </button>
-          </nav>
-
-          <div className="glass-card fixed inset-x-0 bottom-0 z-20 flex items-stretch justify-between px-1 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_20px_rgba(15,23,42,0.06)] sm:hidden">
+            <span className="hidden sm:inline">Kadence</span>
+          </span>
+          <div className="hidden flex-1 items-center gap-1 sm:flex sm:gap-2">
             {NAV_LINKS.map((link) => (
-              <NavItem key={link.to} link={link} active={location.pathname === link.to} mobileTab />
+              <NavItem key={link.to} link={link} active={location.pathname === link.to} />
             ))}
           </div>
-        </>
+          <button
+            onClick={() => logout()}
+            aria-label="Deconnexion"
+            className="shrink-0 rounded-full px-2.5 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 sm:px-3"
+          >
+            <span aria-hidden className="text-lg sm:hidden">
+              🚪
+            </span>
+            <span className="hidden sm:inline">Deconnexion</span>
+          </button>
+        </nav>
       )}
-      <div className={user.onboardingComplete ? "pb-20 sm:pb-0" : undefined}>{children}</div>
+
+      <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+
+      {user.onboardingComplete && (
+        <div className="glass-card z-20 flex shrink-0 items-stretch justify-between px-1 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_20px_rgba(15,23,42,0.06)] sm:hidden">
+          {NAV_LINKS.map((link) => (
+            <NavItem key={link.to} link={link} active={location.pathname === link.to} mobileTab />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

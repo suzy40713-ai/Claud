@@ -74,7 +74,7 @@ export function CoachPage() {
   if (loading) return null;
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-57px)] max-w-2xl flex-col px-4 py-4">
+    <div className="mx-auto flex h-full max-w-2xl flex-col px-4 py-4">
       <div className="mb-2">
         <h1 className="text-2xl font-bold">🤖 Coach IA</h1>
         <p className="text-sm text-slate-400">
