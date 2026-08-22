@@ -194,3 +194,28 @@ export interface MealScanDTO {
   commentaireObjectif: string;
   createdAt: string;
 }
+
+export const RANK_LABELS = ["Bronze", "Argent", "Or", "Platine", "Diamant"] as const;
+export const FRAMES_PAR_DEFI = 6;
+export const REPS_REQUISES = 10;
+
+export const CHALLENGE_STATUTS = ["reussi", "echoue", "manque"] as const;
+export type ChallengeStatut = (typeof CHALLENGE_STATUTS)[number];
+
+export interface PushupChallengeDTO {
+  id: string;
+  semaineDebut: string; // YYYY-MM-DD (lundi)
+  statut: ChallengeStatut;
+  repsDetectees: number;
+  formeValide: boolean;
+  commentaire: string;
+  createdAt: string;
+}
+
+export interface RankStatusDTO {
+  rang: number; // 0 = Bronze .. 4 = Diamant
+  rangLabel: (typeof RANK_LABELS)[number];
+  semaineDebutCourante: string; // YYYY-MM-DD (lundi)
+  defiCourant: PushupChallengeDTO | null; // null = pas encore soumis cette semaine
+  historique: PushupChallengeDTO[];
+}

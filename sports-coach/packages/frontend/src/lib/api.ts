@@ -9,6 +9,7 @@ import type {
   MealScanDTO,
   OnboardingPayload,
   PlannedSessionDTO,
+  RankStatusDTO,
   SessionStatut,
   TrainingPlanResponse,
   UserProfileDTO,
@@ -210,6 +211,13 @@ export const api = {
     const form = new FormData();
     form.append("photo", file);
     return request<{ scan: MealScanDTO }>("/nutrition/scan-meal", { method: "POST", body: form });
+  },
+
+  getRankStatus: () => request<RankStatusDTO>("/rang"),
+  submitPushupChallenge: (frames: Blob[]) => {
+    const form = new FormData();
+    frames.forEach((frame, i) => form.append("frames", frame, `frame-${i}.jpg`));
+    return request<RankStatusDTO>("/rang/defi", { method: "POST", body: form });
   },
 };
 

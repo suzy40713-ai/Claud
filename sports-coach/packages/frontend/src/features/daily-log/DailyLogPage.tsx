@@ -5,6 +5,7 @@ import { api, ApiError } from "../../lib/api";
 import { Button } from "../../components/ui/Button";
 import { ScaleSelector } from "../../components/ui/ScaleSelector";
 import { EbookPromoBanner } from "../../components/ui/PromoBanner";
+import { RankChallengeCard } from "../rank/RankChallengeCard";
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
@@ -64,6 +65,8 @@ export function DailyLogPage() {
         <h1 className="text-2xl font-bold">📓 Journal du jour</h1>
         <p className="text-base text-slate-500">Trois questions, 15 secondes.</p>
       </div>
+
+      <RankChallengeCard />
 
       <div className="flex flex-col gap-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
         <ScaleSelector

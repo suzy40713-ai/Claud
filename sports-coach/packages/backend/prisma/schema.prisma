@@ -58,6 +58,12 @@ enum EbookDeliveryStatus {
   echec
 }
 
+enum ChallengeStatut {
+  reussi
+  echoue
+  manque
+}
+
 model User {
   id                 String   @id @default(uuid())
   email              String   @unique
@@ -89,8 +95,42 @@ model User {
   pushSubscriptions PushSubscription[]
   groceryLists      GroceryList[]
   mealScans         MealScan[]
+  rankProfile       RankProfile?
+  pushupChallenges  PushupChallenge[]
 
   @@map("users")
+}
+
+// Rang de motivation de l'utilisateur (defi hebdomadaire de pompes).
+// Cree paresseusement au premier appel a GET /rang.
+model RankProfile {
+  id                   String    @id @default(uuid())
+  userId               String    @unique @map("user_id")
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rang                 Int       @default(0) // 0=Bronze .. 4=Diamant
+  derniereSemaineResolue DateTime? @map("derniere_semaine_resolue") @db.Date // lundi de la derniere semaine deja prise en compte dans le rang
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  @@map("rank_profiles")
+}
+
+// Une tentative au defi hebdomadaire de pompes. Au plus une par
+// utilisateur et par semaine (voir contrainte unique). Comme pour le scan
+// de repas, seules quelques images extraites de la video sont envoyees a
+// l'IA pour analyse ; rien n'est stocke cote serveur au-dela du resultat.
+model PushupChallenge {
+  id              String          @id @default(uuid())
+  userId          String          @map("user_id")
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  semaineDebut    DateTime        @map("semaine_debut") @db.Date // lundi de la semaine concernee
+  statut          ChallengeStatut
+  repsDetectees   Int             @map("reps_detectees")
+  formeValide     Boolean         @map("forme_valide")
+  commentaire     String
+  createdAt       DateTime        @default(now()) @map("created_at")
+
+  @@unique([userId, semaineDebut])
+  @@map("pushup_challenges")
 }
 
 // Liste de courses generee par l'IA a partir du profil de l'utilisateur

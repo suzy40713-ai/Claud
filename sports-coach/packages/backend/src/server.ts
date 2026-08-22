@@ -15,6 +15,7 @@ import { billingRouter } from "./modules/billing/billing.routes.js";
 import { billingWebhookRouter } from "./modules/billing/billing.webhook.js";
 import { ebookRouter } from "./modules/ebook/ebook.routes.js";
 import { nutritionRouter } from "./modules/nutrition/nutrition.routes.js";
+import { rankRouter } from "./modules/rank/rank.routes.js";
 import { startOverloadAlertScheduler } from "./lib/scheduler.js";
 import { apiRateLimiter } from "./lib/rate-limit.js";
 
@@ -74,6 +75,7 @@ app.use("/api/strava", stravaRouter);
 app.use("/api/billing", billingRouter);
 app.use("/api/ebook", ebookRouter);
 app.use("/api/nutrition", nutritionRouter);
+app.use("/api/rang", rankRouter);
 
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err);
