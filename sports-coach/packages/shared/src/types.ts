@@ -190,5 +190,7 @@ export interface MealScanDTO {
   glucidesG: number;
   lipidesG: number;
   confiance: "faible" | "moyenne" | "haute";
+  adequationObjectif: "adapte" | "a_moderer" | "a_eviter";
+  commentaireObjectif: string;
   createdAt: string;
 }

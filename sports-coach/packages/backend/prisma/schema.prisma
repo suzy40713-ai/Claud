@@ -118,6 +118,8 @@ model MealScan {
   glucidesG   Int      @map("glucides_g")
   lipidesG    Int      @map("lipides_g")
   confiance   String // "faible" | "moyenne" | "haute"
+  adequationObjectif  String @map("adequation_objectif") // "adapte" | "a_moderer" | "a_eviter"
+  commentaireObjectif String @map("commentaire_objectif")
   createdAt   DateTime @default(now()) @map("created_at")
 
   @@index([userId, createdAt])

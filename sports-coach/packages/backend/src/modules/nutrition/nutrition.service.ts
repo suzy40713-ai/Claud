@@ -80,21 +80,36 @@ export interface MealAnalysis {
   glucidesG: number;
   lipidesG: number;
   confiance: "faible" | "moyenne" | "haute";
+  adequationObjectif: "adapte" | "a_moderer" | "a_eviter";
+  commentaireObjectif: string;
 }
 
-const MEAL_SCAN_SYSTEM_PROMPT = `Tu es un nutritionniste expert en estimation visuelle de repas. On te montre une photo d'un plat. Estime son contenu nutritionnel du mieux possible a partir de ce que tu vois (types d'aliments, portions apparentes).
+const MEAL_SCAN_SYSTEM_PROMPT = `Tu es un nutritionniste expert en estimation visuelle de repas. On te montre une photo d'un plat, ainsi que le profil nutritionnel de la personne (objectif, niveau, sports pratiques). Estime le contenu nutritionnel du repas du mieux possible a partir de ce que tu vois (types d'aliments, portions apparentes), puis juge si ce repas est adapte a l'objectif de la personne.
 
 Reponds UNIQUEMENT avec un objet JSON valide, sans aucun texte autour, de la forme :
-{"description": "Poulet grille, riz, brocolis", "calories": 550, "proteinesG": 40, "glucidesG": 55, "lipidesG": 15, "confiance": "moyenne"}
+{"description": "Poulet grille, riz, brocolis", "calories": 550, "proteinesG": 40, "glucidesG": 55, "lipidesG": 15, "confiance": "moyenne", "adequationObjectif": "adapte", "commentaireObjectif": "Bon equilibre proteines/glucides pour une seance de musculation."}
 
-"confiance" doit valoir "faible", "moyenne" ou "haute" selon la clarte de l'image et la facilite d'estimation. Si l'image ne montre clairement pas un repas ou une boisson, mets calories a 0, description "Aucun aliment identifie sur cette photo" et confiance "faible".`;
+"confiance" doit valoir "faible", "moyenne" ou "haute" selon la clarte de l'image et la facilite d'estimation.
 
-export async function analyzeMealImage(imageBase64: string, mediaType: string): Promise<MealAnalysis> {
+"adequationObjectif" doit valoir :
+- "adapte" si le repas correspond bien a l'objectif (ex: riche en proteines et equilibre pour perte de poids ou performance)
+- "a_moderer" si le repas peut convenir occasionnellement mais n'est pas ideal pour l'objectif (ex: trop calorique, trop gras, glucides rapides en exces)
+- "a_eviter" si le repas va clairement a l'encontre de l'objectif
+
+"commentaireObjectif" : une phrase courte, concrete et bienveillante expliquant pourquoi, avec si pertinent un conseil pour le prochain repas. Jamais culpabilisant.
+
+Si l'image ne montre clairement pas un repas ou une boisson, mets calories a 0, description "Aucun aliment identifie sur cette photo", confiance "faible", adequationObjectif "a_moderer" et commentaireObjectif "Impossible d'analyser cette image, reessaie avec une photo plus claire du plat."`;
+
+export async function analyzeMealImage(
+  imageBase64: string,
+  mediaType: string,
+  profil: { objectif: string | null; niveau: string | null; sportsPratiques: string[] }
+): Promise<MealAnalysis> {
   const anthropic = getClient();
 
   const message = await anthropic.messages.create({
     model: env.coachModel,
-    max_tokens: 500,
+    max_tokens: 600,
     thinking: { type: "disabled" },
     system: MEAL_SCAN_SYSTEM_PROMPT,
     messages: [
@@ -105,7 +120,7 @@ export async function analyzeMealImage(imageBase64: string, mediaType: string): 
             type: "image",
             source: { type: "base64", media_type: mediaType as "image/jpeg", data: imageBase64 },
           },
-          { type: "text", text: "Analyse ce repas." },
+          { type: "text", text: `Analyse ce repas pour ce profil : ${JSON.stringify(profil)}` },
         ],
       },
     ],
@@ -122,7 +137,8 @@ export async function analyzeMealImage(imageBase64: string, mediaType: string): 
     typeof parsed.calories !== "number" ||
     typeof parsed.proteinesG !== "number" ||
     typeof parsed.glucidesG !== "number" ||
-    typeof parsed.lipidesG !== "number"
+    typeof parsed.lipidesG !== "number" ||
+    typeof parsed.commentaireObjectif !== "string"
   ) {
     throw new Error("Format d'analyse de repas inattendu.");
   }
@@ -134,5 +150,10 @@ export async function analyzeMealImage(imageBase64: string, mediaType: string): 
     glucidesG: Math.round(parsed.glucidesG),
     lipidesG: Math.round(parsed.lipidesG),
     confiance: parsed.confiance === "haute" || parsed.confiance === "moyenne" ? parsed.confiance : "faible",
+    adequationObjectif:
+      parsed.adequationObjectif === "adapte" || parsed.adequationObjectif === "a_eviter"
+        ? parsed.adequationObjectif
+        : "a_moderer",
+    commentaireObjectif: parsed.commentaireObjectif,
   };
 }

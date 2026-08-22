@@ -11,6 +11,12 @@ const CONFIANCE_LABEL: Record<MealScanDTO["confiance"], string> = {
   haute: "Estimation fiable",
 };
 
+const ADEQUATION_STYLE: Record<MealScanDTO["adequationObjectif"], { label: string; className: string }> = {
+  adapte: { label: "✓ Adapte a ton objectif", className: "bg-emerald-100 text-emerald-700" },
+  a_moderer: { label: "◐ A moderer", className: "bg-amber-100 text-amber-700" },
+  a_eviter: { label: "✕ A eviter pour ton objectif", className: "bg-red-100 text-red-700" },
+};
+
 function UpsellBanner({ text }: { text: string }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-indigo-200 bg-indigo-50/50 px-3 py-2 text-sm">
@@ -182,12 +188,21 @@ export function NutritionPage() {
                   <span>🍞 {scan.glucidesG} g glucides</span>
                   <span>🥑 {scan.lipidesG} g lipides</span>
                 </div>
+                <div className="mt-3 flex flex-col gap-2">
+                  <span
+                    className={`w-fit rounded-full px-2.5 py-1 text-xs font-bold ${ADEQUATION_STYLE[scan.adequationObjectif].className}`}
+                  >
+                    {ADEQUATION_STYLE[scan.adequationObjectif].label}
+                  </span>
+                  <p className="text-sm text-slate-600">{scan.commentaireObjectif}</p>
+                </div>
               </motion.div>
             ))}
           </AnimatePresence>
           {scans.length === 0 && premium !== false && (
             <p className="text-sm text-slate-400">
-              Prends une photo de ton assiette pour estimer ses calories et macronutriments.
+              Prends une photo de ton assiette pour estimer ses calories, macronutriments, et savoir si ce repas est
+              adapte a ton objectif.
             </p>
           )}
         </div>

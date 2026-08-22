@@ -81,7 +81,12 @@ nutritionRouter.post("/scan-meal", requirePremium, upload.single("photo"), async
   }
 
   try {
-    const analysis = await analyzeMealImage(file.buffer.toString("base64"), file.mimetype);
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: req.userId } });
+    const analysis = await analyzeMealImage(file.buffer.toString("base64"), file.mimetype, {
+      objectif: user.objectif,
+      niveau: user.niveau,
+      sportsPratiques: user.sportsPratiques,
+    });
 
     const scan = await prisma.mealScan.create({
       data: {
@@ -92,6 +97,8 @@ nutritionRouter.post("/scan-meal", requirePremium, upload.single("photo"), async
         glucidesG: analysis.glucidesG,
         lipidesG: analysis.lipidesG,
         confiance: analysis.confiance,
+        adequationObjectif: analysis.adequationObjectif,
+        commentaireObjectif: analysis.commentaireObjectif,
       },
     });
 

@@ -18,6 +18,8 @@ export function toMealScanDTO(scan: MealScan): MealScanDTO {
     glucidesG: scan.glucidesG,
     lipidesG: scan.lipidesG,
     confiance: scan.confiance as MealScanDTO["confiance"],
+    adequationObjectif: scan.adequationObjectif as MealScanDTO["adequationObjectif"],
+    commentaireObjectif: scan.commentaireObjectif,
     createdAt: scan.createdAt.toISOString(),
   };
 }
