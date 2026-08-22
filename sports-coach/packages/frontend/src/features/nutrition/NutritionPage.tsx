@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
-import type { GroceryListDTO, MealScanDTO } from "@sports-coach/shared";
+import type { GroceryItemDTO, GroceryListDTO, MealScanDTO } from "@sports-coach/shared";
 import { api, ApiError } from "../../lib/api";
 import { Button } from "../../components/ui/Button";
 
@@ -82,7 +82,7 @@ export function NutritionPage() {
     }
   }
 
-  const itemsByCategorie = (list?.items ?? []).reduce<Record<string, typeof list.items>>((acc, item) => {
+  const itemsByCategorie = (list?.items ?? []).reduce<Record<string, GroceryItemDTO[]>>((acc, item) => {
     (acc[item.categorie] ??= []).push(item);
     return acc;
   }, {});
@@ -123,7 +123,7 @@ export function NutritionPage() {
               <div key={categorie} className="rounded-xl bg-slate-50 p-4">
                 <h3 className="text-sm font-bold uppercase tracking-wide text-indigo-600">{categorie}</h3>
                 <ul className="mt-2 flex flex-col gap-1 text-sm text-slate-700">
-                  {items!.map((item) => (
+                  {items.map((item) => (
                     <li key={item.nom} className="flex justify-between gap-2">
                       <span>{item.nom}</span>
                       <span className="text-slate-400">{item.quantite}</span>
