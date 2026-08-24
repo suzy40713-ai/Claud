@@ -15,7 +15,7 @@ const fadeUp = {
   show: { opacity: 1, y: 0 },
 };
 
-interface RecipeEbookPageProps {
+interface EbookProductPageProps {
   productId: string;
   emoji: string;
   eyebrow: string;
@@ -24,7 +24,7 @@ interface RecipeEbookPageProps {
   contenu: string[];
 }
 
-export function RecipeEbookPage({ productId, emoji, eyebrow, titre, description, contenu }: RecipeEbookPageProps) {
+export function EbookProductPage({ productId, emoji, eyebrow, titre, description, contenu }: EbookProductPageProps) {
   const location = useLocation();
   const { user } = useAuth();
   const [status, setStatus] = useState<{ configured: boolean; priceCents: number; compareAtPriceCents: number } | null>(

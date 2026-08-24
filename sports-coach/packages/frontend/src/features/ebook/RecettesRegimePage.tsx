@@ -1,8 +1,8 @@
-import { RecipeEbookPage } from "./RecipeEbookPage";
+import { EbookProductPage } from "./EbookProductPage";
 
 export function RecettesRegimePage() {
   return (
-    <RecipeEbookPage
+    <EbookProductPage
       productId="recettes-regime"
       emoji="🥗"
       eyebrow="Ebook · PDF · Recettes"

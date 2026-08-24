@@ -22,6 +22,27 @@ const EBOOKS = [
     titre: "Recettes Prise de Masse",
     description: "20 recettes caloriques et riches en protéines pour le surplus.",
   },
+  {
+    to: "/guide-musculation-debutant",
+    id: "guide-musculation-debutant",
+    emoji: "🏋️",
+    titre: "Bases de la Musculation",
+    description: "Le programme simple pour bien débuter, sans te blesser.",
+  },
+  {
+    to: "/programme-maison-sans-materiel",
+    id: "programme-maison-sans-materiel",
+    emoji: "🏠",
+    titre: "Cardio & Renfo Sans Matériel",
+    description: "4 semaines à la maison, sans matériel, 20-30 min par séance.",
+  },
+  {
+    to: "/guide-sommeil-recuperation",
+    id: "guide-sommeil-recuperation",
+    emoji: "😴",
+    titre: "Dors Mieux, Progresse Plus Vite",
+    description: "Le guide pratique du sommeil et de la récupération.",
+  },
 ];
 
 export function EbookSwitcher({ current }: { current: string }) {

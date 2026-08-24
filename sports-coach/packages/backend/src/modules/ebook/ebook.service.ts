@@ -92,6 +92,57 @@ export const EBOOK_PRODUCTS: Record<string, EbookProductConfig> = {
     `,
     successPath: "/recettes-prise-de-masse",
   },
+  "guide-musculation-debutant": {
+    id: "guide-musculation-debutant",
+    name: "Ebook Cadenzo — Bases de la Musculation",
+    description:
+      "Le programme simple pour bien debuter en musculation (full-body, 4 semaines), sans se blesser et sans perdre de temps.",
+    priceCents: 999,
+    compareAtPriceCents: 1999,
+    pdfPath: path.join(ASSETS_DIR, "guide-musculation-debutant.pdf"),
+    downloadFilename: "Cadenzo-Bases-De-La-Musculation.pdf",
+    emailSubject: "Ton ebook Bases de la Musculation est arrive 👑",
+    emailIntroHtml: `
+      <h1 style="font-size: 20px; color: #14121f;">Merci pour ton achat !</h1>
+      <p>Ton ebook <strong>Bases de la Musculation</strong> est en piece jointe de cet email.</p>
+      <p>Une idee simple pour demarrer : lis d'abord les 3 principes en debut de guide avant de te lancer dans la premiere seance — ils t'eviteront la plupart des erreurs de debutant.</p>
+    `,
+    successPath: "/guide-musculation-debutant",
+  },
+  "programme-maison-sans-materiel": {
+    id: "programme-maison-sans-materiel",
+    name: "Ebook Cadenzo — Cardio & Renfo Sans Materiel",
+    description:
+      "Un programme de 4 semaines a faire a la maison, sans materiel, 20 a 30 minutes par seance.",
+    priceCents: 999,
+    compareAtPriceCents: 1999,
+    pdfPath: path.join(ASSETS_DIR, "programme-maison-sans-materiel.pdf"),
+    downloadFilename: "Cadenzo-Cardio-Renfo-Sans-Materiel.pdf",
+    emailSubject: "Ton ebook Cardio & Renfo Sans Materiel est arrive 👑",
+    emailIntroHtml: `
+      <h1 style="font-size: 20px; color: #14121f;">Merci pour ton achat !</h1>
+      <p>Ton ebook <strong>Cardio & Renfo Sans Materiel</strong> est en piece jointe de cet email.</p>
+      <p>Une idee simple pour demarrer : commence par le circuit de la semaine 1, meme si tu le trouves facile — l'intensite monte deja d'elle-meme a partir de la semaine 3.</p>
+    `,
+    successPath: "/programme-maison-sans-materiel",
+  },
+  "guide-sommeil-recuperation": {
+    id: "guide-sommeil-recuperation",
+    name: "Ebook Cadenzo — Dors Mieux, Progresse Plus Vite",
+    description:
+      "Le guide pratique du sommeil et de la recuperation pour progresser plus vite sans t'entrainer plus.",
+    priceCents: 999,
+    compareAtPriceCents: 1999,
+    pdfPath: path.join(ASSETS_DIR, "guide-sommeil-recuperation.pdf"),
+    downloadFilename: "Cadenzo-Dors-Mieux-Progresse-Plus-Vite.pdf",
+    emailSubject: "Ton ebook Dors Mieux, Progresse Plus Vite est arrive 👑",
+    emailIntroHtml: `
+      <h1 style="font-size: 20px; color: #14121f;">Merci pour ton achat !</h1>
+      <p>Ton ebook <strong>Dors Mieux, Progresse Plus Vite</strong> est en piece jointe de cet email.</p>
+      <p>Une idee simple pour demarrer : choisis un seul des 5 points de la routine du soir a mettre en place cette semaine, plutot que de vouloir tout changer d'un coup.</p>
+    `,
+    successPath: "/guide-sommeil-recuperation",
+  },
 };
 
 export function getEbookProduct(productId: string): EbookProductConfig {

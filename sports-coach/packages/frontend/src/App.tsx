@@ -13,6 +13,9 @@ import { BillingPage } from "./features/billing/BillingPage";
 import { EbookPage } from "./features/ebook/EbookPage";
 import { RecettesRegimePage } from "./features/ebook/RecettesRegimePage";
 import { RecettesPriseDeMassePage } from "./features/ebook/RecettesPriseDeMassePage";
+import { GuideMusculationPage } from "./features/ebook/GuideMusculationPage";
+import { ProgrammeMaisonPage } from "./features/ebook/ProgrammeMaisonPage";
+import { GuideSommeilPage } from "./features/ebook/GuideSommeilPage";
 import { PrivacyPage } from "./features/legal/PrivacyPage";
 import { NutritionPage } from "./features/nutrition/NutritionPage";
 
@@ -140,6 +143,9 @@ export default function App() {
       <Route path="/ebook" element={<EbookPage />} />
       <Route path="/recettes-regime" element={<RecettesRegimePage />} />
       <Route path="/recettes-prise-de-masse" element={<RecettesPriseDeMassePage />} />
+      <Route path="/guide-musculation-debutant" element={<GuideMusculationPage />} />
+      <Route path="/programme-maison-sans-materiel" element={<ProgrammeMaisonPage />} />
+      <Route path="/guide-sommeil-recuperation" element={<GuideSommeilPage />} />
       <Route path="/confidentialite" element={<PrivacyPage />} />
       <Route
         path="/onboarding"
