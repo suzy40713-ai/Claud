@@ -15,6 +15,29 @@ const CONTENU = [
   "Une foire aux questions qui repond aux blocages les plus frequents (pas de materiel, debutant complet, emploi du temps charge...)",
 ];
 
+const FAQ = [
+  {
+    q: "Le paiement est-il vraiment sécurisé ?",
+    r: "Oui. Le paiement est traité entièrement par Stripe, le même système utilisé par des millions de sites e-commerce. Nous ne voyons ni ne stockons jamais ton numéro de carte.",
+  },
+  {
+    q: "Comment je reçois l'ebook ?",
+    r: "Par email, en PDF, dans les minutes qui suivent ton achat (vérifie tes spams si tu ne le vois pas). Aucun compte n'est nécessaire pour acheter.",
+  },
+  {
+    q: "Et si ça ne me convient pas ?",
+    r: "Tu es remboursée intégralement si tu écris à suzy40713@gmail.com dans les 14 jours suivant l'achat, sans justification à donner.",
+  },
+  {
+    q: "Je peux le lire où ?",
+    r: "Sur téléphone, tablette ou ordinateur — c'est un PDF classique, lisible avec n'importe quelle liseuse ou navigateur.",
+  },
+  {
+    q: "Une question avant d'acheter ?",
+    r: "Écris directement à suzy40713@gmail.com, on répond personnellement.",
+  },
+];
+
 const RAISONS_ECHEC = [
   {
     titre: "Le programme etait trop complique",
@@ -137,7 +160,7 @@ export function EbookPage() {
               <span className="text-lg text-slate-400 line-through">{compareAtPrice}</span>
               <span className="text-gradient-kadence text-3xl font-extrabold">{price}</span>
               <span className="animate-pulse-glow rounded-full bg-pink-100 px-2.5 py-1 text-xs font-bold text-pink-700">
-                -40% aujourd'hui
+                Offre de lancement -40%
               </span>
             </div>
 
@@ -146,11 +169,31 @@ export function EbookPage() {
             </Button>
             {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
 
-            <ul className="mt-5 flex flex-col gap-1.5 text-sm text-slate-500">
-              <li>🔒 Paiement securise par Stripe</li>
-              <li>📩 Livraison immediate par email, en PDF</li>
-              <li>📖 Lisible sur telephone, tablette ou ordinateur</li>
-            </ul>
+            <div className="mt-5 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+              {[
+                { icon: "🔒", label: "Paiement Stripe" },
+                { icon: "📩", label: "Envoi immédiat" },
+                { icon: "↩️", label: "Remboursé 14j" },
+                { icon: "✉️", label: "Support direct" },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="flex flex-col items-center gap-1 rounded-xl border border-slate-100 bg-slate-50 px-2 py-3 text-center"
+                >
+                  <span aria-hidden className="text-lg leading-none">
+                    {item.icon}
+                  </span>
+                  <span className="text-xs font-medium leading-tight text-slate-600">{item.label}</span>
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 text-xs text-slate-400">
+              Une question ? Écris-nous à{" "}
+              <a href="mailto:suzy40713@gmail.com" className="font-semibold text-indigo-600">
+                suzy40713@gmail.com
+              </a>
+              , on répond personnellement.
+            </p>
           </motion.div>
         </div>
 
@@ -225,6 +268,33 @@ export function EbookPage() {
             vendre du reve, juste un plan clair qui tient la route sur 90 jours."
           </p>
           <p className="relative mt-4 text-sm font-semibold text-slate-400">— L'equipe Cadenzo</p>
+        </motion.section>
+
+        <motion.section
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-80px" }}
+          variants={fadeUp}
+          transition={{ duration: 0.5 }}
+          className="mt-16"
+        >
+          <h2 className="text-2xl font-bold text-slate-900">Questions fréquentes</h2>
+          <div className="mt-6 flex flex-col gap-3">
+            {FAQ.map((item) => (
+              <details
+                key={item.q}
+                className="group rounded-2xl border border-slate-200 px-5 py-4 open:shadow-sm"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 font-semibold text-slate-900">
+                  {item.q}
+                  <span aria-hidden className="text-slate-400 transition-transform group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">{item.r}</p>
+              </details>
+            ))}
+          </div>
         </motion.section>
 
         <motion.section
