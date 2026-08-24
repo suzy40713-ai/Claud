@@ -182,6 +182,18 @@ model EbookPurchase {
   @@map("ebook_purchases")
 }
 
+// Email laisse par un visiteur pas encore pret a acheter, en echange d'un
+// mini-guide gratuit envoye immediatement par email. Independant d'un
+// compte utilisateur (comme EbookPurchase) : capturable sans connexion.
+model EmailLead {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  source    String // ex: "ebook_page"
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("email_leads")
+}
+
 model PushSubscription {
   id        String   @id @default(uuid())
   userId    String   @map("user_id")

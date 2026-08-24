@@ -61,6 +61,60 @@ const fadeUp = {
   show: { opacity: 1, y: 0 },
 };
 
+function EmailLeadCapture() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "busy" | "done" | "error">("idle");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setStatus("busy");
+    try {
+      await api.captureEmailLead(email, "ebook_page");
+      setStatus("done");
+    } catch {
+      setStatus("error");
+    }
+  }
+
+  if (status === "done") {
+    return (
+      <div className="rounded-2xl border border-emerald-100 bg-emerald-50 px-6 py-8 text-center">
+        <p className="font-semibold text-emerald-700">C'est envoye !</p>
+        <p className="mt-1 text-sm text-emerald-600">
+          Regarde ta boite mail (et tes spams) dans les prochaines minutes.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-6 py-8 text-center">
+      <p className="text-xs font-bold uppercase tracking-widest text-indigo-600">Gratuit</p>
+      <h2 className="mt-2 text-xl font-bold text-slate-900">Pas encore prete a acheter ?</h2>
+      <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-600">
+        Recois gratuitement par email un mini-guide avec 3 leviers concrets pour debloquer ta progression, sans
+        engagement.
+      </p>
+      <form onSubmit={handleSubmit} className="mx-auto mt-5 flex max-w-sm flex-col gap-2 sm:flex-row">
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="ton@email.com"
+          className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-900 outline-none focus:border-indigo-400"
+        />
+        <Button type="submit" disabled={status === "busy"} className="shrink-0">
+          {status === "busy" ? "..." : "Je le veux"}
+        </Button>
+      </form>
+      {status === "error" && (
+        <p className="mt-2 text-sm text-red-600">Une erreur est survenue, reessaie dans un instant.</p>
+      )}
+    </div>
+  );
+}
+
 export function EbookPage() {
   const location = useLocation();
   const { user } = useAuth();
@@ -291,6 +345,17 @@ export function EbookPage() {
               </details>
             ))}
           </div>
+        </motion.section>
+
+        <motion.section
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-80px" }}
+          variants={fadeUp}
+          transition={{ duration: 0.5 }}
+          className="mt-16"
+        >
+          <EmailLeadCapture />
         </motion.section>
 
         <motion.section

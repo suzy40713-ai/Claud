@@ -203,6 +203,9 @@ export const api = {
   createEbookCheckoutSession: () =>
     request<{ url: string }>("/ebook/create-checkout-session", { method: "POST" }),
 
+  captureEmailLead: (email: string, source: string) =>
+    request<{ ok: true }>("/leads/capture", { method: "POST", body: JSON.stringify({ email, source }) }),
+
   getGroceryList: () => request<{ list: GroceryListDTO | null }>("/nutrition/grocery-list"),
   generateGroceryList: () => request<{ list: GroceryListDTO }>("/nutrition/grocery-list", { method: "POST" }),
 
