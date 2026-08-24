@@ -25,10 +25,6 @@ const FAQ = [
     r: "Par email, en PDF, dans les minutes qui suivent ton achat (vérifie tes spams si tu ne le vois pas). Aucun compte n'est nécessaire pour acheter.",
   },
   {
-    q: "Et si ça ne me convient pas ?",
-    r: "Tu es remboursée intégralement si tu écris à suzy40713@gmail.com dans les 14 jours suivant l'achat, sans justification à donner.",
-  },
-  {
     q: "Je peux le lire où ?",
     r: "Sur téléphone, tablette ou ordinateur — c'est un PDF classique, lisible avec n'importe quelle liseuse ou navigateur.",
   },
@@ -173,7 +169,7 @@ export function EbookPage() {
               {[
                 { icon: "🔒", label: "Paiement Stripe" },
                 { icon: "📩", label: "Envoi immédiat" },
-                { icon: "↩️", label: "Remboursé 14j" },
+                { icon: "📖", label: "87 pages PDF" },
                 { icon: "✉️", label: "Support direct" },
               ].map((item) => (
                 <div
