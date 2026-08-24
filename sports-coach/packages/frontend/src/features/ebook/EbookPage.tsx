@@ -355,6 +355,43 @@ export function EbookPage() {
           transition={{ duration: 0.5 }}
           className="mt-16"
         >
+          <h2 className="text-2xl font-bold text-slate-900">Nos autres ebooks</h2>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <Link
+              to="/recettes-regime"
+              className="flex flex-col gap-2 rounded-2xl border border-slate-200 p-5 transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/5"
+            >
+              <span aria-hidden className="text-2xl">
+                🥗
+              </span>
+              <h3 className="font-semibold text-slate-900">Recettes Régime</h3>
+              <p className="text-sm leading-relaxed text-slate-600">
+                20 recettes riches en protéines pour manger équilibré pendant une perte de poids.
+              </p>
+            </Link>
+            <Link
+              to="/recettes-prise-de-masse"
+              className="flex flex-col gap-2 rounded-2xl border border-slate-200 p-5 transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/5"
+            >
+              <span aria-hidden className="text-2xl">
+                💪
+              </span>
+              <h3 className="font-semibold text-slate-900">Recettes Prise de Masse</h3>
+              <p className="text-sm leading-relaxed text-slate-600">
+                20 recettes caloriques et riches en protéines pour atteindre ton surplus plus facilement.
+              </p>
+            </Link>
+          </div>
+        </motion.section>
+
+        <motion.section
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-80px" }}
+          variants={fadeUp}
+          transition={{ duration: 0.5 }}
+          className="mt-16"
+        >
           <EmailLeadCapture />
         </motion.section>
 

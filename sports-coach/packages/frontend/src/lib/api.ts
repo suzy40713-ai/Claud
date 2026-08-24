@@ -198,10 +198,12 @@ export const api = {
   createCheckoutSession: () => request<{ url: string }>("/billing/create-checkout-session", { method: "POST" }),
   createPortalSession: () => request<{ url: string }>("/billing/create-portal-session", { method: "POST" }),
 
-  getEbookStatus: () =>
-    request<{ configured: boolean; priceCents: number; compareAtPriceCents: number }>("/ebook/status"),
-  createEbookCheckoutSession: () =>
-    request<{ url: string }>("/ebook/create-checkout-session", { method: "POST" }),
+  getEbookStatus: (product = "transformation-90-jours") =>
+    request<{ configured: boolean; priceCents: number; compareAtPriceCents: number }>(
+      `/ebook/status?product=${encodeURIComponent(product)}`
+    ),
+  createEbookCheckoutSession: (product = "transformation-90-jours") =>
+    request<{ url: string }>("/ebook/create-checkout-session", { method: "POST", body: JSON.stringify({ product }) }),
 
   captureEmailLead: (email: string, source: string) =>
     request<{ ok: true }>("/leads/capture", { method: "POST", body: JSON.stringify({ email, source }) }),

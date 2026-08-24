@@ -171,6 +171,7 @@ model MealScan {
 model EbookPurchase {
   id                    String              @id @default(uuid())
   email                 String
+  product               String              @default("transformation-90-jours") // identifiant du produit achete (voir PRODUCTS dans ebook.service.ts)
   stripeSessionId       String              @unique @map("stripe_session_id")
   stripePaymentIntentId String?             @map("stripe_payment_intent_id")
   amountTotal           Int                 @map("amount_total") // centimes
