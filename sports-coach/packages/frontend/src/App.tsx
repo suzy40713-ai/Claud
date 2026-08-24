@@ -42,7 +42,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
             <span aria-hidden className="text-xl leading-none">
               👑
             </span>
-            <span className="hidden sm:inline">Kadence IA</span>
+            <span className="hidden sm:inline">Cadenzo</span>
           </span>
           <div className="hidden flex-1 items-center gap-1 sm:flex sm:gap-2">
             {NAV_LINKS.map((link) => (

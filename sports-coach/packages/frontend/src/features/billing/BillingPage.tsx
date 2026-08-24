@@ -66,7 +66,7 @@ export function BillingPage() {
         transition={{ duration: 0.4 }}
         className="text-center"
       >
-        <p className="text-xs font-bold uppercase tracking-widest text-pink-600">Kadence IA Premium</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-pink-600">Cadenzo Premium</p>
         <h1 className="mt-1 text-3xl font-extrabold text-slate-900">Va plus loin dans ton entrainement</h1>
         <p className="mx-auto mt-2 max-w-md text-slate-500">
           Un coach qui te repond a toute heure, une synchronisation qui ne t'oublie jamais, et des alertes avant que

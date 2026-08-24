@@ -1,4 +1,4 @@
-# Fiche Google Play Store — Kadence IA (fr-FR)
+# Fiche Google Play Store — Cadenzo (fr-FR)
 
 Copier-coller ces textes dans Play Console > Présence sur la boutique > Fiche
 principale du store.
@@ -6,7 +6,7 @@ principale du store.
 ## Nom de l'application (30 caractères max)
 
 ```
-Kadence IA - Coach Sportif
+Cadenzo - Coach Sportif
 ```
 
 ## Description courte (80 caractères max)
@@ -18,12 +18,12 @@ Coach sportif IA : plan d'entraînement, nutrition et suivi personnalisés
 ## Description complète (4000 caractères max)
 
 ```
-Kadence IA est ton coach sportif intelligent, disponible 24h/24 dans ta poche.
+Cadenzo est ton coach sportif intelligent, disponible 24h/24 dans ta poche.
 
 POURQUOI KADENCE IA ?
 
 La plupart des applications de sport te donnent un programme figé, identique
-pour tout le monde, sans jamais s'adapter à ta réalité. Kadence IA fait
+pour tout le monde, sans jamais s'adapter à ta réalité. Cadenzo fait
 l'inverse : elle observe comment tu récupères, comment tu progresses, et
 ajuste ton plan d'entraînement semaine après semaine — comme le ferait un
 vrai coach.
@@ -66,7 +66,7 @@ Le journal quotidien, le dashboard des séances et le plan d'entraînement
 sont gratuits. Un abonnement premium optionnel débloque le coach IA
 illimité, l'import automatique Strava et les alertes push proactives.
 
-Télécharge Kadence IA et commence dès aujourd'hui.
+Télécharge Cadenzo et commence dès aujourd'hui.
 ```
 
 ## Catégorie

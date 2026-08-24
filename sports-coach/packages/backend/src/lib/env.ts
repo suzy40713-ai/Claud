@@ -65,5 +65,5 @@ export const env = {
   // "onboarding@resend.dev" fonctionne sans domaine verifie mais avec des
   // limitations d'envoi (volume/destinataires) cote Resend : a remplacer par
   // une adresse sur un domaine verifie des que possible.
-  ebookSenderEmail: process.env.EBOOK_SENDER_EMAIL ?? "Kadence IA <onboarding@resend.dev>",
+  ebookSenderEmail: process.env.EBOOK_SENDER_EMAIL ?? "Cadenzo <onboarding@resend.dev>",
 };

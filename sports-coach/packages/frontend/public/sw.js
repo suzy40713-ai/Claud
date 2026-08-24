@@ -1,10 +1,10 @@
 self.addEventListener("push", (event) => {
-  let payload = { title: "Kadence IA", body: "Nouvelle alerte." };
+  let payload = { title: "Cadenzo", body: "Nouvelle alerte." };
   if (event.data) {
     try {
       payload = event.data.json();
     } catch {
-      payload = { title: "Kadence IA", body: event.data.text() };
+      payload = { title: "Cadenzo", body: event.data.text() };
     }
   }
 
