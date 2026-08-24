@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { api, ApiError } from "../../lib/api";
 import { Button } from "../../components/ui/Button";
 import { useAuth } from "../../context/AuthContext";
+import { EbookSwitcher } from "./EbookSwitcher";
 
 function formatPrice(cents: number): string {
   return (cents / 100).toFixed(2).replace(".", ",") + " €";
@@ -21,10 +22,9 @@ interface RecipeEbookPageProps {
   titre: string;
   description: string;
   contenu: string[];
-  crossSell: { to: string; label: string };
 }
 
-export function RecipeEbookPage({ productId, emoji, eyebrow, titre, description, contenu, crossSell }: RecipeEbookPageProps) {
+export function RecipeEbookPage({ productId, emoji, eyebrow, titre, description, contenu }: RecipeEbookPageProps) {
   const location = useLocation();
   const { user } = useAuth();
   const [status, setStatus] = useState<{ configured: boolean; priceCents: number; compareAtPriceCents: number } | null>(
@@ -143,11 +143,7 @@ export function RecipeEbookPage({ productId, emoji, eyebrow, titre, description,
           ))}
         </div>
 
-        <p className="mt-8 text-center text-sm text-slate-500">
-          <Link to={crossSell.to} className="font-semibold text-indigo-600">
-            {crossSell.label}
-          </Link>
-        </p>
+        <EbookSwitcher current={productId} />
       </main>
     </div>
   );

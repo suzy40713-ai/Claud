@@ -22,7 +22,7 @@ const NAV_LINKS = [
   { to: "/plan", label: "Plan", icon: "📅" },
   { to: "/coach", label: "Coach", icon: "🤖" },
   { to: "/nutrition", label: "Nutrition", icon: "🥗", highlight: true },
-  { to: "/ebook", label: "Ebook", icon: "📖", highlight: true },
+  { to: "/ebook", label: "Ebooks", icon: "📖", highlight: true },
   { to: "/abonnement", label: "Abonnement", icon: "👑", highlight: true },
 ];
 

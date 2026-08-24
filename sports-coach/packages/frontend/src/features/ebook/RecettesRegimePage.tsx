@@ -14,10 +14,6 @@ export function RecettesRegimePage() {
         "Des ingrédients simples, faciles à trouver en supermarché",
         "Des astuces pratiques pour gagner du temps et varier les plaisirs",
       ]}
-      crossSell={{
-        to: "/recettes-prise-de-masse",
-        label: "En prise de masse ? Découvre l'ebook Recettes Prise de Masse →",
-      }}
     />
   );
 }

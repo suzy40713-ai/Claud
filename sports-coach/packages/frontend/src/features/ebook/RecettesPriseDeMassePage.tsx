@@ -14,10 +14,6 @@ export function RecettesPriseDeMassePage() {
         "Des idées de shakes et collations denses en énergie pour les jours difficiles",
         "Des ingrédients simples, faciles à trouver en supermarché",
       ]}
-      crossSell={{
-        to: "/recettes-regime",
-        label: "En période de sèche ? Découvre l'ebook Recettes Régime →",
-      }}
     />
   );
 }
