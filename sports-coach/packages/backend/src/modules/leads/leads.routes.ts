@@ -2,6 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../../lib/prisma.js";
 import { isEmailConfigured, sendLeadMagnetEmail } from "../../lib/email.js";
+import { NURTURE_STEP_1_DELAY_MS } from "./leads.nurture.js";
 
 // Capture d'email sans compte requis, en echange d'un mini-guide gratuit
 // envoye par email. Comme ebookRouter, pas de requireAuth ici.
@@ -23,7 +24,7 @@ leadsRouter.post("/capture", async (req, res) => {
   await prisma.emailLead.upsert({
     where: { email },
     update: {},
-    create: { email, source },
+    create: { email, source, nextNurtureAt: new Date(Date.now() + NURTURE_STEP_1_DELAY_MS) },
   });
 
   if (isEmailConfigured()) {

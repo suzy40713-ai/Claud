@@ -186,11 +186,17 @@ model EbookPurchase {
 // Email laisse par un visiteur pas encore pret a acheter, en echange d'un
 // mini-guide gratuit envoye immediatement par email. Independant d'un
 // compte utilisateur (comme EbookPurchase) : capturable sans connexion.
+//
+// nurtureStep/nextNurtureAt pilotent une relance automatique courte (2
+// emails apres le mini-guide initial) : 0 = seul le mini-guide est parti,
+// 1 = la 1ere relance est partie, 2 = sequence terminee (plus aucun envoi).
 model EmailLead {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  source    String // ex: "ebook_page"
-  createdAt DateTime @default(now()) @map("created_at")
+  id            String    @id @default(uuid())
+  email         String    @unique
+  source        String // ex: "ebook_page"
+  nurtureStep   Int       @default(0) @map("nurture_step")
+  nextNurtureAt DateTime? @map("next_nurture_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
 
   @@map("email_leads")
 }

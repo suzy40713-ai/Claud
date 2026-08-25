@@ -17,7 +17,7 @@ import { ebookRouter } from "./modules/ebook/ebook.routes.js";
 import { leadsRouter } from "./modules/leads/leads.routes.js";
 import { nutritionRouter } from "./modules/nutrition/nutrition.routes.js";
 import { rankRouter } from "./modules/rank/rank.routes.js";
-import { startOverloadAlertScheduler } from "./lib/scheduler.js";
+import { startOverloadAlertScheduler, startLeadNurtureScheduler } from "./lib/scheduler.js";
 import { apiRateLimiter } from "./lib/rate-limit.js";
 
 // Filet de securite : une exception non geree ne doit jamais faire tomber
@@ -87,4 +87,5 @@ app.use((err: unknown, _req: express.Request, res: express.Response, _next: expr
 app.listen(env.port, () => {
   console.log(`Backend demarre sur http://localhost:${env.port}`);
   startOverloadAlertScheduler();
+  startLeadNurtureScheduler();
 });

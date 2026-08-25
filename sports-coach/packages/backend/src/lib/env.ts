@@ -66,4 +66,9 @@ export const env = {
   // limitations d'envoi (volume/destinataires) cote Resend : a remplacer par
   // une adresse sur un domaine verifie des que possible.
   ebookSenderEmail: process.env.EBOOK_SENDER_EMAIL ?? "Cadenzo <onboarding@resend.dev>",
+
+  // Frequence de verification des relances email a envoyer aux leads
+  // captures (mini-guide gratuit). 1h par defaut : suffisant vu que les
+  // relances elles-memes sont espacees de plusieurs jours.
+  leadNurtureIntervalMs: Number(process.env.LEAD_NURTURE_INTERVAL_MS ?? 60 * 60 * 1000),
 };
