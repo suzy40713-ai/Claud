@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router";
+import { Link, useLocation } from "react-router";
 import { motion } from "framer-motion";
 import type { BillingStatusDTO } from "@sports-coach/shared";
 import { api, ApiError } from "../../lib/api";
@@ -164,6 +164,25 @@ export function BillingPage() {
       </div>
 
       {error && <p className="mt-4 text-center text-sm text-red-600">{error}</p>}
+
+      {!status.premium && (
+        <Link
+          to="/pack-complet"
+          className="mx-auto mt-8 flex max-w-md items-center justify-between gap-3 rounded-2xl border border-indigo-200 bg-white px-5 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <span className="flex items-center gap-2">
+            <span aria-hidden className="text-xl">
+              🎁
+            </span>
+            <span className="text-sm font-semibold text-slate-900">
+              Ou prends le Pack Complet : tous les ebooks + 1 an Premium en un seul achat
+            </span>
+          </span>
+          <span aria-hidden className="text-indigo-600">
+            →
+          </span>
+        </Link>
+      )}
     </div>
   );
 }

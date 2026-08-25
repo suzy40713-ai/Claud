@@ -15,6 +15,7 @@ import { billingRouter } from "./modules/billing/billing.routes.js";
 import { billingWebhookRouter } from "./modules/billing/billing.webhook.js";
 import { ebookRouter } from "./modules/ebook/ebook.routes.js";
 import { leadsRouter } from "./modules/leads/leads.routes.js";
+import { bundleRouter } from "./modules/bundle/bundle.routes.js";
 import { nutritionRouter } from "./modules/nutrition/nutrition.routes.js";
 import { rankRouter } from "./modules/rank/rank.routes.js";
 import { startOverloadAlertScheduler, startLeadNurtureScheduler } from "./lib/scheduler.js";
@@ -76,6 +77,7 @@ app.use("/api/strava", stravaRouter);
 app.use("/api/billing", billingRouter);
 app.use("/api/ebook", ebookRouter);
 app.use("/api/leads", leadsRouter);
+app.use("/api/bundle", bundleRouter);
 app.use("/api/nutrition", nutritionRouter);
 app.use("/api/rang", rankRouter);
 

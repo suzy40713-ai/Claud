@@ -52,6 +52,37 @@ export async function sendPurchaseEmail(
   }
 }
 
+export async function sendBundleEmail(
+  toEmail: string,
+  ebooks: { pdfPath: string; downloadFilename: string }[]
+): Promise<void> {
+  const resend = getResend();
+  const attachments = await Promise.all(
+    ebooks.map(async (e) => ({ filename: e.downloadFilename, content: await readFile(e.pdfPath) }))
+  );
+
+  const { error } = await resend.emails.send({
+    from: env.ebookSenderEmail,
+    to: toEmail,
+    subject: "Ton Pack Complet Cadenzo est arrive 👑",
+    html: `
+      <div style="font-family: -apple-system, Helvetica, Arial, sans-serif; max-width: 520px; margin: 0 auto; color: #1c1c22;">
+        <p style="font-size: 22px; margin-bottom: 4px;">👑 <strong>Cadenzo</strong></p>
+        <h1 style="font-size: 20px; color: #14121f;">Merci pour ton achat !</h1>
+        <p>Tes <strong>6 ebooks Cadenzo</strong> sont en pieces jointes de cet email, prets a etre lus des maintenant.</p>
+        <p>Ton compte est aussi passe <strong>Premium pour 1 an</strong> : le Coach IA, le scan de plats, la liste de courses generee par IA et le reste des fonctionnalites premium sont deja actifs sur ton compte.</p>
+        <p style="margin-top: 24px;">On croit en toi. Bonne transformation.</p>
+        <p style="color:#6a6680;">&mdash; L'equipe Cadenzo</p>
+      </div>
+    `,
+    attachments,
+  });
+
+  if (error) {
+    throw new Error(`Echec de l'envoi de l'email Resend: ${error.message}`);
+  }
+}
+
 export async function sendLeadMagnetEmail(toEmail: string): Promise<void> {
   const resend = getResend();
 

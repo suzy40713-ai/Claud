@@ -74,6 +74,22 @@ export function EbookSwitcher({ current }: { current: string }) {
           )
         )}
       </div>
+      <Link
+        to="/pack-complet"
+        className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-indigo-200 bg-white px-4 py-3 transition-all hover:-translate-y-0.5 hover:shadow-md hover:shadow-slate-900/5"
+      >
+        <span className="flex items-center gap-2">
+          <span aria-hidden className="text-lg">
+            🎁
+          </span>
+          <span className="text-sm font-semibold text-slate-900">
+            Pack Complet : tous les ebooks + 1 an Premium
+          </span>
+        </span>
+        <span aria-hidden className="text-indigo-600">
+          →
+        </span>
+      </Link>
     </div>
   );
 }

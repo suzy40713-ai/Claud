@@ -16,6 +16,7 @@ import { RecettesPriseDeMassePage } from "./features/ebook/RecettesPriseDeMasseP
 import { GuideMusculationPage } from "./features/ebook/GuideMusculationPage";
 import { ProgrammeMaisonPage } from "./features/ebook/ProgrammeMaisonPage";
 import { GuideSommeilPage } from "./features/ebook/GuideSommeilPage";
+import { BundlePage } from "./features/bundle/BundlePage";
 import { PrivacyPage } from "./features/legal/PrivacyPage";
 import { NutritionPage } from "./features/nutrition/NutritionPage";
 
@@ -146,6 +147,7 @@ export default function App() {
       <Route path="/guide-musculation-debutant" element={<GuideMusculationPage />} />
       <Route path="/programme-maison-sans-materiel" element={<ProgrammeMaisonPage />} />
       <Route path="/guide-sommeil-recuperation" element={<GuideSommeilPage />} />
+      <Route path="/pack-complet" element={<BundlePage />} />
       <Route path="/confidentialite" element={<PrivacyPage />} />
       <Route
         path="/onboarding"

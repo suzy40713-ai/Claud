@@ -97,6 +97,7 @@ model User {
   mealScans         MealScan[]
   rankProfile       RankProfile?
   pushupChallenges  PushupChallenge[]
+  bundlePurchases   BundlePurchase[]
 
   @@map("users")
 }
@@ -199,6 +200,20 @@ model EmailLead {
   createdAt     DateTime  @default(now()) @map("created_at")
 
   @@map("email_leads")
+}
+
+// Achat unique du Pack Complet (tous les ebooks + 1 an de Premium),
+// rattache a un compte (contrairement aux ebooks seuls) car il accorde du
+// Premium, une notion qui n'existe que pour un utilisateur connecte.
+model BundlePurchase {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeSessionId String   @unique @map("stripe_session_id")
+  amountTotal     Int      @map("amount_total")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("bundle_purchases")
 }
 
 model PushSubscription {

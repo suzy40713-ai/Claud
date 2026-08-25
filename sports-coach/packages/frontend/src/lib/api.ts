@@ -208,6 +208,10 @@ export const api = {
   captureEmailLead: (email: string, source: string) =>
     request<{ ok: true }>("/leads/capture", { method: "POST", body: JSON.stringify({ email, source }) }),
 
+  getBundleStatus: () => request<{ configured: boolean; priceCents: number }>("/bundle/status"),
+  createBundleCheckoutSession: () =>
+    request<{ url: string }>("/bundle/create-checkout-session", { method: "POST" }),
+
   getGroceryList: () => request<{ list: GroceryListDTO | null }>("/nutrition/grocery-list"),
   generateGroceryList: () => request<{ list: GroceryListDTO }>("/nutrition/grocery-list", { method: "POST" }),
 

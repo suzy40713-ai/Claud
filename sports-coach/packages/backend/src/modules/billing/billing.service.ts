@@ -3,6 +3,7 @@ import { env } from "../../lib/env.js";
 import { prisma } from "../../lib/prisma.js";
 import type { User } from "@prisma/client";
 import { handleEbookCheckoutCompleted, isEbookCheckoutSession } from "../ebook/ebook.service.js";
+import { handleBundleCheckoutCompleted, isBundleCheckoutSession } from "../bundle/bundle.service.js";
 
 let stripeClient: Stripe | null = null;
 
@@ -150,6 +151,10 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<void> {
       const session = event.data.object as Stripe.Checkout.Session;
       if (isEbookCheckoutSession(session)) {
         await handleEbookCheckoutCompleted(session);
+        break;
+      }
+      if (isBundleCheckoutSession(session)) {
+        await handleBundleCheckoutCompleted(session);
         break;
       }
       if (typeof session.subscription === "string") {
