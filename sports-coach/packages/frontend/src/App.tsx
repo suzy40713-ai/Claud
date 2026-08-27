@@ -18,6 +18,8 @@ import { ProgrammeMaisonPage } from "./features/ebook/ProgrammeMaisonPage";
 import { GuideSommeilPage } from "./features/ebook/GuideSommeilPage";
 import { BundlePage } from "./features/bundle/BundlePage";
 import { SettingsPage } from "./features/settings/SettingsPage";
+import { BlogListPage } from "./features/blog/BlogListPage";
+import { BlogPostPage } from "./features/blog/BlogPostPage";
 import { PrivacyPage } from "./features/legal/PrivacyPage";
 import { NutritionPage } from "./features/nutrition/NutritionPage";
 
@@ -161,6 +163,8 @@ export default function App() {
       <Route path="/programme-maison-sans-materiel" element={<ProgrammeMaisonPage />} />
       <Route path="/guide-sommeil-recuperation" element={<GuideSommeilPage />} />
       <Route path="/pack-complet" element={<BundlePage />} />
+      <Route path="/blog" element={<BlogListPage />} />
+      <Route path="/blog/:slug" element={<BlogPostPage />} />
       <Route path="/confidentialite" element={<PrivacyPage />} />
       <Route
         path="/onboarding"

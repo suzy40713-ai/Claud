@@ -90,6 +90,20 @@ export function EbookSwitcher({ current }: { current: string }) {
           →
         </span>
       </Link>
+      <Link
+        to="/blog"
+        className="mt-2 flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 transition-all hover:-translate-y-0.5 hover:shadow-md hover:shadow-slate-900/5"
+      >
+        <span className="flex items-center gap-2">
+          <span aria-hidden className="text-lg">
+            📚
+          </span>
+          <span className="text-sm font-semibold text-slate-900">Lire nos guides gratuits</span>
+        </span>
+        <span aria-hidden className="text-indigo-600">
+          →
+        </span>
+      </Link>
     </div>
   );
 }

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://suzy40713-ai.github.io/Claud/sitemap.xml
