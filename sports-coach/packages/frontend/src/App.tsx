@@ -17,6 +17,7 @@ import { GuideMusculationPage } from "./features/ebook/GuideMusculationPage";
 import { ProgrammeMaisonPage } from "./features/ebook/ProgrammeMaisonPage";
 import { GuideSommeilPage } from "./features/ebook/GuideSommeilPage";
 import { BundlePage } from "./features/bundle/BundlePage";
+import { SettingsPage } from "./features/settings/SettingsPage";
 import { PrivacyPage } from "./features/legal/PrivacyPage";
 import { NutritionPage } from "./features/nutrition/NutritionPage";
 
@@ -55,6 +56,18 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
               <NavItem key={link.to} link={link} active={location.pathname === link.to} />
             ))}
           </div>
+          <Link
+            to="/parametres"
+            aria-label="Parametres"
+            className={`shrink-0 rounded-full px-2.5 py-2 text-sm font-medium transition-colors hover:bg-slate-100 sm:px-3 ${
+              location.pathname === "/parametres" ? "text-indigo-600" : "text-slate-400 hover:text-slate-600"
+            }`}
+          >
+            <span aria-hidden className="text-lg sm:hidden">
+              ⚙️
+            </span>
+            <span className="hidden sm:inline">Parametres</span>
+          </Link>
           <button
             onClick={() => logout()}
             aria-label="Deconnexion"
@@ -210,6 +223,14 @@ export default function App() {
         element={
           <ProtectedLayout>
             <BillingPage />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/parametres"
+        element={
+          <ProtectedLayout>
+            <SettingsPage />
           </ProtectedLayout>
         }
       />
