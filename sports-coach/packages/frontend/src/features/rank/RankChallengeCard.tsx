@@ -170,27 +170,24 @@ export function RankChallengeCard() {
         </>
       )}
 
-      {phase === "camera" && (
+      {(phase === "camera" || phase === "recording") && (
         <div className="flex flex-col gap-3">
           <video ref={videoRef} autoPlay muted playsInline className="w-full rounded-xl bg-black" />
-          <div className="flex gap-2">
-            <Button onClick={startRecording}>● Demarrer l'enregistrement</Button>
-            <Button variant="ghost" onClick={cancel}>
-              Annuler
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {phase === "recording" && (
-        <div className="flex flex-col gap-3">
-          <video ref={videoRef} autoPlay muted playsInline className="w-full rounded-xl bg-black" />
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-2 text-sm font-semibold text-red-600">
-              <span className="h-2 w-2 animate-pulse-glow rounded-full bg-red-600" /> Enregistrement... {secondsLeft}s
-            </span>
-            <Button onClick={stopRecording}>J'ai fini</Button>
-          </div>
+          {phase === "camera" ? (
+            <div className="flex gap-2">
+              <Button onClick={startRecording}>● Demarrer l'enregistrement</Button>
+              <Button variant="ghost" onClick={cancel}>
+                Annuler
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-2 text-sm font-semibold text-red-600">
+                <span className="h-2 w-2 animate-pulse-glow rounded-full bg-red-600" /> Enregistrement... {secondsLeft}s
+              </span>
+              <Button onClick={stopRecording}>J'ai fini</Button>
+            </div>
+          )}
         </div>
       )}
 
