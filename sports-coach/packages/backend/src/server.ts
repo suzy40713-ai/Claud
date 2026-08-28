@@ -17,7 +17,6 @@ import { ebookRouter } from "./modules/ebook/ebook.routes.js";
 import { leadsRouter } from "./modules/leads/leads.routes.js";
 import { bundleRouter } from "./modules/bundle/bundle.routes.js";
 import { nutritionRouter } from "./modules/nutrition/nutrition.routes.js";
-import { rankRouter } from "./modules/rank/rank.routes.js";
 import { startOverloadAlertScheduler, startLeadNurtureScheduler } from "./lib/scheduler.js";
 import { apiRateLimiter } from "./lib/rate-limit.js";
 
@@ -79,7 +78,6 @@ app.use("/api/ebook", ebookRouter);
 app.use("/api/leads", leadsRouter);
 app.use("/api/bundle", bundleRouter);
 app.use("/api/nutrition", nutritionRouter);
-app.use("/api/rang", rankRouter);
 
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err);
