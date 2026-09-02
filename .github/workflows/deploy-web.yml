@@ -8,6 +8,7 @@ on:
     paths:
       - "sports-coach/packages/frontend/**"
       - "sports-coach/packages/shared/**"
+      - "cotizo/**"
       - ".github/workflows/deploy-web.yml"
 
 permissions:
@@ -49,6 +50,22 @@ jobs:
 
       - name: SPA fallback for GitHub Pages (pas de rewrite serveur)
         run: cp packages/frontend/dist/index.html packages/frontend/dist/404.html
+
+      - name: Install Cotizo dependencies
+        working-directory: cotizo
+        run: npm ci
+
+      - name: Build Cotizo (app statique, sans backend)
+        working-directory: cotizo
+        env:
+          VITE_BASE_PATH: /Claud/cotizo/
+        run: npm run build
+
+      - name: Merge Cotizo into the deployed site (sous-dossier /cotizo/)
+        working-directory: .
+        run: |
+          mkdir -p sports-coach/packages/frontend/dist/cotizo
+          cp -r cotizo/dist/. sports-coach/packages/frontend/dist/cotizo/
 
       - uses: actions/upload-pages-artifact@v3
         with:
