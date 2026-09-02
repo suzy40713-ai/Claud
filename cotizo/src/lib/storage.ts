@@ -11,12 +11,14 @@ export interface CotizoData {
   activity: ActivityType | null;
   versementLiberatoire: boolean;
   entries: MonthEntry[];
+  pro: boolean;
 }
 
 const DEFAULT_DATA: CotizoData = {
   activity: null,
   versementLiberatoire: false,
   entries: [],
+  pro: false,
 };
 
 export function loadData(): CotizoData {

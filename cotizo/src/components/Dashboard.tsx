@@ -5,6 +5,9 @@ import { currentMonthKey, currentYear, yearTotal, type CotizoData } from "../lib
 import { ThresholdBar } from "./ThresholdBar";
 import { HistoryChart } from "./HistoryChart";
 import { Deadlines } from "./Deadlines";
+import { UpgradeCard } from "./UpgradeCard";
+import { ExportButton } from "./ExportButton";
+import { PrintableRecap } from "./PrintableRecap";
 
 export function Dashboard({
   data,
@@ -23,10 +26,19 @@ export function Dashboard({
   const ca = Number(caInput.replace(",", ".")) || 0;
   const result = useMemo(() => computeCharges(activity, ca, data.versementLiberatoire), [activity, ca, data.versementLiberatoire]);
 
-  const year = currentYear();
+  const thisYear = currentYear();
+  const availableYears = useMemo(() => {
+    const years = new Set(data.entries.map((e) => Number(e.month.slice(0, 4))));
+    years.add(thisYear);
+    return [...years].sort((a, b) => b - a);
+  }, [data.entries, thisYear]);
+  const [viewYear, setViewYear] = useState(thisYear);
+  const year = data.pro ? viewYear : thisYear;
+
   const monthKey = currentMonthKey();
   const totalAnnee = yearTotal(data.entries, year);
-  const totalAvecSaisie = totalAnnee - (data.entries.find((e) => e.month === monthKey)?.chiffreAffaires ?? 0) + ca;
+  const totalAvecSaisie =
+    year === thisYear ? totalAnnee - (data.entries.find((e) => e.month === monthKey)?.chiffreAffaires ?? 0) + ca : totalAnnee;
 
   function handleSave() {
     if (ca <= 0) return;
@@ -38,6 +50,7 @@ export function Dashboard({
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 px-5 py-8">
+    <div className="flex flex-col gap-6 print:hidden">
       <header className="flex items-center justify-between">
         <span className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-slate-900">
           <span aria-hidden>🧾</span> Cotizo
@@ -119,9 +132,36 @@ export function Dashboard({
         transition={{ delay: 0.15 }}
         className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
       >
-        <h2 className="text-lg font-bold text-slate-900">Historique {year}</h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-bold text-slate-900">Historique</h2>
+            {data.pro && availableYears.length > 1 ? (
+              <select
+                value={viewYear}
+                onChange={(e) => setViewYear(Number(e.target.value))}
+                className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-sm font-semibold text-slate-700"
+              >
+                {availableYears.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <span className="text-lg font-bold text-slate-900">{year}</span>
+            )}
+          </div>
+          <ExportButton pro={data.pro} />
+        </div>
         <HistoryChart entries={data.entries} year={year} />
+        {!data.pro && (
+          <p className="mt-2 text-xs text-slate-400">
+            Version gratuite : annee en cours uniquement. Passe Pro pour l'historique complet.
+          </p>
+        )}
       </motion.div>
+
+      {!data.pro && <UpgradeCard />}
 
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
         <Deadlines />
@@ -133,6 +173,9 @@ export function Dashboard({
         serveur. Cotizo donne une estimation basee sur le bareme officiel URSSAF — verifie toujours les montants
         exacts sur ton espace autoentrepreneur.urssaf.fr avant declaration.
       </p>
+    </div>
+
+      <PrintableRecap data={data} />
     </div>
   );
 }
