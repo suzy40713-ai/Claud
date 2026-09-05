@@ -1,7 +1,9 @@
 const promptEl = document.getElementById('prompt');
+const promptField = document.getElementById('promptField');
 const charCountEl = document.getElementById('charCount');
 const modeSwitch = document.getElementById('modeSwitch');
 const styleEl = document.getElementById('style');
+const genreEl = document.getElementById('genre');
 const sceneCountEl = document.getElementById('sceneCount');
 const sceneCountValueEl = document.getElementById('sceneCountValue');
 const durationValueEl = document.getElementById('durationValue');
@@ -15,9 +17,11 @@ const resultVideo = document.getElementById('resultVideo');
 const loading = document.getElementById('loading');
 const loadingText = document.getElementById('loadingText');
 const downloadBtn = document.getElementById('downloadBtn');
+const downloadCaptionBtn = document.getElementById('downloadCaptionBtn');
 const historySection = document.getElementById('historySection');
 const historyGrid = document.getElementById('historyGrid');
 const videoOnlyEls = document.querySelectorAll('.video-only');
+const storyOnlyEls = document.querySelectorAll('.story-only');
 
 const SCENE_DURATION_SEC = 3.5;
 let mode = 'image';
@@ -26,6 +30,17 @@ promptEl.addEventListener('input', () => {
   charCountEl.textContent = String(promptEl.value.length);
 });
 
+function applyModeVisibility() {
+  for (const el of videoOnlyEls) {
+    el.style.display = mode === 'video' ? '' : 'none';
+  }
+  for (const el of storyOnlyEls) {
+    el.style.display = mode === 'story' ? '' : 'none';
+  }
+  promptField.style.display = mode === 'story' ? 'none' : '';
+  generateBtn.textContent = mode === 'story' ? 'Generer une histoire' : 'Generer';
+}
+
 modeSwitch.addEventListener('click', (event) => {
   const btn = event.target.closest('.segment');
   if (!btn) return;
@@ -33,13 +48,9 @@ modeSwitch.addEventListener('click', (event) => {
   for (const el of modeSwitch.querySelectorAll('.segment')) {
     el.classList.toggle('active', el === btn);
   }
-  for (const el of videoOnlyEls) {
-    el.style.display = mode === 'video' ? '' : 'none';
-  }
+  applyModeVisibility();
 });
-for (const el of videoOnlyEls) {
-  el.style.display = mode === 'video' ? '' : 'none';
-}
+applyModeVisibility();
 
 function updateSceneDuration() {
   const scenes = Number(sceneCountEl.value);
@@ -66,7 +77,7 @@ function setLoading(isLoading, text) {
   generateBtn.textContent = isLoading ? 'Generation…' : 'Generer';
 }
 
-function showResult(type, url) {
+function showResult(type, url, captionUrl) {
   placeholder.hidden = true;
   if (type === 'image') {
     resultVideo.hidden = true;
@@ -82,6 +93,12 @@ function showResult(type, url) {
   }
   downloadBtn.href = url;
   downloadBtn.hidden = false;
+  if (captionUrl) {
+    downloadCaptionBtn.href = captionUrl;
+    downloadCaptionBtn.hidden = false;
+  } else {
+    downloadCaptionBtn.hidden = true;
+  }
   addToHistory(type, url);
 }
 
@@ -109,6 +126,28 @@ function addToHistory(type, url) {
 
 async function generate() {
   clearError();
+
+  if (mode === 'story') {
+    const style = styleEl.value;
+    const genre = genreEl.value;
+    setLoading(true, 'Invention de l\'histoire, generation des images et montage video…');
+    try {
+      const res = await fetch('/api/generate/story', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ genre, style: style === 'none' ? undefined : style }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erreur inconnue');
+      showResult('video', data.url, data.captionUrl);
+    } catch (err) {
+      showError(err.message);
+    } finally {
+      setLoading(false);
+    }
+    return;
+  }
+
   const prompt = promptEl.value.trim();
   if (!prompt) {
     showError('Ecris un prompt avant de generer.');

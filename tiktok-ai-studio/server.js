@@ -6,6 +6,8 @@ const crypto = require('node:crypto');
 const { fetchPollinationsImage } = require('./src/pollinations');
 const { buildScenes, STYLE_PRESETS } = require('./src/scenes');
 const { buildSlideshow } = require('./src/videoBuilder');
+const { generateStoryVideo } = require('./src/agent');
+const { GENRES } = require('./src/storyIdeas');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -115,6 +117,34 @@ app.post('/api/generate/video', async (req, res) => {
     });
   } finally {
     await Promise.all(workingFiles.map((f) => fs.rm(f, { force: true }).catch(() => {})));
+  }
+});
+
+app.post('/api/generate/story', async (req, res) => {
+  const { genre, style } = req.body || {};
+
+  if (genre && !GENRES[genre]) {
+    return res.status(400).json({ error: `Genre inconnu. Genres disponibles : ${Object.keys(GENRES).join(', ')}.` });
+  }
+
+  try {
+    const result = await generateStoryVideo({ style, genre });
+    res.json({
+      type: 'video',
+      url: `/generated/${result.video}`,
+      captionUrl: `/generated/${result.caption}`,
+      title: result.title,
+      genre: result.genre,
+      durationSec: result.durationSec,
+      sceneCount: result.sceneCount,
+    });
+  } catch (err) {
+    console.error('Erreur generation histoire:', err);
+    res.status(502).json({
+      error:
+        "La generation de l'histoire a echoue. Verifiez que ffmpeg est installe sur le serveur et que la connexion internet permet de joindre Pollinations.ai.",
+      detail: err.message,
+    });
   }
 });
 

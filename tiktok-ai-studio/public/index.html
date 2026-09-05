@@ -18,21 +18,36 @@
 
     <main class="layout">
       <section class="panel">
-        <div class="field">
-          <label for="prompt">Ton prompt</label>
-          <textarea id="prompt" maxlength="500" rows="4" placeholder="Ex: un astronaute qui danse sur la lune, ambiance neon, style cyberpunk"></textarea>
-          <div class="char-count"><span id="charCount">0</span>/500</div>
-        </div>
-
         <div class="field-row">
           <div class="field">
             <label>Mode</label>
             <div class="segmented" id="modeSwitch">
               <button type="button" class="segment active" data-mode="image">🖼️ Image</button>
               <button type="button" class="segment" data-mode="video">🎬 Video</button>
+              <button type="button" class="segment" data-mode="story">📖 Histoire</button>
             </div>
           </div>
+        </div>
 
+        <div class="field prompt-field" id="promptField">
+          <label for="prompt">Ton prompt</label>
+          <textarea id="prompt" maxlength="500" rows="4" placeholder="Ex: un astronaute qui danse sur la lune, ambiance neon, style cyberpunk"></textarea>
+          <div class="char-count"><span id="charCount">0</span>/500</div>
+        </div>
+
+        <div class="field-row story-only" id="genreField">
+          <div class="field">
+            <label for="genre">Genre de l'histoire</label>
+            <select id="genre">
+              <option value="">Aleatoire</option>
+              <option value="horreur">Horreur</option>
+              <option value="mystere">Mystere</option>
+              <option value="temoignage">Temoignage</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
           <div class="field">
             <label for="style">Style visuel</label>
             <select id="style">
@@ -67,9 +82,12 @@
 
         <p class="error" id="errorBox" hidden></p>
 
-        <p class="hint">
+        <p class="hint" id="hintImage">
           Les images sont creees via l'API publique et gratuite <strong>Pollinations.ai</strong>.
           Les videos sont assemblees localement avec <strong>ffmpeg</strong> (effet Ken Burns + sous-titres + ambiance sonore generee, libre de droits).
+        </p>
+        <p class="hint story-only" id="hintStory">
+          Le mode <strong>Histoire</strong> invente lui-meme un titre, un scenario en plusieurs scenes et des hashtags (genre au choix ou aleatoire), puis genere la video complete (~60-90s, pense pour la duree minimale du programme de monetisation TikTok). Le titre/description/hashtags sont telechargeables juste apres, prets a copier-coller pour la publication.
         </p>
       </section>
 
@@ -90,6 +108,7 @@
           </div>
         </div>
         <a id="downloadBtn" class="download-btn" hidden download>⬇️ Telecharger</a>
+        <a id="downloadCaptionBtn" class="download-btn" hidden download>📋 Telecharger titre + hashtags</a>
       </section>
     </main>
 
