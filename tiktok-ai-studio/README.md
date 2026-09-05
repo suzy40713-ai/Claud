@@ -40,6 +40,34 @@ L'app est prete pour [Render](https://render.com) (hebergeur avec un plan gratui
 - Le stockage est ephemere : les images/videos generees disparaissent a chaque redemarrage ou redeploiement (pas de base de donnees, ce n'est pas necessaire pour un usage ponctuel).
 - Contrairement a cet environnement de developpement, les serveurs Render ont un acces internet normal : les appels a Pollinations.ai fonctionnent sans restriction particuliere.
 
+## Agent de contenu automatique (mode "story", pour la monetisation)
+
+En plus de l'interface web (une video a la fois), le projet inclut un agent en ligne de commande qui invente et genere en lot des videos d'histoires courtes (horreur, mystere, temoignage) pretes a publier sur TikTok :
+
+```bash
+cd tiktok-ai-studio
+npm run agent -- --count 5
+```
+
+Options :
+- `--count, -n` : nombre de videos a generer (defaut 1, max 20)
+- `--genre` : force `horreur`, `mystere` ou `temoignage` (sinon tire au hasard a chaque video)
+- `--style` : force un style visuel (`cinematic`, `realistic`, `anime`, ...)
+
+Pour chaque video generee dans `generated/`, l'agent produit aussi :
+- un fichier `.txt` avec le titre, la description et les hashtags, prets a copier-coller au moment de publier ;
+- un fichier `.json` avec les memes infos (utile pour un calendrier de publication).
+
+Les histoires sont generees par un moteur de templates (aucune cle API, aucun cout) : personnage, lieu et objet sont tires au hasard dans une trame narrative fixe par genre, avec accords grammaticaux corrects. Chaque video vise ~60-90 secondes (plusieurs scenes de 4,5s) pour respecter la duree minimale du programme de monetisation TikTok.
+
+**Conditions de monetisation TikTok (Creativity Program)**, a verifier de ton cote sur TikTok :
+- avoir 18 ans ou plus et un compte dans un pays eligible ;
+- au moins 1000 abonnes et 10 000 vues sur les 30 derniers jours ;
+- des videos de plus d'1 minute ;
+- respecter les regles de la communaute TikTok.
+
+Cet agent genere le contenu ; publier les videos, engager la communaute et respecter les regles TikTok reste une demarche manuelle de ton cote.
+
 ## Utilisation
 
 1. Ecris un prompt (ex: *"un chat astronaute qui flotte dans l'espace, style cyberpunk"*).
