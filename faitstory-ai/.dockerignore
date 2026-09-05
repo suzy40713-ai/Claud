@@ -1,0 +1,8 @@
+node_modules
+.next
+.git
+public/generated/*
+!public/generated/.gitkeep
+*.log
+.env
+.env.local

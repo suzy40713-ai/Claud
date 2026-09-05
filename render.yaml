@@ -1,11 +1,25 @@
+databases:
+  - name: faitstory-db
+    plan: free
+    databaseName: faitstory
+    user: faitstory
+
 services:
   - type: web
-    name: tiktok-ai-studio
+    name: faitstory-ai
     runtime: docker
-    rootDir: tiktok-ai-studio
+    rootDir: faitstory-ai
     dockerfilePath: ./Dockerfile
     plan: free
     healthCheckPath: /
     envVars:
       - key: NODE_ENV
         value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: faitstory-db
+          property: connectionString
+      - key: TTS_PROVIDER
+        value: espeak
+      - key: IMAGE_PROVIDER
+        value: pollinations

@@ -1,0 +1,77 @@
+// FAITSTORY AI — schema Prisma
+// Un "Video" represente une video generee (ou en cours de generation) :
+// sujet choisi par l'utilisateur, parametres, script/scenes/sources produits
+// par le pipeline, et chemins des fichiers finaux.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum VideoStatus {
+  PENDING
+  RESEARCHING
+  WRITING_SCRIPT
+  BUILDING_SCENES
+  GENERATING_VOICE
+  GENERATING_SUBTITLES
+  RENDERING
+  DONE
+  FAILED
+}
+
+enum VideoStyle {
+  SURVIE
+  SCIENCE
+  ASTUCE
+  INSOLITE
+}
+
+enum VoiceGender {
+  HOMME
+  FEMME
+}
+
+enum SuspenseLevel {
+  FAIBLE
+  MOYEN
+  FORT
+}
+
+model Video {
+  id String @id @default(cuid())
+
+  // Entree utilisateur
+  subject       String
+  durationSec   Int
+  style         VideoStyle
+  voiceGender   VoiceGender
+  suspenseLevel SuspenseLevel
+
+  // Etat du pipeline
+  status       VideoStatus @default(PENDING)
+  errorMessage String?
+
+  // Sorties du pipeline (stockees en JSON pour rester flexibles pendant les iterations)
+  title    String?
+  hook     String?
+  script   Json? // { hook, intro, developpement, suspense, conclusion }
+  scenes   Json? // Scene[] (texte narration, duree, visuel, texte ecran, transition)
+  sources  Json? // { title, url, extract }[]
+  hashtags Json? // string[]
+
+  // Fichiers generes, servis depuis /public/generated/<id>/...
+  videoPath     String?
+  thumbnailPath String?
+  srtPath       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
