@@ -1,5 +1,6 @@
--- TrendRadar database schema
--- Run this in the Supabase SQL editor (or via `supabase db push`).
+-- TrendRadar database schema — initial migration.
+-- Applied automatically by the Supabase GitHub integration on merge,
+-- or manually via `supabase db push` / the SQL editor.
 
 create extension if not exists "uuid-ossp";
 

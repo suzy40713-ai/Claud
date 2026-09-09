@@ -80,8 +80,8 @@ Route Handlers / composants serveur (jamais préfixées `NEXT_PUBLIC_`).
 
 ### 2. Base de données Supabase
 
-Créer un projet sur [supabase.com](https://supabase.com), puis exécuter le contenu de
-`supabase/schema.sql` dans l'éditeur SQL du projet (ou via `supabase db push`). Ce script crée :
+Créer un projet sur [supabase.com](https://supabase.com). Le schéma vit dans
+`supabase/migrations/20260101000000_init_schema.sql` et crée :
 
 - `profiles` (plan, crédits, infos Stripe)
 - `credit_transactions` (journal des crédits consommés)
@@ -89,6 +89,16 @@ Créer un projet sur [supabase.com](https://supabase.com), puis exécuter le con
 - `calendar_entries`
 - `radar_signals`
 - Les policies RLS nécessaires + un trigger qui crée automatiquement un `profile` à l'inscription
+
+Deux façons de l'appliquer :
+
+**Option A — Intégration GitHub (recommandée)** : Project Settings → Integrations → GitHub →
+connecter le repo. Comme ce dépôt est un monorepo, indiquer `trendradar` comme **Supabase
+directory**. Supabase applique alors automatiquement les fichiers de `supabase/migrations/` à
+chaque merge sur la branche de production.
+
+**Option B — Manuelle** : copier le contenu du fichier de migration dans **SQL Editor → New
+query** du dashboard Supabase et cliquer **Run**.
 
 Dans Supabase Auth, activer la méthode Email/Password. Configurer l'URL de redirection
 `https://<votre-domaine>/auth/callback`.
@@ -129,8 +139,8 @@ Le projet est prêt pour un déploiement Vercel (ou tout hébergeur Next.js) :
 ## Structure du projet
 
 ```
-app/                  Routes (App Router) : landing, auth, dashboard, API routes
-components/           Composants React (landing, dashboard, auth)
-lib/                  Logique métier (plans, crédits, Gemini, Stripe, Supabase clients)
-supabase/schema.sql   Schéma complet de la base de données + RLS
+app/                    Routes (App Router) : landing, auth, dashboard, API routes
+components/             Composants React (landing, dashboard, auth)
+lib/                    Logique métier (plans, crédits, Gemini, Stripe, Supabase clients)
+supabase/migrations/    Schéma complet de la base de données + RLS
 ```
