@@ -8,8 +8,6 @@ import { Button } from "@/components/ui/button";
 import { ProductEditForm } from "@/components/product/product-edit-form";
 import { PageAnalysisPanel } from "@/components/product/page-analysis-panel";
 import { createClient } from "@/lib/supabase/server";
-import { getCreditStatus } from "@/lib/credits";
-import { getPlan } from "@/lib/config/plans";
 
 export default async function ProductPage() {
   const supabase = await createClient();
@@ -41,18 +39,13 @@ export default async function ProductPage() {
 
   const activeProduct = products[0];
 
-  const [{ data: latestAnalysis }, credits] = await Promise.all([
-    supabase
-      .from("product_page_analyses")
-      .select("*")
-      .eq("product_id", activeProduct.id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-    getCreditStatus(user.id),
-  ]);
-
-  const plan = getPlan(credits.plan);
+  const { data: latestAnalysis } = await supabase
+    .from("product_page_analyses")
+    .select("*")
+    .eq("product_id", activeProduct.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
   return (
     <div className="space-y-6">
@@ -83,11 +76,7 @@ export default async function ProductPage() {
           <CardTitle>Analyse de ta page produit</CardTitle>
         </CardHeader>
         <CardContent>
-          <PageAnalysisPanel
-            product={activeProduct}
-            latestAnalysis={latestAnalysis ?? null}
-            canAnalyze={plan.limits.advancedAnalysis}
-          />
+          <PageAnalysisPanel product={activeProduct} latestAnalysis={latestAnalysis ?? null} />
         </CardContent>
       </Card>
 

@@ -36,7 +36,7 @@ export function Navbar() {
             <Link href="/login">Se connecter</Link>
           </Button>
           <Button asChild variant="brand">
-            <Link href="/signup">Créer mon plan gratuitement</Link>
+            <Link href="/signup">Créer mon plan</Link>
           </Button>
         </div>
 

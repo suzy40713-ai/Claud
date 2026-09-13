@@ -21,13 +21,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   ]);
 
   return (
-    <DashboardShell
-      userEmail={user.email ?? ""}
-      userName={profile?.full_name ?? null}
-      plan={credits.plan}
-      creditsRemaining={credits.remaining}
-      creditsLimit={credits.limit}
-    >
+    <DashboardShell userEmail={user.email ?? ""} userName={profile?.full_name ?? null} creditsBalance={credits.balance}>
       {children}
     </DashboardShell>
   );

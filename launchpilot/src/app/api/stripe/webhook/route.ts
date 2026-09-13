@@ -3,23 +3,7 @@ import type Stripe from "stripe";
 
 import { getStripe } from "@/lib/stripe/client";
 import { createAdminClient } from "@/lib/supabase/server";
-import type { SubscriptionStatus } from "@/types/database";
-
-function mapStripeStatus(status: string): SubscriptionStatus {
-  switch (status) {
-    case "active":
-    case "trialing":
-    case "past_due":
-    case "canceled":
-    case "unpaid":
-      return status;
-    case "incomplete":
-    case "incomplete_expired":
-      return "incomplete";
-    default:
-      return "canceled";
-  }
-}
+import { CREDITS_PER_PURCHASE, PLAN_PRICE_CENTS } from "@/lib/credits";
 
 export async function POST(request: Request) {
   const stripe = getStripe();
@@ -43,66 +27,45 @@ export async function POST(request: Request) {
 
   const admin = createAdminClient();
 
-  switch (event.type) {
-    case "checkout.session.completed": {
-      const session = event.data.object as Stripe.Checkout.Session;
-      const userId = session.metadata?.supabase_user_id;
-      if (userId && session.subscription) {
-        const subscriptionId =
-          typeof session.subscription === "string" ? session.subscription : session.subscription.id;
-
-        await admin.from("profiles").update({ plan: "pro" }).eq("id", userId);
-        await admin.from("subscriptions").upsert(
-          {
-            user_id: userId,
-            plan: "pro",
-            status: "active",
-            stripe_customer_id: typeof session.customer === "string" ? session.customer : session.customer?.id,
-            stripe_subscription_id: subscriptionId,
-          },
-          { onConflict: "user_id" }
-        );
-      }
-      break;
+  // Pay-per-generation: a single one-time (`mode: "payment"`) Checkout
+  // Session per 14,99€ purchase — no subscriptions to track.
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object as Stripe.Checkout.Session;
+    if (session.mode !== "payment") {
+      return NextResponse.json({ received: true });
     }
 
-    case "customer.subscription.updated":
-    case "customer.subscription.deleted": {
-      const subscription = event.data.object as Stripe.Subscription;
-      let resolvedUserId: string | undefined = subscription.metadata?.supabase_user_id;
+    const userId = session.metadata?.supabase_user_id;
+    const credits = Number(session.metadata?.credits) || CREDITS_PER_PURCHASE;
 
-      if (!resolvedUserId) {
-        const { data: existing } = await admin
-          .from("subscriptions")
-          .select("user_id")
-          .eq("stripe_subscription_id", subscription.id)
+    if (userId) {
+      const { error: purchaseError } = await admin.from("credit_purchases").insert({
+        user_id: userId,
+        stripe_session_id: session.id,
+        credits_granted: credits,
+        amount_cents: session.amount_total ?? PLAN_PRICE_CENTS,
+      });
+
+      // Unique constraint on stripe_session_id makes this idempotent: a
+      // duplicate webhook delivery fails the insert and we skip granting
+      // credits twice.
+      if (!purchaseError) {
+        const { data: usage } = await admin
+          .from("usage_credits")
+          .select("credits_balance")
+          .eq("user_id", userId)
           .maybeSingle();
-        resolvedUserId = existing?.user_id;
+
+        if (usage) {
+          await admin
+            .from("usage_credits")
+            .update({ credits_balance: usage.credits_balance + credits })
+            .eq("user_id", userId);
+        } else {
+          await admin.from("usage_credits").insert({ user_id: userId, credits_balance: credits });
+        }
       }
-
-      if (!resolvedUserId) break;
-
-      const isActive = subscription.status === "active" || subscription.status === "trialing";
-      const plan = event.type === "customer.subscription.deleted" || !isActive ? "free" : "pro";
-      const periodEnd = subscription.items.data[0]?.current_period_end;
-
-      await admin.from("profiles").update({ plan }).eq("id", resolvedUserId);
-      await admin.from("subscriptions").upsert(
-        {
-          user_id: resolvedUserId,
-          plan,
-          status: mapStripeStatus(subscription.status),
-          stripe_subscription_id: subscription.id,
-          current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
-          cancel_at_period_end: subscription.cancel_at_period_end,
-        },
-        { onConflict: "user_id" }
-      );
-      break;
     }
-
-    default:
-      break;
   }
 
   return NextResponse.json({ received: true });

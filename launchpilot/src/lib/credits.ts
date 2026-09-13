@@ -1,86 +1,66 @@
 import { createAdminClient } from "@/lib/supabase/server";
-import { getPlan, type PlanId } from "@/lib/config/plans";
 
-function currentPeriodStart() {
-  const now = new Date();
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString().slice(0, 10);
-}
+/** Price of a single generated plan — pay-per-generation, no subscription. */
+export const PLAN_PRICE_EUR = 14.99;
+export const PLAN_PRICE_CENTS = 1499;
+export const CREDITS_PER_PURCHASE = 1;
 
 export interface CreditStatus {
-  plan: PlanId;
-  used: number;
-  limit: number;
-  remaining: number;
+  balance: number;
   canGenerate: boolean;
 }
 
 /**
  * Server-only credit check + status. Always reads/writes through the
- * service-role client so a user cannot bypass their monthly limit by
- * calling this from the browser or racing page refreshes — the increment
- * in `consumeGenerationCredit` happens in the same request that performs
- * the generation, never client-side.
+ * service-role client so a user cannot generate a plan for free by calling
+ * this from the browser or racing page refreshes — the decrement in
+ * `consumeGenerationCredit` happens in the same request that performs the
+ * generation, never client-side.
  */
 export async function getCreditStatus(userId: string): Promise<CreditStatus> {
   const admin = createAdminClient();
-
-  const [{ data: profile }, { data: usage }] = await Promise.all([
-    admin.from("profiles").select("plan").eq("id", userId).single(),
-    admin.from("usage_credits").select("*").eq("user_id", userId).maybeSingle(),
-  ]);
-
-  const plan = getPlan(profile?.plan);
-  const period = currentPeriodStart();
-
-  let used = 0;
-  if (usage && usage.period_start === period) {
-    used = usage.plans_generated_this_period;
-  }
-
-  const limit = plan.limits.plansPerMonth;
-  const remaining = Math.max(0, limit - used);
-
-  return { plan: plan.id, used, limit, remaining, canGenerate: remaining > 0 };
+  const { data } = await admin.from("usage_credits").select("credits_balance").eq("user_id", userId).maybeSingle();
+  const balance = data?.credits_balance ?? 0;
+  return { balance, canGenerate: balance > 0 };
 }
 
 /**
- * Atomically checks and increments the usage counter for the current
- * period. Returns false (without incrementing) if the user has no credits
- * left, so the caller must check the result before generating.
+ * Atomically checks and decrements the credit balance. Returns false
+ * (without decrementing) if the user has no credit available, so the
+ * caller must check the result before generating and redirect to purchase.
  */
 export async function consumeGenerationCredit(userId: string): Promise<boolean> {
   const admin = createAdminClient();
-  const period = currentPeriodStart();
+  const { data: usage } = await admin.from("usage_credits").select("credits_balance").eq("user_id", userId).maybeSingle();
 
-  const { data: profile } = await admin.from("profiles").select("plan").eq("id", userId).single();
-  const plan = getPlan(profile?.plan);
-
-  const { data: usage } = await admin.from("usage_credits").select("*").eq("user_id", userId).maybeSingle();
-
-  const isNewPeriod = !usage || usage.period_start !== period;
-  const used = isNewPeriod ? 0 : usage.plans_generated_this_period;
-
-  if (used >= plan.limits.plansPerMonth) {
+  const balance = usage?.credits_balance ?? 0;
+  if (balance <= 0) {
     return false;
   }
 
+  const { error } = await admin
+    .from("usage_credits")
+    .update({ credits_balance: balance - 1 })
+    .eq("user_id", userId)
+    .eq("credits_balance", balance);
+
+  return !error;
+}
+
+/**
+ * Adds credits to a user's balance after a successful purchase (Stripe
+ * webhook or dev-mode fallback in `purchasePlanCredit`).
+ */
+export async function grantCredits(userId: string, amount: number): Promise<void> {
+  const admin = createAdminClient();
+  const { data: usage } = await admin.from("usage_credits").select("credits_balance").eq("user_id", userId).maybeSingle();
+
   if (usage) {
-    const { error } = await admin
+    await admin
       .from("usage_credits")
-      .update({
-        period_start: period,
-        plans_generated_this_period: used + 1,
-      })
-      .eq("user_id", userId)
-      .eq("plans_generated_this_period", usage.plans_generated_this_period);
-
-    if (error) return false;
+      .update({ credits_balance: usage.credits_balance + amount })
+      .eq("user_id", userId);
   } else {
-    const { error } = await admin
-      .from("usage_credits")
-      .insert({ user_id: userId, period_start: period, plans_generated_this_period: 1 });
-    if (error) return false;
+    await admin.from("usage_credits").insert({ user_id: userId, credits_balance: amount });
   }
-
-  return true;
 }

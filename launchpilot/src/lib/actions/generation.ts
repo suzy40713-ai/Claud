@@ -11,6 +11,7 @@ export interface GenerationResult {
   success: boolean;
   reportId?: string;
   error?: string;
+  errorCode?: "no_credit";
 }
 
 export async function generatePlanForProduct(productId: string): Promise<GenerationResult> {
@@ -39,7 +40,8 @@ export async function generatePlanForProduct(productId: string): Promise<Generat
   if (!hasCredit) {
     return {
       success: false,
-      error: "Tu as atteint la limite de plans générés pour ton forfait. Passe en Pro pour en générer plus.",
+      errorCode: "no_credit",
+      error: "Il te faut un crédit pour générer ce plan. Achète un plan pour 14,99€.",
     };
   }
 

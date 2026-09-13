@@ -7,24 +7,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ProfileForm } from "@/components/settings/profile-form";
 import { ThemePreferenceForm } from "@/components/settings/theme-preference-form";
-import { SubscriptionPanel } from "@/components/settings/subscription-panel";
+import { CreditsPanel } from "@/components/settings/credits-panel";
 import { DeleteAccountDialog } from "@/components/settings/delete-account-dialog";
-import type { PlanId } from "@/lib/config/plans";
+import type { Tables } from "@/types/database";
 import Link from "next/link";
 import { Package } from "lucide-react";
 
 export function SettingsTabs({
   email,
   fullName,
-  plan,
-  creditsRemaining,
-  creditsLimit,
+  creditsBalance,
+  purchases,
 }: {
   email: string;
   fullName: string | null;
-  plan: PlanId;
-  creditsRemaining: number;
-  creditsLimit: number;
+  creditsBalance: number;
+  purchases: Tables<"credit_purchases">[];
 }) {
   const searchParams = useSearchParams();
   const initialTab = searchParams.get("tab") || "profil";
@@ -35,7 +33,7 @@ export function SettingsTabs({
         <TabsTrigger value="profil">Profil</TabsTrigger>
         <TabsTrigger value="produit">Produit</TabsTrigger>
         <TabsTrigger value="preferences">Préférences</TabsTrigger>
-        <TabsTrigger value="abonnement">Abonnement</TabsTrigger>
+        <TabsTrigger value="abonnement">Crédits</TabsTrigger>
         <TabsTrigger value="compte">Compte</TabsTrigger>
       </TabsList>
 
@@ -81,7 +79,7 @@ export function SettingsTabs({
       </TabsContent>
 
       <TabsContent value="abonnement">
-        <SubscriptionPanel currentPlan={plan} creditsRemaining={creditsRemaining} creditsLimit={creditsLimit} />
+        <CreditsPanel creditsBalance={creditsBalance} purchases={purchases} />
       </TabsContent>
 
       <TabsContent value="compte">

@@ -1,16 +1,12 @@
-import { Lock, Sparkles } from "lucide-react";
-import Link from "next/link";
+import { Sparkles } from "lucide-react";
 
 import { PageHeader } from "@/components/dashboard/page-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/copy-button";
 import { createClient } from "@/lib/supabase/server";
 import { getLatestReport, getReportBundle } from "@/lib/data/reports";
-import { getCreditStatus } from "@/lib/credits";
-import { getPlan } from "@/lib/config/plans";
 
 export default async function ContentPage() {
   const supabase = await createClient();
@@ -36,15 +32,7 @@ export default async function ContentPage() {
     );
   }
 
-  const [{ contentIdeas }, credits] = await Promise.all([
-    getReportBundle(supabase, latest.id, user.id),
-    getCreditStatus(user.id),
-  ]);
-
-  const plan = getPlan(credits.plan);
-  const visibleCount = plan.limits.contentIdeas;
-  const visible = contentIdeas.slice(0, visibleCount);
-  const locked = contentIdeas.length - visible.length;
+  const { contentIdeas } = await getReportBundle(supabase, latest.id, user.id);
 
   return (
     <div className="space-y-6">
@@ -54,7 +42,7 @@ export default async function ContentPage() {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {visible.map((idea) => (
+        {contentIdeas.map((idea) => (
           <Card key={idea.id} className="flex h-full flex-col">
             <CardContent className="flex flex-1 flex-col gap-3 p-5">
               <div className="flex items-center justify-between">
@@ -74,21 +62,6 @@ export default async function ContentPage() {
           </Card>
         ))}
       </div>
-
-      {locked > 0 && (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center gap-3 p-8 text-center">
-            <Lock className="h-6 w-6 text-muted-foreground" />
-            <p className="font-medium">{locked} idées de contenu supplémentaires avec le forfait Pro</p>
-            <p className="max-w-sm text-sm text-muted-foreground">
-              Débloque les 30 idées de contenu complètes, avec scripts détaillés pour chaque plateforme.
-            </p>
-            <Button asChild variant="brand">
-              <Link href="/dashboard/parametres?tab=abonnement">Passer en Pro</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

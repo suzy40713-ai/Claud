@@ -19,21 +19,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarNav } from "./sidebar-nav";
 import { signOut } from "@/lib/actions/auth";
+import { BuyCreditButton } from "@/components/billing/buy-credit-button";
 
 export function DashboardShell({
   children,
   userEmail,
   userName,
-  plan,
-  creditsRemaining,
-  creditsLimit,
+  creditsBalance,
 }: {
   children: React.ReactNode;
   userEmail: string;
   userName: string | null;
-  plan: "free" | "pro";
-  creditsRemaining: number;
-  creditsLimit: number;
+  creditsBalance: number;
 }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const initials = (userName || userEmail).slice(0, 2).toUpperCase();
@@ -48,7 +45,7 @@ export function DashboardShell({
           <SidebarNav />
         </div>
         <div className="border-t border-border p-4">
-          <UpgradeCard plan={plan} creditsRemaining={creditsRemaining} creditsLimit={creditsLimit} />
+          <CreditsCard creditsBalance={creditsBalance} />
         </div>
       </aside>
 
@@ -62,7 +59,7 @@ export function DashboardShell({
             <SidebarNav onNavigate={() => setMobileOpen(false)} />
           </div>
           <div className="border-t border-border p-4">
-            <UpgradeCard plan={plan} creditsRemaining={creditsRemaining} creditsLimit={creditsLimit} />
+            <CreditsCard creditsBalance={creditsBalance} />
           </div>
         </SheetContent>
       </Sheet>
@@ -75,7 +72,7 @@ export function DashboardShell({
             </Button>
             <Badge variant="secondary" className="hidden sm:flex">
               <Zap className="h-3 w-3" />
-              {creditsRemaining}/{creditsLimit} générations restantes
+              {creditsBalance} crédit{creditsBalance !== 1 ? "s" : ""}
             </Badge>
           </div>
 
@@ -123,32 +120,16 @@ export function DashboardShell({
   );
 }
 
-function UpgradeCard({
-  plan,
-  creditsRemaining,
-  creditsLimit,
-}: {
-  plan: "free" | "pro";
-  creditsRemaining: number;
-  creditsLimit: number;
-}) {
-  if (plan === "pro") {
-    return (
-      <div className="rounded-lg border border-border bg-secondary/50 p-3 text-xs text-muted-foreground">
-        Forfait Pro · {creditsRemaining}/{creditsLimit} plans restants ce mois-ci
-      </div>
-    );
-  }
-
+function CreditsCard({ creditsBalance }: { creditsBalance: number }) {
   return (
     <div className="rounded-lg border border-border bg-gradient-to-br from-primary/5 to-accent/5 p-4">
-      <p className="text-sm font-medium">Forfait Free</p>
-      <p className="mt-1 text-xs text-muted-foreground">
-        {creditsRemaining}/{creditsLimit} plan{creditsLimit > 1 ? "s" : ""} restant ce mois-ci
+      <p className="text-sm font-medium">
+        {creditsBalance} crédit{creditsBalance !== 1 ? "s" : ""} disponible{creditsBalance !== 1 ? "s" : ""}
       </p>
-      <Button asChild size="sm" variant="brand" className="mt-3 w-full">
-        <Link href="/dashboard/parametres?tab=abonnement">Passer en Pro</Link>
-      </Button>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Chaque crédit débloque un plan marketing complet (score, contenu, calendrier 30 jours, emails, pubs...).
+      </p>
+      <BuyCreditButton size="sm" variant="brand" className="mt-3 w-full" label="Acheter un plan — 14,99€" />
     </div>
   );
 }

@@ -58,7 +58,7 @@ export default function SignupPage() {
         )}
 
         <SubmitButton variant="brand" className="w-full" size="lg">
-          Créer mon plan gratuitement
+          Créer mon compte
         </SubmitButton>
 
         <p className="text-center text-xs text-muted-foreground">

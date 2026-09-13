@@ -3,10 +3,11 @@
 import * as React from "react";
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AlertTriangle, Check, Loader2 } from "lucide-react";
+import { AlertTriangle, Check, Loader2, Sparkles } from "lucide-react";
 
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
+import { BuyCreditButton } from "@/components/billing/buy-credit-button";
 import { generatePlanForProduct } from "@/lib/actions/generation";
 
 const MESSAGES = [
@@ -32,6 +33,7 @@ function GeneratingFlow() {
 
   const [messageIndex, setMessageIndex] = React.useState(0);
   const [error, setError] = React.useState<string | null>(null);
+  const [noCredit, setNoCredit] = React.useState(false);
   const [done, setDone] = React.useState(false);
   const startedRef = React.useRef(false);
 
@@ -42,19 +44,27 @@ function GeneratingFlow() {
     return () => clearInterval(interval);
   }, []);
 
-  React.useEffect(() => {
-    if (!productId || startedRef.current) return;
-    startedRef.current = true;
-
+  const runGeneration = React.useCallback(() => {
+    if (!productId) return;
+    setError(null);
+    setNoCredit(false);
     generatePlanForProduct(productId).then((result) => {
       if (result.success && result.reportId) {
         setDone(true);
         setTimeout(() => router.push(`/dashboard/rapports/${result.reportId}`), 900);
+      } else if (result.errorCode === "no_credit") {
+        setNoCredit(true);
       } else {
         setError(result.error || "Une erreur est survenue pendant la génération.");
       }
     });
   }, [productId, router]);
+
+  React.useEffect(() => {
+    if (!productId || startedRef.current) return;
+    startedRef.current = true;
+    runGeneration();
+  }, [productId, runGeneration]);
 
   if (!productId) {
     return (
@@ -63,6 +73,31 @@ function GeneratingFlow() {
         <Button className="mt-4" onClick={() => router.push("/onboarding")}>
           Retour à l'onboarding
         </Button>
+      </Centered>
+    );
+  }
+
+  if (noCredit) {
+    return (
+      <Centered>
+        <div className="flex max-w-sm flex-col items-center gap-3 text-center">
+          <Sparkles className="h-10 w-10 text-primary" />
+          <p className="text-lg font-medium">Ton plan est prêt à être généré</p>
+          <p className="text-sm text-muted-foreground">
+            Chaque plan marketing complet (score, persona, contenu, calendrier 30 jours, emails, pubs...) coûte
+            14,99€, sans abonnement.
+          </p>
+          <BuyCreditButton
+            variant="brand"
+            size="lg"
+            className="mt-2 w-full"
+            returnTo={`/generating?productId=${productId}`}
+            onDevModeSuccess={runGeneration}
+          />
+          <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard")}>
+            Retour au dashboard
+          </Button>
+        </div>
       </Centered>
     );
   }
@@ -80,9 +115,8 @@ function GeneratingFlow() {
             <Button
               variant="brand"
               onClick={() => {
-                setError(null);
-                startedRef.current = false;
                 setMessageIndex(0);
+                runGeneration();
               }}
             >
               Réessayer

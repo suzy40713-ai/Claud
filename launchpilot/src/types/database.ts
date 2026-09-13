@@ -421,10 +421,24 @@ export interface Database {
           user_id: string;
           period_start: string;
           plans_generated_this_period: number;
+          credits_balance: number;
           updated_at: string;
         };
         Insert: Partial<Database["public"]["Tables"]["usage_credits"]["Row"]> & { user_id: string };
         Update: Partial<Database["public"]["Tables"]["usage_credits"]["Row"]>;
+        Relationships: [];
+      };
+      credit_purchases: {
+        Row: {
+          id: string;
+          user_id: string;
+          stripe_session_id: string | null;
+          credits_granted: number;
+          amount_cents: number;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["credit_purchases"]["Row"]> & { user_id: string };
+        Update: Partial<Database["public"]["Tables"]["credit_purchases"]["Row"]>;
         Relationships: [];
       };
     };

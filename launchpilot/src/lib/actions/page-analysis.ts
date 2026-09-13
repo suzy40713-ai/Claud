@@ -5,8 +5,6 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { fetchPublicPage } from "@/lib/fetch-public-page";
 import { analyzeProductPage, PageAnalysisError } from "@/lib/ai/analyze-page";
-import { getCreditStatus } from "@/lib/credits";
-import { getPlan } from "@/lib/config/plans";
 
 export interface PageAnalysisResult {
   success: boolean;
@@ -21,12 +19,6 @@ export async function analyzeProductUrl(productId: string): Promise<PageAnalysis
 
   if (!user) {
     return { success: false, error: "Tu dois être connecté(e)." };
-  }
-
-  const credits = await getCreditStatus(user.id);
-  const plan = getPlan(credits.plan);
-  if (!plan.limits.advancedAnalysis) {
-    return { success: false, error: "L'analyse de page produit est réservée au forfait Pro." };
   }
 
   const { data: product } = await supabase
