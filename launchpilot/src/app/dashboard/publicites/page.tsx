@@ -1,16 +1,12 @@
-import Link from "next/link";
-import { AlertCircle, Lock, Megaphone } from "lucide-react";
+import { AlertCircle, Megaphone } from "lucide-react";
 
 import { PageHeader } from "@/components/dashboard/page-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/copy-button";
 import { createClient } from "@/lib/supabase/server";
 import { getLatestReport, getReportBundle } from "@/lib/data/reports";
-import { getCreditStatus } from "@/lib/credits";
-import { getPlan } from "@/lib/config/plans";
 
 export default async function AdsPage() {
   const supabase = await createClient();
@@ -19,8 +15,7 @@ export default async function AdsPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const [latest, credits] = await Promise.all([getLatestReport(supabase, user.id), getCreditStatus(user.id)]);
-  const plan = getPlan(credits.plan);
+  const latest = await getLatestReport(supabase, user.id);
 
   if (!latest) {
     return (
@@ -33,26 +28,6 @@ export default async function AdsPage() {
           actionLabel="Créer mon plan"
           actionHref="/onboarding"
         />
-      </div>
-    );
-  }
-
-  if (!plan.limits.adCampaigns) {
-    return (
-      <div>
-        <PageHeader title="Publicités" description="5 concepts publicitaires prêts à tester." />
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center gap-3 p-10 text-center">
-            <Lock className="h-6 w-6 text-muted-foreground" />
-            <p className="font-medium">Les concepts publicitaires sont réservés au forfait Pro</p>
-            <p className="max-w-sm text-sm text-muted-foreground">
-              Débloque 5 concepts publicitaires complets (hook, texte, titre, audience) adaptés à ton produit.
-            </p>
-            <Button asChild variant="brand">
-              <Link href="/dashboard/parametres?tab=abonnement">Passer en Pro</Link>
-            </Button>
-          </CardContent>
-        </Card>
       </div>
     );
   }

@@ -12,21 +12,25 @@ export default async function SettingsPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const [{ data: profile }, credits] = await Promise.all([
+  const [{ data: profile }, credits, { data: purchases }] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
     getCreditStatus(user.id),
+    supabase
+      .from("credit_purchases")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false }),
   ]);
 
   return (
     <div>
-      <PageHeader title="Paramètres" description="Ton profil, ton produit, tes préférences et ton abonnement." />
+      <PageHeader title="Paramètres" description="Ton profil, ton produit, tes préférences et tes crédits." />
       <Suspense>
         <SettingsTabs
           email={user.email ?? ""}
           fullName={profile?.full_name ?? null}
-          plan={credits.plan}
-          creditsRemaining={credits.remaining}
-          creditsLimit={credits.limit}
+          creditsBalance={credits.balance}
+          purchases={purchases ?? []}
         />
       </Suspense>
     </div>

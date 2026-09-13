@@ -1,9 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { AlertTriangle, Loader2, Search, Lock } from "lucide-react";
+import { AlertTriangle, Loader2, Search } from "lucide-react";
 import { toast } from "sonner";
-import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,11 +12,9 @@ import type { Tables } from "@/types/database";
 export function PageAnalysisPanel({
   product,
   latestAnalysis,
-  canAnalyze,
 }: {
   product: Tables<"products">;
   latestAnalysis: Tables<"product_page_analyses"> | null;
-  canAnalyze: boolean;
 }) {
   const [loading, setLoading] = React.useState(false);
   const analysis = latestAnalysis;
@@ -34,20 +31,6 @@ export function PageAnalysisPanel({
     // The server action revalidates this page — a full refresh isn't
     // needed, but we optimistically flag that an analysis just completed.
     window.location.reload();
-  }
-
-  if (!canAnalyze) {
-    return (
-      <Card className="border-dashed">
-        <CardContent className="flex flex-col items-center gap-3 p-8 text-center">
-          <Lock className="h-6 w-6 text-muted-foreground" />
-          <p className="font-medium">L'analyse de page produit est réservée au forfait Pro</p>
-          <Button asChild variant="brand">
-            <Link href="/dashboard/parametres?tab=abonnement">Passer en Pro</Link>
-          </Button>
-        </CardContent>
-      </Card>
-    );
   }
 
   if (!product.url) {
