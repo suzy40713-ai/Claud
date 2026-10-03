@@ -113,12 +113,15 @@ Case CGU/confidentialité obligatoire à l'inscription (horodatée), opt-in mark
 ```bash
 npm run typecheck && npm run lint
 npm test                                   # tests unitaires (plans, droits, sources, CSV, schémas IA)
-psql "$DB_URL" -f supabase/tests/rls.test.sql   # tests de sécurité RLS (base jetable, après la migration)
+# tests de sécurité RLS sur un Postgres jetable (le stub recrée les objets Supabase nécessaires) :
+psql "$DB_URL" -f supabase/tests/supabase-stub.sql -f supabase/migrations/0001_init.sql -f supabase/tests/rls.test.sql
 node e2e/smoke.mjs                         # parcours complet dans Chromium (app lancée, DEMO_MODE=true,
                                            # auto-confirmation email, ADMIN_EMAILS=admin@test.dev)
 ```
 
 Le test E2E couvre : landing/SEO/pages légales, redirection des pages privées, inscription, tutoriel, recherche, favoris, collections et limite Free, analyse IA et quota, verrous des fonctionnalités payantes, page d'abonnement non configurée, accès admin refusé/autorisé, attribution manuelle d'une formule, Ad Creator (génération + modification), Trend Radar, exports, historique, équipe, recherche avancée, rendu mobile sans défilement horizontal, suppression du compte.
+
+La CI GitHub Actions (`.github/workflows/adhunter-ci.yml`) exécute lint, typecheck, tests unitaires, build, migration et tests RLS à chaque push touchant `adhunter/`.
 
 ## Déploiement
 
