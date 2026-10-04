@@ -1,6 +1,6 @@
 # Vidéo TikTok : « 7 choses que ton cerveau te cache »
 
-Fichier : `out/tiktok-cerveau.mp4` (1080×1920, 62 s, sans son).
+Fichier : `out/tiktok-cerveau.mp4` (1080×1920, 61,6 s, voix off française, volume normalisé à -14 LUFS).
 
 ## Légende à copier
 
@@ -11,7 +11,7 @@ Le n°7 va marcher sur toi 😳🧠 Tu as tenu jusqu'au bout ?
 
 ## Avant de publier
 
-1. **Ajoute un son tendance** dans l'éditeur TikTok (onglet « Sons » → tendances), volume bas (~20 %). La vidéo est muette exprès : un son tendance aide beaucoup la portée.
+1. **Ajoute un son tendance en fond** dans l'éditeur TikTok (onglet « Sons » → tendances) et mets-le **très bas (5–10 %)** pour que la voix off reste claire. Laisse le son d'origine à 100 %.
 2. Publie entre **18 h et 21 h** (heure de ton public).
 3. Pendant la première heure, **réponds à chaque commentaire** « BAILLÉ » (ça relance l'algorithme).
 4. Épingle ton propre commentaire : « Partie 2 demain ? 👀 ».
@@ -23,8 +23,15 @@ Le n°7 va marcher sur toi 😳🧠 Tu as tenu jusqu'au bout ?
 
 ## Générer une nouvelle vidéo
 
-Modifie le tableau `FACTS` dans `src/Composition.tsx`, puis :
+Tout le texte est dans `src/script.json` : le texte à l'écran (`title`, `text`…) et ce que dit la voix (`titleSay`, `textSay`…, avec les chiffres écrits en toutes lettres).
 
 ```console
-npx remotion render MyComp out/tiktok-cerveau.mp4 --codec=h264 --crf=18
+# 1. Voix off (Kokoro, voix française ff_siwis). Installation : voir l'en-tête du script
+python3 scripts/voiceover.py --models ~/kokoro
+# 2. Rendu de la vidéo (le timing suit automatiquement la durée de la voix)
+npx remotion render MyComp out/raw.mp4 --codec=h264 --crf=18
+# 3. Volume au standard TikTok
+ffmpeg -i out/raw.mp4 -c:v copy -af loudnorm=I=-14:TP=-1.5 -c:a aac -b:a 192k out/tiktok-cerveau.mp4
 ```
+
+La vidéo dure toujours au moins 61,5 s (la fin est allongée si besoin) pour rester éligible au Creator Rewards Program.

@@ -2,6 +2,7 @@ import {
   AbsoluteFill,
   Composition,
   Easing,
+  Html5Audio,
   Sequence,
   interpolate,
   spring,
@@ -9,60 +10,41 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
+import script from "./script.json";
+import voiceover from "./voiceover.json";
 
 const FPS = 30;
-const HOOK = 120;
-const FACT = 225;
-const OUTRO = 165;
+// TikTok's Creator Rewards only pays for videos longer than one minute.
+const MIN_TOTAL = Math.ceil(61.5 * FPS);
 
-type Fact = { emoji: string; title: string; text: string; accent: string };
+type Fact = (typeof script.facts)[number];
 
-const FACTS: Fact[] = [
-  {
-    emoji: "⚡",
-    title: "Il dévore ton énergie",
-    text: "Ton cerveau pèse 2 % de ton corps… mais consomme environ 20 % de ton énergie.",
-    accent: "#FFD23F",
-  },
-  {
-    emoji: "👃",
-    title: "Il efface ton nez",
-    text: "Ton nez est dans ton champ de vision en permanence. Ton cerveau le gomme. Maintenant tu le vois.",
-    accent: "#FF6B9A",
-  },
-  {
-    emoji: "👁️",
-    title: "Tu as un trou dans chaque œil",
-    text: "Chaque œil a un point aveugle. Ton cerveau invente l'image manquante sans te le dire.",
-    accent: "#4DD8FF",
-  },
-  {
-    emoji: "🤭",
-    title: "Impossible de te chatouiller",
-    text: "Ton cerveau prédit tes propres gestes et coupe la sensation avant qu'elle arrive.",
-    accent: "#9DFF6B",
-  },
-  {
-    emoji: "🔁",
-    title: "Le multitâche n'existe pas",
-    text: "Il ne fait pas 2 choses à la fois : il saute de l'une à l'autre très vite… et perd du temps.",
-    accent: "#FF9F43",
-  },
-  {
-    emoji: "🔍",
-    title: "Il te fait voir des « signes »",
-    text: "Tu découvres un mot et tu le vois partout ? C'est l'illusion de fréquence, pas le destin.",
-    accent: "#C08CFF",
-  },
-  {
-    emoji: "🥱",
-    title: "Il copie les baillements",
-    text: "Le baillement est contagieux. Même lire le mot « bailler » peut suffire… Tu sens que ça monte ?",
-    accent: "#FFD23F",
-  },
-];
+const clipFrames = (id: string) =>
+  Math.ceil((voiceover as Record<string, number>)[id] * FPS);
 
-const TOTAL = HOOK + FACTS.length * FACT + OUTRO;
+// Timeline derived from the voice-over lengths (see scripts/voiceover.py).
+const hookSubAt = 4 + clipFrames("hook_title") + 6;
+const HOOK = hookSubAt + clipFrames("hook_sub") + 18;
+
+const FACT_TITLE_AT = 8;
+const factTiming = script.facts.map((_, i) => {
+  const textAt = FACT_TITLE_AT + clipFrames(`fact${i}_title`) + 6;
+  const textFrames = clipFrames(`fact${i}_text`);
+  return { textAt, textFrames, length: textAt + textFrames + 14 };
+});
+const factStarts = factTiming.map(
+  (_, i) => HOOK + factTiming.slice(0, i).reduce((sum, t) => sum + t.length, 0),
+);
+const OUTRO_AT = HOOK + factTiming.reduce((sum, t) => sum + t.length, 0);
+
+const outroCommentAt = clipFrames("outro_question") + 8;
+const outroFollowAt = outroCommentAt + clipFrames("outro_comment") + 8;
+const OUTRO = Math.max(
+  outroFollowAt + clipFrames("outro_follow") + 45,
+  MIN_TOTAL - OUTRO_AT,
+);
+
+const TOTAL = OUTRO_AT + OUTRO;
 
 const FONT = "TheBold";
 
@@ -109,6 +91,12 @@ export const MyComposition = () => {
     />
   );
 };
+
+const Voice: React.FC<{ id: string; at: number }> = ({ id, at }) => (
+  <Sequence from={at} durationInFrames={clipFrames(id) + 2}>
+    <Html5Audio src={staticFile(`voiceover/${id}.wav`)} />
+  </Sequence>
+);
 
 const Background: React.FC = () => {
   const frame = useCurrentFrame();
@@ -172,17 +160,20 @@ const ProgressBar: React.FC = () => {
   );
 };
 
+// Pops words in one by one, spread across `over` frames so the captions
+// follow the voice-over.
 const PopWords: React.FC<{
   text: string;
   start: number;
-  perWord: number;
+  over: number;
   size: number;
   color?: string;
   highlight?: string;
-}> = ({ text, start, perWord, size, color = "#fff", highlight }) => {
+}> = ({ text, start, over, size, color = "#fff", highlight }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const words = caps(text).split(" ");
+  const step = Math.min(10, Math.max(2, (over * 0.9) / words.length));
   return (
     <div
       style={{
@@ -194,7 +185,7 @@ const PopWords: React.FC<{
       }}
     >
       {words.map((w, i) => {
-        const f = frame - start - i * perWord;
+        const f = frame - start - Math.round(i * step);
         const s = spring({ frame: f, fps, config: { damping: 12, mass: 0.5 } });
         const isNum = /\d/.test(w);
         return (
@@ -237,6 +228,8 @@ const Hook: React.FC = () => {
         gap: 40,
       }}
     >
+      <Voice id="hook_title" at={4} />
+      <Voice id="hook_sub" at={hookSubAt} />
       <div
         style={{
           fontSize: 260,
@@ -246,21 +239,19 @@ const Hook: React.FC = () => {
         🧠
       </div>
       <PopWords
-        text="7 choses que ton cerveau te CACHE"
+        text={script.hook.title}
         start={4}
-        perWord={4}
+        over={clipFrames("hook_title")}
         size={110}
         highlight="#FFD23F"
       />
-      <div style={{ opacity: interpolate(frame, [50, 60], [0, 1]) }}>
-        <PopWords
-          text="(le n°7 va marcher sur toi)"
-          start={50}
-          perWord={3}
-          size={58}
-          color="#FF6B9A"
-        />
-      </div>
+      <PopWords
+        text={script.hook.sub}
+        start={hookSubAt}
+        over={clipFrames("hook_sub")}
+        size={58}
+        color="#FF6B9A"
+      />
     </AbsoluteFill>
   );
 };
@@ -271,12 +262,18 @@ const FactScene: React.FC<{ fact: Fact; index: number }> = ({
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const { textAt, textFrames, length } = factTiming[index];
   const enter = spring({ frame, fps, config: { damping: 14 } });
-  const exit = interpolate(frame, [FACT - 10, FACT], [1, 0], {
+  const exit = interpolate(frame, [length - 10, length], [1, 0], {
     extrapolateLeft: "clamp",
     easing: Easing.in(Easing.ease),
   });
   const numScale = spring({ frame, fps, config: { damping: 7, mass: 0.6 } });
+  const titleScale = spring({
+    frame: frame - FACT_TITLE_AT,
+    fps,
+    config: { damping: 12 },
+  });
   const emojiBob = Math.sin(frame / 8) * 12;
   return (
     <AbsoluteFill
@@ -288,6 +285,8 @@ const FactScene: React.FC<{ fact: Fact; index: number }> = ({
         transform: `translateX(${(1 - enter) * 300}px)`,
       }}
     >
+      <Voice id={`fact${index}_title`} at={FACT_TITLE_AT} />
+      <Voice id={`fact${index}_text`} at={textAt} />
       <div
         style={{
           fontSize: 230,
@@ -314,7 +313,7 @@ const FactScene: React.FC<{ fact: Fact; index: number }> = ({
           padding: "14px 34px",
           borderRadius: 24,
           background: fact.accent,
-          transform: `scale(${spring({ frame: frame - 8, fps, config: { damping: 12 } })})`,
+          transform: `scale(${titleScale})`,
         }}
       >
         <span
@@ -332,8 +331,8 @@ const FactScene: React.FC<{ fact: Fact; index: number }> = ({
       <div style={{ marginTop: 50 }}>
         <PopWords
           text={fact.text}
-          start={24}
-          perWord={4}
+          start={textAt}
+          over={textFrames}
           size={64}
           highlight={fact.accent}
         />
@@ -345,7 +344,11 @@ const FactScene: React.FC<{ fact: Fact; index: number }> = ({
 const Outro: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const pop = spring({ frame, fps, config: { damping: 9 } });
+  const pop = spring({
+    frame: frame - outroCommentAt,
+    fps,
+    config: { damping: 9 },
+  });
   const wiggle = Math.sin(frame / 4) * 4;
   return (
     <AbsoluteFill
@@ -356,10 +359,13 @@ const Outro: React.FC = () => {
         gap: 50,
       }}
     >
+      <Voice id="outro_question" at={0} />
+      <Voice id="outro_comment" at={outroCommentAt} />
+      <Voice id="outro_follow" at={outroFollowAt} />
       <PopWords
-        text="Tu as baillé ?"
+        text={script.outro.question}
         start={0}
-        perWord={5}
+        over={clipFrames("outro_question")}
         size={120}
         color="#FFD23F"
       />
@@ -380,13 +386,13 @@ const Outro: React.FC = () => {
             display: "block",
           }}
         >
-          {caps("Écris « BAILLÉ » en commentaire 👇")}
+          {caps(script.outro.comment)}
         </span>
       </div>
       <PopWords
-        text="Abonne-toi pour la partie 2 🧠"
-        start={45}
-        perWord={5}
+        text={script.outro.follow}
+        start={outroFollowAt}
+        over={clipFrames("outro_follow")}
         size={72}
         color="#FF6B9A"
       />
@@ -402,12 +408,16 @@ export const BrainVideo: React.FC = () => {
       <Sequence durationInFrames={HOOK}>
         <Hook />
       </Sequence>
-      {FACTS.map((fact, i) => (
-        <Sequence key={i} from={HOOK + i * FACT} durationInFrames={FACT}>
+      {script.facts.map((fact, i) => (
+        <Sequence
+          key={i}
+          from={factStarts[i]}
+          durationInFrames={factTiming[i].length}
+        >
           <FactScene fact={fact} index={i} />
         </Sequence>
       ))}
-      <Sequence from={HOOK + FACTS.length * FACT} durationInFrames={OUTRO}>
+      <Sequence from={OUTRO_AT} durationInFrames={OUTRO}>
         <Outro />
       </Sequence>
       <ProgressBar />
