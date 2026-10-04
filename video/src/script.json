@@ -1,68 +1,70 @@
 {
   "voice": "ff_siwis",
   "speed": 1.12,
+  "scientist": "Dr Neurone",
   "hook": {
     "title": "7 choses que ton cerveau te CACHE",
-    "titleSay": "Sept choses que ton cerveau te cache.",
-    "sub": "(le n°7 va marcher sur toi)",
-    "subSay": "Et le numéro sept… va marcher sur toi."
+    "introSay": "Salut, moi c'est la docteure Neurone.",
+    "titleSay": "Voici sept choses que ton cerveau te cache.",
+    "sub": "(la n°7 va marcher sur toi)",
+    "subSay": "Et la septième… va marcher sur toi."
   },
   "facts": [
     {
       "emoji": "⚡",
       "title": "Il dévore ton énergie",
-      "titleSay": "Numéro un : il dévore ton énergie.",
-      "text": "Ton cerveau pèse 2 % de ton corps… mais consomme environ 20 % de ton énergie.",
-      "textSay": "Ton cerveau pèse deux pour cent de ton corps… mais il consomme environ vingt pour cent de ton énergie.",
-      "accent": "#FFD23F"
+      "titleSay": "Un : il dévore ton énergie.",
+      "text": "Il pèse 2 % de ton corps… mais consomme environ 20 % de ton énergie au repos.",
+      "textSay": "Ton cerveau pèse deux pour cent de ton corps… mais il consomme environ vingt pour cent de ton énergie au repos.",
+      "accent": "#FFE066"
     },
     {
       "emoji": "👃",
       "title": "Il efface ton nez",
-      "titleSay": "Numéro deux : il efface ton nez.",
-      "text": "Ton nez est dans ton champ de vision en permanence. Ton cerveau le gomme. Maintenant tu le vois.",
-      "textSay": "Ton nez est dans ton champ de vision en permanence. Ton cerveau le gomme. Et maintenant… tu le vois.",
-      "accent": "#FF6B9A"
+      "titleSay": "Deux : il efface ton nez.",
+      "text": "Ton nez est toujours dans ton champ de vision. Ton cerveau filtre ce qui ne change jamais. Et maintenant… tu le vois.",
+      "textSay": "Ton nez est toujours dans ton champ de vision. Mais ton cerveau filtre ce qui ne change jamais. Et maintenant… tu le vois.",
+      "accent": "#FF9EBB"
     },
     {
       "emoji": "👁️",
-      "title": "Tu as un trou dans chaque œil",
-      "titleSay": "Numéro trois : tu as un trou dans chaque œil.",
-      "text": "Chaque œil a un point aveugle. Ton cerveau invente l'image manquante sans te le dire.",
-      "textSay": "Chaque œil a un point aveugle. Ton cerveau invente l'image manquante, sans te le dire.",
-      "accent": "#4DD8FF"
+      "title": "Un trou dans chaque œil",
+      "titleSay": "Trois : tu as un trou dans chaque œil.",
+      "text": "Là où le nerf optique quitte la rétine, il n'y a aucun récepteur. Ton cerveau bouche le trou avec ce qu'il y a autour.",
+      "textSay": "Là où le nerf optique quitte la rétine, il n'y a aucun récepteur. Ton cerveau bouche le trou avec ce qu'il y a autour.",
+      "accent": "#7FE3FF"
     },
     {
       "emoji": "🤭",
       "title": "Impossible de te chatouiller",
-      "titleSay": "Numéro quatre : impossible de te chatouiller toi-même.",
-      "text": "Ton cerveau prédit tes propres gestes et coupe la sensation avant qu'elle arrive.",
-      "textSay": "Ton cerveau prédit tes propres gestes, et coupe la sensation avant qu'elle arrive.",
-      "accent": "#9DFF6B"
+      "titleSay": "Quatre : impossible de te chatouiller toi-même.",
+      "text": "Ton cerveau prédit la sensation de tes propres gestes et l'atténue. Pas de surprise, pas de chatouille.",
+      "textSay": "Ton cerveau prédit la sensation de tes propres gestes, et il l'atténue. Pas de surprise… pas de chatouille.",
+      "accent": "#B6FF8A"
     },
     {
       "emoji": "🔁",
       "title": "Le multitâche n'existe pas",
-      "titleSay": "Numéro cinq : le multitâche n'existe pas.",
-      "text": "Il ne fait pas 2 choses à la fois : il saute de l'une à l'autre très vite… et perd du temps.",
-      "textSay": "Il ne fait pas deux choses à la fois. Il saute de l'une à l'autre, très vite… et il perd du temps.",
-      "accent": "#FF9F43"
+      "titleSay": "Cinq : le multitâche n'existe pas.",
+      "text": "Pour les tâches qui demandent de l'attention, il alterne très vite. Et chaque changement te coûte du temps.",
+      "textSay": "Pour les tâches qui demandent de l'attention, il alterne très vite de l'une à l'autre. Et chaque changement te coûte du temps.",
+      "accent": "#FFB870"
     },
     {
       "emoji": "🔍",
       "title": "Il te fait voir des « signes »",
-      "titleSay": "Numéro six : il te fait voir des signes.",
-      "text": "Tu découvres un mot et tu le vois partout ? C'est l'illusion de fréquence, pas le destin.",
-      "textSay": "Tu découvres un mot, et tu le vois partout ? C'est l'illusion de fréquence. Pas le destin.",
-      "accent": "#C08CFF"
+      "titleSay": "Six : il te fait voir des signes.",
+      "text": "Tu apprends un mot et tu le vois partout ? C'est l'illusion de fréquence : ton attention le remarque, c'est tout.",
+      "textSay": "Tu apprends un mot, et tu le vois partout ? C'est l'illusion de fréquence. Ton attention le remarque, c'est tout.",
+      "accent": "#D4B0FF"
     },
     {
       "emoji": "🥱",
       "title": "Il copie les bâillements",
-      "titleSay": "Et numéro sept : il copie les bâillements.",
-      "text": "Le bâillement est contagieux. Même lire le mot « bâiller » peut suffire… Tu sens que ça monte ?",
-      "textSay": "Le bâillement est contagieux. Même lire le mot bâiller peut suffire… Tu sens que ça monte ?",
-      "accent": "#FFD23F"
+      "titleSay": "Et sept : il copie les bâillements.",
+      "text": "Le bâillement est contagieux. Même lire le mot « bâiller » peut le déclencher… Tu sens que ça monte ?",
+      "textSay": "Le bâillement est contagieux. Même lire le mot bâiller peut le déclencher… Tu sens que ça monte ?",
+      "accent": "#FFE066"
     }
   ],
   "outro": {

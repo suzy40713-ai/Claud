@@ -1,11 +1,13 @@
 # Vidéo TikTok : « 7 choses que ton cerveau te cache »
 
-Fichier : `out/tiktok-cerveau.mp4` (1080×1920, 61,6 s, voix off française, volume normalisé à -14 LUFS).
+Fichier : `out/tiktok-cerveau.mp4` (1080×1920, 67 s, volume normalisé à -14 LUFS).
+
+La vidéo est présentée par **Dr Neurone**, une scientifique animée (personnage de dessin animé) devant un tableau noir : elle parle (synchronisation des lèvres sur la voix off), cligne des yeux et pointe le tableau pendant ses explications.
 
 ## Légende à copier
 
 ```
-Le n°7 va marcher sur toi 😳🧠 Tu as tenu jusqu'au bout ?
+La Dr Neurone t'explique ce que ton cerveau te cache 🧠 Le n°7 va marcher sur toi 😳
 #cerveau #lesaviezvous #psychologie #faitsinteressants #apprendresurtiktok #pourtoi #fyp
 ```
 
@@ -15,10 +17,11 @@ Le n°7 va marcher sur toi 😳🧠 Tu as tenu jusqu'au bout ?
 2. Publie entre **18 h et 21 h** (heure de ton public).
 3. Pendant la première heure, **réponds à chaque commentaire** « BAILLÉ » (ça relance l'algorithme).
 4. Épingle ton propre commentaire : « Partie 2 demain ? 👀 ».
+5. Active **« Contenu généré par l'IA »** dans les paramètres de publication (« Plus d'options »). La voix et la présentatrice sont générées : TikTok exige cette mention et peut retirer la vidéo ou la priver de rémunération si elle manque.
 
 ## Pour gagner de l'argent
 
-- **Creator Rewards Program** : il faut ≥ 18 ans, ≥ 10 000 abonnés, ≥ 100 000 vues sur 30 jours, et des vidéos de **plus d'une minute**. Cette vidéo dure 62 s, elle est donc éligible.
+- **Creator Rewards Program** : il faut ≥ 18 ans, ≥ 10 000 abonnés, ≥ 100 000 vues sur 30 jours, et des vidéos de **plus d'une minute**. Cette vidéo dure 67 s, elle est donc éligible.
 - Le format « partie 1 / partie 2 » sert à fidéliser : publie une série (1 vidéo par jour) plutôt qu'une seule vidéo.
 
 ## Générer une nouvelle vidéo
@@ -26,7 +29,7 @@ Le n°7 va marcher sur toi 😳🧠 Tu as tenu jusqu'au bout ?
 Tout le texte est dans `src/script.json` : le texte à l'écran (`title`, `text`…) et ce que dit la voix (`titleSay`, `textSay`…, avec les chiffres écrits en toutes lettres).
 
 ```console
-# 1. Voix off (Kokoro, voix française ff_siwis). Installation : voir l'en-tête du script
+# 1. Voix off + mouvements de bouche (Kokoro, voix ff_siwis). Installation : voir l'en-tête du script
 python3 scripts/voiceover.py --models ~/kokoro
 # 2. Rendu de la vidéo (le timing suit automatiquement la durée de la voix)
 npx remotion render MyComp out/raw.mp4 --codec=h264 --crf=18
