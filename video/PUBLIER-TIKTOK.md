@@ -2,7 +2,7 @@
 
 Fichier : `out/tiktok-cerveau.mp4` (1080×1920, 67 s, volume normalisé à -14 LUFS).
 
-La vidéo est présentée par **Dr Neurone**, une scientifique animée (personnage de dessin animé) devant un tableau noir : elle parle (synchronisation des lèvres sur la voix off), cligne des yeux et pointe le tableau pendant ses explications.
+Style **motion design** : chaque fait a sa propre illustration vectorielle animée (barres 2 % / 20 %, coupe de l'œil et point aveugle, ondes prédiction/sensation, loupe qui trouve le même mot partout, visages qui bâillent en chaîne…), des transitions en cercle de couleur et du texte qui apparaît mot à mot au rythme de la voix. La **Dr Neurone** (scientifique animée) explique depuis son avatar en haut à gauche, avec la bouche synchronisée sur la voix off.
 
 ## Légende à copier
 
