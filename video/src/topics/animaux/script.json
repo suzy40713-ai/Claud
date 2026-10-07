@@ -1,0 +1,65 @@
+{
+  "voice": "ff_siwis",
+  "speed": 1.12,
+  "scientist": "Dr Bestiole",
+  "hook": {
+    "title": "7 animaux avec de VRAIS super-pouvoirs",
+    "introSay": "Salut, moi c'est la docteure Bestiole.",
+    "titleSay": "Voici sept animaux qui ont de vrais super-pouvoirs.",
+    "sub": "(la n°7 est presque immortelle)",
+    "subSay": "Et la septième… est presque immortelle."
+  },
+  "facts": [
+    {
+      "title": "3 cœurs et du sang bleu",
+      "titleSay": "Un : le poulpe. Trois cœurs, et du sang bleu.",
+      "text": "2 cœurs envoient le sang vers les branchies, le 3e vers le reste du corps. Et son sang est bleu grâce au cuivre.",
+      "textSay": "Deux cœurs envoient le sang vers les branchies, le troisième vers le reste du corps. Et son sang est bleu, grâce au cuivre."
+    },
+    {
+      "title": "Elles dorment main dans la main",
+      "titleSay": "Deux : les loutres de mer dorment main dans la main.",
+      "text": "En dormant sur l'eau, elles se tiennent par les pattes pour ne pas dériver chacune de leur côté.",
+      "textSay": "En dormant sur l'eau, elles se tiennent par les pattes, pour ne pas dériver chacune de leur côté."
+    },
+    {
+      "title": "Il a survécu à l'espace",
+      "titleSay": "Trois : le tardigrade a survécu à l'espace.",
+      "text": "Il mesure moins d'un millimètre. En 2007, des tardigrades envoyés dans l'espace sont revenus vivants.",
+      "textSay": "Il mesure moins d'un millimètre. En deux mille sept, des tardigrades envoyés dans l'espace sont revenus vivants."
+    },
+    {
+      "title": "Il ne peut pas tirer la langue",
+      "titleSay": "Quatre : le crocodile ne peut pas tirer la langue.",
+      "text": "Sa langue est attachée au fond de sa mâchoire par une membrane. Impossible de la sortir.",
+      "textSay": "Sa langue est attachée au fond de sa mâchoire par une membrane. Impossible de la sortir."
+    },
+    {
+      "title": "Rose grâce à son assiette",
+      "titleSay": "Cinq : le flamant est rose… grâce à ce qu'il mange.",
+      "text": "Les pigments des algues et des petites crevettes qu'il mange colorent ses plumes. Sans eux, il pâlit.",
+      "textSay": "Les pigments des algues et des petites crevettes qu'il mange colorent ses plumes. Sans eux, il pâlit."
+    },
+    {
+      "title": "Il fait des crottes en cube",
+      "titleSay": "Six : le wombat fait des crottes en forme de cube.",
+      "text": "Les parois de son intestin, plus ou moins rigides, sculptent des cubes. Il les dépose bien en vue pour marquer son territoire.",
+      "textSay": "Les parois de son intestin, plus ou moins rigides, sculptent des cubes. Il les dépose bien en vue, pour marquer son territoire."
+    },
+    {
+      "title": "Elle peut redevenir jeune",
+      "titleSay": "Et sept : une méduse qui peut redevenir jeune.",
+      "text": "Blessée ou stressée, la méduse Turritopsis peut retourner à son stade de bébé… et recommencer sa vie.",
+      "textSay": "Blessée ou stressée, la méduse Turritopsis peut retourner à son stade de bébé… et recommencer sa vie."
+    }
+  ],
+  "outro": {
+    "question": "Lequel tu voudrais être ?",
+    "questionSay": "Alors… lequel tu voudrais être ?",
+    "comment": "Écris son numéro en commentaire 👇",
+    "commentSay": "Écris son numéro en commentaire.",
+    "follow": "Abonne-toi pour la partie 2 🐙",
+    "followSay": "Et abonne-toi pour la partie deux !",
+    "typed": "Le 7 !"
+  }
+}

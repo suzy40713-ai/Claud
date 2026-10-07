@@ -1,10 +1,10 @@
 """Generate the French voice-over clips for the TikTok video.
 
-Reads src/script.json, synthesizes every "...Say" line with Kokoro
-(voice ff_siwis), writes public/voiceover/<id>.wav and the clip lengths
-(in seconds) to src/voiceover.json, which the composition uses for timing,
-and a per-frame loudness envelope of each clip to src/mouth.json, which
-drives the scientist's lip-sync.
+Reads src/topics/<topic>/script.json, synthesizes every "...Say" line with
+Kokoro (voice ff_siwis), writes public/voiceover/<topic>/<id>.wav, the clip
+lengths (in seconds) to src/topics/<topic>/voiceover.json, which the video
+uses for timing, and a per-frame loudness envelope of each clip to
+src/topics/<topic>/mouth.json, which drives the scientist's lip-sync.
 
 Setup (once):
   pip install kokoro-onnx soundfile
@@ -12,7 +12,7 @@ Setup (once):
   curl -LO https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin
 
 Usage:
-  python3 scripts/voiceover.py --models <dir containing the two files>
+  python3 scripts/voiceover.py <topic> --models <dir containing the two files>
 """
 
 import argparse
@@ -61,14 +61,16 @@ def envelope(audio, sr):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument("topic", help="folder name in src/topics, e.g. animaux")
     parser.add_argument("--models", default=str(Path.home() / "kokoro"))
     args = parser.parse_args()
 
-    script = json.loads((ROOT / "src/script.json").read_text())
+    topic_dir = ROOT / "src/topics" / args.topic
+    script = json.loads((topic_dir / "script.json").read_text())
     models = Path(args.models)
     kokoro = Kokoro(str(models / "kokoro-v1.0.onnx"), str(models / "voices-v1.0.bin"))
 
-    out_dir = ROOT / "public/voiceover"
+    out_dir = ROOT / "public/voiceover" / args.topic
     out_dir.mkdir(parents=True, exist_ok=True)
     durations = {}
     mouth = {}
@@ -83,8 +85,8 @@ def main():
         mouth[clip_id] = envelope(audio, sr)
         print(f"{clip_id}: {durations[clip_id]}s")
 
-    (ROOT / "src/voiceover.json").write_text(json.dumps(durations, indent=2) + "\n")
-    (ROOT / "src/mouth.json").write_text(json.dumps(mouth) + "\n")
+    (topic_dir / "voiceover.json").write_text(json.dumps(durations, indent=2) + "\n")
+    (topic_dir / "mouth.json").write_text(json.dumps(mouth) + "\n")
     print(f"total speech: {sum(durations.values()):.1f}s")
 
 

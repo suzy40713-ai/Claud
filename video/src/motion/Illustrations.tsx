@@ -5,7 +5,9 @@ const W = 960;
 const H = 660;
 const FONT = "TheBold, sans-serif";
 
-const Frame: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+export const Frame: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => (
   <svg
     viewBox={`0 0 ${W} ${H}`}
     width={W}
@@ -16,7 +18,7 @@ const Frame: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </svg>
 );
 
-const Label: React.FC<{
+export const Label: React.FC<{
   x: number;
   y: number;
   text: string;
@@ -39,7 +41,7 @@ const Label: React.FC<{
 );
 
 // Stroke that draws itself on as `t` goes 0 → 1.
-const dash = (t: number) => ({
+export const dash = (t: number) => ({
   pathLength: 1,
   strokeDasharray: 1,
   strokeDashoffset: 1 - t,
@@ -710,9 +712,9 @@ export const YawnArt: React.FC<IllustrationProps> = ({ frame, p, c }) => {
 };
 
 export const OutroArt: React.FC<
-  IllustrationProps & { typed: number; click: number }
-> = ({ frame, c, typed, click }) => {
-  const word = caps("Bâillé");
+  IllustrationProps & { typedWord: string; typed: number; click: number }
+> = ({ frame, c, typedWord, typed, click }) => {
+  const word = caps(typedWord);
   const shown = word.slice(0, Math.round(typed * word.length));
   const bubble = ramp(frame, 0, 18);
   const pressed = click > 0 && click < 0.25 ? 0.92 : 1;
