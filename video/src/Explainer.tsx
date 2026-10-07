@@ -23,7 +23,9 @@ const MIN_TOTAL = Math.ceil(61.5 * FPS);
 
 export type Script = {
   scientist: string;
-  hook: { title: string; sub: string };
+  // `intro`, when set, is shown big over the first voice clip instead of
+  // the host introducing themself.
+  hook: { title: string; sub: string; intro?: string };
   facts: { title: string; text: string }[];
   outro: { question: string; comment: string; follow: string; typed: string };
 };
@@ -57,9 +59,16 @@ export type Topic = {
   // `cue` is the frame where the hook's title lands, for its punchline.
   HookArt: React.FC<IllustrationProps & { cue: number }>;
   factArts: React.FC<IllustrationProps>[];
-  // One per fact; null keeps that fact's illustration on a plain colour.
-  photos?: (Photo | null)[];
+  // One per fact: a photo, or several to cut between; null keeps that
+  // fact's illustration on a plain colour.
+  photos?: (Photo | Photo[] | null)[];
   look?: Look;
+  // false hides the scientist avatar (voice-over only).
+  host?: boolean;
+  // Frames between cuts on photo scenes. Each cut moves to the next photo
+  // or punches in on the same one, and facts change with a hard cut
+  // instead of a colour wipe.
+  cutEvery?: number;
 };
 
 export const NAVY = "#14132B";
@@ -215,6 +224,7 @@ const MaskWords: React.FC<{
         display: "flex",
         flexWrap: "wrap",
         justifyContent: align,
+        width: "100%",
         columnGap: size * 0.28,
         rowGap: size * 0.05,
       }}
@@ -254,13 +264,17 @@ const MaskWords: React.FC<{
   );
 };
 
-const Header: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+// `wide` takes the avatar's place too, when there is no host.
+const Header: React.FC<{ children: React.ReactNode; wide?: boolean }> = ({
+  children,
+  wide = false,
+}) => (
   <div
     style={{
       position: "absolute",
-      left: HEADER.left,
+      left: wide ? CAPTION.left : HEADER.left,
       top: HEADER.top,
-      width: HEADER.width,
+      width: wide ? CAPTION.width : HEADER.width,
       height: HEADER.height,
       display: "flex",
       flexDirection: "column",
@@ -390,22 +404,51 @@ export const createExplainer = (topic: Topic) => {
     return index;
   };
 
+  const cutEvery = topic.cutEvery;
+  const host = topic.host !== false;
+
+  const shotsFor = (fact: number): Photo[] => {
+    const ph = topic.photos?.[fact];
+    return ph ? (Array.isArray(ph) ? ph : [ph]) : [];
+  };
+
+  // The photo on screen `local` frames into a fact, and how long ago the
+  // last cut was. Every pass through the photos alternates wide and punched-in.
+  const shotAt = (fact: number, local: number) => {
+    const shots = shotsFor(fact);
+    if (!cutEvery) {
+      return { photo: shots[0], since: local, punch: false, cut: 0 };
+    }
+    const cut = Math.floor(local / cutEvery);
+    return {
+      photo: shots[cut % shots.length],
+      since: local - cut * cutEvery,
+      punch: Math.floor(cut / shots.length) % 2 === 1,
+      cut,
+    };
+  };
+
+  const montage = (topic.photos ?? []).flatMap((ph) =>
+    ph ? (Array.isArray(ph) ? ph : [ph]) : [],
+  );
+
   // Each scene opens with a circular wipe in its colour, led by a ring in
-  // the accent colour, over the previous scene's background.
+  // the accent colour, over the previous scene's background (or with a
+  // hard cut and a flash, when cutting between photos).
   const Backdrop: React.FC = () => {
     const frame = useCurrentFrame();
     const index = sceneAt(frame);
     const scene = SCENES[index];
     const prev = SCENES[Math.max(index - 1, 0)].c;
     const local = frame - scene.at;
-    const r = index === 0 ? 2400 : mix(0, 2400, ramp(local, 0, 18));
-    const ring = index === 0 ? 2400 : mix(0, 2400, ramp(local, 0, 14));
+    const hard = index === 0 || Boolean(cutEvery);
+    const r = hard ? 2400 : mix(0, 2400, ramp(local, 0, 18));
+    const ring = hard ? 2400 : mix(0, 2400, ramp(local, 0, 14));
     const circle = (radius: number) =>
       `circle(${radius}px at ${WIPE_ORIGIN.x}px ${WIPE_ORIGIN.y}px)`;
-    const photos = topic.photos ?? [];
-    const montage = photos.filter((ph): ph is Photo => ph !== null);
     const fact = index - 1;
     let layer = <Decor frame={frame} color={scene.c.ink} />;
+    let flash = 0;
     if (montage.length > 0 && index === 0) {
       // Hook: rapid montage of every photo.
       const cut = 9;
@@ -416,14 +459,20 @@ export const createExplainer = (topic: Topic) => {
           dim={0.35}
         />
       );
-    } else if (fact >= 0 && photos[fact]) {
-      const photo = photos[fact] as Photo;
+    } else if (fact >= 0 && shotsFor(fact).length > 0) {
       const { textAt, textFrames, length } = factTiming[fact];
       const p = (local - textAt) / textFrames;
+      const { photo, since, punch } = shotAt(fact, local);
+      // On a cut: a short pop of extra zoom and a light flash.
+      const pop = cutEvery ? 0.07 * (1 - ramp(since, 0, 6)) : 0;
+      flash = cutEvery ? 0.35 * (1 - ramp(since, 0, 4)) : 0;
+      const zoom = cutEvery
+        ? (punch ? 1.5 : 1.12) * (1 + 0.06 * (since / cutEvery)) + pop
+        : mix(1.12, 1.28, local / length);
       layer = (
         <PhotoLayer
           photo={photo}
-          zoom={mix(1.12, 1.28, local / length)}
+          zoom={zoom}
           saturation={
             photo.fadeFrom === undefined
               ? 1
@@ -440,6 +489,9 @@ export const createExplainer = (topic: Topic) => {
         <AbsoluteFill style={{ background: scene.c.bg, clipPath: circle(r) }}>
           {layer}
         </AbsoluteFill>
+        {flash > 0 ? (
+          <AbsoluteFill style={{ background: "#FFFFFF", opacity: flash }} />
+        ) : null}
       </AbsoluteFill>
     );
   };
@@ -559,27 +611,54 @@ export const createExplainer = (topic: Topic) => {
     const frame = useCurrentFrame();
     const c = colors.hook;
     const HookArt = topic.HookArt;
+    // The intro question lands big mid-screen, then moves up as the title
+    // starts.
+    const introPop = ramp(frame, hookIntroAt, hookIntroAt + 8);
+    const introUp = ramp(frame, hookTitleAt - 4, hookTitleAt + 8);
     return (
       <SceneOut length={HOOK}>
-        <Header>
-          <MaskWords
-            text="Salut ! Moi c'est"
-            start={hookIntroAt}
-            over={10}
-            size={44}
-            c={c}
-            color={c.accent}
-            align="flex-start"
-          />
-          <MaskWords
-            text={script.scientist}
-            start={hookIntroAt + 12}
-            over={6}
-            size={104}
-            c={c}
-            align="flex-start"
-          />
-        </Header>
+        {script.hook.intro ? (
+          <div
+            style={{
+              position: "absolute",
+              left: CAPTION.left,
+              width: CAPTION.width,
+              top: mix(640, 190, introUp),
+              transform: `scale(${mix(1.12, 1, introUp) * (0.6 + 0.4 * introPop)})`,
+              transformOrigin: "50% 0%",
+            }}
+          >
+            <MaskWords
+              text={script.hook.intro}
+              start={hookIntroAt}
+              over={clipFrames("hook_intro")}
+              size={110}
+              c={c}
+              color={c.accent}
+              shadow
+            />
+          </div>
+        ) : (
+          <Header wide={!host}>
+            <MaskWords
+              text="Salut ! Moi c'est"
+              start={hookIntroAt}
+              over={10}
+              size={44}
+              c={c}
+              color={c.accent}
+              align="flex-start"
+            />
+            <MaskWords
+              text={script.scientist}
+              start={hookIntroAt + 12}
+              over={6}
+              size={104}
+              c={c}
+              align="flex-start"
+            />
+          </Header>
+        )}
         <Art>
           <HookArt
             frame={frame}
@@ -595,6 +674,7 @@ export const createExplainer = (topic: Topic) => {
             over={clipFrames("hook_title")}
             size={92}
             c={c}
+            shadow={montage.length > 0}
           />
           <MaskWords
             text={script.hook.sub}
@@ -615,11 +695,12 @@ export const createExplainer = (topic: Topic) => {
     const c = colors.facts[index];
     const { textAt, textFrames, length } = factTiming[index];
     const IllustrationArt = topic.factArts[index];
-    const photo = topic.photos?.[index];
+    const photo =
+      shotsFor(index).length > 0 ? shotAt(index, frame).photo : undefined;
     const num = ramp(frame, 2, 12);
     return (
-      <SceneOut length={length}>
-        <Header>
+      <SceneOut length={cutEvery ? length + 20 : length}>
+        <Header wide={!host}>
           <div
             style={{
               transform: `translateX(${(1 - num) * -60}px)`,
@@ -685,7 +766,7 @@ export const createExplainer = (topic: Topic) => {
     const c = colors.outro;
     return (
       <AbsoluteFill>
-        <Header>
+        <Header wide={!host}>
           <MaskWords
             text={script.outro.question}
             start={outroQuestionAt}
@@ -751,7 +832,7 @@ export const createExplainer = (topic: Topic) => {
         <Sequence from={OUTRO_AT} durationInFrames={OUTRO}>
           <Outro />
         </Sequence>
-        <Avatar />
+        {host ? <Avatar /> : null}
         <ProgressBar />
         <Voices />
       </AbsoluteFill>

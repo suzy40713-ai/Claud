@@ -36,7 +36,8 @@ const photoScene = (accent: string) => ({
   pop: CREAM,
 });
 
-// « 7 animaux avec de vrais super-pouvoirs », real photos, male narrator.
+// « 7 animaux avec de vrais super-pouvoirs » : opens on « Le savais-tu ? »,
+// real photos cut every second, male voice-over without an on-screen host.
 export const animaux: Topic = {
   id: "animaux",
   script,
@@ -57,18 +58,55 @@ export const animaux: Topic = {
     outro: { bg: "#FF5E8A", ink: NAVY, accent: "#FFD23F", pop: CREAM },
   },
   photos: [
-    photo("poulpe", 1615, 1920, "desertnaturalist (CC BY)", 58, 48),
-    photo("loutres", 1920, 1920, "Daniel Levitis (CC BY)", 52, 42),
-    photo("tardigrade", 1368, 1368, "Robert Martin (CC BY)", 55, 52, {
-      fit: "contain",
-    }),
-    photo("crocodile", 1440, 1920, "Christine Loew (CC BY)", 55, 38),
-    photo("flamant", 1492, 1920, "Jean-Paul Boerekamps (CC0)", 46, 38, {
-      fadeFrom: 0.8,
-    }),
-    photo("wombats", 1440, 1920, "Kai Squires (CC BY)", 30, 45),
-    photo("turritopsis", 1920, 1440, "Luca Davenport-Thomas (CC BY)", 48, 50),
+    [
+      photo("poulpe", 1615, 1920, "desertnaturalist (CC BY)", 58, 48),
+      photo("poulpe-2", 1648, 1920, "Erin McKittrick (CC BY)", 45, 32),
+    ],
+    [
+      photo("loutres", 1920, 1920, "Daniel Levitis (CC BY)", 52, 42),
+      photo("loutre-2", 1440, 1920, "Caleb Krueger (CC BY)", 55, 40),
+      photo("loutres-3", 1440, 1920, "marmottled (CC BY)", 40, 62),
+    ],
+    [
+      photo("tardigrade", 1368, 1368, "Robert Martin (CC BY)", 55, 52, {
+        fit: "contain",
+      }),
+      photo("tardigrade-2", 1779, 1920, "Zihao Wang (CC BY)", 50, 50, {
+        fit: "contain",
+      }),
+      photo("tardigrade-3", 1179, 1839, "Mark Stluka (CC BY)", 50, 45),
+    ],
+    [
+      photo("crocodile", 1440, 1920, "Christine Loew (CC BY)", 55, 38),
+      photo("crocodile-2", 1440, 1920, "Yves Bas (CC BY)", 25, 66),
+      photo("crocodile-3", 1440, 1920, "Louis Imbeau (CC BY)", 55, 60),
+      photo("crocodile-4", 1440, 1920, "M Rutherford (CC BY)", 45, 50),
+    ],
+    [
+      photo("flamant", 1492, 1920, "Jean-Paul Boerekamps (CC0)", 46, 38, {
+        fadeFrom: 0.8,
+      }),
+      photo("flamant-2", 1537, 1920, "Daniel Benefiel (CC BY)", 50, 62, {
+        fadeFrom: 0.8,
+      }),
+      photo("flamant-3", 1615, 1920, "Paul Hoekman (CC BY)", 55, 40, {
+        fadeFrom: 0.8,
+      }),
+    ],
+    [
+      photo("wombats", 1440, 1920, "Kai Squires (CC BY)", 30, 45),
+      photo("wombat-crottes", 1920, 1750, "Jesse Rorabaugh (CC0)", 55, 45),
+      photo("wombat-2", 1000, 1334, "Tony Ladson (CC BY)", 40, 60),
+      photo("wombat-3", 1277, 1920, "Andrew Thornhill (CC BY)", 55, 55),
+    ],
+    [
+      photo("turritopsis", 1920, 1440, "Luca Davenport-Thomas (CC BY)", 48, 50),
+      photo("turritopsis-2", 1920, 1551, "Lisa Bennett (CC BY)", 50, 55),
+      photo("turritopsis-3", 1600, 1200, "Jacqui Geux (CC BY)", 45, 50),
+    ],
   ],
+  host: false,
+  cutEvery: 30,
   HookArt: SuperStampArt,
   factArts: [
     stickers([
@@ -140,15 +178,6 @@ export const animaux: Topic = {
       { text: "Sans : il pâlit", at: 0.84, x: 320, y: 585 },
     ]),
     stickers([
-      {
-        text: "Vraies crottes !",
-        image: "photos/animaux/wombat-crottes.jpg",
-        at: 0.15,
-        x: 760,
-        y: 230,
-        rotate: 6,
-        size: 40,
-      },
       { text: "🟫 Cubes", at: 0.35, x: 220, y: 585 },
       { text: "🚩 Territoire", at: 0.8, x: 250, y: 90, color: RED, ink: CREAM },
     ]),

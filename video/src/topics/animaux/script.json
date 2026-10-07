@@ -4,10 +4,11 @@
   "scientist": "Dr Bestiole",
   "hook": {
     "title": "7 animaux avec de VRAIS super-pouvoirs",
-    "introSay": "Salut, moi c'est le docteur Bestiole.",
-    "titleSay": "Voici sept animaux qui ont de vrais super-pouvoirs.",
+    "introSay": "Le savais-tu ?",
+    "titleSay": "Ces sept animaux ont de vrais super-pouvoirs.",
     "sub": "(la n°7 est presque immortelle)",
-    "subSay": "Et la septième… est presque immortelle."
+    "subSay": "Et la septième… est presque immortelle.",
+    "intro": "Le savais-tu ?"
   },
   "facts": [
     {
