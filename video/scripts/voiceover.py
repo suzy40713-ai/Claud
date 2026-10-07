@@ -1,18 +1,23 @@
 """Generate the French voice-over clips for the TikTok video.
 
 Reads src/topics/<topic>/script.json, synthesizes every "...Say" line with
-Kokoro (voice ff_siwis), writes public/voiceover/<topic>/<id>.wav, the clip
+the voice it names, writes public/voiceover/<topic>/<id>.wav, the clip
 lengths (in seconds) to src/topics/<topic>/voiceover.json, which the video
 uses for timing, and a per-frame loudness envelope of each clip to
 src/topics/<topic>/mouth.json, which drives the scientist's lip-sync.
 
-Setup (once):
-  pip install kokoro-onnx soundfile
-  curl -LO https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx
-  curl -LO https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin
+The "voice" field of script.json picks the engine:
+  - "ff_siwis" (female): Kokoro. Setup, in ~/kokoro:
+      pip install kokoro-onnx soundfile
+      curl -LO https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx
+      curl -LO https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin
+  - "piper:fr_FR-tom-medium" (male): Piper voice run with sherpa-onnx. Setup:
+      pip install sherpa-onnx soundfile
+      curl -LO https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-fr_FR-tom-medium.tar.bz2
+      tar xjf vits-piper-fr_FR-tom-medium.tar.bz2 -C ~/tts
 
 Usage:
-  python3 scripts/voiceover.py <topic> --models <dir containing the two files>
+  python3 scripts/voiceover.py <topic> [--models ~/kokoro] [--piper ~/tts]
 """
 
 import argparse
@@ -21,7 +26,6 @@ from pathlib import Path
 
 import numpy as np
 import soundfile as sf
-from kokoro_onnx import Kokoro
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -59,25 +63,56 @@ def envelope(audio, sr):
     return [round(float(v), 2) for v in rms]
 
 
+def make_synth(voice, speed, args):
+    """Returns text -> (samples, sample_rate) for the voice named in script.json."""
+    if voice.startswith("piper:"):
+        import sherpa_onnx
+
+        name = voice.split(":", 1)[1]
+        d = Path(args.piper).expanduser() / f"vits-piper-{name}"
+        tts = sherpa_onnx.OfflineTts(
+            sherpa_onnx.OfflineTtsConfig(
+                model=sherpa_onnx.OfflineTtsModelConfig(
+                    vits=sherpa_onnx.OfflineTtsVitsModelConfig(
+                        model=str(d / f"{name}.onnx"),
+                        tokens=str(d / "tokens.txt"),
+                        data_dir=str(d / "espeak-ng-data"),
+                    ),
+                    num_threads=4,
+                )
+            )
+        )
+
+        def synth(text):
+            out = tts.generate(text, sid=0, speed=speed)
+            return np.array(out.samples, dtype=np.float32), out.sample_rate
+
+        return synth
+
+    from kokoro_onnx import Kokoro
+
+    models = Path(args.models).expanduser()
+    kokoro = Kokoro(str(models / "kokoro-v1.0.onnx"), str(models / "voices-v1.0.bin"))
+    return lambda text: kokoro.create(text, voice=voice, speed=speed, lang="fr-fr")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("topic", help="folder name in src/topics, e.g. animaux")
-    parser.add_argument("--models", default=str(Path.home() / "kokoro"))
+    parser.add_argument("--models", default="~/kokoro", help="Kokoro model files")
+    parser.add_argument("--piper", default="~/tts", help="sherpa-onnx Piper voices")
     args = parser.parse_args()
 
     topic_dir = ROOT / "src/topics" / args.topic
     script = json.loads((topic_dir / "script.json").read_text())
-    models = Path(args.models)
-    kokoro = Kokoro(str(models / "kokoro-v1.0.onnx"), str(models / "voices-v1.0.bin"))
+    synth = make_synth(script["voice"], script["speed"], args)
 
     out_dir = ROOT / "public/voiceover" / args.topic
     out_dir.mkdir(parents=True, exist_ok=True)
     durations = {}
     mouth = {}
     for clip_id, text in lines(script):
-        audio, sr = kokoro.create(
-            text, voice=script["voice"], speed=script["speed"], lang="fr-fr"
-        )
+        audio, sr = synth(text)
         audio = trim(audio)
         audio = audio / max(np.abs(audio).max(), 1e-6) * 0.89
         sf.write(out_dir / f"{clip_id}.wav", audio, sr)

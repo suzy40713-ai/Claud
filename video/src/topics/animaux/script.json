@@ -1,10 +1,10 @@
 {
-  "voice": "ff_siwis",
+  "voice": "piper:fr_FR-tom-medium",
   "speed": 1.12,
   "scientist": "Dr Bestiole",
   "hook": {
     "title": "7 animaux avec de VRAIS super-pouvoirs",
-    "introSay": "Salut, moi c'est la docteure Bestiole.",
+    "introSay": "Salut, moi c'est le docteur Bestiole.",
     "titleSay": "Voici sept animaux qui ont de vrais super-pouvoirs.",
     "sub": "(la n°7 est presque immortelle)",
     "subSay": "Et la septième… est presque immortelle."

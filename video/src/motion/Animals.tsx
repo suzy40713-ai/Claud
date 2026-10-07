@@ -760,3 +760,20 @@ export const JellyArt: React.FC<IllustrationProps> = ({ frame, p, c }) => {
     </Frame>
   );
 };
+
+// Hook for the photo version: only the stamp, over the photo montage.
+export const SuperStampArt: React.FC<IllustrationProps & { cue: number }> = ({
+  frame,
+  cue,
+}) => (
+  <Frame>
+    <Stamp
+      t={(frame - cue) / 8}
+      frame={frame}
+      text="Super-pouvoirs"
+      x={480}
+      y={330}
+      width={720}
+    />
+  </Frame>
+);

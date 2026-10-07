@@ -1,11 +1,12 @@
 import {
   AbsoluteFill,
   Html5Audio,
+  Img,
   Sequence,
   staticFile,
   useCurrentFrame,
 } from "remotion";
-import { Scientist } from "./Scientist";
+import { Look, Scientist } from "./Scientist";
 import {
   EASE,
   IllustrationProps,
@@ -27,8 +28,26 @@ export type Script = {
   outro: { question: string; comment: string; follow: string; typed: string };
 };
 
+// A photo shown full screen behind a fact, from public/<file> (`w`×`h`
+// pixels). `x`/`y` are the subject's position in percent: the photo is
+// cropped to 9:16 and shifted to bring it into the illustration area.
+// `fadeFrom` drains its colour from that point of the explanation (0..1).
+export type Photo = {
+  file: string;
+  w: number;
+  h: number;
+  credit: string;
+  x?: number;
+  y?: number;
+  fadeFrom?: number;
+  // "contain" shows the whole photo across the width, over a blurred copy,
+  // for wide shots that cropping to 9:16 would cut.
+  fit?: "cover" | "contain";
+};
+
 // One video subject: its script, the voice-over generated for it by
-// scripts/voiceover.py, its colours and its illustrations.
+// scripts/voiceover.py, its colours and its illustrations (or photos, with
+// motion design stickers as `factArts` on top).
 export type Topic = {
   id: string;
   script: Script;
@@ -38,6 +57,9 @@ export type Topic = {
   // `cue` is the frame where the hook's title lands, for its punchline.
   HookArt: React.FC<IllustrationProps & { cue: number }>;
   factArts: React.FC<IllustrationProps>[];
+  // One per fact; null keeps that fact's illustration on a plain colour.
+  photos?: (Photo | null)[];
+  look?: Look;
 };
 
 export const NAVY = "#14132B";
@@ -55,6 +77,8 @@ const AVATAR = { left: 60, top: 190, size: 180 };
 const HEADER = { left: 270, top: 180, width: 750, height: 220 };
 const ART = { left: 60, top: 430 };
 const CAPTION = { left: 70, top: 1110, width: 940 };
+// Height the photo subject is moved to (middle of the illustration area).
+const PHOTO_FOCUS_Y = 760;
 // Where the colour wipes open from (centre of the illustration).
 const WIPE_ORIGIN = { x: 540, y: 760 };
 
@@ -101,6 +125,66 @@ const Decor: React.FC<{ frame: number; color: string }> = ({
   </svg>
 );
 
+// Full-bleed photo with a slow push-in, darkened top and bottom so the
+// header and the captions stay readable.
+const PhotoLayer: React.FC<{
+  photo: Photo;
+  zoom: number;
+  saturation?: number;
+  dim?: number;
+}> = ({ photo, zoom, saturation = 1, dim = 0 }) => {
+  const contain = photo.fit === "contain";
+  const scale =
+    (contain ? 1080 / photo.w : Math.max(1080 / photo.w, 1920 / photo.h)) *
+    zoom;
+  const width = photo.w * scale;
+  const height = photo.h * scale;
+  const clamp = (v: number, min: number) => Math.min(0, Math.max(min, v));
+  const left = contain
+    ? 540 - ((photo.x ?? 50) / 100) * width
+    : clamp(540 - ((photo.x ?? 50) / 100) * width, 1080 - width);
+  const top = contain
+    ? PHOTO_FOCUS_Y - ((photo.y ?? 50) / 100) * height
+    : clamp(PHOTO_FOCUS_Y - ((photo.y ?? 50) / 100) * height, 1920 - height);
+  return (
+    <AbsoluteFill style={{ background: NAVY }}>
+      {contain ? (
+        <Img
+          src={staticFile(photo.file)}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            filter: `blur(40px) brightness(0.6) saturate(${saturation})`,
+            transform: "scale(1.2)",
+          }}
+        />
+      ) : null}
+      <Img
+        src={staticFile(photo.file)}
+        style={{
+          position: "absolute",
+          left,
+          top,
+          width,
+          height,
+          // Tailwind's preflight caps images at the container width.
+          maxWidth: "none",
+          filter: `saturate(${saturation})`,
+        }}
+      />
+      <AbsoluteFill
+        style={{
+          background: `linear-gradient(180deg, rgba(10,10,25,0.75) 0%, rgba(10,10,25,0.35) 14%, rgba(10,10,25,0) 22%, rgba(10,10,25,0) 50%, rgba(10,10,25,0.6) 59%, rgba(10,10,25,0.82) 72%, rgba(10,10,25,0.88) 100%)`,
+        }}
+      />
+      {dim > 0 ? (
+        <AbsoluteFill style={{ background: `rgba(10,10,25,${dim})` }} />
+      ) : null}
+    </AbsoluteFill>
+  );
+};
+
 // Words slide up from behind a mask, spread across `over` frames so they
 // follow the voice. Words with a digit get a highlight chip.
 const MaskWords: React.FC<{
@@ -111,7 +195,17 @@ const MaskWords: React.FC<{
   c: Palette;
   color?: string;
   align?: "center" | "flex-start";
-}> = ({ text, start, over, size, c, color = c.ink, align = "center" }) => {
+  shadow?: boolean;
+}> = ({
+  text,
+  start,
+  over,
+  size,
+  c,
+  color = c.ink,
+  align = "center",
+  shadow = false,
+}) => {
   const frame = useCurrentFrame();
   const words = caps(text).split(" ");
   const step = Math.min(10, Math.max(2, (over * 0.9) / words.length));
@@ -147,6 +241,8 @@ const MaskWords: React.FC<{
                 borderRadius: chip ? size * 0.2 : 0,
                 padding: chip ? `0 ${size * 0.18}px` : 0,
                 transform: `translateY(${(1 - t) * 150}%)`,
+                textShadow:
+                  shadow && !chip ? "0 3px 14px rgba(0,0,0,0.7)" : "none",
               }}
             >
               {w}
@@ -306,13 +402,43 @@ export const createExplainer = (topic: Topic) => {
     const ring = index === 0 ? 2400 : mix(0, 2400, ramp(local, 0, 14));
     const circle = (radius: number) =>
       `circle(${radius}px at ${WIPE_ORIGIN.x}px ${WIPE_ORIGIN.y}px)`;
+    const photos = topic.photos ?? [];
+    const montage = photos.filter((ph): ph is Photo => ph !== null);
+    const fact = index - 1;
+    let layer = <Decor frame={frame} color={scene.c.ink} />;
+    if (montage.length > 0 && index === 0) {
+      // Hook: rapid montage of every photo.
+      const cut = 9;
+      layer = (
+        <PhotoLayer
+          photo={montage[Math.floor(local / cut) % montage.length]}
+          zoom={mix(1.3, 1.15, (local % cut) / cut)}
+          dim={0.35}
+        />
+      );
+    } else if (fact >= 0 && photos[fact]) {
+      const photo = photos[fact] as Photo;
+      const { textAt, textFrames, length } = factTiming[fact];
+      const p = (local - textAt) / textFrames;
+      layer = (
+        <PhotoLayer
+          photo={photo}
+          zoom={mix(1.12, 1.28, local / length)}
+          saturation={
+            photo.fadeFrom === undefined
+              ? 1
+              : 1 - 0.6 * ramp(p, photo.fadeFrom, photo.fadeFrom + 0.12)
+          }
+        />
+      );
+    }
     return (
       <AbsoluteFill style={{ background: prev.bg }}>
         <AbsoluteFill
           style={{ background: scene.c.accent, clipPath: circle(ring) }}
         />
         <AbsoluteFill style={{ background: scene.c.bg, clipPath: circle(r) }}>
-          <Decor frame={frame} color={scene.c.ink} />
+          {layer}
         </AbsoluteFill>
       </AbsoluteFill>
     );
@@ -398,7 +524,12 @@ export const createExplainer = (topic: Topic) => {
               top: -40 * scale,
             }}
           >
-            <Scientist mouth={open} point={0} width={420 * scale} />
+            <Scientist
+              mouth={open}
+              point={0}
+              width={420 * scale}
+              look={topic.look}
+            />
           </div>
         </div>
         <div
@@ -484,6 +615,7 @@ export const createExplainer = (topic: Topic) => {
     const c = colors.facts[index];
     const { textAt, textFrames, length } = factTiming[index];
     const IllustrationArt = topic.factArts[index];
+    const photo = topic.photos?.[index];
     const num = ramp(frame, 2, 12);
     return (
       <SceneOut length={length}>
@@ -508,6 +640,7 @@ export const createExplainer = (topic: Topic) => {
             size={76}
             c={c}
             align="flex-start"
+            shadow={Boolean(photo)}
           />
         </Header>
         <Art>
@@ -524,8 +657,25 @@ export const createExplainer = (topic: Topic) => {
             over={textFrames}
             size={56}
             c={c}
+            shadow={Boolean(photo)}
           />
         </Caption>
+        {photo ? (
+          <div
+            style={{
+              position: "absolute",
+              right: 150,
+              top: 1060,
+              fontFamily: "sans-serif",
+              fontSize: 22,
+              color: CREAM,
+              opacity: 0.8,
+              textShadow: "0 1px 4px rgba(0,0,0,0.8)",
+            }}
+          >
+            {`Photo : ${photo.credit}`}
+          </div>
+        ) : null}
       </SceneOut>
     );
   };

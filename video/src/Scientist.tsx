@@ -7,13 +7,18 @@ const COAT = "#F5F7FC";
 const COAT_LINE = "#C5CEDF";
 const INK = "#1E1B24";
 
+export type Look = "woman" | "man";
+
 // Cartoon scientist. `mouth` (0..1) opens the mouth for lip-sync and
-// `point` (0..1) raises the arm with the pointer towards the board.
+// `point` (0..1) raises the arm with the pointer towards the board. `look`
+// swaps the bun for short hair and a beard.
 export const Scientist: React.FC<{
   mouth: number;
   point: number;
   width: number;
-}> = ({ mouth, point, width }) => {
+  look?: Look;
+}> = ({ mouth, point, width, look = "woman" }) => {
+  const man = look === "man";
   const frame = useCurrentFrame();
   const bob = Math.sin(frame / 12) * 4;
   const tilt = Math.sin(frame / 23) * 2.5 + mouth * 2;
@@ -33,7 +38,9 @@ export const Scientist: React.FC<{
     >
       <g transform={`translate(0 ${bob})`}>
         {/* Back hair */}
-        <ellipse cx={210} cy={235} rx={118} ry={125} fill={HAIR} />
+        {man ? null : (
+          <ellipse cx={210} cy={235} rx={118} ry={125} fill={HAIR} />
+        )}
 
         {/* Lab coat */}
         <path
@@ -93,29 +100,45 @@ export const Scientist: React.FC<{
           <circle cx={322} cy={222} r={20} fill={SKIN_SHADE} />
           <circle cx={210} cy={210} r={112} fill={SKIN} />
 
-          {/* Bun and fringe */}
-          <circle cx={210} cy={82} r={46} fill={HAIR} />
-          <path
-            d="M100 200 Q105 105 210 98 Q315 105 320 200 Q290 140 230 150 Q160 125 100 200 Z"
-            fill={HAIR}
-          />
+          {man ? (
+            <>
+              {/* Short hair and beard */}
+              <path
+                d="M100 190 Q96 92 210 86 Q324 92 320 190 Q302 132 252 126 Q205 140 162 124 Q118 136 100 190 Z"
+                fill={HAIR}
+              />
+              <path
+                d="M104 222 Q112 338 210 342 Q308 338 316 222 Q296 296 210 304 Q124 296 104 222 Z"
+                fill={HAIR}
+              />
+            </>
+          ) : (
+            <>
+              {/* Bun and fringe */}
+              <circle cx={210} cy={82} r={46} fill={HAIR} />
+              <path
+                d="M100 200 Q105 105 210 98 Q315 105 320 200 Q290 140 230 150 Q160 125 100 200 Z"
+                fill={HAIR}
+              />
 
-          {/* Cheeks */}
-          <circle cx={145} cy={262} r={18} fill="#FF8FA3" opacity={0.35} />
-          <circle cx={275} cy={262} r={18} fill="#FF8FA3" opacity={0.35} />
+              {/* Cheeks */}
+              <circle cx={145} cy={262} r={18} fill="#FF8FA3" opacity={0.35} />
+              <circle cx={275} cy={262} r={18} fill="#FF8FA3" opacity={0.35} />
+            </>
+          )}
 
           {/* Eyebrows */}
           <path
             d={`M140 ${168 - brow} Q170 ${156 - brow} 195 ${168 - brow}`}
             stroke={HAIR}
-            strokeWidth={8}
+            strokeWidth={man ? 12 : 8}
             strokeLinecap="round"
             fill="none"
           />
           <path
             d={`M225 ${168 - brow} Q250 ${156 - brow} 280 ${168 - brow}`}
             stroke={HAIR}
-            strokeWidth={8}
+            strokeWidth={man ? 12 : 8}
             strokeLinecap="round"
             fill="none"
           />
@@ -168,6 +191,15 @@ export const Scientist: React.FC<{
               rx={mouthRx * 0.55}
               ry={mouthRy * 0.35}
               fill="#E5677D"
+            />
+          ) : null}
+          {man ? (
+            <path
+              d={`M168 ${270 - mouthRy * 0.6} Q210 ${246 - mouthRy * 0.6} 252 ${270 - mouthRy * 0.6} Q210 ${262 - mouthRy * 0.6} 168 ${270 - mouthRy * 0.6} Z`}
+              fill={HAIR}
+              stroke={HAIR}
+              strokeWidth={8}
+              strokeLinejoin="round"
             />
           ) : null}
         </g>
