@@ -9,7 +9,7 @@ import {
 import { COLOR_A, COLOR_B, SAFE_RIGHT } from "../config";
 import { TEXT_FONT } from "../font";
 
-const TAP_AT = 30; // frame où le doigt "clique" sur S'abonner
+export const TAP_AT = 30; // frame où le doigt "clique" sur S'abonner
 
 // CTA final : follow (bouton animé) + question pour les commentaires.
 export const Outro: React.FC<{ handle: string; nextPart: number }> = ({
@@ -24,14 +24,24 @@ export const Outro: React.FC<{ handle: string; nextPart: number }> = ({
   const tapPop = spring({ frame: frame - TAP_AT, fps, config: { damping: 7 } });
 
   // Le doigt descend vers le bouton puis appuie
-  const handY = interpolate(frame, [6, TAP_AT - 4, TAP_AT, TAP_AT + 8], [260, 30, 10, 60], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const handOpacity = interpolate(frame, [4, 10, TAP_AT + 14, TAP_AT + 22], [0, 1, 1, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  const handY = interpolate(
+    frame,
+    [6, TAP_AT - 4, TAP_AT, TAP_AT + 8],
+    [260, 30, 10, 60],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    },
+  );
+  const handOpacity = interpolate(
+    frame,
+    [4, 10, TAP_AT + 14, TAP_AT + 22],
+    [0, 1, 1, 0],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    },
+  );
   const commentIn = spring({ frame: frame - 40, fps, config: { damping: 12 } });
   const arrowBob = Math.sin(frame / 4) * 12;
 

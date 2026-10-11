@@ -6,22 +6,23 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { COLOR_A, COLOR_B, HOOK_DURATION, SAFE_RIGHT } from "../config";
+import { COLOR_A, COLOR_B, SAFE_RIGHT } from "../config";
 import { TEXT_FONT } from "../font";
 
 // Accroche (1,5 s) : promesse + boucle ouverte ("la dernière est la plus dure")
-export const Hook: React.FC<{ title: string; sub: string; part: number }> = ({
-  title,
-  sub,
-  part,
-}) => {
+export const Hook: React.FC<{
+  title: string;
+  sub: string;
+  part: number;
+  duration: number;
+}> = ({ title, sub, part, duration }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
   const pop = spring({ frame, fps, config: { damping: 9, mass: 0.5 } });
   const wiggle = Math.sin(frame / 3) * 2.5;
   const subIn = spring({ frame: frame - 8, fps, config: { damping: 12 } });
-  const out = interpolate(frame, [HOOK_DURATION - 6, HOOK_DURATION], [1, 0], {
+  const out = interpolate(frame, [duration - 6, duration], [1, 0], {
     extrapolateLeft: "clamp",
   });
 

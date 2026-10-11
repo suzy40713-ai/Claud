@@ -1,8 +1,9 @@
 import "./index.css";
 import React from "react";
 import { Composition } from "remotion";
-import { FPS, totalDuration } from "./config";
+import { FPS } from "./config";
 import { EPISODES } from "./questions";
+import { buildTimeline } from "./timeline";
 import { TuPreferes } from "./TuPreferes";
 
 // Une composition par épisode (Partie 1, Partie 2…) dans la sidebar.
@@ -14,7 +15,7 @@ export const RemotionRoot: React.FC = () => {
           key={episode.id}
           id={episode.id}
           component={TuPreferes}
-          durationInFrames={totalDuration(episode.questions.length)}
+          durationInFrames={buildTimeline(episode).total}
           fps={FPS}
           width={1080}
           height={1920}

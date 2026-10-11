@@ -10,14 +10,29 @@ npm run dev                                   # aperçu dans Remotion Studio
 npx remotion render TuPreferes-Partie1 out/partie1.mp4
 ```
 
-Pour créer un nouvel épisode : ajoute un objet dans `src/questions.ts` (`EPISODES`). Il apparaît tout seul dans la sidebar du Studio.
+Pour créer un nouvel épisode : ajoute un objet dans `src/episodes.json`. Il apparaît tout seul dans la sidebar du Studio.
 
-## Structure d'une vidéo (~39 s avec 6 questions)
+## Voix off + bruitages
+
+Voix française générée hors-ligne (Piper « siwis », gratuite), plus des bruitages (whoosh, tick du chrono, ding, pop) :
+
+```bash
+pip install sherpa-onnx soundfile numpy
+python3 scripts/voiceover.py                     # tous les épisodes
+python3 scripts/voiceover.py TuPreferes-Partie3  # un seul
+```
+
+La voix lit l'accroche, chaque question (« Tu préfères … ou … ? »), le % gagnant, le CTA « Abonne-toi pour la partie N » au milieu et le CTA final.
+Les timings de la vidéo s'adaptent tout seuls à la durée de la voix (`src/timeline.ts`).
+Si une phrase sonne mal, ajoute un champ `"voice": "texte à lire"` à la question dans `episodes.json`.
+Relance le script à chaque modification de texte.
+
+## Structure d'une vidéo (~50 s avec 6 questions et la voix off)
 
 | Moment | Durée | Rôle |
 |---|---|---|
 | Accroche | 1,5 s | Promesse + boucle ouverte (« seulement 1% réussit la dernière ») |
-| Question × 6 | 5,6 s chacune | Entrée 0,4 s → chrono 3 s → % révélés 2,2 s |
+| Question × 6 | 5,6 s minimum | Entrée 0,4 s → voix + chrono (≥ 3 s) → % révélés (≥ 2,2 s) |
 | CTA milieu | pendant la révélation de la Q3 | « Abonne-toi pour la partie 2 👀 » |
 | Dernière question | — | Étiquetée « 🔥 LA PLUS DURE » (barre jaune) : raison de rester jusqu'au bout |
 | CTA final | 3,5 s | Bouton « S'abonner » cliqué + « Commente ton score 👇 » |
@@ -35,7 +50,7 @@ Les timings se règlent dans `src/config.ts`.
 
 ## Conseils de publication
 
-- Ajoute un **son tendance** dans l'app TikTok (volume bas) au moment de poster.
+- Ajoute un **son tendance** dans l'app TikTok, **volume très bas** (la voix off doit rester audible).
 - Légende : « Tu choisis quoi pour la dernière ? 👇 #tupreferes #wouldyourather #choix #fyp ».
 - Poste **1 à 2 fois par jour**, toujours au même format, et numérote les parties.
 - Épingle un commentaire du type « Score ? Moi 4/6 😅 » pour lancer les réponses.

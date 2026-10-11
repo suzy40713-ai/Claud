@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  interpolate,
-  spring,
-  useCurrentFrame,
-  useVideoConfig,
-} from "remotion";
+import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { TEXT_FONT } from "../font";
 
 // Mini-CTA en plein milieu de la vidéo : ceux qui sont accrochés
