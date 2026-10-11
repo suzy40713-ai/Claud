@@ -3,10 +3,11 @@
     pip install sherpa-onnx soundfile numpy
     python3 scripts/voiceover.py            # tous les épisodes
     python3 scripts/voiceover.py TuPreferes-Partie1
+    python3 scripts/voiceover.py --voice pierre   # autre voix d'homme
 
 Écrit public/voice/<episode>/<ligne>.wav, public/sfx/*.wav et
 src/voice-manifest.json (durées, utilisées pour caler les timings).
-La voix (Piper « siwis », ~67 Mo) est téléchargée une fois dans .tts/.
+La voix (Piper, ~65 Mo) est téléchargée une fois dans .tts/.
 """
 
 import json
@@ -20,13 +21,16 @@ import numpy as np
 import soundfile as sf
 
 ROOT = Path(__file__).resolve().parent.parent
-VOICE_NAME = "vits-piper-fr_FR-siwis-medium"
-VOICE_URL = (
-    "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/"
-    f"{VOICE_NAME}.tar.bz2"
-)
-MODEL_DIR = ROOT / ".tts" / VOICE_NAME
-SPEED = 1.15  # un peu plus rapide que nature = plus dynamique
+# nom -> (modèle Piper, id du locuteur)
+VOICES = {
+    "tom": ("fr_FR-tom-medium", 0),  # homme (par défaut)
+    "pierre": ("fr_FR-upmc-medium", 1),  # homme
+    "jessica": ("fr_FR-upmc-medium", 0),  # femme
+    "siwis": ("fr_FR-siwis-medium", 0),  # femme
+}
+DEFAULT_VOICE = "tom"
+VOICES_URL = "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/"
+SPEED = 1.05  # trop rapide = son plus robotique
 
 REVEAL_LINES = [
     "{p} pour cent !",
@@ -47,28 +51,31 @@ def speakable(text: str) -> str:
     return re.sub(r"\s+", " ", t).strip()
 
 
-def ensure_model() -> None:
-    if (MODEL_DIR / "tokens.txt").exists():
-        return
-    MODEL_DIR.parent.mkdir(parents=True, exist_ok=True)
-    archive = MODEL_DIR.parent / f"{VOICE_NAME}.tar.bz2"
-    print(f"Téléchargement de la voix : {VOICE_URL}")
-    urllib.request.urlretrieve(VOICE_URL, archive)
+def ensure_model(model: str) -> Path:
+    name = f"vits-piper-{model}"
+    model_dir = ROOT / ".tts" / name
+    if (model_dir / "tokens.txt").exists():
+        return model_dir
+    model_dir.parent.mkdir(parents=True, exist_ok=True)
+    archive = model_dir.parent / f"{name}.tar.bz2"
+    print(f"Téléchargement de la voix : {VOICES_URL}{name}.tar.bz2")
+    urllib.request.urlretrieve(f"{VOICES_URL}{name}.tar.bz2", archive)
     with tarfile.open(archive) as tar:
-        tar.extractall(MODEL_DIR.parent, filter="data")
+        tar.extractall(model_dir.parent, filter="data")
     archive.unlink()
+    return model_dir
 
 
-def load_tts():
+def load_tts(model: str):
     import sherpa_onnx
 
-    ensure_model()
+    model_dir = ensure_model(model)
     config = sherpa_onnx.OfflineTtsConfig(
         model=sherpa_onnx.OfflineTtsModelConfig(
             vits=sherpa_onnx.OfflineTtsVitsModelConfig(
-                model=str(MODEL_DIR / "fr_FR-siwis-medium.onnx"),
-                tokens=str(MODEL_DIR / "tokens.txt"),
-                data_dir=str(MODEL_DIR / "espeak-ng-data"),
+                model=str(model_dir / f"{model}.onnx"),
+                tokens=str(model_dir / "tokens.txt"),
+                data_dir=str(model_dir / "espeak-ng-data"),
             ),
             num_threads=4,
         )
@@ -76,13 +83,17 @@ def load_tts():
     return sherpa_onnx.OfflineTts(config)
 
 
+def lower_first(text: str) -> str:
+    return text[:1].lower() + text[1:]
+
+
 def episode_lines(ep: dict) -> dict:
     qs = ep["questions"]
     lines = {"hook": speakable(ep["hook"]) + " !"}
     for i, q in enumerate(qs):
         text = q.get("voice") or (
-            f"Tu préfères {speakable(q['a']['text'])}… "
-            f"ou {speakable(q['b']['text'])} ?"
+            f"Tu préfères {lower_first(speakable(q['a']['text']))}… "
+            f"ou {lower_first(speakable(q['b']['text']))} ?"
         )
         if i == len(qs) - 1:
             text = "Dernière question, la plus dure. " + text
@@ -128,13 +139,23 @@ def write_sfx() -> None:
 
 
 def main() -> None:
+    args = sys.argv[1:]
+    voice = DEFAULT_VOICE
+    if "--voice" in args:
+        i = args.index("--voice")
+        voice = args[i + 1]
+        del args[i : i + 2]
+    if voice not in VOICES:
+        sys.exit(f"Voix inconnue : {voice} (choix : {', '.join(VOICES)})")
+    model, speaker = VOICES[voice]
+
     episodes = json.loads((ROOT / "src" / "episodes.json").read_text())
-    only = set(sys.argv[1:])
+    only = set(args)
     manifest_path = ROOT / "src" / "voice-manifest.json"
     manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
 
     write_sfx()
-    tts = load_tts()
+    tts = load_tts(model)
     for ep in episodes:
         if only and ep["id"] not in only:
             continue
@@ -142,7 +163,7 @@ def main() -> None:
         out.mkdir(parents=True, exist_ok=True)
         durations = {}
         for key, text in episode_lines(ep).items():
-            audio = tts.generate(text, sid=0, speed=SPEED)
+            audio = tts.generate(text, sid=speaker, speed=SPEED)
             samples = np.asarray(audio.samples, dtype=np.float32)
             # Volume homogène d'une phrase à l'autre, et bien fort
             samples = samples / (np.abs(samples).max() + 1e-9) * 0.95
