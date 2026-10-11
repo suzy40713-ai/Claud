@@ -148,5 +148,605 @@
         "percentA": 52
       }
     ]
+  },
+  {
+    "id": "TuPreferes-Partie3",
+    "part": 3,
+    "hook": "Personne ne choisit pareil\nsur la dernière 🤯",
+    "hookSub": "Choisis avant la fin du chrono ⏱️",
+    "handle": "@tupreferes",
+    "questions": [
+      {
+        "a": {
+          "emoji": "🍫",
+          "text": "Plus jamais de chocolat"
+        },
+        "b": {
+          "emoji": "🍟",
+          "text": "Plus jamais de frites"
+        },
+        "percentA": 46
+      },
+      {
+        "a": {
+          "emoji": "🐶",
+          "text": "Comprendre les animaux"
+        },
+        "b": {
+          "emoji": "🌍",
+          "text": "Parler toutes les langues"
+        },
+        "percentA": 41
+      },
+      {
+        "a": {
+          "emoji": "🛌",
+          "text": "Dormir 4h et être en forme"
+        },
+        "b": {
+          "emoji": "🍔",
+          "text": "Manger sans jamais grossir"
+        },
+        "percentA": 54
+      },
+      {
+        "a": {
+          "emoji": "🎮",
+          "text": "Gagner à tous les jeux vidéo"
+        },
+        "b": {
+          "emoji": "⚽",
+          "text": "Être un pro du foot"
+        },
+        "percentA": 37
+      },
+      {
+        "a": {
+          "emoji": "📸",
+          "text": "Ton historique photo devient public"
+        },
+        "b": {
+          "emoji": "💬",
+          "text": "Tes messages deviennent publics"
+        },
+        "percentA": 48
+      },
+      {
+        "a": {
+          "emoji": "🔁",
+          "text": "Revivre ta meilleure journée en boucle"
+        },
+        "b": {
+          "emoji": "🎲",
+          "text": "Vivre une journée surprise chaque jour"
+        },
+        "percentA": 50
+      }
+    ]
+  },
+  {
+    "id": "TuPreferes-Partie4",
+    "part": 4,
+    "hook": "99% se trompent\nsur la 3e 😬",
+    "hookSub": "Compte tes réponses majoritaires 👇",
+    "handle": "@tupreferes",
+    "questions": [
+      {
+        "a": {
+          "emoji": "🚀",
+          "text": "Aller sur Mars"
+        },
+        "b": {
+          "emoji": "🌊",
+          "text": "Explorer le fond des océans"
+        },
+        "percentA": 44
+      },
+      {
+        "a": {
+          "emoji": "🥶",
+          "text": "Avoir toujours un peu froid"
+        },
+        "b": {
+          "emoji": "🥵",
+          "text": "Avoir toujours un peu chaud"
+        },
+        "percentA": 61
+      },
+      {
+        "a": {
+          "emoji": "📚",
+          "text": "Tout savoir sans jamais étudier"
+        },
+        "b": {
+          "emoji": "💪",
+          "text": "Être fort sans jamais t'entraîner"
+        },
+        "percentA": 69
+      },
+      {
+        "a": {
+          "emoji": "👻",
+          "text": "Dormir une nuit dans une maison hantée"
+        },
+        "b": {
+          "emoji": "🕷️",
+          "text": "Dormir avec 100 araignées"
+        },
+        "percentA": 78
+      },
+      {
+        "a": {
+          "emoji": "🎁",
+          "text": "1 million d'euros maintenant"
+        },
+        "b": {
+          "emoji": "⏳",
+          "text": "10 millions dans 10 ans"
+        },
+        "percentA": 57
+      },
+      {
+        "a": {
+          "emoji": "🧓",
+          "text": "Vivre jusqu'à 150 ans"
+        },
+        "b": {
+          "emoji": "♾️",
+          "text": "Vivre 80 ans mais sans jamais être malade"
+        },
+        "percentA": 43
+      }
+    ]
+  },
+  {
+    "id": "TuPreferes-Partie5",
+    "part": 5,
+    "hook": "La dernière va\nte faire réfléchir 🧐",
+    "hookSub": "Choisis vite, le chrono tourne ⏱️",
+    "handle": "@tupreferes",
+    "questions": [
+      {
+        "a": {
+          "emoji": "🍕",
+          "text": "Pizza à tous les repas"
+        },
+        "b": {
+          "emoji": "🍣",
+          "text": "Sushis à tous les repas"
+        },
+        "percentA": 55
+      },
+      {
+        "a": {
+          "emoji": "📱",
+          "text": "Plus de réseaux sociaux"
+        },
+        "b": {
+          "emoji": "🎵",
+          "text": "Plus de musique"
+        },
+        "percentA": 36
+      },
+      {
+        "a": {
+          "emoji": "🦸",
+          "text": "Voler"
+        },
+        "b": {
+          "emoji": "⚡",
+          "text": "Te téléporter"
+        },
+        "percentA": 42
+      },
+      {
+        "a": {
+          "emoji": "🏰",
+          "text": "Vivre au Moyen Âge"
+        },
+        "b": {
+          "emoji": "🤖",
+          "text": "Vivre en l'an 3000"
+        },
+        "percentA": 23
+      },
+      {
+        "a": {
+          "emoji": "👀",
+          "text": "Savoir quand quelqu'un te ment"
+        },
+        "b": {
+          "emoji": "🎯",
+          "text": "Réussir tout ce que tu tentes"
+        },
+        "percentA": 47
+      },
+      {
+        "a": {
+          "emoji": "🧳",
+          "text": "Changer de pays tous les ans"
+        },
+        "b": {
+          "emoji": "🏡",
+          "text": "Ne jamais quitter ta ville"
+        },
+        "percentA": 71
+      }
+    ]
+  },
+  {
+    "id": "TuPreferes-Partie6",
+    "part": 6,
+    "hook": "Seulement 1% hésite pas\nsur la dernière 😈",
+    "hookSub": "Choisis avant la fin du chrono ⏱️",
+    "handle": "@tupreferes",
+    "questions": [
+      {
+        "a": {
+          "emoji": "☕",
+          "text": "Plus jamais de café"
+        },
+        "b": {
+          "emoji": "🥤",
+          "text": "Plus jamais de soda"
+        },
+        "percentA": 59
+      },
+      {
+        "a": {
+          "emoji": "🐍",
+          "text": "Un serpent dans ta chambre"
+        },
+        "b": {
+          "emoji": "🐀",
+          "text": "Un rat dans ta cuisine"
+        },
+        "percentA": 34
+      },
+      {
+        "a": {
+          "emoji": "💤",
+          "text": "Ne plus jamais rêver"
+        },
+        "b": {
+          "emoji": "😱",
+          "text": "Faire un cauchemar par semaine"
+        },
+        "percentA": 62
+      },
+      {
+        "a": {
+          "emoji": "🎤",
+          "text": "Chanter devant 10 000 personnes"
+        },
+        "b": {
+          "emoji": "🎭",
+          "text": "Jouer dans un film"
+        },
+        "percentA": 45
+      },
+      {
+        "a": {
+          "emoji": "🧠",
+          "text": "Être un génie mais seul"
+        },
+        "b": {
+          "emoji": "🥳",
+          "text": "Être moyen mais entouré d'amis"
+        },
+        "percentA": 27
+      },
+      {
+        "a": {
+          "emoji": "🔮",
+          "text": "Connaître ton futur"
+        },
+        "b": {
+          "emoji": "📜",
+          "text": "Changer ton passé"
+        },
+        "percentA": 51
+      }
+    ]
+  },
+  {
+    "id": "TuPreferes-Partie7",
+    "part": 7,
+    "hook": "Tu vas changer d'avis\nsur la dernière 🤔",
+    "hookSub": "Compte tes réponses majoritaires 👇",
+    "handle": "@tupreferes",
+    "questions": [
+      {
+        "a": {
+          "emoji": "🏖️",
+          "text": "Vacances à la plage"
+        },
+        "b": {
+          "emoji": "🏔️",
+          "text": "Vacances à la montagne"
+        },
+        "percentA": 63
+      },
+      {
+        "a": {
+          "emoji": "🐱",
+          "text": "Avoir un chat qui parle"
+        },
+        "b": {
+          "emoji": "🐕",
+          "text": "Avoir un chien immortel"
+        },
+        "percentA": 49
+      },
+      {
+        "a": {
+          "emoji": "🚗",
+          "text": "Une voiture de luxe"
+        },
+        "b": {
+          "emoji": "🏠",
+          "text": "Une maison de rêve"
+        },
+        "percentA": 22
+      },
+      {
+        "a": {
+          "emoji": "📺",
+          "text": "Plus jamais de séries"
+        },
+        "b": {
+          "emoji": "🎬",
+          "text": "Plus jamais de films"
+        },
+        "percentA": 44
+      },
+      {
+        "a": {
+          "emoji": "👑",
+          "text": "Être célèbre mais détesté"
+        },
+        "b": {
+          "emoji": "🤫",
+          "text": "Être inconnu mais aimé"
+        },
+        "percentA": 19
+      },
+      {
+        "a": {
+          "emoji": "⌛",
+          "text": "Arrêter le temps 1h par jour"
+        },
+        "b": {
+          "emoji": "⏪",
+          "text": "Revenir 1 minute en arrière à volonté"
+        },
+        "percentA": 53
+      }
+    ]
+  },
+  {
+    "id": "TuPreferes-Partie8",
+    "part": 8,
+    "hook": "Impossible de choisir\nla dernière 😳",
+    "hookSub": "Choisis avant la fin du chrono ⏱️",
+    "handle": "@tupreferes",
+    "questions": [
+      {
+        "a": {
+          "emoji": "🍦",
+          "text": "Glace en plein hiver"
+        },
+        "b": {
+          "emoji": "🍲",
+          "text": "Soupe en plein été"
+        },
+        "percentA": 58
+      },
+      {
+        "a": {
+          "emoji": "🧙",
+          "text": "Être un sorcier"
+        },
+        "b": {
+          "emoji": "🧛",
+          "text": "Être un vampire"
+        },
+        "percentA": 64
+      },
+      {
+        "a": {
+          "emoji": "🎒",
+          "text": "Refaire le collège"
+        },
+        "b": {
+          "emoji": "💼",
+          "text": "Travailler dès demain"
+        },
+        "percentA": 38
+      },
+      {
+        "a": {
+          "emoji": "🌙",
+          "text": "Vivre que la nuit"
+        },
+        "b": {
+          "emoji": "☀️",
+          "text": "Vivre que le jour"
+        },
+        "percentA": 33
+      },
+      {
+        "a": {
+          "emoji": "🐘",
+          "text": "Une mémoire d'éléphant"
+        },
+        "b": {
+          "emoji": "🦅",
+          "text": "Une vue d'aigle"
+        },
+        "percentA": 52
+      },
+      {
+        "a": {
+          "emoji": "❤️",
+          "text": "Trouver l'amour de ta vie"
+        },
+        "b": {
+          "emoji": "💰",
+          "text": "Devenir millionnaire"
+        },
+        "percentA": 48
+      }
+    ]
+  },
+  {
+    "id": "TuPreferes-Partie9",
+    "part": 9,
+    "hook": "La 4e divise\ntout le monde 🔥",
+    "hookSub": "Compte tes réponses majoritaires 👇",
+    "handle": "@tupreferes",
+    "questions": [
+      {
+        "a": {
+          "emoji": "🧊",
+          "text": "Vivre dans un igloo"
+        },
+        "b": {
+          "emoji": "🌴",
+          "text": "Vivre dans une cabane dans les arbres"
+        },
+        "percentA": 29
+      },
+      {
+        "a": {
+          "emoji": "🤳",
+          "text": "Ne plus jamais pouvoir prendre de selfie"
+        },
+        "b": {
+          "emoji": "🎧",
+          "text": "Ne plus jamais mettre d'écouteurs"
+        },
+        "percentA": 56
+      },
+      {
+        "a": {
+          "emoji": "🦖",
+          "text": "Voir un vrai dinosaure"
+        },
+        "b": {
+          "emoji": "👽",
+          "text": "Rencontrer un extraterrestre"
+        },
+        "percentA": 47
+      },
+      {
+        "a": {
+          "emoji": "🗣️",
+          "text": "Tout le monde entend tes pensées"
+        },
+        "b": {
+          "emoji": "🙈",
+          "text": "Tu oublies tout chaque soir"
+        },
+        "percentA": 50
+      },
+      {
+        "a": {
+          "emoji": "🏆",
+          "text": "Gagner une médaille d'or"
+        },
+        "b": {
+          "emoji": "🎓",
+          "text": "Avoir un prix Nobel"
+        },
+        "percentA": 43
+      },
+      {
+        "a": {
+          "emoji": "👨‍👩‍👧",
+          "text": "Revoir quelqu'un qui t'a quitté"
+        },
+        "b": {
+          "emoji": "🌅",
+          "text": "Avoir 10 ans de plus à vivre"
+        },
+        "percentA": 52
+      }
+    ]
+  },
+  {
+    "id": "TuPreferes-Partie10",
+    "part": 10,
+    "hook": "Spécial Partie 10 :\nles plus durs 😈",
+    "hookSub": "Choisis avant la fin du chrono ⏱️",
+    "handle": "@tupreferes",
+    "questions": [
+      {
+        "a": {
+          "emoji": "🔇",
+          "text": "Ne plus jamais entendre de musique"
+        },
+        "b": {
+          "emoji": "🍬",
+          "text": "Ne plus jamais manger de sucre"
+        },
+        "percentA": 31
+      },
+      {
+        "a": {
+          "emoji": "🪞",
+          "text": "Voir ton toi du futur"
+        },
+        "b": {
+          "emoji": "👶",
+          "text": "Voir tes futurs enfants"
+        },
+        "percentA": 46
+      },
+      {
+        "a": {
+          "emoji": "🕵️",
+          "text": "Savoir ce qu'on dit dans ton dos"
+        },
+        "b": {
+          "emoji": "🙉",
+          "text": "Ne jamais le savoir"
+        },
+        "percentA": 58
+      },
+      {
+        "a": {
+          "emoji": "🌎",
+          "text": "Faire le tour du monde seul"
+        },
+        "b": {
+          "emoji": "🏠",
+          "text": "Rester chez toi avec tes potes"
+        },
+        "percentA": 40
+      },
+      {
+        "a": {
+          "emoji": "⚖️",
+          "text": "Toujours dire la vérité"
+        },
+        "b": {
+          "emoji": "🎭",
+          "text": "Pouvoir mentir sans jamais être grillé"
+        },
+        "percentA": 49
+      },
+      {
+        "a": {
+          "emoji": "🧬",
+          "text": "Recommencer ta vie à zéro"
+        },
+        "b": {
+          "emoji": "✨",
+          "text": "Garder ta vie telle qu'elle est"
+        },
+        "percentA": 50
+      }
+    ]
   }
 ]

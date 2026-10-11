@@ -3,7 +3,7 @@
     pip install sherpa-onnx soundfile numpy
     python3 scripts/voiceover.py            # tous les épisodes
     python3 scripts/voiceover.py TuPreferes-Partie1
-    python3 scripts/voiceover.py --voice pierre   # autre voix d'homme
+    python3 scripts/voiceover.py --voice tom      # autre voix d'homme
 
 Écrit public/voice/<episode>/<ligne>.wav, public/sfx/*.wav et
 src/voice-manifest.json (durées, utilisées pour caler les timings).
@@ -23,12 +23,12 @@ import soundfile as sf
 ROOT = Path(__file__).resolve().parent.parent
 # nom -> (modèle Piper, id du locuteur)
 VOICES = {
-    "tom": ("fr_FR-tom-medium", 0),  # homme (par défaut)
-    "pierre": ("fr_FR-upmc-medium", 1),  # homme
+    "tom": ("fr_FR-tom-medium", 0),  # homme
+    "pierre": ("fr_FR-upmc-medium", 1),  # homme (par défaut)
     "jessica": ("fr_FR-upmc-medium", 0),  # femme
     "siwis": ("fr_FR-siwis-medium", 0),  # femme
 }
-DEFAULT_VOICE = "tom"
+DEFAULT_VOICE = "pierre"
 VOICES_URL = "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/"
 SPEED = 1.05  # trop rapide = son plus robotique
 
@@ -37,6 +37,12 @@ REVEAL_LINES = [
     "Et c'est {p} pour cent !",
     "{p} pour cent ! T'es d'accord ?",
 ]
+
+ORDINALS = {
+    "2": "deuxième", "3": "troisième", "4": "quatrième", "5": "cinquième",
+    "6": "sixième", "7": "septième", "8": "huitième", "9": "neuvième",
+    "10": "dixième",
+}
 
 EMOJI_RE = re.compile(
     "[\U0001F000-\U0001FAFF☀-➿⬀-⯿️‍]+"
@@ -47,6 +53,9 @@ def speakable(text: str) -> str:
     t = EMOJI_RE.sub("", text).replace("\n", " ")
     t = re.sub(r"(\d)[   ](\d{3})", r"\1\2", t)  # 10 000 -> 10000
     t = re.sub(r"\b1\s*€", "un euro", t)
+    t = re.sub(r"\b1\s*h\b", "une heure", t)
+    t = re.sub(r"\b(\d+)\s*h\b", r"\1 heures", t)
+    t = re.sub(r"\b(\d+)e\b", lambda m: ORDINALS.get(m.group(1), m.group(0)), t)
     t = t.replace("€", " euros").replace("%", " pour cent")
     return re.sub(r"\s+", " ", t).strip()
 

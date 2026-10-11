@@ -14,7 +14,7 @@ Pour créer un nouvel épisode : ajoute un objet dans `src/episodes.json`. Il ap
 
 ## Voix off + bruitages
 
-Voix d'homme française générée hors-ligne (Piper « tom », gratuite ; `--voice pierre|jessica|siwis` pour changer), plus des bruitages (whoosh, tick du chrono, ding, pop) :
+Voix d'homme française générée hors-ligne (Piper « pierre », gratuite ; `--voice tom|jessica|siwis` pour changer), plus des bruitages (whoosh, tick du chrono, ding, pop) :
 
 ```bash
 pip install sherpa-onnx soundfile numpy
