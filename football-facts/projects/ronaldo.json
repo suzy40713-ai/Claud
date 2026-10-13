@@ -1,0 +1,69 @@
+{
+  "id": "ronaldo-legende",
+  "title": "Pourquoi Cristiano Ronaldo est-il devenu une légende du football ?",
+  "voice": { "edge_voice": "fr-FR-HenriNeural", "edge_rate": "+12%", "espeak_voice": "fr", "espeak_rate": 185 },
+  "music": { "bpm": 124, "volume_db": -21 },
+  "scenes": [
+    {
+      "id": "hook",
+      "duration": 3.0,
+      "visual": "hook",
+      "on_screen": "COMMENT EST-IL DEVENU UNE *LÉGENDE* ? 🤯",
+      "lines": [
+        { "text": "Comment est-il devenu une *légende* ?" }
+      ]
+    },
+    {
+      "id": "debuts",
+      "duration": 7.0,
+      "visual": "debuts",
+      "lines": [
+        { "text": "Né en *1985* à *Madère*,", "say": "Né en 1985, à Madère," },
+        { "text": "il quitte sa famille *à 12 ans*", "say": "il quitte sa famille à douze ans" },
+        { "text": "pour le *Sporting Portugal*." },
+        { "text": "Pro à *17 ans* !", "say": "Professionnel à dix-sept ans !" }
+      ]
+    },
+    {
+      "id": "explosion",
+      "duration": 10.0,
+      "visual": "explosion",
+      "lines": [
+        { "text": "En *2003*, *Manchester United* le recrute", "say": "En 2003, Manchester United le recrute" },
+        { "text": "et lui confie le *numéro 7*.", "say": "et lui confie le numéro sept." },
+        { "text": "Il s'entraîne *sans relâche*." },
+        { "text": "En *2008* : *Ligue des champions*", "say": "En 2008 : Ligue des champions" },
+        { "text": "et premier *Ballon d'Or* !" }
+      ]
+    },
+    {
+      "id": "records",
+      "duration": 10.0,
+      "visual": "records",
+      "lines": [
+        { "text": "*5 Ballons d'Or*.", "say": "Cinq Ballons d'Or." },
+        { "text": "*5 Ligues des champions*.", "say": "Cinq Ligues des champions." },
+        { "text": "*Meilleur buteur* de l'histoire de la C1.", "say": "Meilleur buteur de l'histoire de la Ligue des champions." },
+        { "text": "Avec le Portugal : *Euro 2016*", "say": "Avec le Portugal : l'Euro 2016," },
+        { "text": "et *record mondial* de buts en sélection !", "say": "et le record mondial de buts en sélection !" }
+      ]
+    },
+    {
+      "id": "outro",
+      "duration": 9.0,
+      "visual": "outro",
+      "on_screen": "POUR TOI, EST-IL LE *PLUS GRAND* ? 👑",
+      "lines": [
+        { "text": "Pour toi, est-il le *plus grand* ?" },
+        { "text": "Dis-le en *commentaire* !", "say": "Dis-le en commentaire !" },
+        { "text": "*Abonne-toi* à *Football Facts*", "say": "Abonne-toi à Football Facts" },
+        { "text": "pour découvrir d'autres *histoires du football* !" }
+      ]
+    }
+  ],
+  "publish": {
+    "title": "Comment Cristiano Ronaldo est devenu une LÉGENDE 🤯👑",
+    "description": "De Madère au sommet du football mondial : 5 Ballons d'Or, 5 Ligues des champions, l'Euro 2016 et le record mondial de buts en sélection. Pour toi, est-il le plus grand de l'histoire ? Dis-le en commentaire 👇 Abonne-toi à Football Facts pour d'autres histoires du foot ⚽",
+    "hashtags": ["#footballfacts", "#cristianoronaldo", "#cr7", "#football", "#legende"]
+  }
+}
