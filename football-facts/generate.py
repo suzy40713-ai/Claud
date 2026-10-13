@@ -165,11 +165,28 @@ class EdgeTTS:
             raise RuntimeError("edge-tts n'a renvoyé aucun audio")
 
 
+class SilentTTS:
+    """Pas de voix off : chaque phrase reçoit une durée de lecture confortable pour les sous-titres."""
+
+    name = "aucune (sous-titres seuls)"
+
+    def synth(self, text, path):
+        n = int(max(1.0, len(text) / 14.0 + 0.25) * SR)
+        with wave.open(path, "wb") as w:
+            w.setnchannels(1)
+            w.setsampwidth(2)
+            w.setframerate(SR)
+            w.writeframes(b"\x00\x00" * n)
+
+
 def make_tts(engine, cfg, tmp):
     errors = []
-    order = ["edge", "espeak"] if engine == "auto" else [engine]
+    # auto : voix neuronale si disponible, sinon vidéo sans voix (jamais de voix robotique par défaut)
+    order = ["edge", "none"] if engine == "auto" else [engine]
     for name in order:
         try:
+            if name == "none":
+                return SilentTTS()
             if name == "edge":
                 tts = EdgeTTS(cfg["edge_voice"], cfg["edge_rate"])
                 tts.synth("Test.", os.path.join(tmp, "probe.mp3"))
@@ -357,7 +374,7 @@ def mix_audio(scenes, total, voice_clips, music_db, out_wav):
     rng = np.random.default_rng(7)
     voice = np.zeros(int(total * SR) + SR)
     for st, c in voice_clips:
-        c = c / max(1e-9, np.abs(c).max()) * 0.85
+        c = c / max(1e-3, np.abs(c).max()) * 0.85
         add(voice, st, c)
     # enveloppe de la voix -> ducking de la musique
     k = int(0.05 * SR)
@@ -945,7 +962,8 @@ def write_publish(project, path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("project")
-    ap.add_argument("--engine", choices=["auto", "edge", "espeak"], default="auto")
+    ap.add_argument("--engine", choices=["auto", "edge", "espeak", "none"], default="auto",
+                    help="auto = voix neuronale edge-tts si Internet, sinon sans voix")
     ap.add_argument("--out", default=os.path.join(ROOT, "output"))
     ap.add_argument("--preview", action="store_true", help="exporte seulement des images PNG clés")
     ap.add_argument("--workers", type=int, default=os.cpu_count() or 2)
@@ -976,7 +994,8 @@ def main():
 
     print("2/5 Musique + effets sonores (synthétisés)…")
     wav = os.path.join(tmp, "mix.wav")
-    mix_audio(scenes, total, clips, project["music"]["volume_db"], wav)
+    music_db = project["music"]["volume_db"] + (7 if isinstance(tts, SilentTTS) else 0)  # musique plus présente sans voix
+    mix_audio(scenes, total, clips, music_db, wav)
 
     print("3/5 Sous-titres + textes de publication…")
     write_srt(scenes, os.path.join(a.out, name + ".srt"))

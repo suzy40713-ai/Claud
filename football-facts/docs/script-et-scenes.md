@@ -1,10 +1,10 @@
 # Ronaldo — script vérifié et liste des scènes
 
-Vidéo : `output/ronaldo-legende.mp4` · 1080×1920 · 30 fps · 39 s · H.264 + AAC · −14 LUFS
+Vidéo : `output/ronaldo-legende.mp4` · 1080×1920 · 30 fps · 40 s · H.264 + AAC · −15 LUFS · sans voix off (musique + sous-titres)
 
 ## Liste des scènes
 
-| # | Temps | Texte à l'écran | Narration (voix off) | Visuel |
+| # | Temps | Texte à l'écran | Texte narré / sous-titré | Visuel |
 |---|-------|-----------------|----------------------|--------|
 | 1 — Hook | 0 → 3 s | COMMENT EST-IL DEVENU UNE **LÉGENDE** ? 🤯 | « Comment est-il devenu une légende ? » | Flash blanc, impact sonore, zoom percutant du titre, ondes de choc néon, « 7 » géant en filigrane, tremblement de caméra |
 | 2 — Les débuts | 3 → 10 s | Sous-titres synchronisés | « Né en 1985, à Madère, il quitte sa famille à douze ans pour le Sporting Portugal. Professionnel à dix-sept ans ! » | Carte de Madère tracée au néon, épingle sur Funchal, frise 1985 → 1997 → 2002 synchronisée avec la voix |

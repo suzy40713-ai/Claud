@@ -2,7 +2,7 @@
 
 Génère automatiquement des vidéos verticales 1080×1920 sur le football : voix off française, sous-titres synchronisés (mots clés en vert néon), animations, musique et effets sonores libres de droits, logo Football Facts. Sans visage, sans abonnement payant.
 
-**Première vidéo :** `output/ronaldo-legende.mp4` — « Pourquoi Cristiano Ronaldo est-il devenu une légende du football ? » (39 s)
+**Première vidéo :** `output/ronaldo-legende.mp4` — « Pourquoi Cristiano Ronaldo est-il devenu une légende du football ? » (40 s, sans voix off)
 
 | Fichier | Contenu |
 |---------|---------|
@@ -13,12 +13,14 @@ Génère automatiquement des vidéos verticales 1080×1920 sur le football : voi
 | `docs/script-et-scenes.md` | Script, liste des scènes, faits vérifiés, sources, droits |
 | `projects/ronaldo.json` | Le script modifiable de la vidéo |
 
-## ⚠️ La voix de cette première version
+## Voix off
 
-Le conteneur où la vidéo a été générée n'avait **pas accès** aux serveurs de voix neuronales. La narration utilise donc **espeak-ng** (gratuit, hors ligne) : elle est claire et bien synchronisée, mais **robotique**. Deux solutions gratuites pour une voix naturelle :
+La vidéo actuelle est **sans voix** : la musique, les effets sonores et les grands sous-titres racontent l'histoire. La voix robotique (espeak-ng) a été retirée, et le mode automatique ne l'utilise plus.
 
-1. **Sur ordinateur (recommandé)** : `pip install edge-tts`, puis relance `python3 generate.py projects/ronaldo.json`. Le script utilise automatiquement la voix neuronale `fr-FR-HenriNeural` (gratuite, sans clé API, nécessite Internet).
-2. **Sur téléphone avec CapCut (gratuit)** : importe le MP4, coupe le son de la piste, ajoute *Texte → Texte en voix*, voix française, avec le texte de `docs/script-et-scenes.md`. Les sous-titres sont déjà incrustés dans l'image.
+Pour ajouter une voix naturelle gratuite :
+
+1. **Sur ordinateur (recommandé)** : `pip install edge-tts`, puis relance `python3 generate.py projects/ronaldo.json`. Si Internet est accessible, le script utilise automatiquement la voix neuronale `fr-FR-HenriNeural` (gratuite, sans clé API) et cale les sous-titres sur la voix.
+2. **Sur téléphone avec CapCut (gratuit)** : importe le MP4, ajoute *Texte → Texte en voix* avec une voix française, et colle le texte de `docs/script-et-scenes.md`.
 
 ## Installation (ordinateur : Windows, macOS, Linux)
 
@@ -35,7 +37,8 @@ Options :
 
 ```bash
 python3 generate.py projects/ronaldo.json --preview          # 10 images PNG d'aperçu en ~5 s
-python3 generate.py projects/ronaldo.json --engine espeak    # forcer la voix hors ligne
+python3 generate.py projects/ronaldo.json --engine none      # sans voix (sous-titres + musique)
+python3 generate.py projects/ronaldo.json --engine espeak    # voix hors ligne robotique (déconseillée)
 python3 generate.py projects/ronaldo.json --engine edge      # forcer la voix neuronale
 ```
 
@@ -66,7 +69,7 @@ Les visuels animés (`visual` : `hook`, `debuts`, `explosion`, `records`, `outro
 
 ## Comment ça marche
 
-1. **Voix** : chaque phrase est synthétisée séparément (edge-tts, sinon espeak-ng) → les sous-titres tombent exactement sur la voix.
+1. **Voix** : chaque phrase est synthétisée séparément avec edge-tts → les sous-titres tombent exactement sur la voix. Sans voix disponible, chaque sous-titre reçoit une durée de lecture calculée sur sa longueur.
 2. **Audio** : musique 124 BPM (batterie, basse, nappe, arpège) et effets (impact, whoosh, pops) générés en Python ; la musique baisse automatiquement quand la voix parle ; normalisation autour de −14 LUFS.
 3. **Image** : chaque image 1080×1920 est dessinée avec Pillow (zooms, transitions diagonales néon, compteurs animés), en parallèle sur tous les cœurs.
 4. **Export** : FFmpeg encode en H.264/AAC, MP4 avec `faststart`, prêt pour TikTok.
