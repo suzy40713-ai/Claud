@@ -28,7 +28,7 @@ SKETCHES = [
             A=P(skin=SKIN[2], hair=("sidepart", "#3a2a1f"), top=("vest", "#1f1f1f", "#ffffff"),
                 bottom=("pants", "#1f1f1f"), shoes="#1f1f1f", mustache="#3a2a1f", held="notepad"),
         ),
-        voices=dict(E=("siwis", 0.9, -2.0), K=("siwis", 0.88, 5.0), V=("gilles", 0.9, 0.5), A=("gilles", 0.92, -4.0)),
+        voices=dict(E=("siwis", 1.0, 0.0), K=("jessica", 0.95, 4.0), V=("tom", 1.0, 0.0), A=("pierre", 1.0, 0.0)),
         lines=[
             ("E", "s", "Excusez-moi monsieur, ce sont bien des frites que vous avez là ?"),
             ("V", "n", "Oui, ce sont les miennes."),
@@ -62,7 +62,7 @@ SKETCHES = [
             A=P(skin=SKIN[4], hair=("short", "#1c1412"), top=("uniform", "#9d0208", "#f2c23a"),
                 bottom=("pants", "#1f1f1f"), shoes="#1f1f1f", held="flashlight"),
         ),
-        voices=dict(E=("gilles", 0.9, 1.0), V=("siwis", 0.92, 0.0), A=("gilles", 0.92, -4.0)),
+        voices=dict(E=("tom", 1.0, 0.0), V=("siwis", 1.0, 0.0), A=("pierre", 1.0, 0.0)),
         lines=[
             ("E", "s", "Excusez-moi madame, vous êtes bien assise au milieu de la rangée ?"),
             ("V", "n", "Oui, c'est ma place. Rangée G, numéro douze."),
@@ -98,7 +98,7 @@ SKETCHES = [
             A=P(skin=SKIN[2], hair=("short", "#e8c15a"), hat=("cap", "#d62828"), top=("tshirt", "#d62828"),
                 bottom=("shorts", "#ffd166"), shoes="#1b1b1b", whistle=True),
         ),
-        voices=dict(E=("siwis", 0.9, -1.5), K=("siwis", 0.88, 5.5), V=("gilles", 0.9, -3.5), A=("gilles", 0.9, 1.5)),
+        voices=dict(E=("jessica", 1.0, 0.0), K=("siwis", 0.95, 4.0), V=("pierre", 1.0, 0.0), A=("tom", 1.0, 0.0)),
         lines=[
             ("E", "s", "Excusez-moi monsieur, c'est bien votre parasol ?"),
             ("V", "n", "Oui, je l'ai apporté ce matin."),
@@ -133,7 +133,7 @@ SKETCHES = [
             A=P(skin=SKIN[0], hair=("ponytail", "#c1121f"), top=("polo", "#2d6a4f"), nametag=True,
                 bottom=("pants", "#1f1f1f"), shoes="#1f1f1f", glasses=True),
         ),
-        voices=dict(E=("gilles", 0.9, -2.0), V=("siwis", 0.92, -0.5), A=("siwis", 0.9, 2.5)),
+        voices=dict(E=("tom", 1.0, 0.0), V=("siwis", 1.0, 0.0), A=("jessica", 1.0, 0.0)),
         lines=[
             ("E", "s", "Excusez-moi madame, vous n'avez qu'une baguette ?"),
             ("V", "n", "Oui, juste une baguette."),
@@ -168,7 +168,7 @@ SKETCHES = [
             A=P(skin=SKIN[4], hair=("bald", "#1c1412"), hat=("cap", "#1d3557"), beard="#1c1412",
                 top=("uniform", "#a8dadc", "#1d3557"), bottom=("pants", "#1d3557"), shoes="#1b1b1b"),
         ),
-        voices=dict(E=("siwis", 0.9, -2.0), K=("siwis", 0.88, 4.5), V=("gilles", 0.9, 0.5), A=("gilles", 0.92, -4.0)),
+        voices=dict(E=("siwis", 1.0, 0.0), K=("jessica", 0.95, 4.0), V=("pierre", 1.0, 0.0), A=("tom", 1.0, 0.0)),
         lines=[
             ("E", "s", "Excusez-moi monsieur, c'est bien un chargeur que vous avez là ?"),
             ("V", "n", "Oui, c'est le mien."),
@@ -204,7 +204,7 @@ SKETCHES = [
             A=P(skin=SKIN[4], hair=("short", "#1c1412"), top=("blazer", "#264653", "#ffffff"), nametag=True,
                 bottom=("pants", "#264653"), shoes="#1b1b1b", glasses=True, held="clipboard"),
         ),
-        voices=dict(E=("gilles", 0.9, -3.0), K=("siwis", 0.88, 5.0), V=("siwis", 0.92, 0.0), A=("gilles", 0.9, 1.5)),
+        voices=dict(E=("pierre", 1.0, 0.0), K=("siwis", 0.95, 4.0), V=("jessica", 1.0, 0.0), A=("tom", 1.0, 0.0)),
         lines=[
             ("E", "s", "Excusez-moi madame, c'est bien votre transat ?"),
             ("V", "n", "Oui, je suis installée depuis ce matin."),
@@ -241,7 +241,7 @@ SKETCHES = [
             A=P(skin=SKIN[2], hair=("sidepart", "#2b211c"), top=("uniform", "#14213d", "#fca311"),
                 bottom=("pants", "#14213d"), shoes="#1b1b1b", held="tray"),
         ),
-        voices=dict(E=("siwis", 0.9, -1.0), K=("siwis", 0.88, 5.0), V=("gilles", 0.9, 0.5), A=("gilles", 0.92, -4.0)),
+        voices=dict(E=("jessica", 1.0, 0.0), K=("siwis", 0.95, 4.0), V=("tom", 1.0, 0.0), A=("pierre", 1.0, 0.0)),
         lines=[
             ("E", "s", "Excusez-moi monsieur, c'est bien un casque anti-bruit que vous portez ?"),
             ("V", "n", "Oui, c'est cela."),
@@ -276,7 +276,7 @@ SKETCHES = [
             A=P(skin=SKIN[1], hair=("spiky", "#c26a2b"), top=("apron", "#ffffff", "#5c3d2e"),
                 bottom=("pants", "#1f1f1f"), shoes="#1f1f1f", held="notepad"),
         ),
-        voices=dict(E=("gilles", 0.9, -1.5), K=("siwis", 0.88, 5.0), V=("siwis", 0.92, -0.5), A=("gilles", 0.9, 2.5)),
+        voices=dict(E=("tom", 1.0, 0.0), K=("jessica", 0.95, 4.0), V=("siwis", 1.0, 0.0), A=("pierre", 1.0, 0.0)),
         lines=[
             ("E", "s", "Excusez-moi madame, c'est bien un ordinateur portable que vous avez là ?"),
             ("V", "n", "Oui, je travaille dessus."),
@@ -310,7 +310,7 @@ SKETCHES = [
             A=P(skin=SKIN[5], hair=("short", "#1c1412"), top=("tshirt", "#90e0ef"), bottom=("pants", "#90e0ef"),
                 shoes="#ffffff", nametag=True, held="clipboard"),
         ),
-        voices=dict(E=("siwis", 0.9, -1.0), V=("gilles", 0.9, -3.0), A=("gilles", 0.9, 1.5)),
+        voices=dict(E=("siwis", 1.0, 0.0), V=("pierre", 1.0, 0.0), A=("tom", 1.0, 0.0)),
         lines=[
             ("E", "s", "Excusez-moi monsieur, vous êtes bien le prochain sur la liste ?"),
             ("V", "n", "Oui, j'ai rendez-vous à quatorze heures."),
@@ -347,7 +347,7 @@ SKETCHES = [
             A=P(skin=SKIN[1], hair=("short", "#6e5d4e"), hat=("paper", "#ffffff"), top=("apron", "#f1faee", "#ff8fab"),
                 bottom=("pants", "#1f1f1f"), shoes="#1f1f1f", mustache="#6e5d4e", held="scoop"),
         ),
-        voices=dict(E=("gilles", 0.9, -3.5), K=("siwis", 0.88, 5.0), V=("siwis", 0.92, 0.5), A=("gilles", 0.9, 1.5)),
+        voices=dict(E=("pierre", 1.0, 0.0), K=("siwis", 0.95, 4.0), V=("jessica", 1.0, 0.0), A=("tom", 1.0, 0.0)),
         lines=[
             ("E", "s", "Excusez-moi madame, c'est bien une glace à la fraise que vous mangez ?"),
             ("V", "n", "Oui, c'est la mienne."),

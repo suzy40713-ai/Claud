@@ -63,7 +63,7 @@ def to_sr(path_in, path_out, semitones):
     af.append("silenceremove=start_periods=1:start_threshold=-45dB")
     af.append("areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse")
     # raccourcit les pauses internes trop longues (garde 0,22 s)
-    af.append("silenceremove=stop_periods=-1:stop_duration=0.3:stop_threshold=-42dB:stop_silence=0.22")
+    af.append("silenceremove=stop_periods=-1:stop_duration=0.45:stop_threshold=-42dB:stop_silence=0.35")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", path_in, "-af", ",".join(af),
                     "-ac", "1", path_out], check=True)
 

@@ -26,6 +26,42 @@ from sketches import SKETCHES
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "videos")
 MAX_DUR = 69.5
+tts.SR = 44100  # voix « medium » récentes, dont une à 44,1 kHz
+
+# Voix Piper « medium » récentes (miroir GitHub de sherpa-onnx) : (modèle, locuteur)
+VOICE_REL = "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/"
+VOICES2 = {
+    "tom": ("fr_FR-tom-medium", None),       # homme
+    "pierre": ("fr_FR-upmc-medium", 1),      # homme
+    "siwis": ("fr_FR-siwis-medium", None),   # femme
+    "jessica": ("fr_FR-upmc-medium", 0),     # femme
+}
+
+
+def voice_model(name):
+    d = os.path.join(tts.BUILD, "voices2", "vits-piper-" + name)
+    onnx = os.path.join(d, name + ".onnx")
+    if not os.path.exists(onnx):
+        import tarfile
+        import urllib.request
+        os.makedirs(os.path.dirname(d), exist_ok=True)
+        tb = d + ".tar.bz2"
+        urllib.request.urlretrieve(VOICE_REL + "vits-piper-" + name + ".tar.bz2", tb)
+        with tarfile.open(tb) as t_:
+            t_.extractall(os.path.dirname(d), filter="data")
+        os.remove(tb)
+    return onnx
+
+
+def room(x, sr, wet=0.08):
+    """Très légère réverbération de pièce pour que la voix « sonne » moins sèche."""
+    n = int(0.18 * sr)
+    rng = np.random.default_rng(11)
+    ir = rng.standard_normal(n) * np.exp(-np.arange(n) / (0.045 * sr))
+    ir[: int(0.012 * sr)] = 0
+    ir /= np.abs(ir).sum() + 1e-9
+    tail = np.convolve(x, ir)[: len(x)] * 6
+    return (x + wet * tail).astype(np.float32)
 
 MOODS = {"n": "neutral", "s": "smile", "m": "smug", "a": "annoyed", "g": "angry", "k": "shocked", "d": "sad"}
 SUB_COL = {"E": "#ffb36b", "V": "#ffe27a", "K": "#d7b8ff", "A": "#9fd3ff"}
@@ -925,7 +961,7 @@ ENTER_DUR, EXIT_DUR = 1.5, 2.6
 
 def synth(sk, speed_mul=1.0):
     from piper import PiperVoice, SynthesisConfig
-    d = os.path.join(tts.BUILD, "sk", sk["slug"])
+    d = os.path.join(tts.BUILD, "sk2", sk["slug"])
     os.makedirs(d, exist_ok=True)
     loaded = {}
     out = []
@@ -938,13 +974,14 @@ def synth(sk, speed_mul=1.0):
         speed *= speed_mul
         final = os.path.join(d, "%02d_%s_%.3f.wav" % (i, role, speed_mul))
         if not os.path.exists(final):
-            if vkey not in loaded:
-                loaded[vkey] = PiperVoice.load(tts.ensure_voice(vkey))
+            model, spk = VOICES2[vkey]
+            if model not in loaded:
+                loaded[model] = PiperVoice.load(voice_model(model))
             raw = final.replace(".wav", "_raw.wav")
             with wave.open(raw, "wb") as w_:
-                loaded[vkey].synthesize_wav(text.replace("...", ","), w_,
-                                            syn_config=SynthesisConfig(length_scale=speed, noise_scale=0.6,
-                                                                       noise_w_scale=0.7))
+                loaded[model].synthesize_wav(text.replace("...", ","), w_,
+                                             syn_config=SynthesisConfig(speaker_id=spk, length_scale=speed,
+                                                                        noise_scale=0.667, noise_w_scale=0.8))
             tts.to_sr(raw, final, semis)
             os.remove(raw)
         out.append(final)
@@ -1262,6 +1299,7 @@ def mix_audio(c, out):
     for sg in c.segs:
         if sg["kind"] == "line":
             x, sr = tts.read_wav(sg["wav"])
+            x = room(x, sr)
             i0 = int(sg["t0"] * sr)
             mix[i0:i0 + len(x)] += x * 0.95
         elif sg["kind"] == "enter":
