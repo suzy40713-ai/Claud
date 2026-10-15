@@ -14,3 +14,28 @@ python3 render.py --frames 2,40   # images fixes de contrôle dans build/
 ```
 
 Pour un autre sketch : modifier `TITLE` et `LINES` dans `script.py`.
+
+## Série de 10 sketchs (≤ 1 min 10 chacun)
+
+`sketches.py` décrit 10 sketchs (décor, personnages, voix, dialogues) et `engine.py` les rend tous :
+
+| # | Sketch | Décor |
+|---|--------|-------|
+| 01 | Refus de partager ses frites | restaurant |
+| 02 | Refus de céder sa place au cinéma | cinéma |
+| 03 | Refus de prêter son parasol | plage |
+| 04 | Refus de laisser passer à la caisse | supermarché |
+| 05 | Refus de prêter son chargeur | bus |
+| 06 | Refus de céder son transat | piscine d'hôtel |
+| 07 | Refus de prêter son casque dans l'avion | avion |
+| 08 | Refus de prêter son ordinateur au café | café |
+| 09 | Refus de céder son tour chez le médecin | salle d'attente |
+| 10 | Refus de partager sa glace au parc | parc |
+
+```bash
+python3 engine.py            # rend les 10 vidéos dans videos/
+python3 engine.py 03 07      # seulement certains sketchs
+python3 engine.py 05 --frames 2,30   # images de contrôle
+```
+
+La durée est vérifiée automatiquement : si un sketch dépasse 69,5 s, les voix sont accélérées.
