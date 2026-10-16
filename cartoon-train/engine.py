@@ -19,9 +19,12 @@ from multiprocessing import Pool
 import numpy as np
 
 import tts
-from render import (INK, LW, W, H, FPS, f, ease, lerp, circle, ellipse, rect, line, path, head, arm, legs,
+from render import (INK, LW, W, H, f, ease, lerp, circle, ellipse, rect, line, path, head, arm, legs, eye_lid,
                     torso, arm_pose, text_el, wrap, rrect_d)
 from sketches import SKETCHES
+from render import EXPR
+
+FPS = 60  # animation plus fluide
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "videos")
@@ -110,6 +113,115 @@ def darker(c, k=0.82):
     c = c.lstrip("#")
     r, g, b = (int(c[i:i + 2], 16) for i in (0, 2, 4))
     return "#%02x%02x%02x" % (int(r * k), int(g * k), int(b * k))
+
+
+def lighter(c, k=1.12):
+    c = c.lstrip("#")
+    r, g, b = (int(c[i:i + 2], 16) for i in (0, 2, 4))
+    return "#%02x%02x%02x" % tuple(min(255, int(v * k + 8)) for v in (r, g, b))
+
+
+def lin_grad(col):
+    """Dégradé horizontal (lumière à gauche, ombre à droite) pour les vêtements."""
+    gid = "lg" + col.lstrip("#")
+    d = ('<defs><linearGradient id="%s" x1="0" y1="0" x2="1" y2="0.25">'
+         '<stop offset="0" stop-color="%s"/><stop offset="0.55" stop-color="%s"/>'
+         '<stop offset="1" stop-color="%s"/></linearGradient></defs>') % (gid, lighter(col, 1.1), col, darker(col, 0.74))
+    return "url(#%s)" % gid, d
+
+
+def rad_grad(col):
+    """Dégradé radial (volume) pour la peau et les cheveux."""
+    gid = "rg" + col.lstrip("#")
+    d = ('<defs><radialGradient id="%s" cx="0.38" cy="0.32" r="0.78">'
+         '<stop offset="0" stop-color="%s"/><stop offset="0.6" stop-color="%s"/>'
+         '<stop offset="1" stop-color="%s"/></radialGradient></defs>') % (gid, lighter(col, 1.07), col, darker(col, 0.86))
+    return "url(#%s)" % gid, d
+
+
+def head2(x, hy, R, skin, expr, mouth, blink, look, back="", front="", after="", mustache=None, beard=None,
+          glasses=False, blush=0.25, mouth_color="#5a1a1a", tilt=0.0):
+    """Tête plus détaillée : volume, reflets dans les yeux, nez, oreilles, bouche continue (0..1)."""
+    bl, br, curve, lids = EXPR[expr]
+    fill, defs = rad_grad(skin)
+    s = [defs, '<g transform="rotate(%.2f %s %s)">' % (tilt, f(x), f(hy + R * 0.9)), back]
+    for sx in (-1, 1):
+        ex_ = x + sx * R * 0.96
+        s.append(circle(ex_, hy + R * 0.14, R * 0.2, skin))
+        s.append(path("M %s %s q %s %s 0 %s" % (f(ex_ - sx * R * 0.04), f(hy + R * 0.04), f(sx * R * 0.12),
+                                               f(R * 0.1), f(R * 0.2)), stroke=darker(skin, 0.7), sw=4))
+    s.append(circle(x, hy, R, fill))
+    # léger ombrage du menton
+    s.append(path("M %s %s Q %s %s %s %s" % (f(x - R * 0.7), f(hy + R * 0.72), f(x), f(hy + R * 1.08),
+                                            f(x + R * 0.7), f(hy + R * 0.72)), stroke=darker(skin, 0.8), sw=6,
+                  extra='opacity="0.35"'))
+    s.append(front)
+    if blush:
+        for sx in (-1, 1):
+            s.append(ellipse(x + sx * R * 0.56, hy + R * 0.4, R * 0.15, R * 0.08, "#f28b8b", stroke="none",
+                             sw=0, extra='opacity="%.2f"' % blush))
+    if beard:
+        s.append(path("M %s %s Q %s %s %s %s Q %s %s %s %s Q %s %s %s %s Z" % (
+            f(x - R * 0.86), f(hy + R * 0.22), f(x - R * 0.62), f(hy + R * 1.12), f(x), f(hy + R * 1.1),
+            f(x + R * 0.62), f(hy + R * 1.12), f(x + R * 0.86), f(hy + R * 0.22),
+            f(x), f(hy + R * 0.86), f(x - R * 0.86), f(hy + R * 0.22)), fill=beard, sw=5))
+    re = R * 0.3
+    ey = hy - R * 0.04
+    pr = re * (0.2 if expr == "shocked" else 0.3)
+    lid_amt = max(lids, blink)
+    for sx, brow in ((-1, bl), (1, br)):
+        ex_ = x + sx * R * 0.31
+        s.append(circle(ex_, ey, re, "#ffffff", sw=6))
+        px = ex_ + look[0] * re * 0.5
+        py = ey + look[1] * re * 0.42
+        s.append(circle(px, py, pr * 1.25, "#4a3426", stroke="none", sw=0))
+        s.append(circle(px, py, pr * 0.8, INK, stroke="none", sw=0))
+        s.append(circle(px - pr * 0.45, py - pr * 0.5, pr * 0.38, "#ffffff", stroke="none", sw=0))
+        s.append(eye_lid(ex_, ey, re, lid_amt, skin))
+        by = ey - re - R * 0.13
+        inner, outer = brow
+        ix, iy = ex_ - sx * re * 0.55, by + inner * R
+        ox, oy = ex_ + sx * re * 0.9, by + outer * R
+        s.append(path("M %s %s Q %s %s %s %s" % (f(ix), f(iy), f((ix + ox) / 2), f((iy + oy) / 2 - R * 0.05),
+                                                f(ox), f(oy)), sw=R * 0.08))
+        if glasses:
+            s.append(circle(ex_, ey, re * 1.12, "none", sw=5))
+    if glasses:
+        s.append(line(x - R * 0.31 + re * 1.12, ey, x + R * 0.31 - re * 1.12, ey, sw=5))
+    # nez
+    s.append(path("M %s %s Q %s %s %s %s" % (f(x - R * 0.02), f(hy + R * 0.2), f(x + R * 0.1), f(hy + R * 0.33),
+                                            f(x - R * 0.04), f(hy + R * 0.34)), stroke=darker(skin, 0.62), sw=5))
+    my = hy + R * 0.58
+    m = max(0.0, min(1.0, mouth))
+    if m < 0.06:
+        if expr == "shocked":
+            s.append(ellipse(x, my, R * 0.07, R * 0.08, mouth_color, sw=5))
+        else:
+            c = curve * R
+            skew = R * 0.05 if expr == "smug" else 0
+            s.append(path("M %s %s Q %s %s %s %s" % (f(x - R * 0.17), f(my - c * 0.3 + skew), f(x), f(my + c),
+                                                     f(x + R * 0.17), f(my - c * 0.3 - skew)), sw=6))
+    else:
+        rx = R * (0.11 + 0.06 * m)
+        ry = R * (0.035 + 0.13 * m)
+        top = my - ry * (0.6 if curve > 0.05 else 1.0)
+        s.append(path("M %s %s Q %s %s %s %s Q %s %s %s %s Z" % (
+            f(x - rx), f(my - ry * 0.1 - curve * R * 0.3), f(x), f(top - ry * 0.25), f(x + rx),
+            f(my - ry * 0.1 - curve * R * 0.3), f(x), f(my + ry * 1.25), f(x - rx), f(my - ry * 0.1 - curve * R * 0.3)),
+            fill=mouth_color, sw=5))
+        if m > 0.45:
+            s.append(ellipse(x, my + ry * 0.62, rx * 0.5, ry * 0.3, "#e0607a", stroke="none", sw=0))
+        if m > 0.25:
+            s.append(rect(x - rx * 0.55, top + ry * 0.05, rx * 1.1, ry * 0.28, "#ffffff", rx=3, stroke="none", sw=0))
+    if mustache:
+        mx, myy = x, hy + R * 0.42
+        s.append(path("M %s %s Q %s %s %s %s Q %s %s %s %s Q %s %s %s %s Z" % (
+            f(mx - R * 0.34), f(myy + R * 0.1), f(mx - R * 0.2), f(myy - R * 0.14), f(mx), f(myy - R * 0.02),
+            f(mx + R * 0.2), f(myy - R * 0.14), f(mx + R * 0.34), f(myy + R * 0.1),
+            f(mx), f(myy + R * 0.02), f(mx - R * 0.34), f(myy + R * 0.1)), fill=mustache, sw=5))
+    s.append(after)
+    s.append("</g>")
+    return "".join(s)
 
 
 def hair_parts(style, col, x, hy, R):
@@ -250,16 +362,21 @@ def top_layer(spec, x, sy, hip, R):
     col2 = style[2] if len(style) > 2 else darker(col)
     child = spec.get("child")
     s = []
+    gfill, gdefs = lin_grad(col)
+    s.append(gdefs)
     if kind == "dress":
         s.append(path("M %s %s Q %s %s %s %s L %s %s Q %s %s %s %s Z" % (
             f(x - R * 0.7), f(sy + R * 0.1), f(x), f(sy - R * 0.15), f(x + R * 0.7), f(sy + R * 0.1),
             f(x + R * 1.25), f(hip + R * 0.25), f(x), f(hip + R * 0.45), f(x - R * 1.25), f(hip + R * 0.25)),
-            fill=col))
+            fill=gfill))
         s.append(path("M %s %s Q %s %s %s %s" % (f(x - R), f(hip), f(x), f(hip + R * 0.2), f(x + R), f(hip)),
                       stroke="#ffffff", sw=8))
         return "".join(s)
     wtop = 0.7 if child else 0.95
-    s.append(torso(x, sy, hip, R, col, wtop=wtop, wbot=wtop + 0.05))
+    s.append(torso(x, sy, hip, R, gfill, wtop=wtop, wbot=wtop + 0.05))
+    # pli de vêtement
+    s.append(path("M %s %s q %s %s %s %s" % (f(x + R * 0.45), f(hip - R * 0.9), f(R * 0.1), f(R * 0.35), f(R * 0.05),
+                                            f(R * 0.7)), stroke=darker(col, 0.65), sw=4, extra='opacity="0.6"'))
     if kind == "polo":
         s.append(path("M %s %s L %s %s L %s %s Z M %s %s L %s %s L %s %s Z" % (
             f(x - R * 0.45), f(sy - R * 0.04), f(x), f(sy + R * 0.4), f(x - R * 0.05), f(sy - R * 0.04),
@@ -445,15 +562,39 @@ def person(spec, st, t, seated=False, prop=None, hands=None):
     skin = spec["skin"]
     s = []
     hstyle, hcol = spec.get("hair", ("short", "#2b211c"))
-    hback, hfront = hair_parts(hstyle, hcol, x, hy, R)
+    hfill, hdefs = rad_grad(hcol)
+    hback, hfront = hair_parts(hstyle, hfill, x, hy, R)
+    hback = hdefs + hback
     if not seated:
+        s.append(ellipse(x, foot + R * 0.12, R * 1.15, R * 0.17, "#000000", stroke="none", sw=0,
+                         extra='opacity="0.13"'))
         s.append(lower_layer(spec, x, hip, foot, R, walk))
+    # cou
+    s.append(rect(x - R * 0.17, hy + R * 0.75, R * 0.34, sy - hy - R * 0.6, darker(skin, 0.92), rx=6, sw=5))
     s.append(top_layer(spec, x, sy, hip, R))
     sleeve, slen = sleeve_of(spec)
     pose = st.get("pose", "down")
+    amt = st.get("pose_amt", 1.0)
     held = spec.get("held")
+    base_pose = st.get("base_pose", "machine" if held else "down")
     for side in (-1, 1):
         shp = (x + side * R * (0.65 if child else 0.88), sy + R * 0.25)
+        el, ha = arm_target(spec, st, t, pose, side, shp, x, sy, hip, R, seated, hands, child, held)
+        if amt < 0.999 and pose != base_pose:
+            el0, ha0 = arm_target(spec, st, t, base_pose, side, shp, x, sy, hip, R, seated, hands, child, held)
+            el = (lerp(el0[0], el[0], amt), lerp(el0[1], el[1], amt))
+            ha = (lerp(ha0[0], ha[0], amt), lerp(ha0[1], ha[1], amt))
+        s.append(arm(shp, el, ha, R, skin, sleeve=sleeve, sleeve_len=slen))
+        if pose == "point" and side == 1 and not seated and amt > 0.6:
+            s.append(line(ha[0], ha[1], ha[0] + R * 0.32 * amt, ha[1] - R * 0.05, sw=R * 0.1))
+    if held and pose in ("machine", "gesture") and not seated:
+        s.append(held_prop(held, x, sy + R * 1.55, R))
+    s.append(person_rest(spec, st, t, seated, prop, hands, x, hy, sy, R, child, hback, hfront))
+    return "".join(s)
+
+
+def arm_target(spec, st, t, pose, side, shp, x, sy, hip, R, seated, hands, child, held):
+    if True:
         if seated:
             if pose == "wave" and side == 1:
                 el, ha = arm_pose("wave", 1, shp[0], shp[1], R, t, hip)
@@ -481,11 +622,13 @@ def person(spec, st, t, seated=False, prop=None, hands=None):
             el, ha = arm_pose("machine", side, shp[0], shp[1], R, t, hip)
         else:
             el, ha = arm_pose(pose, side, shp[0], shp[1], R, t, hip)
-        s.append(arm(shp, el, ha, R, skin, sleeve=sleeve, sleeve_len=slen))
-        if pose == "point" and side == 1 and not seated:
-            s.append(line(ha[0], ha[1], ha[0] + R * 0.32, ha[1] - R * 0.05, sw=R * 0.1))
-    if held and pose in ("machine", "gesture") and not seated:
-        s.append(held_prop(held, x, sy + R * 1.55, R))
+    return el, ha
+
+
+def person_rest(spec, st, t, seated, prop, hands, x, hy, sy, R, child, hback, hfront):
+    s = []
+    pose = st.get("pose", "down")
+    skin = spec["skin"]
     if seated and prop and pose != "wave" and hands != "table" and prop != "icecream":
         s.append(lap_prop(prop, x, sy + R * 1.72, R, t))
     if seated and prop == "icecream" and pose != "wave":
@@ -505,11 +648,6 @@ def person(spec, st, t, seated=False, prop=None, hands=None):
     if spec.get("earrings"):
         after += "".join(circle(x + sd * R * 0.98, hy + R * 0.42, R * 0.1, "none", stroke=spec["earrings"], sw=5)
                          for sd in (-1, 1))
-    if spec.get("beard"):
-        after += path("M %s %s Q %s %s %s %s Q %s %s %s %s Q %s %s %s %s Z" % (
-            f(x - R * 0.85), f(hy + R * 0.25), f(x - R * 0.6), f(hy + R * 1.1), f(x), f(hy + R * 1.08),
-            f(x + R * 0.6), f(hy + R * 1.1), f(x + R * 0.85), f(hy + R * 0.25),
-            f(x), f(hy + R * 0.85), f(x - R * 0.85), f(hy + R * 0.25)), fill=spec["beard"], sw=5)
     if spec.get("freckles"):
         after += "".join(circle(x + sd * R * (0.5 + k * 0.1), hy + R * (0.35 + (k % 2) * 0.08), 3, "#b5651d",
                                 stroke="none", sw=0) for sd in (-1, 1) for k in range(3))
@@ -517,17 +655,10 @@ def person(spec, st, t, seated=False, prop=None, hands=None):
         after += hat_parts(spec["hat"], x, hy, R)
     expr = st.get("expr", "neutral")
     mouth = st.get("mouth", 0)
-    hd = head(x, hy, R, skin, expr, mouth, st.get("blink"), st.get("look", (0, 0)), back=hback, front=hfront,
-              after="", mustache=spec.get("mustache"), glasses=spec.get("glasses"), blush=child,
-              mouth_color="#a4161a" if spec.get("lipstick") else "#5a1a1a")
-    if spec.get("beard"):
-        # la barbe passe sous la bouche : on la place avant la tête puis on redessine la bouche par-dessus
-        hd = head(x, hy, R, skin, expr, mouth, st.get("blink"), st.get("look", (0, 0)), back=hback, front=hfront,
-                  after=after_beard_mouth(spec, x, hy, R, expr, mouth), mustache=spec.get("mustache"),
-                  glasses=spec.get("glasses"), blush=child)
-        after = after.replace(after_beard(spec, x, hy, R), "")
-    s.append(hd)
-    s.append(after)
+    s.append(head2(x, hy, R, skin, expr, mouth, st.get("blink", 0.0), st.get("look", (0, 0)), back=hback,
+                   front=hfront, after=after, mustache=spec.get("mustache"), beard=spec.get("beard"),
+                   glasses=spec.get("glasses"), blush=0.6 if child else 0.22,
+                   mouth_color="#a4161a" if spec.get("lipstick") else "#5a1a1a", tilt=st.get("tilt", 0.0)))
     return "".join(s)
 
 
@@ -1110,11 +1241,17 @@ def state(c, t):
                    moods={"E": "smile", "V": "neutral", "K": "neutral", "A": "neutral"})
     speaking = cur["kind"] == "line" and t < cur["t1"]
     who = cur.get("who") if speaking else None
-    mouth = 0
+    mouth = 0.0
     if speaking:
-        k = int((t - cur["t0"]) * FPS)
-        e = cur["env"][min(k, len(cur["env"]) - 1)]
-        mouth = 0 if e < 0.25 else (1 if e < 0.7 else 2)
+        env = cur["env"]
+        k = (t - cur["t0"]) * FPS
+        i0 = int(k)
+        a = env[min(i0, len(env) - 1)]
+        b = env[min(i0 + 1, len(env) - 1)]
+        e = lerp(a, b, k - i0)
+        e = 0.6 * e + 0.4 * env[max(0, min(i0 - 2, len(env) - 1))]  # lissage
+        mouth = max(0.0, min(1.0, (e - 0.18) / 0.85))
+        mouth *= min(1.0, (cur["t1"] - t) / 0.08)  # fermeture douce en fin de phrase
 
     en, ex = c.enter, c.exit
     E0, K0, A0 = 330, 150, 150
@@ -1147,9 +1284,13 @@ def state(c, t):
 
     st = {}
     for r in "EVKA":
-        st[r] = dict(expr=cur["moods"].get(r, "neutral"), mouth=mouth if who == r else 0,
-                     blink=((t + "EVKA".index(r) * 0.63) % (3.3 + "EVKA".index(r) * 0.37)) < 0.13,
-                     walk=walk.get(r), pose="down")
+        ph = (t + "EVKA".index(r) * 0.63) % (3.3 + "EVKA".index(r) * 0.37)
+        bk = max(0.0, 1.0 - abs(ph - 0.09) / 0.09) if ph < 0.18 else 0.0
+        st[r] = dict(expr=cur["moods"].get(r, "neutral"), mouth=mouth if who == r else 0.0, blink=bk,
+                     walk=walk.get(r), pose="down", pose_amt=1.0,
+                     tilt=math.sin(t * 0.9 + "EVKA".index(r) * 1.7) * 1.6)
+        if who == r:
+            st[r]["tilt"] += math.sin(t * 3.1) * 2.2 + mouth * 1.5
     st["E"]["x"], st["K"]["x"], st["A"]["x"], st["V"]["x"] = ex_, kx, ax, vx
     focus = who if who else ("A" if cur["kind"] == "enter" else None)
     for r in "EVKA":
@@ -1163,26 +1304,38 @@ def state(c, t):
         st["V"]["look"] = (0.05, 0.95)
     if c.has_k and not (speaking and who == "K") and cur["kind"] != "exit" and int(t / 2.7) % 3:
         st["K"]["look"] = look_vec(heads, "K", "V")
+    # gestes : montée progressive au début de la réplique, retour progressif après
+    for r in "EA":
+        last = None
+        for sg in c.segs:
+            if sg["kind"] == "line" and sg["who"] == r and sg["t0"] <= t:
+                last = sg
+        if last is None:
+            continue
+        ee = last["moods"].get(r, "neutral")
+        target = ({"angry": "point", "shocked": "up"}.get(ee, "gesture")) if r == "E" else "gesture"
+        if t < last["t1"]:
+            st[r]["pose"], st[r]["pose_amt"] = target, ease((t - last["t0"]) / 0.35)
+        elif t - last["t1"] < 0.4:
+            st[r]["pose"], st[r]["pose_amt"] = target, 1.0 - ease((t - last["t1"]) / 0.4)
     if speaking:
-        e = st[who]["expr"]
-        if who == "E":
-            st["E"]["pose"] = {"angry": "point", "shocked": "up"}.get(e, "gesture")
-        if who == "A":
-            st["A"]["pose"] = "gesture"
         if who == "K":
             st["K"]["stomp"] = True
             st["K"]["hop"] = -abs(math.sin((t - cur["t0"]) * 9)) * 18
-    if not (speaking and who == "A"):
+    if st["A"]["pose"] == "down":
         st["A"]["pose"] = "machine"
     if c.has_k and t < en["t0"] and not st["K"].get("stomp"):
         st["E"]["hold_left"] = (ex_ - 100, 1292)
         st["K"]["hold_right"] = (ex_ - 100, 1292)
-    if c.sk.get("cart") and st["E"]["pose"] == "down":
+    if c.sk.get("cart") and (st["E"]["pose"] == "down" or st["E"]["pose_amt"] < 0.05):
+        st["E"]["pose"] = "down"
         st["E"]["cart"] = True
     if c.standing_v:
         st["V"]["basket"] = True
     if speaking and who == "V" and cur.get("to") == "CAM" and st["V"]["expr"] == "smile":
         st["V"]["pose"] = "wave"
+        st["V"]["base_pose"] = "down"
+        st["V"]["pose_amt"] = ease((t - cur["t0"]) / 0.35)
     if t >= ex["t0"]:
         u = t - ex["t0"]
         st["E"]["look"] = (-1, 0)
@@ -1193,6 +1346,7 @@ def state(c, t):
         st["K"].pop("hold_right", None)
         st["E"]["drag"] = c.has_k
         st["E"]["pose"] = "down"
+        st["E"]["pose_amt"] = 1.0
         st["V"]["look"] = (-0.95, 0.1) if t < ex["t1"] - 0.5 else (0.0, 0.1)
     st["A"]["visible"] = t >= en["t0"] and ax > -500
     st["E"]["visible"] = ex_ > -420
@@ -1201,15 +1355,27 @@ def state(c, t):
     shots = {"wide": (540, 960, 1.0), "E": (ex_ + 30, 1010, 1.7), "V": (vx - 25, 990, 1.7),
              "K": (kx + 40, 1330, 1.85), "A": (max(ax + 110, 330), 1000, 1.6), "EV": (560, 1000, 1.12),
              "EA": ((ex_ + ax) / 2, 1020, 1.38)}
-    sx, sy, sc = shots[cur.get("shot", "wide")]
-    u = min(1.0, (t - cur["t0"]) / 5.0)
-    sc *= 1 + 0.035 * u
-    if cur["kind"] == "exit":
-        sc = 1.0 + 0.05 * u
-    vw, vh = W / sc, H / sc
-    sx = min(max(sx, -260 + vw / 2), 1340 - vw / 2) if sc > 1.0 else 540
-    sy = min(max(sy, vh / 2), 1920 - vh / 2)
-    return st, (sx, sy, sc), cur
+
+    def cam_of(sg):
+        sx, sy, sc = shots[sg.get("shot", "wide")]
+        u = min(1.0, max(0.0, (t - sg["t0"]) / 5.0))
+        sc *= 1 + 0.035 * u
+        if sg["kind"] == "exit":
+            sc = 1.0 + 0.05 * u
+        vw, vh = W / sc, H / sc
+        sx = min(max(sx, -260 + vw / 2), 1340 - vw / 2) if sc > 1.0 else 540
+        sy = min(max(sy, vh / 2), 1920 - vh / 2)
+        return sx, sy, sc
+
+    cam = cam_of(cur)
+    # transition douce (travelling) depuis le plan précédent
+    idx = c.segs.index(cur) if cur in c.segs else -1
+    if idx > 0 and c.segs[idx - 1].get("shot") != cur.get("shot"):
+        u = ease((t - cur["t0"]) / 0.55)
+        if u < 1:
+            p0 = cam_of(c.segs[idx - 1])
+            cam = tuple(lerp(a, b, u) for a, b in zip(p0, cam))
+    return st, cam, cur
 
 
 def overlay(c, cur, t):
