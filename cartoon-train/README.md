@@ -5,7 +5,7 @@ un père exige qu'une passagère cède sa place côté fenêtre à sa fille… j
 
 - `script.py` : dialogues, humeurs des personnages, plans de caméra
 - `tts.py` : voix françaises hors-ligne (Piper) + ambiance sonore du train
-- voix de la série : Piper « medium » récentes (tom, pierre, siwis, jessica), téléchargées depuis les releases GitHub de sherpa-onnx
+- voix : Kokoro (modèle hors-ligne, releases GitHub de kokoro-onnx), mélanges de styles « homme1/homme2/femme1/femme2 »
 - `render.py` : décor, personnages, lip-sync, caméra, sous-titres → MP4
 
 ```bash

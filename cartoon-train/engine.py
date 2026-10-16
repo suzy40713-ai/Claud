@@ -38,6 +38,43 @@ VOICES2 = {
 }
 
 
+# Voix Kokoro (plus naturelles) : mélanges de styles. « homme1 » = la voix F choisie.
+KOKORO_DIR = os.path.join(tts.BUILD, "kokoro")
+KOKORO_REL = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/"
+KOKORO_MIX = {
+    "homme1": [("ff_siwis", 0.35), ("bm_lewis", 0.65)],
+    "homme2": [("ff_siwis", 0.35), ("bm_lewis", 0.40), ("am_onyx", 0.25)],
+    "femme1": [("ff_siwis", 1.0)],
+    "femme2": [("ff_siwis", 0.75), ("af_bella", 0.25)],
+}
+# correspondance avec les noms de voix utilisés dans sketches*.py
+KOKORO_OF = {"tom": "homme1", "pierre": "homme2", "siwis": "femme1", "jessica": "femme2"}
+_KOKORO = {}
+
+
+def kokoro():
+    if "k" not in _KOKORO:
+        from kokoro_onnx import Kokoro
+        import urllib.request
+        os.makedirs(KOKORO_DIR, exist_ok=True)
+        for fn in ("kokoro-v1.0.onnx", "voices-v1.0.bin"):
+            if not os.path.exists(os.path.join(KOKORO_DIR, fn)):
+                urllib.request.urlretrieve(KOKORO_REL + fn, os.path.join(KOKORO_DIR, fn))
+        _KOKORO["k"] = Kokoro(os.path.join(KOKORO_DIR, "kokoro-v1.0.onnx"), os.path.join(KOKORO_DIR, "voices-v1.0.bin"))
+    return _KOKORO["k"]
+
+
+def kokoro_wav(text, mix, speed, path):
+    k = kokoro()
+    style = sum(w * k.get_voice_style(v) for v, w in KOKORO_MIX[mix])
+    samples, sr = k.create(text, voice=style, speed=speed, lang="fr-fr")
+    with wave.open(path, "wb") as w_:
+        w_.setnchannels(1)
+        w_.setsampwidth(2)
+        w_.setframerate(sr)
+        w_.writeframes((np.clip(samples, -1, 1) * 32767).astype(np.int16).tobytes())
+
+
 def voice_model(name):
     d = os.path.join(tts.BUILD, "voices2", "vits-piper-" + name)
     onnx = os.path.join(d, name + ".onnx")
@@ -960,8 +997,8 @@ ENTER_DUR, EXIT_DUR = 1.5, 2.6
 
 
 def synth(sk, speed_mul=1.0):
-    from piper import PiperVoice, SynthesisConfig
-    d = os.path.join(tts.BUILD, "sk2", sk["slug"])
+    pass  # voix générées par Kokoro (voir kokoro_wav)
+    d = os.path.join(tts.BUILD, "sk3", sk["slug"])
     os.makedirs(d, exist_ok=True)
     loaded = {}
     out = []
@@ -974,14 +1011,8 @@ def synth(sk, speed_mul=1.0):
         speed *= speed_mul
         final = os.path.join(d, "%02d_%s_%.3f.wav" % (i, role, speed_mul))
         if not os.path.exists(final):
-            model, spk = VOICES2[vkey]
-            if model not in loaded:
-                loaded[model] = PiperVoice.load(voice_model(model))
             raw = final.replace(".wav", "_raw.wav")
-            with wave.open(raw, "wb") as w_:
-                loaded[model].synthesize_wav(text.replace("...", ","), w_,
-                                             syn_config=SynthesisConfig(speaker_id=spk, length_scale=speed,
-                                                                        noise_scale=0.667, noise_w_scale=0.8))
+            kokoro_wav(text.replace("...", ","), KOKORO_OF[vkey], 0.92 / speed, raw)
             tts.to_sr(raw, final, semis)
             os.remove(raw)
         out.append(final)
@@ -1342,7 +1373,7 @@ def render(sk, frames=None):
         return paths
     os.makedirs(OUT, exist_ok=True)
     out = os.path.join(OUT, sk["slug"] + ".mp4")
-    audio = os.path.join(tts.BUILD, "sk2", sk["slug"], "mix.wav")
+    audio = os.path.join(tts.BUILD, "sk3", sk["slug"], "mix.wav")
     mix_audio(c, audio)
     nframes = int(c.total * FPS)
     ff = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
