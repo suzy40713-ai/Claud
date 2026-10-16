@@ -40,3 +40,14 @@ python3 engine.py 05 --frames 2,30   # images de contrôle
 ```
 
 La durée est vérifiée automatiquement : si un sketch dépasse 69,5 s, les voix sont accélérées.
+
+## Série 2 : 10 sketchs sans enfant
+
+`sketches2.py` — même mécanique (demande absurde → refus poli → l'autorité arrive → la chute se retourne
+contre l'exigeant), sans personnage d'enfant : siège d'avion, table de restaurant, prise électrique au café,
+ticket de bus, serviette à la plage, dernière baguette, pop-corn au cinéma, cocktail à la piscine,
+magazine chez le médecin, banc au parc.
+
+```bash
+python3 engine.py --serie 2          # rend les 10 vidéos dans videos-serie2/
+```

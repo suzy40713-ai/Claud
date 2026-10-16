@@ -722,8 +722,8 @@ class Bus(Scene):
             s.append(rect(x, 540, 470, 400, "none", rx=20, stroke="#495057", sw=14))
         s.append(rect(-800, 0, 2700, 300, "#dee2e6", stroke="none", sw=0))
         s.append(rect(-800, 300, 2700, 70, "#ffd166", stroke=INK, sw=5))
-        s.append(rect(300, 395, 480, 80, "#1b1b1b", rx=10))
-        s.append(text_el(540, 450, "LIGNE 42 · TERMINUS", 36, "#ff9f1c"))
+        s.append(rect(640, 395, 420, 80, "#1b1b1b", rx=10))
+        s.append(text_el(850, 450, "LIGNE 42 · TERMINUS", 34, "#ff9f1c"))
         for px in (-260, 560):
             s.append(rect(px - 14, 370, 28, 1130, "#ffd166", rx=10, sw=5))
         s.append(rect(546, 760, 28, 60, "#e63946", rx=8, sw=4))
@@ -1150,7 +1150,7 @@ def state(c, t):
         st["E"]["cart"] = True
     if c.standing_v:
         st["V"]["basket"] = True
-    if speaking and who == "V" and cur.get("to") == "CAM":
+    if speaking and who == "V" and cur.get("to") == "CAM" and st["V"]["expr"] == "smile":
         st["V"]["pose"] = "wave"
     if t >= ex["t0"]:
         u = t - ex["t0"]
@@ -1336,7 +1336,7 @@ def render(sk, frames=None):
         from PIL import Image
         paths = []
         for ts in frames:
-            p = os.path.join(tts.BUILD, "sk_%s_%s.png" % (sk["slug"][:2], ts))
+            p = os.path.join(tts.BUILD, "sk_%s_%s.png" % (sk["slug"], ts))
             Image.frombytes("RGB", (W, H), _render(int(float(ts) * FPS))).save(p)
             paths.append(p)
         return paths
@@ -1363,8 +1363,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("only", nargs="*")
     ap.add_argument("--frames", default="")
+    ap.add_argument("--serie", type=int, default=1, help="1 = sketches.py, 2 = sketches2.py (sans enfant)")
     a = ap.parse_args()
-    for sk in SKETCHES:
+    global OUT
+    sketches = SKETCHES
+    if a.serie == 2:
+        from sketches2 import SKETCHES as sketches
+        OUT = os.path.join(HERE, "videos-serie2")
+    for sk in sketches:
         if a.only and not any(sk["slug"].startswith(o) for o in a.only):
             continue
         for p in render(sk, a.frames.split(",") if a.frames else None):
