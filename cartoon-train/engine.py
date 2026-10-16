@@ -1342,7 +1342,7 @@ def render(sk, frames=None):
         return paths
     os.makedirs(OUT, exist_ok=True)
     out = os.path.join(OUT, sk["slug"] + ".mp4")
-    audio = os.path.join(tts.BUILD, "sk", sk["slug"], "mix.wav")
+    audio = os.path.join(tts.BUILD, "sk2", sk["slug"], "mix.wav")
     mix_audio(c, audio)
     nframes = int(c.total * FPS)
     ff = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
