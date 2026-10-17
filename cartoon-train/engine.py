@@ -1174,7 +1174,7 @@ def build_timeline(sk, wavs, gap=0.3):
         segs.append(dict(kind="line", t0=t, t1=t + dur, who=role, text=text, wav=wavs[i], env=env,
                          moods=dict(moods), idx=i))
         t += dur + gap
-    total = t + END_HOLD
+    total = t + (2.2 if sk.get("cta") else END_HOLD)
     # plans de caméra automatiques
     after_enter = False
     n_e = 0
@@ -1197,7 +1197,8 @@ def build_timeline(sk, wavs, gap=0.3):
         else:
             sg["shot"] = who
         sg["to"] = {"E": "A" if after_enter else "V", "V": "E", "K": "E", "A": "E"}[who]
-        if who == "V" and sg is [s for s in segs if s["kind"] == "line"][-1]:
+        if who == "V" and (sg is [s for s in segs if s["kind"] == "line"][-1] or
+                           any(x["kind"] == "exit" and x["t0"] <= sg["t0"] for x in segs)):
             sg["to"] = "CAM"
     return segs, total
 
@@ -1378,6 +1379,54 @@ def state(c, t):
     return st, cam, cur
 
 
+def cta_card(c, t):
+    """Carte « Abonne-toi » animée : bouton + Suivre, main qui clique, objectif 10 000 abonnés."""
+    lines_ = [s_ for s_ in c.segs if s_["kind"] == "line"]
+    t0 = lines_[-1]["t0"]
+    if t < t0:
+        return ""
+    u = t - t0
+    dy = (1 - ease(u / 0.45)) * 520
+    s = ['<g transform="translate(0 %s)">' % f(dy)]
+    s.append(rect(118, 1188, 844, 300, "#000000", rx=44, stroke="none", sw=0, extra='opacity="0.18"'))
+    s.append(rect(110, 1176, 860, 300, "#ffffff", rx=44, sw=6))
+    # avatar
+    s.append(circle(225, 1290, 72, "#ffd166", sw=6))
+    s.append(circle(200, 1275, 12, INK, stroke="none", sw=0) + circle(250, 1275, 12, INK, stroke="none", sw=0))
+    s.append(path("M 190 1312 Q 225 1345 260 1312", sw=7))
+    s.append(text_el(330, 1262, "Abonne-toi !", 60, INK, anchor="start"))
+    s.append(text_el(330, 1308, "Une nouvelle histoire chaque jour", 30, "#555555", weight=600, anchor="start"))
+    tap = 1.3
+    followed = u > tap + 0.15
+    pulse = 1 + (0.06 * math.sin(u * 9) if not followed else 0)
+    if u > tap and u < tap + 0.15:
+        pulse = 0.92
+    bx, by, bw, bh = 330, 1332, 330, 84
+    cx, cy = bx + bw / 2, by + bh / 2
+    s.append('<g transform="translate(%s %s) scale(%.3f) translate(%s %s)">' % (f(cx), f(cy), pulse, f(-cx), f(-cy)))
+    s.append(rect(bx, by, bw, bh, "#9aa0a6" if followed else "#fe2c55", rx=42, sw=5))
+    s.append(text_el(cx, cy + 16, "Abonné" if followed else "+ Suivre", 44, "#ffffff"))
+    s.append("</g>")
+    # objectif 10 000
+    prog = min(1.0, 0.82 + 0.17 * ease((u - tap) / 1.2)) if u > tap else 0.82
+    s.append(rect(690, 1350, 250, 24, "#eeeeee", rx=12, sw=4))
+    s.append(rect(690, 1350, 250 * prog, 24, "#25d366", rx=12, stroke="none", sw=0))
+    s.append(text_el(815, 1408, "%d / 10 000" % int(prog * 10000), 30, INK, weight=800))
+    s.append(text_el(815, 1440, "objectif", 24, "#777777", weight=600))
+    # main qui vient cliquer
+    hx = lerp(900, cx + 40, ease((u - 0.4) / 0.8))
+    hy = lerp(1700, cy + 30, ease((u - 0.4) / 0.8))
+    if u > tap + 0.5:
+        hy += ease((u - tap - 0.5) / 0.5) * 500
+    hs = 0.85 if tap < u < tap + 0.15 else 1.0
+    s.append('<g transform="translate(%s %s) scale(%.2f)">' % (f(hx), f(hy), hs))
+    s.append(path("M -14 0 L -14 -70 Q 0 -86 14 -70 L 14 -10 L 40 -16 Q 62 -14 60 14 L 52 70 L -26 70 "
+                  "L -48 26 Q -54 6 -36 6 Z", fill="#ffe0bd", sw=6))
+    s.append("</g>")
+    s.append("</g>")
+    return "".join(s)
+
+
 def overlay(c, cur, t):
     title = c.sk["title"]
     size = 46 if len(title) <= 36 else int(46 * 36 / len(title))
@@ -1400,6 +1449,8 @@ def overlay(c, cur, t):
             y = 1548 + i * 74
             s.append(text_el(540, y, r, 58, INK, stroke=INK, sw=13))
             s.append(text_el(540, y, r, 58, "#ffffff" if i else SUB_COL[cur["who"]]))
+    if c.sk.get("cta"):
+        s.append(cta_card(c, t))
     if t > c.total - 0.5:
         s.append(rect(0, 0, W, H, "#000000", stroke="none", sw=0,
                       extra='opacity="%.3f"' % min(1, (t - (c.total - 0.5)) / 0.5)))
@@ -1567,6 +1618,9 @@ def main():
     if a.serie == 2:
         from sketches2 import SKETCHES as sketches
         OUT = os.path.join(HERE, "videos-serie2")
+    elif a.serie == 3:
+        from sketches3 import SKETCHES as sketches
+        OUT = os.path.join(HERE, "videos-serie3")
     for sk in sketches:
         if a.only and not any(sk["slug"].startswith(o) for o in a.only):
             continue
