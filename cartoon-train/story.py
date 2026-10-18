@@ -25,8 +25,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "videos-histoires")
 TITLE = "Et si tu entendais les pensées des gens ?"
 SLUG = "h1-pensees"
-VOICE = "homme1"   # la voix F choisie
-SPEED = 0.95
+# voix H choisie : vraie voix d'homme française (Piper upmc, locuteur « pierre »), sans accent
+VOICE_MODEL, VOICE_SPK = "fr_FR-upmc-medium", 1
+LENGTH = 1.05
 
 TOI = P(skin=SKIN[1], hair=("sidepart", "#3a2a1f"), top=("hoodie", "#2a9d8f", "#21867a"), bottom=("pants", "#264653"),
         shoes="#ffffff")
@@ -107,15 +108,28 @@ BEATS = [
 
 # ------------------------------------------------------------------ audio / timeline
 
+_PV = {}
+
+
+def piper_wav(text, path_):
+    import wave
+    from piper import PiperVoice, SynthesisConfig
+    if "v" not in _PV:
+        _PV["v"] = PiperVoice.load(engine.voice_model(VOICE_MODEL))
+    with wave.open(path_, "wb") as w_:
+        _PV["v"].synthesize_wav(text, w_, syn_config=SynthesisConfig(speaker_id=VOICE_SPK, length_scale=LENGTH,
+                                                                     noise_scale=0.667, noise_w_scale=0.8))
+
+
 def synth_beats():
-    d = os.path.join(tts.BUILD, "story", SLUG)
+    d = os.path.join(tts.BUILD, "story-h", SLUG)
     os.makedirs(d, exist_ok=True)
     out = []
     for i, b in enumerate(BEATS):
         final = os.path.join(d, "%02d.wav" % i)
         if not os.path.exists(final):
             raw = final.replace(".wav", "_raw.wav")
-            engine.kokoro_wav(b["text"].replace("...", ","), VOICE, SPEED, raw)
+            piper_wav(b["text"].replace("...", ","), raw)
             tts.to_sr(raw, final, 0.0)
             os.remove(raw)
         out.append(final)
@@ -431,7 +445,7 @@ def main():
         return
     os.makedirs(OUT, exist_ok=True)
     out = os.path.join(OUT, SLUG + ".mp4")
-    audio = os.path.join(tts.BUILD, "story", SLUG, "mix.wav")
+    audio = os.path.join(tts.BUILD, "story-h", SLUG, "mix.wav")
     mix(segs, total, audio)
     nf = int(total * FPS)
     ff = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
