@@ -45,6 +45,9 @@ INCONNU = P(skin=SKIN[1], hair=("sidepart", "#111111"), top=("blazer", "#111111"
             shoes="#111111", glasses=False, R=112)
 
 
+HERO = TOI
+
+
 def B(text, scene, cast, shot, **fx):
     return dict(text=text, scene=scene, cast=cast, shot=shot, fx=fx)
 
@@ -230,21 +233,31 @@ def frame_svg(segs, total, t):
         st["look"] = (0.0, 0.1) if lk == "CAM" else lk
         if o.get("pose") == "up":
             st["pose_amt"] = 0.75 + 0.1 * math.sin(t * 3)
+        op = o.get("ghost")
+        g0, g1 = ('<g opacity="%.2f">' % op, "</g>") if op is not None else ("", "")
         if o.get("seated"):
-            world.append(person(spec, st, t, seated=True))
+            world.append(g0 + person(spec, st, t, seated=True) + g1)
             world.append(scene.seat_front(t))
             world.append(seated_legs(spec, x, spec.get("R", 108)))
             hy = 905
         else:
-            standing.append(person(spec, st, t))
+            standing.append(g0 + person(spec, st, t) + g1)
             hy = 1590 - 6.2 * spec.get("R", 108)
+        if o.get("tag"):
+            txt, col = o["tag"] if isinstance(o["tag"], tuple) else (o["tag"], "#ffd166")
+            ta = cur["t0"] + o.get("tag_at", 0.1) * (cur["t1"] - cur["t0"])
+            if t >= ta:
+                k_ = ease((t - ta) / 0.25)
+                tw_ = text_w(txt, 46) + 60
+                effects.append('<g transform="translate(%s %s) scale(%.3f)">' % (f(x), f(hy - 190 + math.sin(t * 2.5) * 6), k_)
+                               + rect(-tw_ / 2, -40, tw_, 80, col, rx=40, sw=6) + text_el(0, 16, txt, 46, INK) + "</g>")
         if o.get("bubble"):
             ta = cur["t0"] + o.get("bubble_at", 0.15) * (cur["t1"] - cur["t0"])
             if t >= ta:
                 pop = ease((t - ta) / 0.25)
                 bx = min(max(x + (110 if x < 540 else -110), 260), 820)
                 effects.append(bubble(bx, hy - 300 + math.sin(t * 2) * 8, o["bubble"], pop))
-        if cur["fx"].get("rings") and spec is TOI:
+        if cur["fx"].get("rings") and spec is HERO:
             effects.append(rings(x, hy, t))
 
     world.append(scene.front(t))
@@ -264,13 +277,40 @@ def frame_svg(segs, total, t):
     if cur["fx"].get("silence"):
         over.append(rect(0, 0, W, H, "#ffffff", stroke="none", sw=0,
                          extra='opacity="%.3f"' % (0.55 * max(0.0, 1 - (t - cur["t0"]) / 0.5))))
+    if cur["fx"].get("rewind"):
+        u_ = min(1.0, (t - cur["t0"] + 0.35) / 1.2)
+        if u_ < 1:
+            over.append(rect(0, 0, W, H, "#1d3557", stroke="none", sw=0, extra='opacity="%.2f"' % (0.35 * (1 - u_))))
+            for k_ in range(0, H, 24):
+                yy = (k_ + t * 900) % H
+                over.append(rect(0, yy, W, 5, "#ffffff", stroke="none", sw=0, extra='opacity="0.12"'))
+            over.append('<g opacity="%.2f">' % (1 - u_) + path("M 600 820 L 470 960 L 600 1100 Z", fill="#ffffff", sw=8)
+                        + path("M 760 820 L 630 960 L 760 1100 Z", fill="#ffffff", sw=8) + "</g>")
     # vignette
     over.append('<rect width="%d" height="%d" fill="url(#vig)"/>' % (W, H))
 
     ui = []
-    tw = len(TITLE) * 25.5 + 60
-    ui.append(rect(540 - tw / 2, 168, tw, 82, "#000000", rx=14, stroke="none", sw=0, extra='opacity="0.85"'))
-    ui.append(text_el(540, 225, TITLE, 46, "#ffffff"))
+    if len(TITLE) <= 36:
+        tlines = [TITLE]
+    else:
+        words_ = TITLE.split()
+        best = min(range(1, len(words_)), key=lambda k: abs(len(" ".join(words_[:k])) - len(TITLE) / 2))
+        tlines = [" ".join(words_[:best]), " ".join(words_[best:])]
+    tsize = 46
+    tw = max(text_w(l_, tsize) for l_ in tlines) + 70
+    th = 82 + (len(tlines) - 1) * 56
+    ui.append(rect(540 - tw / 2, 168, tw, th, "#000000", rx=14, stroke="none", sw=0, extra='opacity="0.85"'))
+    for li, l_ in enumerate(tlines):
+        ui.append(text_el(540, 225 + li * 56, l_, tsize, "#ffffff"))
+    if cur["fx"].get("notif") and u_beat > cur["fx"].get("notif_at", 0.1):
+        k_ = ease((u_beat - cur["fx"].get("notif_at", 0.1)) / 0.1)
+        y0 = lerp(-200, 330, k_)
+        ui.append(rect(80, y0, 920, 150, "#ffffff", rx=36, sw=5, extra='opacity="0.97"'))
+        ui.append(rect(110, y0 + 30, 90, 90, "#25d366", rx=22, stroke="none", sw=0))
+        ui.append(text_el(155, y0 + 92, "!", 60, "#ffffff"))
+        ui.append(text_el(230, y0 + 62, cur["fx"].get("notif_from", "Message de demain"), 30, "#777777",
+                          weight=700, anchor="start"))
+        ui.append(text_el(230, y0 + 112, cur["fx"]["notif"], 44, INK, anchor="start"))
     ui.append(captions(cur, t))
     if cur["fx"].get("inner") and u_beat > 0.55:
         k = ease((u_beat - 0.55) / 0.12)
@@ -429,17 +469,34 @@ def _render(i):
     return Image.open(io.BytesIO(png)).convert("RGB").tobytes()
 
 
+def load_story(d):
+    global TITLE, SLUG, BEATS, HERO
+    TITLE, SLUG, BEATS, HERO = d["title"], d["slug"], d["beats"], d["hero"]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--frames", default="")
+    ap.add_argument("--story", default="h1", help="h1 (pensées) | all | préfixe de slug de histoires.py")
     a = ap.parse_args()
+    if a.story == "h1":
+        stories = [dict(title=TITLE, slug=SLUG, beats=BEATS, hero=TOI)]
+    else:
+        from histoires import STORIES
+        stories = [s_ for s_ in STORIES if a.story == "all" or s_["slug"].startswith(a.story)]
+    for d in stories:
+        load_story(d)
+        render_story(a)
+
+
+def render_story(a):
     segs, total = build(synth_beats())
     print("durée %.1f s" % total)
     _init(segs, total)
     if a.frames:
         from PIL import Image
         for ts in a.frames.split(","):
-            p = os.path.join(tts.BUILD, "story_%s.png" % ts)
+            p = os.path.join(tts.BUILD, "story_%s_%s.png" % (SLUG, ts))
             Image.frombytes("RGB", (W, H), _render(int(float(ts) * FPS))).save(p)
             print(p)
         return
