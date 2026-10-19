@@ -48,6 +48,74 @@ INCONNU = P(skin=SKIN[1], hair=("sidepart", "#111111"), top=("blazer", "#111111"
 HERO = TOI
 
 
+class Burst(engine.Scene):
+    """Fond à rayons (style vidéos « Pourquoi c'est la galère d'être... »)."""
+    c1, c2 = "#ff8fb1", "#ffb3c8"
+
+    def back(self, t):
+        s_ = [rect(-800, 0, 2700, 1920, self.c1, stroke="none", sw=0)]
+        cx, cy, n = 540, 1050, 22
+        rot = t * 4
+        for k in range(n):
+            if k % 2:
+                continue
+            a0 = math.radians(rot + k * 360 / n)
+            a1 = math.radians(rot + (k + 1) * 360 / n)
+            s_.append(path("M %s %s L %s %s L %s %s Z" % (f(cx), f(cy), f(cx + 3000 * math.cos(a0)),
+                                                         f(cy + 3000 * math.sin(a0)), f(cx + 3000 * math.cos(a1)),
+                                                         f(cy + 3000 * math.sin(a1))), fill=self.c2, stroke="none", sw=0))
+        s_.append(ellipse(540, 1620, 700, 60, "#000000", stroke="none", sw=0, extra='opacity="0.08"'))
+        return "".join(s_)
+
+
+class BurstBlue(Burst):
+    c1, c2 = "#5aa9e6", "#7fc8f8"
+
+
+class BurstYellow(Burst):
+    c1, c2 = "#ffcf56", "#ffe08a"
+
+
+SCENES["burst"], SCENES["burstblue"], SCENES["burstyellow"] = Burst, BurstBlue, BurstYellow
+HEADER = None  # (ligne1, ligne2, sujet) pour le style « galère »
+
+
+def header_svg(t):
+    l1, l2, subj = HEADER
+    s_ = []
+    def outlined(x, y, txt, size, col, sw_):
+        return text_el(x, y, txt, size, INK, stroke=INK, sw=sw_) + text_el(x, y, txt, size, col)
+    s_.append(outlined(540, 218, l1, 64, "#ffd166", 16))
+    s_.append(outlined(540, 298, l2, 64, "#ffd166", 16))
+    size = 124
+    while text_w(subj, size) > 860 and size > 92:
+        size -= 4
+    pop = 1 + 0.04 * math.sin(t * 3)
+    s_.append('<g transform="translate(540 410) scale(%.3f) translate(-540 -410)">' % pop)
+    if text_w(subj, size) > 860:
+        w_ = subj.split()
+        k_ = min(range(1, len(w_)), key=lambda i: abs(len(" ".join(w_[:i])) - len(subj) / 2))
+        size = 96
+        s_.append(outlined(540, 405, " ".join(w_[:k_]), size, "#ffffff", 22))
+        s_.append(outlined(540, 500, " ".join(w_[k_:]), size, "#ffffff", 22))
+        s_.append("</g>")
+        return "".join(s_)
+    s_.append(outlined(540, 420 + (124 - size) * 0.3, subj, size, "#ffffff", 22))
+    sw_ = text_w(subj, size)
+    if sw_ > 720:
+        s_.append("</g>")
+        return "".join(s_)
+    # petit nuage d'orage
+    nx, ny = 540 + sw_ / 2 + 60, 355
+    s_.append(circle(nx - 22, ny, 26, "#9aa4ab", sw=5) + circle(nx + 10, ny - 14, 32, "#9aa4ab", sw=5)
+              + circle(nx + 38, ny + 2, 24, "#9aa4ab", sw=5)
+              + rect(nx - 40, ny, 100, 26, "#9aa4ab", rx=12, stroke="none", sw=0)
+              + path("M %s %s l -14 34 l 16 0 l -10 32 l 30 -44 l -16 0 l 10 -22 Z" % (f(nx + 8), f(ny + 20)),
+                     fill="#ffd166", sw=4))
+    s_.append("</g>")
+    return "".join(s_)
+
+
 def B(text, scene, cast, shot, **fx):
     return dict(text=text, scene=scene, cast=cast, shot=shot, fx=fx)
 
@@ -290,21 +358,25 @@ def frame_svg(segs, total, t):
     over.append('<rect width="%d" height="%d" fill="url(#vig)"/>' % (W, H))
 
     ui = []
-    if len(TITLE) <= 36:
+    if HEADER:
+        tlines = []
+        ui.append(header_svg(t))
+    elif len(TITLE) <= 36:
         tlines = [TITLE]
     else:
         words_ = TITLE.split()
         best = min(range(1, len(words_)), key=lambda k: abs(len(" ".join(words_[:k])) - len(TITLE) / 2))
         tlines = [" ".join(words_[:best]), " ".join(words_[best:])]
     tsize = 46
-    tw = max(text_w(l_, tsize) for l_ in tlines) + 70
-    th = 82 + (len(tlines) - 1) * 56
-    ui.append(rect(540 - tw / 2, 168, tw, th, "#000000", rx=14, stroke="none", sw=0, extra='opacity="0.85"'))
+    if tlines:
+        tw = max(text_w(l_, tsize) for l_ in tlines) + 70
+        th = 82 + (len(tlines) - 1) * 56
+        ui.append(rect(540 - tw / 2, 168, tw, th, "#000000", rx=14, stroke="none", sw=0, extra='opacity="0.85"'))
     for li, l_ in enumerate(tlines):
         ui.append(text_el(540, 225 + li * 56, l_, tsize, "#ffffff"))
     if cur["fx"].get("notif") and u_beat > cur["fx"].get("notif_at", 0.1):
         k_ = ease((u_beat - cur["fx"].get("notif_at", 0.1)) / 0.1)
-        y0 = lerp(-200, 330, k_)
+        y0 = lerp(-200, 560 if HEADER else 330, k_)
         ui.append(rect(80, y0, 920, 150, "#ffffff", rx=36, sw=5, extra='opacity="0.97"'))
         ui.append(rect(110, y0 + 30, 90, 90, "#25d366", rx=22, stroke="none", sw=0))
         ui.append(text_el(155, y0 + 92, "!", 60, "#ffffff"))
@@ -470,8 +542,10 @@ def _render(i):
 
 
 def load_story(d):
-    global TITLE, SLUG, BEATS, HERO
+    global TITLE, SLUG, BEATS, HERO, HEADER, OUT
     TITLE, SLUG, BEATS, HERO = d["title"], d["slug"], d["beats"], d["hero"]
+    HEADER = d.get("header")
+    OUT = os.path.join(HERE, d.get("out", "videos-histoires"))
 
 
 def main():
@@ -481,6 +555,9 @@ def main():
     a = ap.parse_args()
     if a.story == "h1":
         stories = [dict(title=TITLE, slug=SLUG, beats=BEATS, hero=TOI)]
+    elif a.story.startswith("g"):
+        from galere import STORIES as G
+        stories = [s_ for s_ in G if a.story == "gall" or s_["slug"].startswith(a.story)]
     else:
         from histoires import STORIES
         stories = [s_ for s_ in STORIES if a.story == "all" or s_["slug"].startswith(a.story)]
