@@ -297,6 +297,8 @@ def frame_svg(segs, total, t):
                   tilt=math.sin(t * 0.9 + k * 1.7) * 1.8,
                   blink=o.get("blink", max(0.0, 1 - abs(((t + k * 0.7) % 3.4) - 0.09) / 0.09)
                               if ((t + k * 0.7) % 3.4) < 0.18 else 0.0))
+        if cur["fx"].get("freeze") and spec is not HERO:
+            st["blink"], st["tilt"] = 0.0, 0.0
         lk = o.get("look", (0, 0))
         st["look"] = (0.0, 0.1) if lk == "CAM" else lk
         if o.get("pose") == "up":
@@ -309,6 +311,11 @@ def frame_svg(segs, total, t):
             world.append(seated_legs(spec, x, spec.get("R", 108)))
             hy = 905
         else:
+            if o.get("mirror"):
+                standing.append(rect(x - 190, 600, 380, 1040, "#d9eef7", rx=30, stroke="#b8c4cc", sw=26)
+                                + rect(x - 203, 587, 406, 1066, "none", rx=36, sw=6)
+                                + path("M %s 700 l 90 -70 M %s 780 l 140 -120" % (f(x - 150), f(x - 150)),
+                                       stroke="#ffffff", sw=12, extra='opacity="0.7"'))
             standing.append(g0 + person(spec, st, t) + g1)
             hy = 1590 - 6.2 * spec.get("R", 108)
         if o.get("tag"):
@@ -345,6 +352,9 @@ def frame_svg(segs, total, t):
     if cur["fx"].get("silence"):
         over.append(rect(0, 0, W, H, "#ffffff", stroke="none", sw=0,
                          extra='opacity="%.3f"' % (0.55 * max(0.0, 1 - (t - cur["t0"]) / 0.5))))
+    if cur["fx"].get("freeze"):
+        over.append(rect(0, 0, W, H, "#a8dadc", stroke="none", sw=0, extra='opacity="0.22"'))
+        over.append(rect(900, 560, 34, 110, "#ffffff", rx=8, sw=6) + rect(960, 560, 34, 110, "#ffffff", rx=8, sw=6))
     if cur["fx"].get("rewind"):
         u_ = min(1.0, (t - cur["t0"] + 0.35) / 1.2)
         if u_ < 1:
@@ -555,6 +565,9 @@ def main():
     a = ap.parse_args()
     if a.story == "h1":
         stories = [dict(title=TITLE, slug=SLUG, beats=BEATS, hero=TOI)]
+    elif a.story.startswith("x"):
+        from histoires2 import STORIES as X
+        stories = [s_ for s_ in X if a.story == "xall" or s_["slug"].startswith(a.story)]
     elif a.story.startswith("g"):
         from galere import STORIES as G
         stories = [s_ for s_ in G if a.story == "gall" or s_["slug"].startswith(a.story)]
