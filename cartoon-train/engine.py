@@ -19,6 +19,7 @@ from multiprocessing import Pool
 import numpy as np
 
 import tts
+import overlays
 from render import (INK, LW, W, H, f, ease, lerp, circle, ellipse, rect, line, path, head, arm, legs, eye_lid,
                     torso, arm_pose, text_el, wrap, rrect_d)
 from sketches import SKETCHES
@@ -1127,9 +1128,25 @@ LEAD_IN, END_HOLD = 0.8, 1.4
 ENTER_DUR, EXIT_DUR = 1.5, 2.6
 
 
+PIPER_FR = {"tom": ("fr_FR-tom-medium", None), "pierre": ("fr_FR-upmc-medium", 1),
+            "jessica": ("fr_FR-upmc-medium", 0)}
+_PIPER = {}
+
+
+def piper_say(text, voice, length, path_):
+    """Voix Piper françaises natives (sans accent) ; « pierre » = la voix H choisie."""
+    from piper import PiperVoice, SynthesisConfig
+    model, spk = PIPER_FR[voice]
+    if model not in _PIPER:
+        _PIPER[model] = PiperVoice.load(voice_model(model))
+    with wave.open(path_, "wb") as w_:
+        _PIPER[model].synthesize_wav(text, w_, syn_config=SynthesisConfig(
+            speaker_id=spk, length_scale=length, noise_scale=0.667, noise_w_scale=0.8))
+
+
 def synth(sk, speed_mul=1.0):
-    pass  # voix générées par Kokoro (voir kokoro_wav)
-    d = os.path.join(tts.BUILD, "sk3", sk["slug"])
+    fr = sk.get("voice_mode") == "fr"
+    d = os.path.join(tts.BUILD, "sk4" if fr else "sk3", sk["slug"])
     os.makedirs(d, exist_ok=True)
     loaded = {}
     out = []
@@ -1137,13 +1154,18 @@ def synth(sk, speed_mul=1.0):
         if ln[0].startswith("@"):
             out.append(None)
             continue
-        role, _, text = ln
+        role, _, text = ln[:3]
         vkey, speed, semis = sk["voices"][role]
         speed *= speed_mul
         final = os.path.join(d, "%02d_%s_%.3f.wav" % (i, role, speed_mul))
         if not os.path.exists(final):
             raw = final.replace(".wav", "_raw.wav")
-            kokoro_wav(text.replace("...", ","), KOKORO_OF[vkey], 0.92 / speed, raw)
+            if fr and vkey in PIPER_FR:
+                piper_say(text.replace("...", ","), vkey, 0.97 * speed, raw)
+            elif fr:
+                kokoro_wav(text.replace("...", ","), "femme1", 1.0 / speed, raw)
+            else:
+                kokoro_wav(text.replace("...", ","), KOKORO_OF[vkey], 0.92 / speed, raw)
             tts.to_sr(raw, final, semis)
             os.remove(raw)
         out.append(final)
@@ -1152,7 +1174,7 @@ def synth(sk, speed_mul=1.0):
 
 def build_timeline(sk, wavs, gap=0.3):
     segs = []
-    t = LEAD_IN
+    t = 0.15 if sk.get("hook_text") else LEAD_IN
     moods = {"E": "smile", "V": "neutral", "K": "neutral", "A": "neutral"}
     for i, ln in enumerate(sk["lines"]):
         if ln[0] == "@ENTER":
@@ -1163,7 +1185,8 @@ def build_timeline(sk, wavs, gap=0.3):
             segs.append(dict(kind="exit", t0=t, t1=t + EXIT_DUR, moods=dict(moods), shot="wide"))
             t += EXIT_DUR
             continue
-        role, mood, text = ln
+        role, mood, text = ln[:3]
+        mid = len(ln) > 3 and ln[3] == "MID"
         moods[role] = MOODS[mood]
         x, sr = tts.read_wav(wavs[i])
         dur = len(x) / sr
@@ -1172,7 +1195,7 @@ def build_timeline(sk, wavs, gap=0.3):
                         for k in range(int(math.ceil(len(x) / hop)))])
         env = env / (np.percentile(env, 90) + 1e-9)
         segs.append(dict(kind="line", t0=t, t1=t + dur, who=role, text=text, wav=wavs[i], env=env,
-                         moods=dict(moods), idx=i))
+                         moods=dict(moods), idx=i, mid=mid))
         t += dur + gap
     total = t + (2.2 if sk.get("cta") else END_HOLD)
     # plans de caméra automatiques
@@ -1199,6 +1222,8 @@ def build_timeline(sk, wavs, gap=0.3):
         sg["to"] = {"E": "A" if after_enter else "V", "V": "E", "K": "E", "A": "E"}[who]
         if who == "V" and (sg is [s for s in segs if s["kind"] == "line"][-1] or
                            any(x["kind"] == "exit" and x["t0"] <= sg["t0"] for x in segs)):
+            sg["to"] = "CAM"
+        if sg.get("mid"):
             sg["to"] = "CAM"
     return segs, total
 
@@ -1446,15 +1471,20 @@ def overlay(c, cur, t):
                 page = p
                 break
         for i, r in enumerate(page):
-            y = 1548 + i * 74
+            y = c.sk.get("caption_y", 1548) + i * 74
             s.append(text_el(540, y, r, 58, INK, stroke=INK, sw=13))
             s.append(text_el(540, y, r, 58, "#ffffff" if i else SUB_COL[cur["who"]]))
+    first = next((x for x in c.segs if x["kind"] == "line"), None)
+    if c.sk.get("hook_text") and first is not None and t < first["t1"] + 0.3:
+        s.append(overlays.hook_svg(c.sk["hook_text"], t + 0.25, first["t1"]))
+    if cur["kind"] == "line" and cur.get("mid"):
+        s.append(overlays.mid_cta_svg(t - cur["t0"], cur["t1"] - cur["t0"]))
     if c.sk.get("cta"):
-        s.append(cta_card(c, t))
+        s.append('<g transform="translate(0 %d)">%s</g>' % (c.sk.get("cta_dy", 0), cta_card(c, t)))
     if t > c.total - 0.5:
         s.append(rect(0, 0, W, H, "#000000", stroke="none", sw=0,
                       extra='opacity="%.3f"' % min(1, (t - (c.total - 0.5)) / 0.5)))
-    if t < 0.3:
+    if t < 0.3 and not c.sk.get("hook_text"):
         s.append(rect(0, 0, W, H, "#000000", stroke="none", sw=0, extra='opacity="%.3f"' % (1 - t / 0.3)))
     return "".join(s)
 
@@ -1550,6 +1580,16 @@ def mix_audio(c, out):
             x = room(x, sr)
             i0 = int(sg["t0"] * sr)
             mix[i0:i0 + len(x)] += x * 0.95
+            if c.sk.get("hook_text") and sg is next(x for x in c.segs if x["kind"] == "line"):
+                kk = np.arange(int(0.5 * tts.SR))
+                boom = 0.45 * np.sin(2 * np.pi * (60 - 25 * kk / len(kk)) * kk / tts.SR) * np.exp(-kk / (0.12 * tts.SR))
+                mix[i0:i0 + len(kk)] += boom.astype(np.float32)
+            if sg.get("mid"):
+                for dt, fr_ in ((0.0, 880.0), (1.1, 1320.0)):
+                    kk = np.arange(int(0.18 * tts.SR))
+                    j = int((sg["t0"] + dt) * tts.SR)
+                    mix[j:j + len(kk)] += (0.16 * np.sin(2 * np.pi * fr_ * kk / tts.SR) *
+                                           np.exp(-kk / (0.04 * tts.SR))).astype(np.float32)
         elif sg["kind"] == "enter":
             mix += tts.footsteps(np.arange(sg["t0"], sg["t0"] + ENTER_DUR * 0.95, 0.33), n)
         elif sg["kind"] == "exit":
@@ -1621,6 +1661,9 @@ def main():
     elif a.serie == 3:
         from sketches3 import SKETCHES as sketches
         OUT = os.path.join(HERE, "videos-serie3")
+    elif a.serie == 4:
+        from sketches4 import SKETCHES as sketches
+        OUT = os.path.join(HERE, "videos-serie4")
     for sk in sketches:
         if a.only and not any(sk["slug"].startswith(o) for o in a.only):
             continue
