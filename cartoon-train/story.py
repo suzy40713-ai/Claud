@@ -78,6 +78,9 @@ class BurstYellow(Burst):
 
 SCENES["burst"], SCENES["burstblue"], SCENES["burstyellow"] = Burst, BurstBlue, BurstYellow
 HEADER = None  # (ligne1, ligne2, sujet) pour le style « galère »
+CAPTION_Y = 1500   # hauteur des sous-titres (remontés pour la zone sûre TikTok si besoin)
+HOOK_TEXT = None   # gros texte d'accroche pendant le premier plan
+STORY = {}
 
 
 def header_svg(t):
@@ -208,7 +211,7 @@ def synth_beats():
 
 
 def build(wavs):
-    t = 0.4
+    t = 0.15 if HOOK_TEXT else 0.4
     segs = []
     for b, w_ in zip(BEATS, wavs):
         x, sr = tts.read_wav(w_)
@@ -400,12 +403,16 @@ def frame_svg(segs, total, t):
         ui.append(rect(-420, -80, 840, 160, "#000000", rx=30, stroke="#ff2a3d", sw=8, extra='opacity="0.85"'))
         ui.append(text_el(0, 22, cur["fx"]["inner"], 62, "#ff4757"))
         ui.append("</g>")
+    if HOOK_TEXT and cur is segs[0]:
+        ui.append(hook_svg(t + 0.25, cur["t1"]))
+    if cur["fx"].get("mid_cta"):
+        ui.append(mid_cta_svg(t - cur["t0"], cur["t1"] - cur["t0"]))
     if cur["fx"].get("cta"):
         ui.append(cta(t - cur["t0"]))
     if t > total - 0.5:
         ui.append(rect(0, 0, W, H, "#000000", stroke="none", sw=0,
                        extra='opacity="%.3f"' % min(1, (t - total + 0.5) / 0.5)))
-    if t < 0.3:
+    if t < 0.3 and not HOOK_TEXT:
         ui.append(rect(0, 0, W, H, "#000000", stroke="none", sw=0, extra='opacity="%.3f"' % (1 - t / 0.3)))
     defs = ('<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc6f2"/>'
             '<stop offset="1" stop-color="#d6f0ff"/></linearGradient>'
@@ -460,15 +467,81 @@ def captions(sg, t):
     full = sum(text_w(words[j], size) for j in grp) + gap * (len(grp) - 1)
     x = 540 - full / 2
     pop = 1 + 0.08 * max(0.0, 1 - (t - starts[grp[0]]) / 0.12)
-    out = ['<g transform="translate(540 1500) scale(%.3f) translate(-540 -1500)">' % pop]
+    out = ['<g transform="translate(540 %d) scale(%.3f) translate(-540 -%d)">' % (CAPTION_Y, pop, CAPTION_Y)]
     for j in grp:
         w_ = words[j]
         col = "#ffe600" if j == idx else "#ffffff"
-        out.append(text_el(x, 1500, w_, size, INK, stroke=INK, sw=16, anchor="start"))
-        out.append(text_el(x, 1500, w_, size, col, anchor="start"))
+        out.append(text_el(x, CAPTION_Y, w_, size, INK, stroke=INK, sw=16, anchor="start"))
+        out.append(text_el(x, CAPTION_Y, w_, size, col, anchor="start"))
         x += text_w(w_, size) + gap
     out.append("</g>")
     return "".join(out)
+
+
+def hook_svg(u, dur):
+    """Gros texte d'accroche qui « claque » dès la première seconde."""
+    if u < 0 or u > dur + 0.3:
+        return ""
+    words = HOOK_TEXT.split()
+    lines_ = [HOOK_TEXT]
+    if text_w(HOOK_TEXT, 92) > 900 and len(words) > 1:
+        k = min(range(1, len(words)), key=lambda i: abs(len(" ".join(words[:i])) - len(HOOK_TEXT) / 2))
+        lines_ = [" ".join(words[:k]), " ".join(words[k:])]
+    size = 92
+    while max(text_w(l_, size) for l_ in lines_) > 920 and size > 60:
+        size -= 4
+    sc = 1.45 - 0.45 * ease(u / 0.22)
+    out_a = 1.0 if u < dur else max(0.0, 1 - (u - dur) / 0.3)
+    shake = math.sin(u * 60) * 10 * max(0.0, 1 - u / 0.35)
+    y0 = 640
+    s_ = ['<g opacity="%.2f" transform="translate(%s %d) scale(%.3f) rotate(-3) translate(-540 -%d)">'
+          % (out_a, f(540 + shake), y0, sc, y0)]
+    hh = len(lines_) * (size + 14) + 50
+    bw = max(text_w(l_, size) for l_ in lines_) + 80
+    s_.append(rect(540 - bw / 2, y0 - hh / 2 - 10, bw, hh, "#ffe600", rx=24, sw=8))
+    for i, l_ in enumerate(lines_):
+        yy = y0 - hh / 2 + 25 + (i + 1) * (size + 14) - 26
+        s_.append(text_el(540, yy, l_, size, INK, weight=900))
+    s_.append("</g>")
+    return "".join(s_)
+
+
+def mid_cta_svg(u, dur):
+    """Bandeau d'abonnement compact au milieu de la vidéo (ne cache pas les personnages)."""
+    if u < 0:
+        return ""
+    k = ease(u / 0.35)
+    if u > dur:
+        k = max(0.0, 1 - (u - dur) / 0.3)
+    dx = (1 - k) * 1100
+    y0 = 520
+    s_ = ['<g transform="translate(%s 0)">' % f(dx)]
+    s_.append(rect(90, y0, 900, 170, "#000000", rx=40, stroke="none", sw=0, extra='opacity="0.25"'))
+    s_.append(rect(80, y0 - 10, 900, 170, "#ffffff", rx=40, sw=6))
+    s_.append(circle(170, y0 + 75, 52, "#ffd166", sw=5))
+    s_.append(circle(152, y0 + 64, 9, INK, stroke="none", sw=0) + circle(188, y0 + 64, 9, INK, stroke="none", sw=0))
+    s_.append(path("M 145 %s Q 170 %s 195 %s" % (f(y0 + 92), f(y0 + 116), f(y0 + 92)), sw=6))
+    s_.append(text_el(250, y0 + 62, "Ne rate pas la suite", 44, INK, anchor="start"))
+    s_.append(text_el(250, y0 + 112, "Abonne-toi maintenant", 34, "#555555", weight=700, anchor="start"))
+    tap = 1.1
+    followed = u > tap + 0.15
+    pulse = 1 + (0.07 * math.sin(u * 10) if not followed else 0)
+    if tap < u < tap + 0.15:
+        pulse = 0.9
+    cx, cy = 840, y0 + 75
+    s_.append('<g transform="translate(%s %s) scale(%.3f) translate(%s %s)">' % (f(cx), f(cy), pulse, f(-cx), f(-cy)))
+    s_.append(rect(cx - 115, cy - 42, 230, 84, "#9aa0a6" if followed else "#fe2c55", rx=42, sw=5))
+    s_.append(text_el(cx, cy + 15, "Abonné" if followed else "+ Suivre", 38, "#ffffff"))
+    s_.append("</g>")
+    hx = lerp(1050, cx + 30, ease((u - 0.3) / 0.6))
+    hy = lerp(y0 + 420, cy + 25, ease((u - 0.3) / 0.6))
+    if u > tap + 0.4:
+        hy += ease((u - tap - 0.4) / 0.4) * 500
+    s_.append('<g transform="translate(%s %s) scale(%.2f)">' % (f(hx), f(hy), 0.85 if tap < u < tap + 0.15 else 1))
+    s_.append(path("M -14 0 L -14 -70 Q 0 -86 14 -70 L 14 -10 L 40 -16 Q 62 -14 60 14 L 52 70 L -26 70 "
+                   "L -48 26 Q -54 6 -36 6 Z", fill="#ffe0bd", sw=6))
+    s_.append("</g></g>")
+    return "".join(s_)
 
 
 def cta(u):
@@ -496,7 +569,7 @@ def cta(u):
 
 # ------------------------------------------------------------------ son
 
-def mix(segs, total, out):
+def mix(segs, total, out, voice=True):
     sr = tts.SR
     n = int((total + 1) * sr)
     tt = np.arange(n) / sr
@@ -508,7 +581,19 @@ def mix(segs, total, out):
     for sg in segs:
         x, srr = tts.read_wav(sg["wav"])
         i0 = int(sg["t0"] * sr)
-        m[i0:i0 + len(x)] += engine.room(x, srr, 0.06) * 1.0
+        if voice:
+            m[i0:i0 + len(x)] += engine.room(x, srr, 0.06) * 1.0
+        if HOOK_TEXT and sg is segs[0]:
+            kk = np.arange(int(0.5 * sr))
+            boom = 0.5 * np.sin(2 * np.pi * (60 - 25 * kk / len(kk)) * kk / sr) * np.exp(-kk / (0.12 * sr))
+            boom += rng.standard_normal(len(kk)) * 0.15 * np.exp(-kk / (0.02 * sr))
+            m[i0:i0 + len(kk)] += boom.astype(np.float32)
+        if sg["fx"].get("mid_cta"):
+            for dt, fr in ((0.0, 880.0), (1.1, 1320.0)):
+                kk = np.arange(int(0.18 * sr))
+                pop = 0.18 * np.sin(2 * np.pi * fr * kk / sr) * np.exp(-kk / (0.04 * sr))
+                j = int((sg["t0"] + dt) * sr)
+                m[j:j + len(kk)] += pop.astype(np.float32)
         # « whoosh » de transition
         j0 = int((sg["t0"] - 0.35) * sr)
         k = int(0.35 * sr)
@@ -552,9 +637,12 @@ def _render(i):
 
 
 def load_story(d):
-    global TITLE, SLUG, BEATS, HERO, HEADER, OUT
+    global TITLE, SLUG, BEATS, HERO, HEADER, OUT, CAPTION_Y, HOOK_TEXT, STORY
     TITLE, SLUG, BEATS, HERO = d["title"], d["slug"], d["beats"], d["hero"]
     HEADER = d.get("header")
+    CAPTION_Y = d.get("caption_y", 1500)
+    HOOK_TEXT = d.get("hook_text")
+    STORY = d
     OUT = os.path.join(HERE, d.get("out", "videos-histoires"))
 
 
@@ -565,6 +653,9 @@ def main():
     a = ap.parse_args()
     if a.story == "h1":
         stories = [dict(title=TITLE, slug=SLUG, beats=BEATS, hero=TOI)]
+    elif a.story.startswith("y"):
+        from yscripts import STORIES as Y
+        stories = [s_ for s_ in Y if a.story == "yall" or s_["slug"].startswith(a.story)]
     elif a.story.startswith("x"):
         from histoires2 import STORIES as X
         stories = [s_ for s_ in X if a.story == "xall" or s_["slug"].startswith(a.story)]
@@ -605,6 +696,25 @@ def render_story(a):
     ff.stdin.close()
     ff.wait()
     print("->", out)
+    if STORY.get("novoice"):
+        quiet = os.path.join(tts.BUILD, "story-h", SLUG, "mix_sans_voix.wav")
+        mix(segs, total, quiet, voice=False)
+        out2 = os.path.join(OUT, SLUG + "-sans-voix.mp4")
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", out, "-i", quiet, "-map", "0:v", "-map", "1:a",
+                        "-c:v", "copy", "-c:a", "aac", "-b:a", "160k", "-shortest", "-movflags", "+faststart", out2],
+                       check=True)
+        txt = os.path.join(OUT, SLUG + "-texte-a-enregistrer.txt")
+        with open(txt, "w") as fh:
+            fh.write("%s\n\nTexte à lire (les temps indiquent quand commencer chaque phrase) :\n\n" % TITLE)
+            for sg in segs:
+                fh.write("[%05.1f s -> %05.1f s]  %s\n" % (sg["t0"], sg["t1"], sg["text"]))
+            for key in ("caption", "pinned_comment"):
+                if STORY.get(key):
+                    fh.write("\n%s :\n%s\n" % ({"caption": "Légende TikTok", "pinned_comment": "Commentaire à épingler"}[key],
+                                                 STORY[key]))
+            if STORY.get("hashtags"):
+                fh.write("\nHashtags : %s\n" % " ".join(STORY["hashtags"]))
+        print("->", out2, txt)
 
 
 if __name__ == "__main__":
