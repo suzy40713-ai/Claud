@@ -493,7 +493,7 @@ def hook_svg(u, dur):
     sc = 1.45 - 0.45 * ease(u / 0.22)
     out_a = 1.0 if u < dur else max(0.0, 1 - (u - dur) / 0.3)
     shake = math.sin(u * 60) * 10 * max(0.0, 1 - u / 0.35)
-    y0 = 640
+    y0 = 1060
     s_ = ['<g opacity="%.2f" transform="translate(%s %d) scale(%.3f) rotate(-3) translate(-540 -%d)">'
           % (out_a, f(540 + shake), y0, sc, y0)]
     hh = len(lines_) * (size + 14) + 50

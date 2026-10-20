@@ -1,0 +1,975 @@
+[
+ {
+  "slug": "y01-murmure",
+  "title": "Et si tout le monde te murmurait le même chiffre ?",
+  "hook_text": "Il te reste 7 jours…",
+  "beats": [
+   {
+    "narration": "Tout le monde te murmure le même chiffre. Sept.",
+    "scene": "park",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 330,
+      "seated": false,
+      "expr": "shocked",
+      "look": "RIGHT"
+     },
+     {
+      "who": "HOMME",
+      "x": 760,
+      "seated": false,
+      "expr": "neutral",
+      "look": "LEFT",
+      "bubble": "Sept."
+     }
+    ],
+    "crowd": [
+     "Sept.",
+     "Sept.",
+     "Sept."
+    ],
+    "fx": []
+   },
+   {
+    "narration": "La dame du bus se penche vers toi. Sept.",
+    "scene": "bus",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "FEMME",
+      "x": 330,
+      "seated": false,
+      "expr": "neutral",
+      "look": "RIGHT",
+      "bubble": "Sept."
+     },
+     {
+      "who": "HERO",
+      "x": 932,
+      "seated": true,
+      "expr": "shocked",
+      "look": "LEFT"
+     }
+    ],
+    "fx": []
+   },
+   {
+    "narration": "Le serveur pose ta tasse. Sept. Et il repart, comme si de rien n'était.",
+    "scene": "cafe",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "SERVEUR",
+      "x": 400,
+      "seated": false,
+      "expr": "smile",
+      "look": "RIGHT",
+      "bubble": "Sept."
+     },
+     {
+      "who": "HERO",
+      "x": 932,
+      "seated": true,
+      "expr": "shocked",
+      "look": "LEFT"
+     }
+    ],
+    "fx": []
+   },
+   {
+    "narration": "Le lendemain, c'est six. Puis cinq. Un compte à rebours. Mais vers quoi ?",
+    "scene": "supermarket",
+    "shot": "wide",
+    "cast": [
+     {
+      "who": "FEMME2",
+      "x": 220,
+      "seated": false,
+      "expr": "neutral",
+      "look": "RIGHT"
+     },
+     {
+      "who": "HERO",
+      "x": 540,
+      "seated": false,
+      "expr": "shocked",
+      "look": "CAM",
+      "tag": "5",
+      "tag_color": "red"
+     },
+     {
+      "who": "HOMME2",
+      "x": 860,
+      "seated": false,
+      "expr": "neutral",
+      "look": "LEFT"
+     }
+    ],
+    "crowd": [
+     "Six.",
+     "Six.",
+     "Cinq.",
+     "Cinq."
+    ],
+    "fx": []
+   },
+   {
+    "narration": "Quatre. Trois. Et personne ne se souvient de te l'avoir dit.",
+    "scene": "park",
+    "shot": "hero_close",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 540,
+      "seated": false,
+      "expr": "sad",
+      "look": "DOWN",
+      "tag": "3",
+      "tag_color": "red"
+     }
+    ],
+    "crowd": [
+     "Quatre.",
+     "Trois.",
+     "Trois."
+    ],
+    "fx": [
+     "dark"
+    ],
+    "dark_level": 0.25
+   },
+   {
+    "narration": "Même ta mère te serre dans ses bras. Et murmure : deux.",
+    "scene": "restaurant",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "MERE",
+      "x": 330,
+      "seated": false,
+      "expr": "neutral",
+      "look": "RIGHT",
+      "bubble": "Deux."
+     },
+     {
+      "who": "HERO",
+      "x": 800,
+      "seated": false,
+      "expr": "shocked",
+      "look": "LEFT",
+      "tag": "2",
+      "tag_color": "red"
+     }
+    ],
+    "fx": [
+     "dark"
+    ],
+    "dark_level": 0.3
+   },
+   {
+    "narration": "Abonne-toi. Parce que ce qui arrive à zéro, personne ne l'a vu venir.",
+    "scene": "restaurant",
+    "shot": "hero_close",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 540,
+      "seated": false,
+      "expr": "shocked",
+      "look": "CAM",
+      "tag": "2",
+      "tag_color": "red"
+     }
+    ],
+    "fx": [
+     "mid_cta",
+     "dark"
+    ],
+    "dark_level": 0.35
+   },
+   {
+    "narration": "Le dernier jour, tu t'enfermes chez toi. Ton téléphone vibre. Un seul mot : un.",
+    "scene": "waiting",
+    "shot": "hero_close",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 932,
+      "seated": true,
+      "expr": "shocked",
+      "look": "DOWN"
+     }
+    ],
+    "notif": "Un.",
+    "notif_from": "Moi",
+    "fx": [
+     "dark"
+    ],
+    "dark_level": 0.5
+   },
+   {
+    "narration": "Minuit. Tu regardes dehors. Toute la rue est là, immobile, tournée vers toi.",
+    "scene": "park",
+    "shot": "wide",
+    "cast": [
+     {
+      "who": "FEMME",
+      "x": 220,
+      "seated": false,
+      "expr": "neutral",
+      "look": "CAM"
+     },
+     {
+      "who": "SERVEUR",
+      "x": 540,
+      "seated": false,
+      "expr": "neutral",
+      "look": "CAM"
+     },
+     {
+      "who": "MERE",
+      "x": 860,
+      "seated": false,
+      "expr": "neutral",
+      "look": "CAM"
+     }
+    ],
+    "fx": [
+     "dark",
+     "silence"
+    ],
+    "dark_level": 0.65
+   },
+   {
+    "narration": "Et tous ensemble, ils murmurent : zéro.",
+    "scene": "park",
+    "shot": "extreme",
+    "cast": [
+     {
+      "who": "MERE",
+      "x": 540,
+      "seated": false,
+      "expr": "smile",
+      "look": "CAM"
+     }
+    ],
+    "crowd": [
+     "Zéro.",
+     "Zéro.",
+     "Zéro."
+    ],
+    "fx": [
+     "dark",
+     "red"
+    ],
+    "dark_level": 0.65
+   },
+   {
+    "narration": "Au réveil, tu as tout oublié. Un inconnu passe. Et ta bouche murmure, toute seule : sept.",
+    "scene": "park",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 330,
+      "seated": false,
+      "expr": "smile",
+      "look": "RIGHT",
+      "bubble": "Sept."
+     },
+     {
+      "who": "HOMME2",
+      "x": 760,
+      "seated": false,
+      "expr": "shocked",
+      "look": "LEFT"
+     }
+    ],
+    "inner": "C'EST TON TOUR.",
+    "fx": [
+     "rings"
+    ]
+   },
+   {
+    "narration": "Abonne-toi pour la partie deux : la nuit du zéro.",
+    "scene": "park",
+    "shot": "hero_close",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 540,
+      "seated": false,
+      "expr": "smug",
+      "look": "CAM",
+      "tag": "7",
+      "tag_color": "red"
+     }
+    ],
+    "fx": [
+     "final_cta"
+    ]
+   }
+  ],
+  "caption": "Chaque jour, tout le monde te murmure un chiffre plus petit. À zéro, tu oublies une nuit entière… et c'est toi qui commences à murmurer. Il s'est passé quoi à minuit ? Écris ta théorie en commentaire, les meilleures seront dans la partie 2.",
+  "hashtags": [
+   "#histoire",
+   "#etsi",
+   "#mystere",
+   "#suspense",
+   "#flippant",
+   "#animation",
+   "#dessinanime",
+   "#pourtoi",
+   "#fyp"
+  ],
+  "pinned_comment": "Indice : regarde bien qui lui envoie le message « Un. » 👀 Selon toi, il s'est passé quoi à minuit ? Les meilleures théories seront dans la partie 2. Et toi, c'est quoi le chiffre qu'on t'a murmuré aujourd'hui ?"
+ },
+ {
+  "slug": "y02-souvenirs",
+  "title": "Et si tu pouvais vendre tes souvenirs ?",
+  "hook_text": "Il rachète tes souvenirs",
+  "beats": [
+   {
+    "narration": "Ton premier bisou vaut cinq cents euros. Ne le vends surtout pas.",
+    "scene": "cafe",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "NOIR",
+      "x": 640,
+      "seated": false,
+      "expr": "smug",
+      "look": "RIGHT",
+      "pose": "gesture"
+     },
+     {
+      "who": "HERO",
+      "x": 932,
+      "seated": true,
+      "expr": "shocked",
+      "look": "LEFT",
+      "tag": "500 €",
+      "tag_color": "green"
+     }
+    ],
+    "fx": [
+     "rings"
+    ]
+   },
+   {
+    "narration": "Un homme en noir achète les souvenirs. Tu en vends un, pour voir.",
+    "scene": "cafe",
+    "shot": "wide",
+    "cast": [
+     {
+      "who": "NOIR",
+      "x": 620,
+      "seated": false,
+      "expr": "smug",
+      "look": "RIGHT",
+      "pose": "gesture",
+      "bubble": "Un souvenir, un billet."
+     },
+     {
+      "who": "HERO",
+      "x": 932,
+      "seated": true,
+      "expr": "smile",
+      "look": "LEFT"
+     }
+    ],
+    "fx": []
+   },
+   {
+    "narration": "Le billet est vrai. Ton souvenir, lui, a disparu.",
+    "scene": "cafe",
+    "shot": "hero_close",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 932,
+      "seated": true,
+      "expr": "smile",
+      "look": "DOWN",
+      "tag": "+500 €",
+      "tag_color": "green"
+     }
+    ],
+    "fx": [],
+    "notif": "Souvenir effacé : 1er bisou",
+    "notif_from": "Mémoire"
+   },
+   {
+    "narration": "Tes vacances à la mer ? Mille euros. Ton premier rendez-vous ? Trois mille. Tu vends. Tu vends encore.",
+    "scene": "burstyellow",
+    "shot": "hero_close",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 540,
+      "seated": false,
+      "expr": "smug",
+      "look": "CAM",
+      "pose": "gesture"
+     }
+    ],
+    "crowd": [
+     "1000 €",
+     "3000 €",
+     "VENDU !",
+     "VENDU !",
+     "VENDU !"
+    ],
+    "fx": []
+   },
+   {
+    "narration": "Avion, plage, palace. Tu ne regrettes rien. Normal : tu ne te souviens de rien.",
+    "scene": "plane",
+    "shot": "hero_close",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 932,
+      "seated": true,
+      "expr": "smug",
+      "look": "CAM",
+      "tag": "RICHE",
+      "tag_color": "yellow"
+     }
+    ],
+    "fx": []
+   },
+   {
+    "narration": "Abonne-toi, parce que tu n'as pas encore compris ce que tu as vendu.",
+    "scene": "beach",
+    "shot": "wide",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 400,
+      "seated": false,
+      "expr": "smug",
+      "look": "CAM",
+      "pose": "up"
+     },
+     {
+      "who": "NOIR",
+      "x": 760,
+      "seated": false,
+      "expr": "smug",
+      "look": "LEFT",
+      "ghost": true
+     }
+    ],
+    "fx": [
+     "mid_cta"
+    ]
+   },
+   {
+    "narration": "Un jour, une femme se jette dans tes bras. Elle pleure : mon amour, tu es revenu !",
+    "scene": "cafe",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "FEMME",
+      "x": 360,
+      "seated": false,
+      "expr": "sad",
+      "look": "RIGHT",
+      "pose": "up",
+      "bubble": "Tu es revenu !!"
+     },
+     {
+      "who": "HERO",
+      "x": 640,
+      "seated": false,
+      "expr": "shocked",
+      "look": "LEFT"
+     }
+    ],
+    "fx": []
+   },
+   {
+    "narration": "Toi, tu ne l'as jamais vue de ta vie.",
+    "scene": "cafe",
+    "shot": "hero_close",
+    "cast": [
+     {
+      "who": "FEMME",
+      "x": 330,
+      "seated": false,
+      "expr": "sad",
+      "look": "RIGHT"
+     },
+     {
+      "who": "HERO",
+      "x": 600,
+      "seated": false,
+      "expr": "shocked",
+      "look": "CAM",
+      "bubble": "C'est qui ?!"
+     }
+    ],
+    "fx": []
+   },
+   {
+    "narration": "Au fond, l'homme en noir sourit. Lui, il se souvient d'elle. De tout.",
+    "scene": "cafe",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "FEMME",
+      "x": 200,
+      "seated": false,
+      "expr": "sad",
+      "look": "RIGHT"
+     },
+     {
+      "who": "HERO",
+      "x": 450,
+      "seated": false,
+      "expr": "shocked",
+      "look": "RIGHT"
+     },
+     {
+      "who": "NOIR",
+      "x": 932,
+      "seated": true,
+      "expr": "smug",
+      "look": "LEFT",
+      "tag": "ACHETEUR",
+      "tag_color": "red"
+     }
+    ],
+    "crowd": [
+     "Son prénom",
+     "Vos vacances",
+     "Votre chanson",
+     "1er rendez-vous"
+    ],
+    "fx": [
+     "dark"
+    ],
+    "dark_level": 0.5
+   },
+   {
+    "narration": "Ton premier bisou à cinq cents euros... c'était avec elle.",
+    "scene": "cafe",
+    "shot": "extreme",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 540,
+      "seated": false,
+      "expr": "shocked",
+      "look": "CAM"
+     }
+    ],
+    "inner": "C'ÉTAIT AVEC ELLE",
+    "fx": [
+     "dark",
+     "red",
+     "silence"
+    ],
+    "dark_level": 0.55
+   },
+   {
+    "narration": "Abonne-toi pour la partie deux. Il te rend tout. Mais pas contre de l'argent.",
+    "scene": "cafe",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 420,
+      "seated": false,
+      "expr": "angry",
+      "look": "CAM",
+      "pose": "gesture"
+     },
+     {
+      "who": "NOIR",
+      "x": 932,
+      "seated": true,
+      "expr": "smug",
+      "look": "LEFT",
+      "tag": "ACHETEUR",
+      "tag_color": "red",
+      "bubble": "Tu sais ce que je veux."
+     }
+    ],
+    "fx": [
+     "dark",
+     "final_cta"
+    ],
+    "dark_level": 0.5
+   }
+  ],
+  "caption": "Un homme en noir rachète tes souvenirs, en vrais billets. Tu vends tout, sans aucun regret... grosse erreur. Et toi, quel souvenir tu ne vendrais jamais, même pour un million ? Dis-le en commentaire.",
+  "hashtags": [
+   "#etsi",
+   "#histoire",
+   "#animation",
+   "#dessinanime",
+   "#souvenirs",
+   "#argent",
+   "#storytime",
+   "#pourtoi",
+   "#fyp"
+  ],
+  "pinned_comment": "À ton avis, qu'est-ce que l'homme en noir va demander à la place de l'argent ? Les meilleures théories seront dans la partie 2."
+ },
+ {
+  "slug": "y03-seul-a-le-voir",
+  "title": "Et si tu étais le seul à voir cet homme ?",
+  "hook_text": "Tu le vois, toi ?",
+  "beats": [
+   {
+    "narration": "Personne ne voit cet homme. Sauf toi. Et il se rapproche.",
+    "scene": "park",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "NOIR",
+      "x": 200,
+      "seated": false,
+      "expr": "neutral",
+      "look": "CAM"
+     },
+     {
+      "who": "HERO",
+      "x": 520,
+      "seated": false,
+      "expr": "shocked",
+      "look": "LEFT"
+     },
+     {
+      "who": "HOMME2",
+      "x": 860,
+      "seated": false,
+      "expr": "neutral",
+      "look": "LEFT",
+      "ghost": true
+     }
+    ],
+    "fx": [
+     "rings"
+    ]
+   },
+   {
+    "narration": "Ce matin, il est au fond du bus. Il te fixe.",
+    "scene": "bus",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "NOIR",
+      "x": 160,
+      "seated": false,
+      "expr": "neutral",
+      "look": "RIGHT"
+     },
+     {
+      "who": "HERO",
+      "x": 932,
+      "seated": true,
+      "expr": "neutral",
+      "look": "LEFT"
+     }
+    ],
+    "fx": []
+   },
+   {
+    "narration": "À midi, il est plus près. Le serveur ne le voit même pas.",
+    "scene": "cafe",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "SERVEUR",
+      "x": 330,
+      "seated": false,
+      "expr": "neutral",
+      "look": "RIGHT",
+      "bubble": "Il fixe quoi, lui ?"
+     },
+     {
+      "who": "NOIR",
+      "x": 620,
+      "seated": false,
+      "expr": "neutral",
+      "look": "RIGHT"
+     },
+     {
+      "who": "HERO",
+      "x": 932,
+      "seated": true,
+      "expr": "shocked",
+      "look": "LEFT"
+     }
+    ],
+    "fx": []
+   },
+   {
+    "narration": "Le soir, il n'est plus qu'à deux pas.",
+    "scene": "supermarket",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 330,
+      "seated": false,
+      "expr": "shocked",
+      "look": "RIGHT"
+     },
+     {
+      "who": "NOIR",
+      "x": 600,
+      "seated": false,
+      "expr": "neutral",
+      "look": "LEFT"
+     },
+     {
+      "who": "HOMME2",
+      "x": 880,
+      "seated": false,
+      "expr": "neutral",
+      "look": "LEFT",
+      "ghost": true
+     }
+    ],
+    "fx": [
+     "dark"
+    ],
+    "dark_level": 0.25
+   },
+   {
+    "narration": "Au cinéma, il est juste derrière toi. Ton amie se retourne… personne.",
+    "scene": "cinema",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "NOIR",
+      "x": 400,
+      "seated": false,
+      "expr": "neutral",
+      "look": "CAM"
+     },
+     {
+      "who": "HERO",
+      "x": 640,
+      "seated": false,
+      "expr": "shocked",
+      "look": "CAM"
+     },
+     {
+      "who": "FEMME",
+      "x": 932,
+      "seated": true,
+      "expr": "neutral",
+      "look": "LEFT",
+      "bubble": "Quel homme ?"
+     }
+    ],
+    "fx": [
+     "dark"
+    ],
+    "dark_level": 0.2
+   },
+   {
+    "narration": "Alors tu fuis. À l'autre bout du monde.",
+    "scene": "waiting",
+    "shot": "wide",
+    "cast": [
+     {
+      "who": "HOMME2",
+      "x": 300,
+      "seated": false,
+      "expr": "neutral",
+      "look": "RIGHT",
+      "ghost": true
+     },
+     {
+      "who": "HERO",
+      "x": 932,
+      "seated": true,
+      "expr": "smile",
+      "look": "CAM",
+      "tag": "ENFIN SEUL",
+      "tag_color": "green"
+     }
+    ],
+    "fx": [],
+    "notif": "Embarquement immédiat",
+    "notif_from": "Aéroport"
+   },
+   {
+    "narration": "Abonne-toi maintenant. Parce que la vérité sur cet homme… personne ne la devine.",
+    "scene": "plane",
+    "shot": "wide",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 400,
+      "seated": false,
+      "expr": "neutral",
+      "look": "RIGHT"
+     }
+    ],
+    "fx": [
+     "dark",
+     "mid_cta"
+    ],
+    "dark_level": 0.3
+   },
+   {
+    "narration": "Ton siège ? Juste à côté de lui. Et il sourit.",
+    "scene": "plane",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 330,
+      "seated": false,
+      "expr": "shocked",
+      "look": "RIGHT"
+     },
+     {
+      "who": "NOIR",
+      "x": 932,
+      "seated": true,
+      "expr": "smile",
+      "look": "CAM"
+     }
+    ],
+    "fx": [
+     "silence",
+     "dark"
+    ],
+    "dark_level": 0.3
+   },
+   {
+    "narration": "Sur la plage, tu craques. Pourquoi tu me suis ?",
+    "scene": "beach",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 330,
+      "seated": false,
+      "expr": "angry",
+      "look": "RIGHT",
+      "pose": "gesture",
+      "bubble": "Laisse-moi tranquille !"
+     },
+     {
+      "who": "NOIR",
+      "x": 600,
+      "seated": false,
+      "expr": "neutral",
+      "look": "LEFT"
+     },
+     {
+      "who": "HOMME2",
+      "x": 880,
+      "seated": false,
+      "expr": "neutral",
+      "look": "LEFT",
+      "ghost": true
+     }
+    ],
+    "fx": [
+     "dark"
+    ],
+    "dark_level": 0.4
+   },
+   {
+    "narration": "Il chuchote : je ne te suis pas. Je me cache derrière toi. Quelqu'un me cherche.",
+    "scene": "beach",
+    "shot": "extreme",
+    "cast": [
+     {
+      "who": "NOIR",
+      "x": 540,
+      "seated": false,
+      "expr": "shocked",
+      "look": "CAM"
+     }
+    ],
+    "fx": [
+     "dark"
+    ],
+    "dark_level": 0.5,
+    "inner": "Je me cache derrière toi."
+   },
+   {
+    "narration": "Il disparaît. Au loin, un autre homme te fixe. Personne ne le voit… sauf toi.",
+    "scene": "beach",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 330,
+      "seated": false,
+      "expr": "shocked",
+      "look": "RIGHT"
+     },
+     {
+      "who": "HOMME2",
+      "x": 880,
+      "seated": false,
+      "expr": "neutral",
+      "look": "CAM",
+      "ghost": true
+     }
+    ],
+    "fx": [
+     "dark",
+     "red"
+    ],
+    "dark_level": 0.6,
+    "inner": "Sauf toi."
+   },
+   {
+    "narration": "Abonne-toi pour la partie deux. Et revois le début : il était déjà là.",
+    "scene": "beach",
+    "shot": "two_shot",
+    "cast": [
+     {
+      "who": "HERO",
+      "x": 330,
+      "seated": false,
+      "expr": "shocked",
+      "look": "CAM"
+     },
+     {
+      "who": "HOMME2",
+      "x": 600,
+      "seated": false,
+      "expr": "neutral",
+      "look": "CAM"
+     }
+    ],
+    "fx": [
+     "dark",
+     "final_cta"
+    ],
+    "dark_level": 0.55
+   }
+  ],
+  "caption": "L'autre homme était là dès la première seconde. Tu l'avais repéré ? Et l'homme en noir… il fuit qui, à ton avis ? Ta théorie en commentaire.",
+  "hashtags": [
+   "#etsi",
+   "#histoire",
+   "#histoireanimee",
+   "#animation",
+   "#dessinanime",
+   "#frisson",
+   "#mystere",
+   "#suspense",
+   "#theorie",
+   "#pourtoi",
+   "#fyp"
+  ],
+  "pinned_comment": "Indice : l'autre homme apparaît 4 fois avant d'être révélé, dès le tout premier plan. Tu les as toutes trouvées ? Et l'homme en noir… il fuit qui ? Je lis toutes vos théories pour la partie 2."
+ }
+]
