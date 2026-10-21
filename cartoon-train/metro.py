@@ -21,7 +21,8 @@ OUT = os.path.join(HERE, "videos-metro")
 BUILD = os.path.join(HERE, "build", "metro")
 W, H, FPS = 1080, 1920, 60
 SR = 44100
-TOTAL = 66.0
+TOTAL = 80.0
+T_END = 72.6      # début du dernier plan (la question)
 FONT = "Inter"
 MONO = "DejaVu Sans Mono"
 
@@ -106,7 +107,7 @@ def text_w(txt, size):
 
 # ------------------------------------------------------------------ chronologie
 
-CLOCK = [(0, "23:58"), (14.0, "23:59"), (29.0, "00:00")]
+CLOCK = [(0, "23:58"), (14.0, "23:59"), (29.0, "00:00"), (68.4, "05:30")]
 
 CAPTIONS = [  # (début, fin, lignes)
     (0.3, 3.5, ["Imagine…", "tu rates le dernier métro."]),
@@ -124,8 +125,12 @@ CAPTIONS = [  # (début, fin, lignes)
     (38.6, 41.4, ["Les portes s'ouvrent.", "Personne à bord."]),
     (41.8, 46.8, ["Et derrière toi…", "des pas lents."]),
     (47.1, 50.3, ["Il s'arrête juste", "derrière ton épaule."]),
-    (50.6, 53.4, ["Quelque chose respire."]),
+    (50.6, 53.4, ["Quelqu'un respire,", "juste derrière toi."]),
     (53.7, 57.0, ["Les portes vont", "se fermer…"]),
+    (57.4, 60.0, ["Tu hésites…", "et une main te retient."]),
+    (60.3, 64.3, ["« Ne monte pas !", "C'est la rame du dépôt. »"]),
+    (64.8, 68.2, ["Elle ne s'arrête nulle part", "avant le matin."]),
+    (68.6, 72.4, ["C'était l'agent de nuit.", "Il t'offre un café", "dans sa cabine."]),
 ]
 
 
@@ -354,9 +359,9 @@ def cabin_scene(t):
     return "".join(s)
 
 
-def paper(t, lt):
+def paper(t, lt, restored=False, cx=540, cy=900, sc=1.0):
     """La feuille scotchée à la vitre (repère local 380 x 520)."""
-    s = ['<g transform="translate(540 900) rotate(-2.2) translate(-190 -260)">']
+    s = ['<g transform="translate(%s %s) rotate(-2.2) scale(%.3f) translate(-190 -260)">' % (f(cx), f(cy), sc)]
     s.append(R(8, 12, 380, 520, "#000000", op=0.35))
     s.append(R(0, 0, 380, 520, "#e9e4d3"))
     s.append(R(0, 0, 380, 520, "#d8cfae", op=0.18))
@@ -368,16 +373,22 @@ def paper(t, lt):
     s.append(T(190, 262, "DANS UNE RAME", 30, "#1a1a1a", weight=700, font=MONO))
     s.append(T(190, 302, "VIDE.", 30, "#1a1a1a", weight=700, font=MONO))
     s.append(L(24, 330, 356, 330, "#222", 2))
-    # le reste est abîmé
-    s.append(T(24, 372, "RÈGLE N°2 : N", 22, "#222", weight=700, font=MONO, anchor="start", op=0.8))
-    s.append(P("M 24 392 q 20 -8 40 0 t 40 0 t 40 0 t 40 0 t 40 0 t 40 0 t 40 0", "none", stroke="#444", sw=3, op=0.55))
-    s.append(T(24, 428, "…ntend…", 22, "#222", weight=700, font=MONO, anchor="start", op=0.45))
-    s.append(P("M 24 446 q 20 -8 40 0 t 40 0 t 40 0 t 40 0 t 40 0", "none", stroke="#444", sw=3, op=0.4))
-    s.append(E(250, 440, 120, 70, "#6b4a1f", op=0.28))
-    s.append(E(120, 380, 70, 40, "#6b4a1f", op=0.22))
-    s.append(P("M 0 484 L 40 500 L 90 478 L 150 506 L 210 482 L 270 510 L 330 486 L 380 504 L 380 520 L 0 520 Z",
-               "#0e1b27"))
-    s.append(P("M 0 484 L 40 500 L 90 478 L 150 506 L 210 482 L 270 510 L 330 486 L 380 504", "none",
+    if restored:
+        s.append(T(190, 372, "RÈGLE N°2", 36, "#b3211e", weight=700, font=MONO))
+        s.append(T(190, 410, "TOUTE RAME VIDE", 26, "#1a1a1a", weight=700, font=MONO))
+        s.append(T(190, 442, "VA AU DÉPÔT.", 26, "#1a1a1a", weight=700, font=MONO))
+        s.append(T(190, 474, "ATTENDS L'AGENT.", 26, "#1a1a1a", weight=700, font=MONO))
+    else:
+        # le reste est abîmé
+        s.append(T(24, 372, "RÈGLE N°2 : N", 22, "#222", weight=700, font=MONO, anchor="start", op=0.8))
+        s.append(P("M 24 392 q 20 -8 40 0 t 40 0 t 40 0 t 40 0 t 40 0 t 40 0 t 40 0", "none", stroke="#444", sw=3, op=0.55))
+        s.append(T(24, 428, "…ntend…", 22, "#222", weight=700, font=MONO, anchor="start", op=0.45))
+        s.append(P("M 24 446 q 20 -8 40 0 t 40 0 t 40 0 t 40 0 t 40 0", "none", stroke="#444", sw=3, op=0.4))
+        s.append(E(250, 440, 120, 70, "#6b4a1f", op=0.28))
+        s.append(E(120, 380, 70, 40, "#6b4a1f", op=0.22))
+    edge = "#6b4a2b" if restored else "#0e1b27"
+    s.append(P("M 0 492 L 40 506 L 90 488 L 150 512 L 210 490 L 270 514 L 330 494 L 380 508 L 380 520 L 0 520 Z", edge))
+    s.append(P("M 0 492 L 40 506 L 90 488 L 150 512 L 210 490 L 270 514 L 330 494 L 380 508", "none",
                stroke="#bfb79a", sw=2, op=0.6))
     # scotch
     s.append('<g transform="rotate(-12 40 8)">' + R(-6, -10, 96, 34, "#e8d27a", op=0.7) + "</g>")
@@ -425,6 +436,39 @@ def ghost(x, base, h, t, alpha=1.0, blink=0.0, wave=0.0, smile=0.0, glow=True, b
                                           f(x + w * 0.06), f(my)), "none", stroke="#2a2f38", sw=max(2, w * 0.018)))
     s.append("</g>")
     return "".join(s)
+
+
+def stick(x, base, h, t, alpha=1.0, walk=0.0, pose="down", target=None, phase=0.0):
+    """Bonhomme-bâton : tête blanche, ni visage ni cheveux, corps en traits noirs (liseré clair pour le voir dans le noir)."""
+    r = 0.095 * h
+    neck = base - h + 2 * r
+    sh = neck + 0.05 * h
+    hip = base - 0.46 * h
+    w_ = max(6.0, 0.036 * h)
+    sw_ = math.sin(walk) * 0.09 * h
+    segs = [[(x, neck), (x, hip)],
+            [(x, hip), (x - 0.06 * h + sw_, base)],
+            [(x, hip), (x + 0.06 * h - sw_, base)],
+            [(x, sh), (x - 0.10 * h, sh + 0.17 * h), (x - 0.11 * h - sw_ * 0.3, sh + 0.33 * h)]]
+    if pose == "grab" and target:
+        tx, ty = target
+        segs.append([(x, sh), ((x + tx) / 2, (sh + ty) / 2 + 0.05 * h), (tx, ty)])
+    elif pose == "stop":
+        segs.append([(x, sh), (x + 0.15 * h, sh + 0.08 * h), (x + 0.17 * h, sh - 0.10 * h)])
+    elif pose == "wave":
+        segs.append([(x, sh), (x + 0.15 * h, sh + 0.07 * h), (x + 0.20 * h + 0.05 * h * math.sin(phase), sh - 0.14 * h)])
+    elif pose == "mug":
+        segs.append([(x, sh), (x + 0.13 * h, sh + 0.16 * h), (x + 0.26 * h, sh + 0.10 * h)])
+    else:
+        segs.append([(x, sh), (x + 0.10 * h, sh + 0.17 * h), (x + 0.11 * h + sw_ * 0.3, sh + 0.33 * h)])
+    out = ['<g opacity="%.3f">' % alpha]
+    for color, wd in (("#8795a8", w_ + 7), ("#0a0d12", w_)):
+        for sg in segs:
+            d = "M " + " L ".join("%s %s" % (f(px), f(py)) for px, py in sg)
+            out.append(P(d, "none", stroke=color, sw=wd))
+    out.append(C(x, base - h + r, r, "#fbfcff", stroke="#c3cddb", sw=max(2, 0.012 * h)))
+    out.append("</g>")
+    return "".join(out)
 
 
 def viewer(x, y, op=0.82):
@@ -517,11 +561,10 @@ def reflection(u, t, breath, fade=1.0):
     s.append(viewer(x + 345, y + 270, op=0.80))
     # position du fantôme : arrive du fond (gauche, petit) jusque derrière ton épaule
     p = ease(u)
-    gh = lerp(110, 420, p)
+    gh = lerp(120, 450, p)
     gx = lerp(x + 30, x + 250, p)
     base = y + h - 20
-    bob = math.sin(t * 5) * lerp(2, 6, p) * (1 if u < 1 else 0.3)
-    s.append(ghost(gx, base, gh, t, alpha=0.62, blink=0.0, glow=False, bob=bob))
+    s.append(stick(gx, base, gh, t, alpha=0.66, walk=(t * 4.2 if u < 1 else 0.0)))
     if breath > 0:
         for k in range(3):
             q = ((t * 0.55 + k / 3.0) % 1.0)
@@ -539,7 +582,7 @@ def camera(t):
           (14.0, 540, 700, 1.0), (18.0, 540, 960, 1.0), (18.0001, 540, 900, 1.0), (23.5, 540, 900, 1.12),
           (29.0, 540, 900, 1.9), (29.01, 540, 960, 1.0), (32.0, 540, 960, 1.0), (35.5, 540, 960, 1.14),
           (35.51, 540, 960, 1.0), (47.0, 540, 960, 1.0), (50.5, 560, 900, 1.25), (53.5, 560, 900, 1.5),
-          (57.0, 560, 900, 1.5), (57.01, 540, 960, 1.0), (TOTAL, 540, 960, 1.0)]
+          (57.2, 560, 900, 1.5), (57.21, 540, 960, 1.0), (TOTAL, 540, 960, 1.0)]
     for (t0, x0, y0, z0), (t1, x1, y1, z1) in zip(kf, kf[1:]):
         if t0 <= t < t1:
             u = ease((t - t0) / (t1 - t0)) if t1 - t0 > 0.5 else 0.0
@@ -584,50 +627,72 @@ def scene_svg(t):
     arrive = ease((t - 35.5) / 2.3)
     shift = lerp(-1300, 0, arrive) if t < 37.9 else 0
     door = ease((t - 38.6) / 1.2)
-    if t > 53.6:
-        door = 1 - ease((t - 53.9) / 2.6) * 0.92
-    red = t > 53.5 and t < 57.0
+    if t > 54.0:
+        door = max(0.0, 1 - ease((t - 54.0) / 6.0))
+    red = 53.5 < t < 60.2
+    if t >= 68.4:
+        return cabin_lit(t, t - 68.4)
+    if t >= 57.2:
+        shift = lerp(0, 1500, ease((t - 64.8) / 2.6)) if t > 64.8 else 0
+        return hand_scene(t, t - 57.2, door, red and t < 60.2, shift)
     s = train_scene(t, t - 35.5, shift, door, red)
-    if 41.4 < t < 57.0:
+    if 41.4 < t < 57.2:
         u = (t - 41.8) / 5.2
-        breath = clamp((t - 50.6) / 0.8) * (1 if t < 57 else 0)
+        breath = clamp((t - 50.6) / 0.8)
         s += reflection(clamp(u), t, breath, clamp((t - 41.4) / 0.9))
     return s
 
 
-def final_scene(t, lt):
-    """Dernier plan : le vrai fantôme, la question et les boutons."""
-    s = [R(0, 0, W, H, "#070b11")]
-    s.append(R(0, 1400, W, 520, "url(#floor)"))
-    # portes ouvertes en fond
-    s.append(R(0, 520, W, 900, "#aeb8c2"))
-    s.append(R(0, 600, 300, 800, "#fff0bf"))
-    s.append(R(780, 600, 300, 800, "#fff0bf"))
-    s.append(E(150, 1000, 240, 500, "url(#warm)", op=0.7))
-    s.append(E(930, 1000, 240, 500, "url(#warm)", op=0.7))
-    s.append(R(0, 520, W, 80, "#8a949f"))
-    s.append(R(300, 600, 480, 800, "#9aa4af"))
-    s.append(R(300, 600, 480, 800, "#0c1620", op=0.55))
-    s.append(R(0, 1180, W, 50, "#1f55a6"))
-    s.append(R(0, 1400, W, 30, "#2a3039"))
-    # fantôme
-    appear = ease(lt / 0.8)
-    s.append(ghost(540, 1620 + (1 - appear) * 160, 760, t, alpha=appear, blink=max(0.0, 1 - abs(((t * 0.9) % 3.0) - 0.1) / 0.1)
-                   if ((t * 0.9) % 3.0) < 0.2 else 0.0, wave=1.0 if lt > 1.2 else 0.0, smile=1.0 if lt > 1.2 else 0.0,
-                   glow=True, bob=math.sin(t * 2.2) * 8))
+def cabin_lit(t, lt):
+    """La cabine de l'agent, lumière revenue : la règle n°2 est enfin lisible, un café fume."""
+    s = [R(0, 0, W, H, "#0c141d"), R(0, 0, W, 1500, "#1b2835")]
+    s.append(R(60, 360, 960, 1180, "#26384a", rx=18, stroke="#0b121b", sw=10))
+    s.append(R(150, 480, 780, 800, "#0b141d", rx=10, stroke="#0a0f15", sw=14))
+    s.append(R(170, 500, 740, 760, "#ffe7a8"))
+    s.append(E(540, 880, 440, 400, "url(#warm)", op=0.8))
+    s.append(R(170, 1140, 740, 120, "#7a5530") + R(170, 1128, 740, 18, "#99703f"))
+    s.append(stick(660, 1130, 650, t, pose="mug"))
+    hx, hy = 660 + 0.26 * 650, 1130 - 650 + 2 * 0.095 * 650 + 0.05 * 650 + 0.10 * 650
+    s.append(R(hx - 34, hy - 6, 68, 78, "#f4f1ea", rx=10, stroke="#cfc8b8", sw=3))
+    s.append(P("M %s %s q 34 6 0 40" % (f(hx + 34), f(hy + 14)), "none", stroke="#cfc8b8", sw=8))
+    for k in range(3):
+        q = (t * 0.7 + k / 3.0) % 1.0
+        s.append(P("M %s %s q 14 -26 0 -52 t 0 -52" % (f(hx - 12 + k * 12), f(hy - 8 - q * 30)), "none",
+                   stroke="#ffffff", sw=6, op=0.6 * (1 - q)))
+    s.append(paper(t, lt, restored=True, cx=345, cy=900, sc=0.86))
+    s.append(R(40, 1280, 1000, 60, "#2d4054", rx=8) + R(60, 1340, 960, 160, "#1c2937"))
     return "".join(s)
+
+
+def hand_scene(t, lt, door, red, shift):
+    """L'agent (bonhomme-bâton) retient ton épaule : toi, de dos, au premier plan."""
+    s = train_scene(t, t - 35.5, shift, door, red)
+    s += viewer(840, 1370, op=0.97)
+    if lt < 3.0:
+        s += stick(430, 1900, 1010, t, pose="grab", target=(720, 1450))
+    else:
+        s += stick(430 + 20 * ease((lt - 3.0) / 0.6), 1900, 1010, t, pose="stop")
+    return s
+
+
+def final_scene(t, lt):
+    """Dernier plan : la station rallumée, l'agent te fait signe. La question arrive par-dessus."""
+    s = station(1.0, t)
+    s += R(0, 395, W, 245, "#04070c", op=0.62)
+    s += stick(540, 1520, 720, t, pose="wave", phase=t * 7)
+    return s
 
 
 def question_ui(t, lt):
     s = []
     a = ease(lt / 0.5)
     s.append('<g opacity="%.2f">' % a)
-    for i, line in enumerate(("Tu montes", "ou tu restes ?")):
-        y = 470 + i * 118
-        s.append(T(540, y, line, 104, "#000000", stroke="#000000", sw=26))
-        s.append(T(540, y, line, 104, "#ffffff"))
+    for i, line in enumerate(("Et toi, tu serais", "monté dans la rame ?")):
+        y = 470 + i * 108
+        s.append(T(540, y, line, 88, "#000000", stroke="#000000", sw=24))
+        s.append(T(540, y, line, 88, "#ffffff"))
     pulse = 1 + 0.04 * math.sin(t * 5)
-    for (cx, label, col) in ((290, "MONTER", "#1fb86a"), (790, "RESTER", "#e5484d")):
+    for (cx, label, col) in ((290, "OUI", "#1fb86a"), (790, "NON", "#e5484d")):
         s.append('<g transform="translate(%s 1615) scale(%.3f) translate(%s -1615)">' % (f(cx), pulse, f(-cx)))
         s.append(R(cx - 215, 1555, 430, 120, col, rx=60, stroke="#ffffff", sw=6))
         s.append(T(cx, 1635, label, 58, "#ffffff"))
@@ -640,7 +705,7 @@ def question_ui(t, lt):
     if k > 0:
         s.append('<g opacity="%.2f">' % k)
         s.append(R(150, 250, 780, 112, "#ffffff", rx=56, stroke="#111111", sw=5))
-        s.append(T(190, 322, "Abonne-toi pour la partie 2", 34, "#111111", anchor="start", weight=800))
+        s.append(T(190, 322, "Abonne-toi pour la suite", 36, "#111111", anchor="start", weight=800))
         followed = lt > 3.3
         pu = 1 + (0.05 * math.sin(t * 9) if not followed else 0)
         s.append('<g transform="translate(790 306) scale(%.3f) translate(-790 -306)">' % pu)
@@ -689,17 +754,17 @@ def frame_svg(t):
     dx = math.sin(t * 1.7) * 3 + rng.normal() * shake * 0.4
     dy = math.cos(t * 1.3) * 3 + rng.normal() * shake * 0.4
     tr = "translate(%s %s) scale(%.4f) translate(%s %s)" % (f(W / 2 + dx), f(H / 2 + dy), zoom, f(-cx), f(-cy))
-    if t >= 57.0:
-        body = final_scene(t, t - 57.0)
+    if t >= T_END:
+        body = final_scene(t, t - T_END)
     else:
         body = scene_svg(t)
     ui = []
     # horloge
     ui.append(R(780, 90, 250, 74, "#05080c", rx=14, op=0.6))
-    ui.append(T(905, 146, clock_text(t), 56, "#ff4d4d" if t >= 29 else "#ffd9a0", font=MONO, weight=700))
+    ui.append(T(905, 146, clock_text(t), 56, "#ff4d4d" if 29 <= t < 68.4 else "#ffd9a0", font=MONO, weight=700))
     ui.append(captions_svg(t))
-    if t >= 57.0:
-        ui.append(question_ui(t, t - 57.0))
+    if t >= T_END:
+        ui.append(question_ui(t, t - T_END))
     # grain léger
     for _ in range(26):
         ui.append(R(rng.uniform(0, W), rng.uniform(0, H), 3, 3, "#ffffff", op=0.07))
@@ -768,11 +833,12 @@ def build_audio():
     # nappe grave qui monte avec la tension
     tension = np.clip((t - 29.0) / 28.0, 0, 1)
     drone = (np.sin(2 * np.pi * 55 * t) * 0.5 + np.sin(2 * np.pi * 82.4 * t) * 0.3 + np.sin(2 * np.pi * 110.6 * t) * 0.18)
-    drone *= 0.020 * (0.6 + 0.4 * np.sin(2 * np.pi * 0.07 * t)) * (1 + 1.6 * tension)
+    relax = 1 - 0.85 * np.clip((t - 57.6) / 3.0, 0, 1)
+    drone *= 0.020 * (0.6 + 0.4 * np.sin(2 * np.pi * 0.07 * t)) * (1 + 1.6 * tension) * relax
     m += drone.astype(np.float32)
     # bourdonnement des néons (éteint à minuit)
     hum = np.sin(2 * np.pi * 100 * t) * 0.6 + np.sin(2 * np.pi * 200 * t) * 0.25
-    hum *= 0.014 * (t < 29.0)
+    hum *= 0.014 * ((t < 29.0) | (t > 68.4))
     for a, b in ((5.4, 5.47), (8.55, 8.66), (26.6, 26.68), (27.35, 27.5), (28.15, 28.27), (28.65, 28.8)):
         hum[int(a * SR):int(b * SR)] *= 0.1
     m += hum.astype(np.float32)
@@ -844,16 +910,35 @@ def build_audio():
         at(m, t0, breath * 0.28)
     # bips de fermeture des portes
     kk = int(0.12 * SR)
-    for tb in np.arange(53.6, 57.0, 0.34):
+    for tb in np.arange(53.6, 60.0, 0.34):
         at(m, tb, (np.sin(2 * np.pi * 1000 * np.arange(kk) / SR) * np.hanning(kk) * 0.12).astype(np.float32))
-    # dernier plan : petit tintement rassurant
+    # la main sur l'épaule (tissu + petit choc), puis les portes se ferment pour de bon
+    kk = int(0.4 * SR)
+    at(m, 57.9, fft_filter(noise(kk, 40), lo=200, hi=1800) * np.hanning(kk) * 0.25)
+    tt = np.arange(int(0.5 * SR)) / SR
+    at(m, 58.0, (np.sin(2 * np.pi * (90 - 30 * tt / 0.5) * tt) * np.exp(-tt / 0.08) * 0.5).astype(np.float32))
+    at(m, 60.0, (np.sin(2 * np.pi * (70 - 25 * tt / 0.5) * tt) * np.exp(-tt / 0.1) * 0.6).astype(np.float32))
+    at(m, 60.0, fft_filter(noise(int(0.7 * SR), 41), lo=1500, hi=9000) * np.hanning(int(0.7 * SR)) * 0.18)
+    # la rame repart à vide
+    k = int(4.2 * SR)
+    tt = np.arange(k) / SR
+    leave = fft_filter(noise(k, 42), lo=40, hi=900) * np.clip(tt / 0.8, 0, 1) * np.clip(1 - (tt - 1.2) / 3.0, 0, 1)
+    at(m, 64.6, leave * 0.7)
+    # la lumière revient : tic-tic puis bourdonnement ; le mug se pose
+    for dt in (0.0, 0.12, 0.3):
+        kk = int(0.05 * SR)
+        at(m, 68.4 + dt, fft_filter(noise(kk, 43), lo=2000) * np.hanning(kk) * 0.3)
+    kk = int(0.5 * SR)
+    tt = np.arange(kk) / SR
+    at(m, 69.6, (np.sin(2 * np.pi * 2300 * tt) * np.exp(-tt / 0.06) * 0.12).astype(np.float32))
+    # petite mélodie douce pour la question
     for dt, fr in ((0.0, 784.0), (0.2, 988.0), (0.4, 1175.0), (0.7, 1568.0)):
         kk = int(1.2 * SR)
         tt = np.arange(kk) / SR
-        at(m, 57.4 + dt, (np.sin(2 * np.pi * fr * tt) * np.exp(-tt / 0.4) * 0.12).astype(np.float32))
+        at(m, T_END + 0.3 + dt, (np.sin(2 * np.pi * fr * tt) * np.exp(-tt / 0.4) * 0.12).astype(np.float32))
     # clic de l'abonnement
     kk = int(0.1 * SR)
-    at(m, 57.0 + 3.3, (np.sin(2 * np.pi * 1500 * np.arange(kk) / SR) * np.hanning(kk) * 0.12).astype(np.float32))
+    at(m, T_END + 3.3, (np.sin(2 * np.pi * 1500 * np.arange(kk) / SR) * np.hanning(kk) * 0.12).astype(np.float32))
     m = reverb(m, 0.30, 1.6)
     end = int(TOTAL * SR)
     m[end - int(0.8 * SR):end] *= np.linspace(1, 0, int(0.8 * SR))
