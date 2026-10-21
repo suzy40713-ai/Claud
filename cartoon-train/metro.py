@@ -22,7 +22,26 @@ BUILD = os.path.join(HERE, "build", "metro")
 W, H, FPS = 1080, 1920, 60
 SR = 44100
 TOTAL = 80.0
-T_END = 72.6      # début du dernier plan (la question)
+T_END = 72.6      # début du dernier plan (la question), sur la chronologie d'origine (80 s)
+OUT_TOTAL = 60.0  # durée de la vidéo finale
+CAPTIONS_ON = False
+
+# Montage court : (début, fin) dans la vidéo finale  ->  (début, fin) dans la chronologie d'origine
+SEGMAP = [
+    (0.0, 3.0, 0.0, 3.6), (3.0, 5.4, 3.6, 6.4), (5.4, 7.4, 7.8, 9.8), (7.4, 10.6, 9.8, 14.0),
+    (10.6, 13.4, 14.4, 18.0), (13.4, 16.4, 19.0, 23.5), (16.4, 21.4, 23.5, 29.0), (21.4, 23.6, 29.0, 31.4),
+    (23.6, 26.4, 32.4, 35.5), (26.4, 30.6, 35.5, 40.8), (30.6, 34.6, 42.2, 47.0), (34.6, 37.2, 47.0, 50.4),
+    (37.2, 39.6, 50.6, 53.7), (39.6, 42.2, 53.7, 57.2), (42.2, 44.8, 57.2, 60.5), (44.8, 47.8, 60.5, 64.3),
+    (47.8, 50.4, 64.8, 68.4), (50.4, 53.8, 68.4, 72.4), (53.8, 60.0, 72.6, 78.8),
+]
+
+
+def remap(tn):
+    """Temps de la vidéo finale -> temps de la chronologie d'origine."""
+    for a, b, A, B in SEGMAP:
+        if a <= tn < b:
+            return A + (tn - a) * (B - A) / (b - a)
+    return SEGMAP[-1][3]
 FONT = "Inter"
 MONO = "DejaVu Sans Mono"
 
@@ -741,7 +760,8 @@ def captions_svg(t):
     return ""
 
 
-def frame_svg(t):
+def frame_svg(t, tn=None):
+    tn = t if tn is None else tn
     cx, cy, zoom = camera(t)
     rng = np.random.default_rng(int(t * FPS))
     shake = 0.0
@@ -762,7 +782,8 @@ def frame_svg(t):
     # horloge
     ui.append(R(780, 90, 250, 74, "#05080c", rx=14, op=0.6))
     ui.append(T(905, 146, clock_text(t), 56, "#ff4d4d" if 29 <= t < 68.4 else "#ffd9a0", font=MONO, weight=700))
-    ui.append(captions_svg(t))
+    if CAPTIONS_ON:
+        ui.append(captions_svg(t))
     if t >= T_END:
         ui.append(question_ui(t, t - T_END))
     # grain léger
@@ -772,10 +793,10 @@ def frame_svg(t):
     if 29.0 <= t < 29.18:
         ui.append(R(0, 0, W, H, "#ffffff", op=0.5 * (1 - (t - 29.0) / 0.18)))
     fade = 0.0
-    if t < 0.5:
-        fade = 1 - t / 0.5
-    elif t > TOTAL - 0.8:
-        fade = (t - (TOTAL - 0.8)) / 0.8
+    if tn < 0.5:
+        fade = 1 - tn / 0.5
+    elif tn > OUT_TOTAL - 0.8:
+        fade = (tn - (OUT_TOTAL - 0.8)) / 0.8
     clip = ('<clipPath id="winclip"><rect x="%d" y="%d" width="%d" height="%d"/></clipPath>' % WIN)
     return ('<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d">%s<defs>%s</defs>'
             '<g transform="%s">%s</g><rect width="%d" height="%d" fill="url(#vig)"/>%s'
@@ -960,38 +981,60 @@ def write_wav(path_, x):
 def _render(i):
     import cairosvg
     from PIL import Image
-    png = cairosvg.svg2png(bytestring=frame_svg(i / FPS).encode("utf-8"), output_width=W, output_height=H)
+    tn = i / FPS
+    png = cairosvg.svg2png(bytestring=frame_svg(remap(tn), tn).encode("utf-8"), output_width=W, output_height=H)
     return Image.open(io.BytesIO(png)).convert("RGB").tobytes()
 
 
+def montage_audio(src, dst):
+    """Découpe le son d'origine selon SEGMAP et ajuste la vitesse de chaque morceau (hauteur conservée)."""
+    parts, labels = [], []
+    for i, (a, b, A, B) in enumerate(SEGMAP):
+        r = (B - A) / (b - a)
+        parts.append("[0:a]atrim=%.3f:%.3f,asetpts=PTS-STARTPTS,atempo=%.4f[a%d]" % (A, B, r, i))
+        labels.append("[a%d]" % i)
+    fc = ";".join(parts) + ";" + "".join(labels) + "concat=n=%d:v=0:a=1,afade=t=out:st=%.2f:d=0.8[out]" % (
+        len(SEGMAP), OUT_TOTAL - 0.8)
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", src, "-filter_complex", fc, "-map", "[out]",
+                    "-t", "%.3f" % OUT_TOTAL, dst], check=True)
+
+
 def main():
+    global CAPTIONS_ON
     ap = argparse.ArgumentParser()
     ap.add_argument("--frames", default="")
+    ap.add_argument("--captions", action="store_true", help="avec les phrases à l'écran (test)")
     a = ap.parse_args()
     os.makedirs(BUILD, exist_ok=True)
     if a.frames:
         from PIL import Image
+        CAPTIONS_ON = a.captions
         for ts in a.frames.split(","):
             p = os.path.join(BUILD, "m_%s.png" % ts)
             Image.frombytes("RGB", (W, H), _render(int(float(ts) * FPS))).save(p)
             print(p)
         return
     os.makedirs(OUT, exist_ok=True)
+    wav_full = os.path.join(BUILD, "audio_full.wav")
+    write_wav(wav_full, build_audio())
     wav = os.path.join(BUILD, "audio.wav")
-    write_wav(wav, build_audio())
-    out = os.path.join(OUT, "le-dernier-metro.mp4")
-    ff = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
-                           "-s", "%dx%d" % (W, H), "-r", str(FPS), "-i", "-", "-i", wav, "-t", "%.3f" % TOTAL,
-                           "-c:v", "libx264", "-preset", "medium", "-crf", "21", "-pix_fmt", "yuv420p",
-                           "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", out], stdin=subprocess.PIPE)
-    with Pool(os.cpu_count()) as pool:
-        for k, buf in enumerate(pool.imap(_render, range(int(TOTAL * FPS)), chunksize=4)):
-            ff.stdin.write(buf)
-            if k % 300 == 0:
-                print("  image %d / %d" % (k, int(TOTAL * FPS)), flush=True)
-    ff.stdin.close()
-    ff.wait()
-    print("OK ->", out)
+    montage_audio(wav_full, wav)
+    for name, caps in (("le-dernier-metro", False), ("le-dernier-metro-avec-texte", True)):
+        CAPTIONS_ON = caps
+        out = os.path.join(OUT, name + ".mp4")
+        ff = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
+                               "-s", "%dx%d" % (W, H), "-r", str(FPS), "-i", "-", "-i", wav, "-t", "%.3f" % OUT_TOTAL,
+                               "-c:v", "libx264", "-preset", "medium", "-crf", "21", "-pix_fmt", "yuv420p",
+                               "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", out], stdin=subprocess.PIPE)
+        n = int(OUT_TOTAL * FPS)
+        with Pool(os.cpu_count()) as pool:
+            for k, buf in enumerate(pool.imap(_render, range(n), chunksize=4)):
+                ff.stdin.write(buf)
+                if k % 600 == 0:
+                    print("  [%s] image %d / %d" % (name, k, n), flush=True)
+        ff.stdin.close()
+        ff.wait()
+        print("OK ->", out, flush=True)
 
 
 if __name__ == "__main__":
