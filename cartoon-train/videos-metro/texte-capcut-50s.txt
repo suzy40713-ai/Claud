@@ -1,0 +1,56 @@
+LE DERNIER MÉTRO — texte pour CapCut (vidéo de 50 s « le-dernier-metro-50s.mp4 »)
+
+=====================================================================
+1) TEXTE À COLLER D'UN BLOC (voix off ou « Texte en parole »)
+=====================================================================
+
+Imagine… tu rates le dernier métro. Les grilles se ferment. Station Les Arcades : plus personne. Téléphone : trois pour cent. Pas de réseau. Prochain métro : cinq heures trente. Dans la cabine, une feuille scotchée à la vitre. Règle numéro un : ne monte jamais dans une rame vide. Minuit. Tout s'éteint. Au fond du tunnel, deux phares. Une rame arrive. Les portes s'ouvrent. Personne à bord. Derrière toi, des pas lents. Ils se rapprochent. Ils s'arrêtent derrière ton épaule. Quelqu'un respire, tout près. Les portes vont se fermer… Tu hésites… une main te retient. « Ne monte pas ! C'est la rame du dépôt ! » Elle roule à vide jusqu'au matin. C'était l'agent de nuit. Règle numéro deux : attends-le. Et toi, tu serais monté dans la rame ? Dis-le en commentaire, abonne-toi !
+
+=====================================================================
+2) VERSION MINUTÉE (une ligne = un bloc de texte dans CapCut)
+   Le temps indique OÙ poser le début du bloc sur la timeline.
+=====================================================================
+
+00:00  Imagine… tu rates le dernier métro.
+00:02  Les grilles se ferment. Station Les Arcades : plus personne.
+00:06  Téléphone : trois pour cent. Pas de réseau.
+00:09  Prochain métro : cinq heures trente.
+00:11  Dans la cabine, une feuille scotchée à la vitre. Règle numéro un : ne monte jamais dans une rame vide.
+00:17  Minuit. Tout s'éteint.
+00:19  Au fond du tunnel, deux phares.
+00:22  Une rame arrive. Les portes s'ouvrent. Personne à bord.
+00:25  Derrière toi, des pas lents. Ils se rapprochent.
+00:28  Ils s'arrêtent derrière ton épaule.
+00:31  Quelqu'un respire, tout près.
+00:33  Les portes vont se fermer…
+00:35  Tu hésites… une main te retient.
+00:37  « Ne monte pas ! C'est la rame du dépôt ! »     <- l'agent : voix plus grave si possible
+00:40  Elle roule à vide jusqu'au matin.
+00:42  C'était l'agent de nuit. Règle numéro deux : attends-le.
+00:45  Et toi, tu serais monté dans la rame ?
+00:48  Dis-le en commentaire, abonne-toi !
+
+=====================================================================
+3) COMMENT FAIRE DANS CAPCUT
+=====================================================================
+
+- Importe « le-dernier-metro-50s.mp4 » (sans sous-titres).
+- Voix générée : Texte > Ajouter du texte > colle UNE ligne de la version minutée
+  > place-la au bon moment > « Texte en parole » > voix française d'homme, calme et grave.
+  Le montage est serré : si une phrase dépasse son créneau, mets-la à la vitesse 1,1x ou 1,2x.
+- Ta propre voix : Audio > Voix off, en suivant les temps de la version minutée.
+- Sous-titres : Texte > Sous-titres automatiques (après avoir ajouté la voix).
+- Baisse le son d'ambiance de la vidéo à environ 30 % si ta voix est noyée.
+
+=====================================================================
+4) PUBLICATION
+=====================================================================
+
+Légende :
+Tu rates le dernier métro. Une rame vide s'arrête devant toi… et quelqu'un respire dans ton dos. Tu serais monté ? Dis-le en commentaire 👇
+
+Hashtags :
+#histoire #metro #suspense #mystere #dernierMetro #storytime #pourtoi #fyp
+
+Commentaire à épingler :
+Moi, je ne serais jamais monté. Et toi, tu montes ou tu restes ? 🚇 Abonne-toi pour la prochaine histoire !

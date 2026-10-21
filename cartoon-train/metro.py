@@ -27,13 +27,24 @@ OUT_TOTAL = 60.0  # durée de la vidéo finale
 CAPTIONS_ON = False
 
 # Montage court : (début, fin) dans la vidéo finale  ->  (début, fin) dans la chronologie d'origine
-SEGMAP = [
+SEGMAP_60 = [
     (0.0, 3.0, 0.0, 3.6), (3.0, 5.4, 3.6, 6.4), (5.4, 7.4, 7.8, 9.8), (7.4, 10.6, 9.8, 14.0),
     (10.6, 13.4, 14.4, 18.0), (13.4, 16.4, 19.0, 23.5), (16.4, 21.4, 23.5, 29.0), (21.4, 23.6, 29.0, 31.4),
     (23.6, 26.4, 32.4, 35.5), (26.4, 30.6, 35.5, 40.8), (30.6, 34.6, 42.2, 47.0), (34.6, 37.2, 47.0, 50.4),
     (37.2, 39.6, 50.6, 53.7), (39.6, 42.2, 53.7, 57.2), (42.2, 44.8, 57.2, 60.5), (44.8, 47.8, 60.5, 64.3),
     (47.8, 50.4, 64.8, 68.4), (50.4, 53.8, 68.4, 72.4), (53.8, 60.0, 72.6, 78.8),
 ]
+
+
+# Montage de 50 s : mêmes scènes, passages d'ambiance resserrés
+SEGMAP_50 = [
+    (0.0, 2.4, 0.6, 3.6), (2.4, 4.4, 3.9, 6.3), (4.4, 6.0, 8.2, 9.8), (6.0, 8.6, 10.0, 13.4),
+    (8.6, 10.8, 15.0, 17.8), (10.8, 13.2, 20.5, 23.5), (13.2, 17.4, 23.5, 29.0), (17.4, 19.2, 29.0, 31.0),
+    (19.2, 21.6, 32.5, 35.5), (21.6, 25.0, 36.0, 40.4), (25.0, 28.4, 42.4, 47.0), (28.4, 30.6, 47.2, 50.2),
+    (30.6, 32.6, 50.6, 53.4), (32.6, 34.8, 54.2, 57.2), (34.8, 37.0, 57.2, 60.4), (37.0, 39.6, 60.5, 64.2),
+    (39.6, 41.8, 65.0, 68.4), (41.8, 44.8, 68.4, 72.4), (44.8, 50.0, 72.6, 77.8),
+]
+SEGMAP = SEGMAP_60
 
 
 def remap(tn):
@@ -1000,11 +1011,14 @@ def montage_audio(src, dst):
 
 
 def main():
-    global CAPTIONS_ON
+    global CAPTIONS_ON, SEGMAP, OUT_TOTAL
     ap = argparse.ArgumentParser()
     ap.add_argument("--frames", default="")
     ap.add_argument("--captions", action="store_true", help="avec les phrases à l'écran (test)")
+    ap.add_argument("--duree", type=int, default=60, choices=(50, 60), help="durée finale en secondes")
     a = ap.parse_args()
+    if a.duree == 50:
+        SEGMAP, OUT_TOTAL = SEGMAP_50, 50.0
     os.makedirs(BUILD, exist_ok=True)
     if a.frames:
         from PIL import Image
@@ -1019,7 +1033,9 @@ def main():
     write_wav(wav_full, build_audio())
     wav = os.path.join(BUILD, "audio.wav")
     montage_audio(wav_full, wav)
-    for name, caps in (("le-dernier-metro", False), ("le-dernier-metro-avec-texte", True)):
+    variants = (("le-dernier-metro-50s", False),) if a.duree == 50 else (
+        ("le-dernier-metro", False), ("le-dernier-metro-avec-texte", True))
+    for name, caps in variants:
         CAPTIONS_ON = caps
         out = os.path.join(OUT, name + ".mp4")
         ff = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
