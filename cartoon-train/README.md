@@ -51,3 +51,8 @@ magazine chez le médecin, banc au parc.
 ```bash
 python3 engine.py --serie 2          # rend les 10 vidéos dans videos-serie2/
 ```
+
+## Court-métrage « Le dernier métro »
+
+`metro.py` : ambiance sans voix off ni personnage cartoon (phrases à l'écran, petit fantôme blanc, son 100 % synthétisé).
+`python3 metro.py` -> `videos-metro/le-dernier-metro.mp4`.
