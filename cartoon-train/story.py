@@ -656,6 +656,9 @@ def main():
     elif a.story.startswith("y"):
         from yscripts import STORIES as Y
         stories = [s_ for s_ in Y if a.story == "yall" or s_["slug"].startswith(a.story)]
+    elif a.story.startswith("z"):
+        from histoires3 import STORIES as Zs
+        stories = [s_ for s_ in Zs if a.story == "zall" or s_["slug"].startswith(a.story)]
     elif a.story.startswith("x"):
         from histoires2 import STORIES as X
         stories = [s_ for s_ in X if a.story == "xall" or s_["slug"].startswith(a.story)]
