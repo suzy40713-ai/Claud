@@ -20,7 +20,7 @@ export function createAnthropicProvider(): LlmProvider {
         },
         body: JSON.stringify({
           model,
-          max_tokens: 8192,
+          max_tokens: 16000,
           system,
           messages: [{ role: "user", content: user }],
         }),
@@ -32,7 +32,11 @@ export function createAnthropicProvider(): LlmProvider {
       }
 
       const data = await response.json();
-      const text = data?.content?.[0]?.text;
+      // Current models think by default, so the first block may be a thinking
+      // block — pick the first text block instead of content[0].
+      const text = Array.isArray(data?.content)
+        ? data.content.find((block: { type?: string }) => block?.type === "text")?.text
+        : undefined;
       if (typeof text !== "string") {
         throw new LlmProviderError("Anthropic response missing text content", "anthropic");
       }

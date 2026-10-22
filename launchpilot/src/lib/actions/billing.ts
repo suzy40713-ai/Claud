@@ -36,6 +36,11 @@ export async function purchasePlanCredit(returnTo?: string): Promise<BillingActi
   }
 
   if (!isStripeConfigured()) {
+    // Never hand out free credits on a production build: a deployment missing
+    // its Stripe keys must fail closed, not give plans away.
+    if (process.env.NODE_ENV === "production") {
+      return { success: false, error: "Le paiement n'est pas encore disponible. Réessaie plus tard." };
+    }
     await grantCredits(user.id, CREDITS_PER_PURCHASE);
     revalidatePath("/dashboard");
     revalidatePath("/onboarding");
