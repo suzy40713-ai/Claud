@@ -1,0 +1,20 @@
+{
+  "name": "studio-cartoon",
+  "version": "1.0.0",
+  "description": "Site de vente et d'accès à la formation Studio Cartoon (sketchs animés).",
+  "private": true,
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "resend": "^4.0.0",
+    "stripe": "^16.12.0"
+  }
+}

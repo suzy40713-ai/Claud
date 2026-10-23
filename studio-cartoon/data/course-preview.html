@@ -1,0 +1,134 @@
+<!doctype html><html lang='fr'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><meta name='robots' content='noindex'><title>Studio Cartoon</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout : barre latérale des modules à gauche (repliée en haut sur téléphone), une leçon à la fois à droite. */
+:root{--bg:#fbf8f1;--panel:#ffffff;--ink:#1d2027;--muted:#5d6672;--line:#e5dfd2;--navy:#13233a;--on-navy:#d4dbe5;
+  --accent:#e0194a;--sun:#ffc94d;--done:#1f9d55;--tint:#f2eee4;--codebg:#efeae0;
+  --display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;--text:'Source Sans 3','Segoe UI',system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f141b;--panel:#161d26;--ink:#eef0f3;--muted:#a3adb9;--line:#283241;--navy:#0a1220;--on-navy:#c3ccd8;--accent:#ff4d78;--done:#3ccf7d;--tint:#1c2531;--codebg:#222c39;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f141b;--panel:#161d26;--ink:#eef0f3;--muted:#a3adb9;--line:#283241;--navy:#0a1220;--on-navy:#c3ccd8;--accent:#ff4d78;--done:#3ccf7d;--tint:#1c2531;--codebg:#222c39;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{margin:0;color:var(--ink);font-family:var(--text);font-size:17px;line-height:1.6}
+.top{background:var(--navy);color:#fff;padding-block:18px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top .in{max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between}
+.brand{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-.01em}
+.brand small{display:block;font-family:var(--text);font-weight:400;font-size:14px;color:var(--on-navy)}
+.prog{min-width:0;flex:1 1 260px;max-width:420px}
+.prog .bar{height:10px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden}
+.prog .bar i{display:block;height:100%;background:var(--sun);width:0;transition:width .3s}
+.prog .lbl{font-size:13px;color:var(--on-navy);margin-top:5px;font-variant-numeric:tabular-nums}
+.shell{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:300px minmax(0,1fr);gap:28px;padding-block:24px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+nav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);align-self:start;max-height:calc(100vh - 24px);overflow:auto;padding-right:4px}
+nav details{border-bottom:1px solid var(--line);padding-block:6px}
+nav summary{cursor:pointer;font-weight:700;padding:6px 4px;list-style:none;display:flex;gap:8px;align-items:baseline}
+nav summary::-webkit-details-marker{display:none}
+nav summary .n{font-family:var(--display);color:var(--accent);font-size:14px;min-width:22px}
+nav ol{list-style:none;margin:2px 0 6px;padding:0}
+nav button{all:unset;cursor:pointer;display:flex;gap:8px;width:100%;padding:5px 6px 5px 30px;border-radius:8px;font-size:15px;color:var(--muted);box-sizing:border-box}
+nav button:hover{background:var(--tint);color:var(--ink)}
+nav button.cur{background:var(--tint);color:var(--ink);font-weight:700}
+nav button .ck{width:16px;flex:none;color:var(--done)}
+nav button:focus-visible,.btn:focus-visible,summary:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+main{min-width:0}
+.crumb{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,4.2vw,42px);line-height:1.1;margin:6px 0 6px;text-wrap:balance}
+.intro{color:var(--muted);margin:0 0 18px}
+article{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px clamp(16px,3vw,32px);max-width:78ch}
+article h3{font-family:var(--display);font-size:20px;margin:22px 0 6px}
+article table{border-collapse:collapse;width:100%;font-size:15px;margin:10px 0}
+.tw{overflow-x:auto}
+article th,article td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+article th{background:var(--tint)}
+td.blank{height:34px;width:60%}
+.note{background:var(--tint);border-left:5px solid var(--sun);padding:11px 14px;border-radius:8px;margin:14px 0}
+.script{background:var(--tint);padding:12px 15px;border-radius:10px;font-size:15.5px}
+code{background:var(--codebg);padding:1px 5px;border-radius:5px;font-size:.9em}
+.cols{columns:2 240px;column-gap:24px;padding-left:18px}.cols li{break-inside:avoid}
+ul.check{list-style:none;padding:0}ul.check li::before{content:"\2610  "}
+.ex{margin-top:22px;border:2px dashed var(--done);border-radius:12px;padding:14px 16px}
+.ex b{color:var(--done)}
+.foot{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-top:20px;max-width:78ch}
+.btn{all:unset;cursor:pointer;padding:11px 18px;border-radius:999px;font-weight:700;border:2px solid var(--line);background:var(--panel)}
+.btn.main{background:var(--accent);color:#fff;border-color:var(--accent)}
+.dl{color:#fff;text-decoration:none;font-weight:700;border:2px solid rgba(255,255,255,.35);padding:8px 14px;border-radius:999px;font-size:15px}
+.dl:hover{background:rgba(255,255,255,.1)}
+.btn[disabled]{opacity:.4;cursor:default}
+label.done{display:flex;gap:8px;align-items:center;font-weight:700;cursor:pointer}
+label.done input{width:20px;height:20px;accent-color:var(--done)}
+@media (max-width:860px){.shell{grid-template-columns:minmax(0,1fr)}nav{position:static;max-height:none;border:1px solid var(--line);border-radius:14px;padding:6px 10px;background:var(--panel)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head><body><header class="top"><div class="in">
+  <div class="brand">Studio Cartoon<small>Aperçu gratuit · modules 0 et 1</small></div>
+  <div class="prog" aria-live="polite"><div class="bar"><i id="pbar"></i></div><div class="lbl" id="plbl"></div></div>
+<a class="dl" href="/#acheter">Débloquer tout</a></div></header>
+<div class="shell">
+  <nav id="nav" aria-label="Modules de la formation"></nav>
+  <main>
+    <div class="crumb" id="crumb"></div>
+    <h1 id="ltitle"></h1>
+    <p class="intro" id="lintro"></p>
+    <article id="lbody"></article>
+    <div class="foot">
+      <button class="btn" id="prev" type="button">← Précédente</button>
+      <label class="done"><input type="checkbox" id="donebox"> Leçon terminée</label>
+      <button class="btn main" id="next" type="button">Suivante →</button>
+    </div>
+  </main>
+</div>
+<script>
+const DATA = [{"title": "Bienvenue", "intro": "Comment suivre la formation et t'organiser pour publier ta première vidéo vite.", "lessons": [{"title": "Ce que tu vas construire", "body": "\n<p>À la fin de cette formation, tu auras :<\/p>\n<ul>\n<li><b>un personnage récurrent<\/b> avec son look, sa voix et son défaut ;<\/li>\n<li><b>un kit visuel réutilisable<\/b> : personnages, décors, bouches, cartes de fin ;<\/li>\n<li><b>une méthode d'écriture<\/b> qui te permet d'écrire un script de 40 secondes en 15 minutes ;<\/li>\n<li><b>une routine de production<\/b> pour sortir une vidéo par jour sans y passer tes soirées ;<\/li>\n<li><b>une première saison de 10 épisodes<\/b> prête à publier.<\/li>\n<\/ul>\n<p>La formation suit l'ordre réel de fabrication : idée, script, hook, visuels, voix, montage, publication, croissance.\nChaque leçon se termine par un exercice. Fais-les : c'est en produisant qu'on progresse, pas en lisant.<\/p>\n", "ex": "Écris en une phrase pourquoi tu veux faire ces vidéos (t'amuser, construire une audience, vendre plus tard…). Garde cette phrase : elle t'aidera à tenir pendant les semaines où les chiffres stagnent."}, {"title": "Le matériel nécessaire", "body": "\n<table>\n<tr><th>Outil<\/th><th>À quoi il sert<\/th><th>Prix<\/th><\/tr>\n<tr><td>Un téléphone récent ou un ordinateur<\/td><td>Tout le reste<\/td><td>—<\/td><\/tr>\n<tr><td>CapCut<\/td><td>Montage, voix de synthèse, sous-titres automatiques<\/td><td>Version gratuite suffisante pour commencer<\/td><\/tr>\n<tr><td>Canva<\/td><td>Décors, cartes de fin, couvertures, suppression d'arrière-plan<\/td><td>Gratuit, certaines fonctions payantes<\/td><\/tr>\n<tr><td>Un générateur d'images IA (au choix)<\/td><td>Créer les personnages sans savoir dessiner<\/td><td>Souvent un quota gratuit<\/td><\/tr>\n<tr><td>Un micro de casque (optionnel)<\/td><td>Enregistrer ta propre voix<\/td><td>Celui de tes écouteurs suffit<\/td><\/tr>\n<tr><td>Un tableur ou une appli de notes<\/td><td>Ton carnet d'idées et ton planning<\/td><td>Gratuit<\/td><\/tr>\n<\/table>\n<div class=\"note\">Les outils changent souvent de fonctions, de prix et de conditions. Avant de publier, vérifie que tu as le droit d'utiliser commercialement ce que tu génères (images, voix, musiques, polices).<\/div>\n", "ex": "Installe CapCut et Canva, crée un compte, et crée un dossier « Studio » sur ton téléphone ou ton ordinateur avec quatre sous-dossiers : Personnages, Décors, Voix, Vidéos."}, {"title": "Ton planning sur 30 jours", "body": "\n<table>\n<tr><th>Semaine<\/th><th>Objectif<\/th><th>Modules<\/th><\/tr>\n<tr><td>Semaine 1<\/td><td>Comprendre le format, trouver ton personnage, écrire 3 scripts<\/td><td>1 à 4<\/td><\/tr>\n<tr><td>Semaine 2<\/td><td>Créer ton kit visuel et ta voix, monter ton premier épisode<\/td><td>5 à 7<\/td><\/tr>\n<tr><td>Semaine 3<\/td><td>Produire 7 épisodes en série et commencer à publier<\/td><td>8 et 9<\/td><\/tr>\n<tr><td>Semaine 4<\/td><td>Publier chaque jour, répondre aux commentaires, analyser<\/td><td>10<\/td><\/tr>\n<\/table>\n<p>Compte environ <b>1 heure par jour<\/b>. Le premier épisode prend plus de temps (2 à 4 heures) car tu crées ton kit.\nEnsuite, un épisode prend 30 à 45 minutes.<\/p>\n", "ex": "Bloque dans ton agenda un créneau fixe d'une heure par jour pour les 30 prochains jours. Note-le maintenant."}]}, {"title": "Comprendre le format", "intro": "Pourquoi ces vidéos retiennent l'attention et comment elles sont construites.", "lessons": [{"title": "Pourquoi les sketchs animés fonctionnent", "body": "\n<p>Une vidéo courte doit faire trois choses : <b>arrêter le défilement<\/b>, <b>tenir jusqu'à la fin<\/b> et\n<b>donner envie de réagir<\/b>. Le sketch animé coche les trois :<\/p>\n<ul>\n<li><b>Il se comprend sans le son<\/b> grâce aux sous-titres et aux expressions exagérées.<\/li>\n<li><b>Il crée un conflit immédiat<\/b> : quelqu'un exige quelque chose d'absurde.<\/li>\n<li><b>Il promet une récompense<\/b> : on veut voir l'exigeant remis à sa place.<\/li>\n<li><b>Il touche au vécu<\/b> : tout le monde a croisé un client impossible, un voisin pénible, un collègue de mauvaise foi.<\/li>\n<\/ul>\n<p>L'animation a un autre avantage : pas besoin d'acteurs, de décor réel ni de te montrer. Et un personnage dessiné\npeut être bien plus exagéré qu'un humain sans paraître méchant.<\/p>\n", "ex": "Fais défiler TikTok ou Shorts pendant 15 minutes et note 5 vidéos animées qui t'ont arrêté. Pour chacune, écris ce qui t'a arrêté dans les 2 premières secondes."}, {"title": "Les trois rôles", "body": "\n<table>\n<tr><th>Rôle<\/th><th>Ce qu'il fait<\/th><th>Ce que ressent le spectateur<\/th><\/tr>\n<tr><td><b>L'exigeant<\/b><\/td><td>Demande l'absurde avec une totale assurance<\/td><td>Agacement, envie qu'il perde<\/td><\/tr>\n<tr><td><b>La victime<\/b><\/td><td>Reste calme et logique<\/td><td>Identification : « c'est moi »<\/td><\/tr>\n<tr><td><b>L'autorité<\/b><\/td><td>Arrive avec une preuve et retourne la situation<\/td><td>Satisfaction, soulagement<\/td><\/tr>\n<\/table>\n<p>La clé est le <b>contraste<\/b> : plus l'exigeant est sûr de lui, plus la chute est satisfaisante. La victime ne doit\njamais crier : si elle s'énerve, le spectateur ne sait plus qui a raison.<\/p>\n<p>L'autorité peut être un patron, un contrôleur, une hôtesse, un gardien, un chef cuisinier, un médecin… Ce qui compte,\nc'est qu'elle apporte <b>une preuve concrète<\/b> : un registre, une affiche, une mesure, un ticket, une caméra.<\/p>\n", "ex": "Reprends une des vidéos notées à la leçon précédente et identifie qui joue l'exigeant, la victime et l'autorité. Si un rôle manque, explique comment la vidéo le remplace."}, {"title": "Les trois formats répétables", "body": "\n<h3>1. Le sketch dialogué<\/h3>\n<p>Trois personnages, un lieu, une chute. C'est le format de base. Exemple : « Il interdit de rire au cinéma ».<\/p>\n<h3>2. Le « Et si tu… »<\/h3>\n<p>Une voix off raconte une situation imaginaire à la deuxième personne, avec un retournement final.\nExemple : « Et si tu entendais les pensées des gens ? ». Ce format fonctionne parce que la première phrase est une\nquestion que le spectateur se pose aussitôt.<\/p>\n<h3>3. La série à personnage<\/h3>\n<p>Le même personnage revient dans chaque épisode, dans un lieu différent. Exemple : « Gérard · Épisode 4 ».\nC'est le format qui donne le plus de raisons de s'abonner, car le spectateur veut voir la suite.<\/p>\n<div class=\"note\">Conseil : commence par la série à personnage. Les deux autres formats peuvent devenir des épisodes\nspéciaux de ta série.<\/div>\n", "ex": "Choisis ton format principal pour les 30 prochains jours. Écris-le en haut de ton carnet."}, {"title": "Le personnage récurrent : ta meilleure arme pour les abonnés", "body": "\n<p>Beaucoup de créateurs publient des histoires toutes différentes et obtiennent des vues… mais presque aucun abonné.\nLa raison est simple : le spectateur regarde, rit, puis passe à la vidéo suivante. Rien ne l'incite à revenir.<\/p>\n<p>Un personnage récurrent change tout : on s'y attache, on reconnaît sa voix, on attend sa prochaine bêtise.\nL'abonnement devient le moyen de ne pas rater la suite.<\/p>\n<h3>La fiche personnage<\/h3>\n<table>\n<tr><th>Élément<\/th><th>Exemple (Gérard)<\/th><\/tr>\n<tr><td>Prénom simple et mémorable<\/td><td>Gérard<\/td><\/tr>\n<tr><td>Un seul défaut, très clair<\/td><td>Il pense que le client est roi et que tout lui est dû<\/td><\/tr>\n<tr><td>Une phrase fétiche<\/td><td>« Le client est roi ! »<\/td><\/tr>\n<tr><td>Un look reconnaissable en miniature<\/td><td>Lunettes rondes, moustache, veste bleu marine<\/td><\/tr>\n<tr><td>Une voix unique<\/td><td>Voix d'homme posée, un peu hautaine<\/td><\/tr>\n<tr><td>Un ou deux personnages qui reviennent<\/td><td>Léa la barista, Karim le patron<\/td><\/tr>\n<\/table>\n", "ex": "Remplis la fiche personnage pour ton héros. Si tu hésites entre deux défauts, garde le plus simple à expliquer en 5 mots."}]}, {"title": "La suite", "intro": "Tu as terminé l'aperçu gratuit.", "lessons": [{"title": "Débloque la formation complète", "body": "<p>Tu viens de voir les deux premiers modules. La formation complète contient <b>13 modules<\/b>, <b>59 leçons<\/b>, <b>55 exercices<\/b>, 20 scripts complets et le cahier PDF.<\/p><p><a class='btn main' href='/#acheter'>Voir la formation complète<\/a><\/p>", "ex": null}]}];
+const flat = [];
+DATA.forEach((m, i) => m.lessons.forEach((l, j) => flat.push({m: i, l: j})));
+let done = {};
+try { done = JSON.parse(localStorage.getItem("scp-done") || "{}"); } catch (e) {}
+let cur = 0;
+try { cur = Math.min(flat.length - 1, Math.max(0, +(localStorage.getItem("scp-cur") || 0))); } catch (e) {}
+const key = k => flat[k].m + "." + flat[k].l;
+function save() { try { localStorage.setItem("scp-done", JSON.stringify(done)); localStorage.setItem("scp-cur", cur); } catch (e) {} }
+function navBuild() {
+  const nav = document.getElementById("nav"); nav.innerHTML = "";
+  DATA.forEach((m, i) => {
+    const d = document.createElement("details");
+    d.open = flat[cur].m === i;
+    const s = document.createElement("summary");
+    const n = m.lessons.length, nd = m.lessons.filter((_, j) => done[i + "." + j]).length;
+    s.innerHTML = '<span class="n">' + (i === DATA.length - 1 ? "★" : i) + '</span><span>' + m.title + ' <small style="color:var(--muted);font-weight:400">' + nd + "/" + n + "</small></span>";
+    d.appendChild(s);
+    const ol = document.createElement("ol");
+    m.lessons.forEach((l, j) => {
+      const k = flat.findIndex(x => x.m === i && x.l === j);
+      const li = document.createElement("li"), b = document.createElement("button");
+      b.type = "button"; if (k === cur) b.className = "cur";
+      b.innerHTML = '<span class="ck">' + (done[i + "." + j] ? "✓" : "") + "</span><span>" + l.title + "</span>";
+      b.onclick = () => go(k);
+      li.appendChild(b); ol.appendChild(li);
+    });
+    d.appendChild(ol); nav.appendChild(d);
+  });
+}
+function render() {
+  const f = flat[cur], m = DATA[f.m], l = m.lessons[f.l];
+  document.getElementById("crumb").textContent = (f.m === DATA.length - 1 ? "Bonus" : "Module " + f.m + " · " + m.title) + " · Leçon " + (f.l + 1) + "/" + m.lessons.length;
+  document.getElementById("ltitle").textContent = l.title;
+  document.getElementById("lintro").textContent = f.l === 0 ? m.intro : "";
+  let body = l.body.replace(/<table>/g, '<div class="tw"><table>').replace(/<\/table>/g, "</table></div>");
+  if (l.ex) body += '<div class="ex"><b>Exercice.</b> ' + l.ex + "</div>";
+  document.getElementById("lbody").innerHTML = body;
+  document.getElementById("prev").disabled = cur === 0;
+  document.getElementById("next").disabled = cur === flat.length - 1;
+  document.getElementById("donebox").checked = !!done[key(cur)];
+  const nd = Object.values(done).filter(Boolean).length;
+  document.getElementById("pbar").style.width = (100 * nd / flat.length) + "%";
+  document.getElementById("plbl").textContent = nd + " / " + flat.length + " leçons terminées";
+  navBuild();
+}
+function go(k) { cur = k; save(); render(); window.scrollTo({top: 0}); }
+document.getElementById("prev").onclick = () => cur > 0 && go(cur - 1);
+document.getElementById("next").onclick = () => { done[key(cur)] = true; if (cur < flat.length - 1) go(cur + 1); else { save(); render(); } };
+document.getElementById("donebox").onchange = e => { done[key(cur)] = e.target.checked; save(); render(); };
+render();
+</script>
+</body></html>

@@ -168,6 +168,8 @@ ul.check{list-style:none;padding:0}ul.check li::before{content:"\2610  "}
 .foot{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-top:20px;max-width:78ch}
 .btn{all:unset;cursor:pointer;padding:11px 18px;border-radius:999px;font-weight:700;border:2px solid var(--line);background:var(--panel)}
 .btn.main{background:var(--accent);color:#fff;border-color:var(--accent)}
+.dl{color:#fff;text-decoration:none;font-weight:700;border:2px solid rgba(255,255,255,.35);padding:8px 14px;border-radius:999px;font-size:15px}
+.dl:hover{background:rgba(255,255,255,.1)}
 .btn[disabled]{opacity:.4;cursor:default}
 label.done{display:flex;gap:8px;align-items:center;font-weight:700;cursor:pointer}
 label.done input{width:20px;height:20px;accent-color:var(--done)}
@@ -177,7 +179,7 @@ label.done input{width:20px;height:20px;accent-color:var(--done)}
 <header class="top"><div class="in">
   <div class="brand">Studio Cartoon<small>__SUB__</small></div>
   <div class="prog" aria-live="polite"><div class="bar"><i id="pbar"></i></div><div class="lbl" id="plbl"></div></div>
-</div></header>
+__EXTRA__</div></header>
 <div class="shell">
   <nav id="nav" aria-label="Modules de la formation"></nav>
   <main>
@@ -248,16 +250,44 @@ render();
 """
 
 
+def course_page(modules, extra="", sub=None):
+    data = [dict(title=m["title"], intro=m["intro"], lessons=m["lessons"]) for m in modules]
+    return COURSE_TEMPLATE.replace("__DATA__", json.dumps(data, ensure_ascii=False).replace("</", "<\\/")) \
+        .replace("__SUB__", sub or "%d modules · %d leçons · %d exercices" % (len(ALL), N_LESSONS, N_EX)) \
+        .replace("__EXTRA__", extra)
+
+
 def build_course(path):
-    data = [dict(title=m["title"], intro=m["intro"], lessons=m["lessons"]) for m in ALL]
-    page = COURSE_TEMPLATE.replace("__DATA__", json.dumps(data, ensure_ascii=False).replace("</", "<\\/")) \
-        .replace("__SUB__", "%d modules · %d leçons · %d exercices" % (len(ALL), N_LESSONS, N_EX))
     with open(path, "w") as fh:
-        fh.write(page)
+        fh.write(course_page(ALL))
     return path
+
+
+def build_site(site_dir):
+    """Pages de la formation pour le site : complète (accès payant) et aperçu gratuit (modules 0 et 1)."""
+    data_dir = os.path.join(site_dir, "data")
+    os.makedirs(data_dir, exist_ok=True)
+    full = course_page(ALL, extra='<a class="dl" href="__PDF_URL__">Télécharger le cahier PDF</a>')
+    teaser = dict(title="La suite", intro="Tu as terminé l'aperçu gratuit.", lessons=[dict(
+        title="Débloque la formation complète",
+        body=("<p>Tu viens de voir les deux premiers modules. La formation complète contient <b>%d modules</b>, "
+              "<b>%d leçons</b>, <b>%d exercices</b>, 20 scripts complets et le cahier PDF.</p>"
+              "<p><a class='btn main' href='/#acheter'>Voir la formation complète</a></p>") % (len(ALL), N_LESSONS, N_EX),
+        ex=None)])
+    preview = course_page(ALL[:2] + [teaser], extra='<a class="dl" href="/#acheter">Débloquer tout</a>',
+                          sub="Aperçu gratuit · modules 0 et 1").replace('"sc-', '"scp-')
+    for name, frag in (("course-full.html", full), ("course-preview.html", preview)):
+        head, rest = frag.split("<header", 1)
+        with open(os.path.join(data_dir, name), "w") as fh:
+            fh.write("<!doctype html><html lang='fr'><head><meta charset='utf-8'>"
+                     "<meta name='viewport' content='width=device-width, initial-scale=1'>"
+                     "<meta name='robots' content='noindex'>%s</head><body><header%s</body></html>" % (
+                         head.replace('<meta name="claude:viewport-fit-sides" content="cover">', ""), rest))
+    return data_dir
 
 
 if __name__ == "__main__":
     print(build_pdf())
     print(build_course(sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "studio-cartoon-cours.html")))
+    print(build_site(os.path.join(os.path.dirname(os.path.dirname(HERE)), "studio-cartoon")))
     print("modules=%d lecons=%d exercices=%d" % (len(ALL), N_LESSONS, N_EX))

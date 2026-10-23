@@ -9,3 +9,29 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+  - type: web
+    name: studio-cartoon
+    runtime: docker
+    rootDir: studio-cartoon
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PRICE_CENTS
+        value: "2900"
+      - key: CURRENCY
+        value: eur
+      - key: ACCESS_SECRET
+        generateValue: true
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: PUBLIC_ORIGIN
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: SENDER_EMAIL
+        sync: false
+      - key: LEAD_NOTIFY_EMAIL
+        sync: false
