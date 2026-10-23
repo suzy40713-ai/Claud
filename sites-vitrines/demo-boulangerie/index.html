@@ -1,0 +1,378 @@
+<title>Le Fournil des Lilas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Boulangerie artisanale : pain au levain, viennoiseries et gâteaux sur commande.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap">
+<style>
+/* Layout: one narrow column of stacked bands, like a shop window read from the street. */
+:root {
+  --bg: #f3f4f1;
+  --surface: #ffffff;
+  --fg: #1d2420;
+  --muted: #5d6a63;
+  --line: #d9ddd6;
+  --accent: #23533f;      /* vert sapin de la devanture */
+  --accent-fg: #ffffff;
+  --wheat: #e2a93b;       /* couleur croûte / blé */
+  --wheat-soft: #f7ecd4;
+  --font-display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Literata", Georgia, "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121714; --surface: #1a211d; --fg: #e9ede8; --muted: #9eaba3; --line: #2c3530;
+    --accent: #6fb593; --accent-fg: #0f1512; --wheat: #e9b552; --wheat-soft: #2b2617;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121714; --surface: #1a211d; --fg: #e9ede8; --muted: #9eaba3; --line: #2c3530;
+  --accent: #6fb593; --accent-fg: #0f1512; --wheat: #e9b552; --wheat-soft: #2b2617;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.6;
+}
+.wrap {
+  max-width: 1040px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.7rem, 4vw, 2.4rem); font-weight: 800; letter-spacing: -0.01em; }
+p { margin: 0; }
+a { color: inherit; }
+.eyebrow {
+  font-family: var(--font-display); font-weight: 700; font-size: 0.78rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
+}
+
+/* Bandeau démo */
+.demo-bar { background: var(--wheat-soft); border-bottom: 1px solid var(--line); font-size: 0.85rem; color: var(--muted); }
+.demo-bar .wrap { padding-block: 8px; text-align: center; }
+
+/* En-tête */
+header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 18px; flex-wrap: wrap; }
+.logo { font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px; }
+.logo svg { flex: none; }
+nav { display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.95rem; }
+nav a { text-decoration: none; color: var(--muted); }
+nav a:hover, nav a:focus-visible { color: var(--fg); }
+
+/* Hero */
+.hero .wrap { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center; padding-block: 32px 56px; }
+.hero h1 { font-size: clamp(2.4rem, 7vw, 4.4rem); font-weight: 800; letter-spacing: -0.02em; }
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero-text { display: grid; gap: 20px; min-width: 0; }
+.hero-text > p { color: var(--muted); max-width: 46ch; font-size: 1.08rem; }
+.today {
+  display: inline-flex; align-items: center; gap: 10px; width: fit-content;
+  padding: 8px 14px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line);
+  font-family: var(--font-display); font-weight: 500; font-size: 0.95rem;
+}
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); }
+.dot.open { background: #2f9e62; box-shadow: 0 0 0 4px color-mix(in srgb, #2f9e62 22%, transparent); }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 13px 20px; border-radius: 10px;
+  font-family: var(--font-display); font-weight: 700; font-size: 1rem; text-decoration: none;
+  border: 2px solid var(--accent); cursor: pointer; background: transparent; color: var(--accent);
+}
+.btn.primary { background: var(--accent); color: var(--accent-fg); }
+.btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--wheat); outline-offset: 2px; }
+
+/* Visuel : miche dessinée */
+.loaf { background: var(--wheat-soft); border-radius: 24px; aspect-ratio: 1 / 1; max-width: 100%; display: grid; place-items: center; position: relative; overflow: hidden; }
+.loaf svg { width: 78%; height: auto; }
+.loaf .tag {
+  position: absolute; left: 16px; bottom: 16px; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 10px; padding: 8px 12px; font-family: var(--font-display); font-size: 0.85rem;
+}
+.loaf .tag strong { display: block; font-size: 1rem; }
+
+/* Fournées */
+.batches { background: var(--accent); color: var(--accent-fg); }
+.batches .wrap { display: flex; flex-wrap: wrap; gap: 12px 40px; padding-block: 18px; align-items: baseline; font-family: var(--font-display); }
+.batches b { font-weight: 800; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+
+section > .wrap { padding-block: 64px; display: grid; gap: 28px; }
+.section-head { display: grid; gap: 8px; max-width: 60ch; }
+.section-head p { color: var(--muted); }
+
+/* Produits */
+.products { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.product { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: grid; gap: 6px; align-content: start; }
+.product h3 { font-size: 1.2rem; font-weight: 700; }
+.product p { color: var(--muted); font-size: 0.95rem; }
+.price { font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+.price small { font-weight: 500; color: var(--muted); font-size: 0.85rem; }
+
+/* Histoire */
+.story { background: var(--surface); border-block: 1px solid var(--line); }
+.story .wrap { grid-template-columns: 1fr 1fr; align-items: start; }
+.story p + p { margin-top: 14px; }
+.facts { display: grid; gap: 14px; }
+.fact { display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: baseline; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.fact b { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+
+/* Horaires + accès */
+.info { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.info > div { min-width: 0; display: grid; gap: 14px; align-content: start; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+td { padding: 9px 0; border-bottom: 1px solid var(--line); }
+td:last-child { text-align: right; }
+tr.is-today td { font-weight: 600; color: var(--accent); }
+.closed { color: var(--muted); }
+.contact-line { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.copy { font: inherit; font-size: 0.85rem; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); cursor: pointer; }
+
+/* Commande */
+form { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+label { display: grid; gap: 6px; font-family: var(--font-display); font-weight: 500; font-size: 0.92rem; min-width: 0; }
+input, select, textarea {
+  font: inherit; font-family: var(--font-body); font-size: 1rem; padding: 11px 12px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--fg); width: 100%;
+}
+.full { grid-column: 1 / -1; }
+.form-note { color: var(--muted); font-size: 0.9rem; }
+.success { grid-column: 1 / -1; background: var(--wheat-soft); border-radius: 10px; padding: 14px 16px; }
+
+footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9rem; }
+footer .wrap { padding-block: 28px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+@media (max-width: 760px) {
+  .hero .wrap, .story .wrap, .info { grid-template-columns: 1fr; }
+  .products { grid-template-columns: 1fr; }
+  form { grid-template-columns: 1fr; }
+  .loaf { max-width: 360px; }
+  nav { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .loaf svg .steam { animation: rise 3.5s ease-in-out infinite; }
+  .loaf svg .steam:nth-child(2) { animation-delay: 1.1s; }
+  .loaf svg .steam:nth-child(3) { animation-delay: 2.2s; }
+  @keyframes rise { 0%,100% { transform: translateY(0); opacity: .25 } 50% { transform: translateY(-10px); opacity: .7 } }
+}
+</style>
+
+<div class="demo-bar"><div class="wrap">Site de démonstration : ce commerce est fictif. Exemple de ce que je peux faire pour votre boutique.</div></div>
+
+<header>
+  <div class="wrap">
+    <div class="logo">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+        <circle cx="17" cy="17" r="16" fill="var(--accent)"/>
+        <path d="M17 7 C13 12 13 22 17 27 C21 22 21 12 17 7 Z" fill="var(--wheat)"/>
+      </svg>
+      Le Fournil des Lilas
+    </div>
+    <nav aria-label="Navigation principale">
+      <a href="#produits">Nos produits</a>
+      <a href="#horaires">Horaires & accès</a>
+      <a href="#commande">Commander un gâteau</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero-text">
+        <span class="eyebrow">Boulangerie artisanale depuis 2009</span>
+        <h1>Le pain au levain, <em>cuit deux fois par jour.</em></h1>
+        <p>Farines bio d'un moulin de la Brie, levain maison nourri chaque matin, et une deuxième fournée à 16h pour avoir du pain encore tiède à la sortie du travail.</p>
+        <div class="today" id="today"><span class="dot" id="today-dot"></span><span id="today-text">Horaires du jour</span></div>
+        <div class="actions">
+          <a class="btn primary" href="#commande">Commander un gâteau</a>
+          <a class="btn" href="#horaires">Voir l'adresse</a>
+        </div>
+      </div>
+      <div class="loaf" role="img" aria-label="Illustration d'une miche de pain">
+        <svg viewBox="0 0 240 200" aria-hidden="true">
+          <path class="steam" d="M90 52 q-8 -12 0 -24 q8 -12 0 -24" stroke="var(--muted)" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path class="steam" d="M120 46 q-8 -12 0 -24 q8 -12 0 -24" stroke="var(--muted)" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path class="steam" d="M150 52 q-8 -12 0 -24 q8 -12 0 -24" stroke="var(--muted)" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <ellipse cx="120" cy="128" rx="104" ry="58" fill="var(--wheat)"/>
+          <ellipse cx="120" cy="120" rx="96" ry="50" fill="color-mix(in srgb, var(--wheat) 80%, white)"/>
+          <path d="M62 110 q20 -24 40 0 M100 100 q20 -24 40 0 M138 110 q20 -24 40 0" stroke="var(--wheat)" stroke-width="7" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div class="tag"><strong>Miche au levain</strong>1 kg · 6,80 €</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="batches">
+    <div class="wrap">
+      <span>Fournées du jour</span>
+      <span><b>7h00</b> baguettes & viennoiseries</span>
+      <span><b>16h00</b> pains au levain</span>
+    </div>
+  </div>
+
+  <section id="produits">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Nos produits</span>
+        <h2>Ce qui sort du four</h2>
+        <p>Une petite gamme, faite sur place chaque jour. Les prix sont à l'unité.</p>
+      </div>
+      <div class="products">
+        <article class="product"><h3>Baguette de tradition</h3><p>Fermentation lente de 18 heures, croûte fine et mie alvéolée.</p><span class="price">1,30 € <small>/ 250 g</small></span></article>
+        <article class="product"><h3>Croissant pur beurre</h3><p>Beurre AOP Charentes-Poitou, feuilleté sur trois jours.</p><span class="price">1,40 € <small>/ pièce</small></span></article>
+        <article class="product"><h3>Pain aux graines</h3><p>Levain, lin, tournesol et sésame grillé. Se garde 4 jours.</p><span class="price">4,20 € <small>/ 500 g</small></span></article>
+        <article class="product"><h3>Flan pâtissier</h3><p>Vanille de Madagascar, pâte brisée maison. En part ou entier.</p><span class="price">3,20 € <small>/ part</small></span></article>
+        <article class="product"><h3>Tarte de saison</h3><p>En ce moment : pommes et noisettes du Lot.</p><span class="price">22 € <small>/ 6 parts</small></span></article>
+        <article class="product"><h3>Formule midi</h3><p>Sandwich du jour, boisson et dessert, de 11h30 à 14h.</p><span class="price">9,50 € <small>/ formule</small></span></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="story">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">L'atelier</span>
+        <h2>Une boulangerie de quartier, à l'ancienne</h2>
+        <p>Nous pétrissons, façonnons et cuisons tout dans l'atelier derrière la boutique. Pas de pâte surgelée, pas de pain livré.</p>
+        <p>Le levain qui sert à nos miches a été lancé à l'ouverture en 2009. Il est nourri tous les matins à 4h, avant la première fournée.</p>
+      </div>
+      <div class="facts">
+        <div class="fact"><b>18 h</b><span>de fermentation pour chaque baguette de tradition</span></div>
+        <div class="fact"><b>2</b><span>fournées par jour, à 7h et à 16h</span></div>
+        <div class="fact"><b>100 %</b><span>des farines viennent d'un moulin à moins de 80 km</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="horaires">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Horaires & accès</span>
+        <h2>Passez nous voir</h2>
+      </div>
+      <div class="info">
+        <div>
+          <table aria-label="Horaires d'ouverture">
+            <tbody id="hours"></tbody>
+          </table>
+        </div>
+        <div>
+          <p><strong>12 rue des Lilas, 75000 Paris</strong><br>Adresse fictive pour la démonstration.</p>
+          <div class="contact-line"><span>Téléphone : <strong id="phone">01 23 45 67 89</strong></span><button class="copy" type="button" data-copy="phone">Copier</button></div>
+          <p class="form-note">Paiement par carte dès 1 €. Terrasse de 6 places aux beaux jours.</p>
+          <a class="btn" href="https://www.google.com/maps/search/?api=1&query=rue+des+Lilas+Paris" target="_blank" rel="noopener">Ouvrir l'itinéraire</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="commande">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Sur commande</span>
+        <h2>Commander un gâteau</h2>
+        <p>Anniversaire, baptême ou simple envie : réservez au moins 48 heures à l'avance. Nous vous rappelons pour confirmer.</p>
+      </div>
+      <form id="order" novalidate>
+        <label for="o-name">Votre nom<input id="o-name" name="name" required autocomplete="name" value="Camille Martin"></label>
+        <label for="o-phone">Téléphone<input id="o-phone" name="phone" required autocomplete="tel" inputmode="tel" value="06 12 34 56 78"></label>
+        <label for="o-cake">Gâteau
+          <select id="o-cake" name="cake">
+            <option>Fraisier</option><option selected>Tarte de saison</option><option>Paris-Brest</option><option>Entremets chocolat</option>
+          </select>
+        </label>
+        <label for="o-parts">Nombre de parts
+          <select id="o-parts" name="parts"><option>4</option><option selected>6</option><option>8</option><option>12</option></select>
+        </label>
+        <label class="full" for="o-date">Date de retrait<input id="o-date" name="date" type="date" required></label>
+        <label class="full" for="o-note">Message (facultatif)<textarea id="o-note" name="note" rows="3">« Joyeux anniversaire Léa » sur une plaque en chocolat.</textarea></label>
+        <div class="full actions"><button class="btn primary" type="submit">Envoyer ma demande</button></div>
+        <p class="full form-note">Démonstration : aucune demande n'est réellement envoyée.</p>
+        <div class="success" id="success" hidden></div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© Le Fournil des Lilas · Boulangerie fictive</span>
+    <span>Site vitrine de démonstration</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // 0 = dimanche … 6 = samedi ; null = fermé
+  var schedule = [
+    { day: "Dimanche", open: "07:00", close: "13:00" },
+    { day: "Lundi", open: null },
+    { day: "Mardi", open: "07:00", close: "19:30" },
+    { day: "Mercredi", open: "07:00", close: "19:30" },
+    { day: "Jeudi", open: "07:00", close: "19:30" },
+    { day: "Vendredi", open: "07:00", close: "19:30" },
+    { day: "Samedi", open: "07:00", close: "19:30" }
+  ];
+  var order = [1, 2, 3, 4, 5, 6, 0];
+  var now = new Date();
+  var today = now.getDay();
+  var fmt = function (t) { return t.replace(":", "h"); };
+
+  var tbody = document.getElementById("hours");
+  order.forEach(function (i) {
+    var s = schedule[i];
+    var tr = document.createElement("tr");
+    if (i === today) tr.className = "is-today";
+    var a = document.createElement("td"); a.textContent = s.day + (i === today ? " (aujourd'hui)" : "");
+    var b = document.createElement("td");
+    if (s.open) { b.textContent = fmt(s.open) + " – " + fmt(s.close); } else { b.textContent = "Fermé"; b.className = "closed"; }
+    tr.appendChild(a); tr.appendChild(b); tbody.appendChild(tr);
+  });
+
+  var s = schedule[today];
+  var mins = now.getHours() * 60 + now.getMinutes();
+  var toMin = function (t) { var p = t.split(":"); return +p[0] * 60 + +p[1]; };
+  var text = document.getElementById("today-text");
+  var dot = document.getElementById("today-dot");
+  if (s.open && mins >= toMin(s.open) && mins < toMin(s.close)) {
+    dot.classList.add("open");
+    text.textContent = "Ouvert maintenant, jusqu'à " + fmt(s.close);
+  } else if (s.open && mins < toMin(s.open)) {
+    text.textContent = "Ouvre aujourd'hui à " + fmt(s.open);
+  } else {
+    text.textContent = "Fermé pour le moment";
+  }
+
+  // Date de retrait par défaut : dans 3 jours
+  var d = new Date(now.getTime() + 3 * 864e5);
+  var dateInput = document.getElementById("o-date");
+  dateInput.value = d.toISOString().slice(0, 10);
+  dateInput.min = new Date(now.getTime() + 2 * 864e5).toISOString().slice(0, 10);
+
+  document.getElementById("order").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var f = e.target;
+    var box = document.getElementById("success");
+    if (!f.name.value.trim() || !f.phone.value.trim() || !f.date.value) {
+      box.textContent = "Indiquez votre nom, votre téléphone et une date de retrait.";
+    } else {
+      var when = new Date(f.date.value + "T12:00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+      box.textContent = "Exemple de confirmation : " + f.cake.value + " pour " + f.parts.value + " personnes, à retirer le " + when + ". Sur un vrai site, la boulangerie recevrait cette demande par email.";
+    }
+    box.hidden = false;
+  });
+
+  document.querySelectorAll("[data-copy]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var el = document.getElementById(btn.getAttribute("data-copy"));
+      var done = function () { btn.textContent = "Copié"; setTimeout(function () { btn.textContent = "Copier"; }, 1500); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(el.textContent).then(done, function () { window.getSelection().selectAllChildren(el); });
+      } else { window.getSelection().selectAllChildren(el); }
+    });
+  });
+})();
+</script>
