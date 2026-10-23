@@ -1419,8 +1419,9 @@ def cta_card(c, t):
     s.append(circle(225, 1290, 72, "#ffd166", sw=6))
     s.append(circle(200, 1275, 12, INK, stroke="none", sw=0) + circle(250, 1275, 12, INK, stroke="none", sw=0))
     s.append(path("M 190 1312 Q 225 1345 260 1312", sw=7))
-    s.append(text_el(330, 1262, "Abonne-toi !", 60, INK, anchor="start"))
-    s.append(text_el(330, 1308, "Une nouvelle histoire chaque jour", 30, "#555555", weight=600, anchor="start"))
+    s.append(text_el(330, 1262, c.sk.get("cta_title", "Abonne-toi !"), 60, INK, anchor="start"))
+    s.append(text_el(330, 1308, c.sk.get("cta_sub", "Une nouvelle histoire chaque jour"), 30, "#555555", weight=600,
+                     anchor="start"))
     tap = 1.3
     followed = u > tap + 0.15
     pulse = 1 + (0.06 * math.sin(u * 9) if not followed else 0)
@@ -1664,6 +1665,9 @@ def main():
     elif a.serie == 4:
         from sketches4 import SKETCHES as sketches
         OUT = os.path.join(HERE, "videos-serie4")
+    if a.serie == 5:
+        from sketches5 import SKETCHES as sketches
+        OUT = os.path.join(HERE, "videos-gerard")
     for sk in sketches:
         if a.only and not any(sk["slug"].startswith(o) for o in a.only):
             continue
