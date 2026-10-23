@@ -1423,7 +1423,8 @@ def cta_card(c, t):
     s.append(text_el(330, 1308, c.sk.get("cta_sub", "Une nouvelle histoire chaque jour"), 30, "#555555", weight=600,
                      anchor="start"))
     tap = 1.3
-    followed = u > tap + 0.15
+    btn = c.sk.get("cta_btn")
+    followed = u > tap + 0.15 and not btn
     pulse = 1 + (0.06 * math.sin(u * 9) if not followed else 0)
     if u > tap and u < tap + 0.15:
         pulse = 0.92
@@ -1431,14 +1432,15 @@ def cta_card(c, t):
     cx, cy = bx + bw / 2, by + bh / 2
     s.append('<g transform="translate(%s %s) scale(%.3f) translate(%s %s)">' % (f(cx), f(cy), pulse, f(-cx), f(-cy)))
     s.append(rect(bx, by, bw, bh, "#9aa0a6" if followed else "#fe2c55", rx=42, sw=5))
-    s.append(text_el(cx, cy + 16, "Abonné" if followed else "+ Suivre", 44, "#ffffff"))
+    s.append(text_el(cx, cy + 16, btn or ("Abonné" if followed else "+ Suivre"), 44, "#ffffff"))
     s.append("</g>")
-    # objectif 10 000
-    prog = min(1.0, 0.82 + 0.17 * ease((u - tap) / 1.2)) if u > tap else 0.82
-    s.append(rect(690, 1350, 250, 24, "#eeeeee", rx=12, sw=4))
-    s.append(rect(690, 1350, 250 * prog, 24, "#25d366", rx=12, stroke="none", sw=0))
-    s.append(text_el(815, 1408, "%d / 10 000" % int(prog * 10000), 30, INK, weight=800))
-    s.append(text_el(815, 1440, "objectif", 24, "#777777", weight=600))
+    if not btn:
+        # objectif 10 000
+        prog = min(1.0, 0.82 + 0.17 * ease((u - tap) / 1.2)) if u > tap else 0.82
+        s.append(rect(690, 1350, 250, 24, "#eeeeee", rx=12, sw=4))
+        s.append(rect(690, 1350, 250 * prog, 24, "#25d366", rx=12, stroke="none", sw=0))
+        s.append(text_el(815, 1408, "%d / 10 000" % int(prog * 10000), 30, INK, weight=800))
+        s.append(text_el(815, 1440, "objectif", 24, "#777777", weight=600))
     # main qui vient cliquer
     hx = lerp(900, cx + 40, ease((u - 0.4) / 0.8))
     hy = lerp(1700, cy + 30, ease((u - 0.4) / 0.8))
@@ -1665,6 +1667,9 @@ def main():
     elif a.serie == 4:
         from sketches4 import SKETCHES as sketches
         OUT = os.path.join(HERE, "videos-serie4")
+    if a.serie == 6:
+        from sketches6 import SKETCHES as sketches
+        OUT = os.path.join(HERE, "videos-gerard-bonus")
     if a.serie == 5:
         from sketches5 import SKETCHES as sketches
         OUT = os.path.join(HERE, "videos-gerard")

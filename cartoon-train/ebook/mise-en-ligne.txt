@@ -1,0 +1,22 @@
+MISE EN LIGNE DU PRODUIT — marche à suivre
+
+1) HÉBERGER ET VENDRE
+- Crée le produit sur une plateforme de vente de produits numériques (Gumroad, Payhip, Systeme.io, Stan, etc.).
+- Dépose guide-videos-animees.pdf comme fichier à télécharger.
+- Colle le texte de page-de-vente.html (ou téléverse le fichier si la plateforme le permet).
+- Remplace dans la page : [LIEN_ACHAT], [PRIX], [TON NOM / PAGE], [TON EMAIL], et la ligne de politique de remboursement.
+- Vérifie les règles de ta plateforme (TVA, mentions légales, droit de rétractation pour produit numérique).
+
+2) METTRE LE LIEN
+- TikTok : lien dans la bio (selon ton type de compte, l'option « site web » peut demander un compte professionnel).
+- YouTube : ajoute le lien dans la description de chaque vidéo (la ligne [LIEN_PRODUIT] est déjà prévue dans youtube-description.txt) et dans la section « Liens » de ta chaîne.
+
+3) VIDÉOS AVEC APPEL « VA DANS LA BIO »
+- videos-gerard-bonus/b01-wifi.mp4, b02-trop-chaud.mp4, b03-eau-mouillee.mp4
+- Dernière réplique : « Tu veux faire les mêmes vidéos ? Le guide est dans la bio ! » + carte de fin « Lien dans la bio ».
+- Rythme conseillé : alterne 2 épisodes de la série Gérard (sans vente) pour 1 bonus avec lien. Trop d'appels à acheter font fuir les abonnés.
+
+4) À RESPECTER (important)
+- N'écris jamais de promesse de résultat (« 10 000 abonnés », « gagne X € »). Les plateformes et la loi sanctionnent les promesses trompeuses, et les gens s'en rendent compte.
+- Précise que ces vidéos sont animées et que les voix peuvent être de synthèse.
+- Vérifie les conditions d'utilisation commerciale des outils (images IA, polices, musiques) avant de vendre.
