@@ -28,6 +28,8 @@ SLUG = "h1-pensees"
 # voix H choisie : vraie voix d'homme française (Piper upmc, locuteur « pierre »), sans accent
 VOICE_MODEL, VOICE_SPK = "fr_FR-upmc-medium", 1
 LENGTH = 1.05
+SEMIS = 0.0
+_DEFAULT_VOICE = (VOICE_MODEL, VOICE_SPK, LENGTH, SEMIS)
 
 TOI = P(skin=SKIN[1], hair=("sidepart", "#3a2a1f"), top=("hoodie", "#2a9d8f", "#21867a"), bottom=("pants", "#264653"),
         shoes="#ffffff")
@@ -188,10 +190,10 @@ _PV = {}
 def piper_wav(text, path_):
     import wave
     from piper import PiperVoice, SynthesisConfig
-    if "v" not in _PV:
-        _PV["v"] = PiperVoice.load(engine.voice_model(VOICE_MODEL))
+    if VOICE_MODEL not in _PV:
+        _PV[VOICE_MODEL] = PiperVoice.load(engine.voice_model(VOICE_MODEL))
     with wave.open(path_, "wb") as w_:
-        _PV["v"].synthesize_wav(text, w_, syn_config=SynthesisConfig(speaker_id=VOICE_SPK, length_scale=LENGTH,
+        _PV[VOICE_MODEL].synthesize_wav(text, w_, syn_config=SynthesisConfig(speaker_id=VOICE_SPK, length_scale=LENGTH,
                                                                      noise_scale=0.667, noise_w_scale=0.8))
 
 
@@ -204,7 +206,7 @@ def synth_beats():
         if not os.path.exists(final):
             raw = final.replace(".wav", "_raw.wav")
             piper_wav(b["text"].replace("...", ","), raw)
-            tts.to_sr(raw, final, 0.0)
+            tts.to_sr(raw, final, SEMIS)
             os.remove(raw)
         out.append(final)
     return out
@@ -371,7 +373,9 @@ def frame_svg(segs, total, t):
     over.append('<rect width="%d" height="%d" fill="url(#vig)"/>' % (W, H))
 
     ui = []
-    if HEADER:
+    if STORY.get("no_title"):
+        tlines = []
+    elif HEADER:
         tlines = []
         ui.append(header_svg(t))
     elif len(TITLE) <= 36:
@@ -396,7 +400,8 @@ def frame_svg(segs, total, t):
         ui.append(text_el(230, y0 + 62, cur["fx"].get("notif_from", "Message de demain"), 30, "#777777",
                           weight=700, anchor="start"))
         ui.append(text_el(230, y0 + 112, cur["fx"]["notif"], 44, INK, anchor="start"))
-    ui.append(captions(cur, t))
+    if not (STORY.get("caps") == "keywords" and HOOK_TEXT and cur is segs[0]):
+        ui.append(captions(cur, t))
     if cur["fx"].get("inner") and u_beat > 0.55:
         k = ease((u_beat - 0.55) / 0.12)
         ui.append('<g transform="translate(540 520) scale(%.3f)">' % (k * (1 + 0.03 * math.sin(t * 7))))
@@ -450,11 +455,13 @@ def captions(sg, t):
         if t < starts[k] + dur * weights[k] / tot:
             idx = k
             break
+    kw = STORY.get("caps") == "keywords"
     # groupes de mots
     groups, g = [], []
     for k, w_ in enumerate(words):
         g.append(k)
-        if len(" ".join(words[j] for j in g)) > 16 or w_.endswith((".", "?", "!", ":", ",")):
+        full = (len(g) >= 2 or len(w_) > 9) if kw else len(" ".join(words[j] for j in g)) > 16
+        if full or w_.endswith((".", "?", "!", ":", ",")):
             groups.append(g)
             g = []
     if g:
@@ -463,6 +470,9 @@ def captions(sg, t):
     txt_parts = []
     total_len = sum(len(words[j]) for j in grp) + len(grp) - 1
     size = 74 if total_len < 14 else 64
+    if kw:
+        words = [w_.upper().strip(",.:;") or w_ for w_ in words]
+        size = 96 if total_len < 12 else 80
     gap = size * 0.32
     full = sum(text_w(words[j], size) for j in grp) + gap * (len(grp) - 1)
     x = 540 - full / 2
@@ -471,7 +481,7 @@ def captions(sg, t):
     for j in grp:
         w_ = words[j]
         col = "#ffe600" if j == idx else "#ffffff"
-        out.append(text_el(x, CAPTION_Y, w_, size, INK, stroke=INK, sw=16, anchor="start"))
+        out.append(text_el(x, CAPTION_Y, w_, size, INK, stroke=INK, sw=20 if kw else 16, anchor="start"))
         out.append(text_el(x, CAPTION_Y, w_, size, col, anchor="start"))
         x += text_w(w_, size) + gap
     out.append("</g>")
@@ -578,6 +588,24 @@ def mix(segs, total, out, voice=True):
     pad *= 0.022 * (0.7 + 0.3 * np.sin(2 * np.pi * 0.1 * tt))
     m = pad.astype(np.float32)
     rng = np.random.default_rng(3)
+    if STORY.get("music"):
+        m = (m * 0.4).astype(np.float32)
+        notes = [261.6, 329.6, 392.0, 440.0, 523.3, 440.0, 392.0, 329.6]
+        bass = [130.8, 130.8, 110.0, 98.0]
+        step = 60 / 112 / 2
+        kk = np.arange(int(0.45 * sr))
+        env = np.exp(-kk / (0.09 * sr))
+        for k, t0 in enumerate(np.arange(0, total, step)):
+            j = int(t0 * sr)
+            fr = notes[k % len(notes)] * (1.5 if (k // 16) % 2 else 1.0)
+            tone = (np.sin(2 * np.pi * fr * kk / sr) + 0.3 * np.sin(4 * np.pi * fr * kk / sr)) * env * 0.035
+            seg = tone[: max(0, min(len(kk), n - j))]
+            m[j:j + len(seg)] += seg.astype(np.float32)
+            if k % 4 == 0:
+                fb = bass[(k // 8) % len(bass)]
+                tb = np.sin(2 * np.pi * fb * kk / sr) * np.exp(-kk / (0.2 * sr)) * 0.05
+                seg = tb[: max(0, min(len(kk), n - j))]
+                m[j:j + len(seg)] += seg.astype(np.float32)
     for sg in segs:
         x, srr = tts.read_wav(sg["wav"])
         i0 = int(sg["t0"] * sr)
@@ -637,7 +665,8 @@ def _render(i):
 
 
 def load_story(d):
-    global TITLE, SLUG, BEATS, HERO, HEADER, OUT, CAPTION_Y, HOOK_TEXT, STORY
+    global TITLE, SLUG, BEATS, HERO, HEADER, OUT, CAPTION_Y, HOOK_TEXT, STORY, VOICE_MODEL, VOICE_SPK, LENGTH, SEMIS
+    VOICE_MODEL, VOICE_SPK, LENGTH, SEMIS = d.get("voice", _DEFAULT_VOICE)
     TITLE, SLUG, BEATS, HERO = d["title"], d["slug"], d["beats"], d["hero"]
     HEADER = d.get("header")
     CAPTION_Y = d.get("caption_y", 1500)
@@ -656,6 +685,9 @@ def main():
     elif a.story.startswith("y"):
         from yscripts import STORIES as Y
         stories = [s_ for s_ in Y if a.story == "yall" or s_["slug"].startswith(a.story)]
+    elif a.story.startswith("c"):
+        from corps import STORIES as Cs
+        stories = [s_ for s_ in Cs if a.story == "call" or s_["slug"].startswith(a.story)]
     elif a.story.startswith("z"):
         from histoires3 import STORIES as Zs
         stories = [s_ for s_ in Zs if a.story == "zall" or s_["slug"].startswith(a.story)]
