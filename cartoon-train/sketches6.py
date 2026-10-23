@@ -4,12 +4,12 @@ from sketches import P, SKIN
 from sketches4 import sk as _sk, L
 from sketches5 import GERARD
 
-BIO_LINE = "Tu veux faire les mêmes vidéos ? Le guide est dans la bio !"
+BIO_LINE = "Tu veux faire les mêmes vidéos ? La formation est dans la bio !"
 
 
 def ep(n, name, hook, scene, prop, amb, V, A, voices, lines, **kw):
     d = _sk("b%02d" % n, "Gérard · Bonus %d" % n, hook, scene, prop, amb, dict(E=GERARD, V=V, A=A), voices, lines,
-            cta_title="Lien dans la bio !", cta_sub="Apprends à faire ces vidéos", cta_btn="Voir la bio", **kw)
+            cta_title="Lien dans la bio !", cta_sub="Formation : fais ces vidéos", cta_btn="Voir la bio", **kw)
     d["slug"] = "b%02d-%s" % (n, name)
     return d
 

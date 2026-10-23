@@ -1,15 +1,15 @@
 TEXTE DE LA PAGE DE VENTE (à coller dans Gumroad, Payhip, Systeme.io, Stan…)
-Remplace [PRIX] et [LIEN_ACHAT] / ta politique de remboursement.
+Remplace [PRIX], [LIEN_ACHAT] et ta politique de remboursement.
 
-GUIDE PRATIQUE · PDF
+FORMATION EN LIGNE + CAHIER PDF
 
-=== Crée tes propres vidéos animées pour TikTok, Shorts et YouTube ===
+=== La formation complète pour créer tes sketchs animés ===
 
-La méthode « sketch cartoon » : trouve l'idée, écris le script, crée ton personnage, ajoute la voix et monte une série qui donne envie de s'abonner.
+De l'idée à la vidéo publiée : écris tes scripts, crée ton personnage, ajoute la voix, monte dans CapCut et construis une série qui donne envie de s'abonner.
 
-[BOUTON] Je veux le guide — [PRIX] €
+[BOUTON] Je veux la formation — [PRIX] €
 
-16 pages · 10 scripts complets inclus · Téléchargement immédiat
+13 modules · 59 leçons · 55 exercices · 20 scripts complets · cahier PDF de 44 pages
 
 === Tu reconnais ce problème ? ===
 
@@ -18,43 +18,49 @@ La méthode « sketch cartoon » : trouve l'idée, écris le script, crée ton p
 • Tes vidéos sont regardées mais personne ne s'abonne.
 • Tu ne sais pas dessiner, et tu penses que c'est un obstacle.
 
-Ce guide te donne une méthode simple et répétable pour produire des vidéos courtes animées sans savoir dessiner ni programmer.
+Cette formation te donne une méthode simple et répétable pour produire des vidéos courtes animées sans savoir dessiner ni programmer.
 
-=== Ce que tu trouves dans le guide ===
+=== Le programme ===
 
-1. Le format qui fonctionneExigeant / victime / autorité, « Et si tu… » et série à personnage récurrent.
+1. Comprendre le format : Les trois rôles, les trois formats et le personnage récurrent qui fait s'abonner.
 
-2. Des idées sans finLa formule en 3 questions + 30 idées de départ.
+2. Trouver des idées : La formule en 3 questions, la méthode lieu × défaut et 60 idées prêtes.
 
-3. Le script en 7 tempsStructure pour une vidéo de 40 secondes, avec un exemple complet.
+3. Écrire le script : La structure en 7 temps, les chutes qui marchent, la réécriture en 3 passes.
 
-4. 8 formules de hookPour que la première image retienne le spectateur.
+4. Les hooks : 12 formules et les règles du texte à l'écran pour les 2 premières secondes.
 
-5. Personnages et décorsLes créer une fois, les réutiliser toujours, sans savoir dessiner.
+5. Ton univers visuel : Personnage, seconds rôles, décors et bouches, sans savoir dessiner.
 
-6. La voixVoix de synthèse ou la tienne, avec les réglages qui sonnent naturel.
+6. La voix et le son : Voix de synthèse ou la tienne, ambiance, effets et volumes.
 
-7. Le montage CapCutL'ordre de montage, sous-titres et appel à s'abonner.
+7. Monter dans CapCut : Animer, faire parler, zoomer, sous-titrer, carte de fin, export.
 
-8. Publier et grandirRythme, profil, légendes, statistiques et plan sur 10 jours.
+8. Produire en série : Le travail par lots et le projet modèle pour une vidéo par jour.
 
-Bonus : 10 scriptsToute la série « Les galères de Gérard », prête à adapter.
+9. Publier : Heure, légende, hashtags, couvertures et plusieurs plateformes.
+
+10. Grandir : Profil, commentaires, saisons et lecture des statistiques.
+
+11. Monétiser : Programmes créateurs, partenariats et produits, avec réalisme.
+
+Bonus : Checklist, modèles à remplir et 20 scripts complets.
 
 === Pour qui ? ===
 
-Ce guide est pour toi si…
+Cette formation est pour toi si… :
 
 • tu veux créer du contenu animé régulièrement
 • tu aimes l'humour et les situations du quotidien
 • tu es prêt à publier chaque jour pendant quelques semaines
 
-Ce guide n'est pas pour toi si…
+Cette formation n'est pas pour toi si… :
 
 • tu cherches un résultat garanti sans effort
 • tu veux des animations 3D ou du dessin à la main
 • tu n'es pas prêt à publier régulièrement
 
-Ce que je ne te promets pas. Je ne peux pas te garantir un nombre d'abonnés, de vues ou de revenus : ça dépend de l'algorithme, de ta régularité et de tes idées. Ce guide est une méthode de travail et des modèles concrets.
+Ce que je ne te promets pas. Je ne peux pas te garantir un nombre d'abonnés, de vues ou de revenus : ça dépend de l'algorithme, de ta régularité et de tes idées. Cette formation est une méthode de travail complète, avec des exercices et des modèles concrets.
 
 === Un aperçu de la méthode ===
 
@@ -72,24 +78,27 @@ Cette structure est celle des vidéos que tu as vues sur ma page.
 === Questions fréquentes ===
 
 Q : Faut-il savoir dessiner ?
-R : Non. Le guide explique comment créer des personnages simples avec des outils d'images IA et de découpe, et comment les réutiliser.
+R : Non. La formation explique comment créer des personnages simples avec des outils d'images IA et de découpe, et comment les réutiliser.
 
 Q : Quels outils faut-il ?
 R : Un téléphone ou un ordinateur, CapCut (version gratuite suffisante) et, au choix, Canva ou un outil de génération d'images. Les fonctions des outils évoluent : vérifie leurs conditions d'utilisation.
 
-Q : Dans quel format est le guide ?
-R : Un PDF de 16 pages, à lire sur téléphone, tablette ou ordinateur, avec téléchargement immédiat après l'achat.
+Q : Comment se présente la formation ?
+R : Une formation en ligne de 13 modules et 59 leçons, à suivre à ton rythme sur téléphone ou ordinateur, avec ta progression enregistrée. Tu reçois aussi le cahier d'exercices PDF de 44 pages.
+
+Q : Combien de temps faut-il ?
+R : Environ une heure par jour pendant 30 jours. Le premier épisode prend 2 à 4 heures, le temps de créer ton kit ; ensuite, compte 30 à 45 minutes par épisode.
 
 Q : Est-ce que je vais avoir des abonnés ?
-R : Je ne peux pas le promettre. Ce guide te donne la méthode pour publier de façon régulière et cohérente, qui est ce qui augmente tes chances.
+R : Je ne peux pas le promettre. Cette formation te donne la méthode pour publier de façon régulière et cohérente, qui est ce qui augmente tes chances.
 
-Q : Et si le guide ne me convient pas ?
+Q : Et si la formation ne me convient pas ?
 R : [À COMPLÉTER : ta politique de remboursement, ex. « satisfait ou remboursé sous 14 jours » si ta plateforme le permet.]
 
 === Prêt à créer ta première vidéo ? ===
 
-Télécharge le guide et publie ton premier épisode cette semaine.
+Commence aujourd'hui : le planning de 30 jours t'amène à ta première saison de 10 épisodes.
 
-[BOUTON] Je veux le guide — [PRIX] €
+[BOUTON] Je veux la formation — [PRIX] €
 
 © [TON NOM / PAGE] · Contact : [TON EMAIL] · Les résultats varient selon chaque personne.

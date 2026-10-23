@@ -2,7 +2,7 @@ MISE EN LIGNE DU PRODUIT — marche à suivre
 
 1) HÉBERGER ET VENDRE
 - Crée le produit sur une plateforme de vente de produits numériques (Gumroad, Payhip, Systeme.io, Stan, etc.).
-- Dépose guide-videos-animees.pdf comme fichier à télécharger.
+- Dépose studio-cartoon-formation.pdf (cahier) comme fichier, et donne aux acheteurs le lien de la formation en ligne.
 - Colle le texte de page-de-vente.html (ou téléverse le fichier si la plateforme le permet).
 - Remplace dans la page : [LIEN_ACHAT], [PRIX], [TON NOM / PAGE], [TON EMAIL], et la ligne de politique de remboursement.
 - Vérifie les règles de ta plateforme (TVA, mentions légales, droit de rétractation pour produit numérique).
