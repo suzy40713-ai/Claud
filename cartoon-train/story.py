@@ -685,6 +685,9 @@ def main():
     elif a.story.startswith("y"):
         from yscripts import STORIES as Y
         stories = [s_ for s_ in Y if a.story == "yall" or s_["slug"].startswith(a.story)]
+    elif a.story.startswith("p"):
+        from galere2 import STORIES as Ps
+        stories = [s_ for s_ in Ps if a.story == "pall" or s_["slug"].startswith(a.story)]
     elif a.story.startswith("c"):
         from corps import STORIES as Cs
         stories = [s_ for s_ in Cs if a.story == "call" or s_["slug"].startswith(a.story)]
