@@ -291,3 +291,19 @@ if __name__ == "__main__":
     print(build_course(sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "studio-cartoon-cours.html")))
     print(build_site(os.path.join(os.path.dirname(os.path.dirname(HERE)), "studio-cartoon")))
     print("modules=%d lecons=%d exercices=%d" % (len(ALL), N_LESSONS, N_EX))
+
+
+def export_json(full_path, preview_path):
+    """Contenu de la formation en JSON : complet (servi par le serveur aux acheteurs) et aperçu (modules 0 et 1)."""
+    def pack(mods):
+        return [dict(title=m["title"], intro=m["intro"], lessons=m["lessons"]) for m in mods]
+    teaser = dict(title="La suite", intro="Tu as terminé l'aperçu gratuit.", lessons=[dict(
+        title="Débloque la formation complète",
+        body=("<p>Tu viens de voir les deux premiers modules. La formation complète contient <b>%d modules</b>, "
+              "<b>%d leçons</b>, <b>%d exercices</b>, 20 scripts complets et le cahier PDF.</p>") % (
+            len(ALL), N_LESSONS, N_EX), ex=None)])
+    meta = dict(modules=len(ALL), lessons=N_LESSONS, exercises=N_EX)
+    with open(full_path, "w") as fh:
+        json.dump(dict(meta=meta, modules=pack(ALL)), fh, ensure_ascii=False)
+    with open(preview_path, "w") as fh:
+        json.dump(dict(meta=meta, modules=pack(ALL[:2]) + pack([teaser])), fh, ensure_ascii=False)
