@@ -9,6 +9,10 @@ const NURTURE_STEP_2_DELAY_MS = 4 * 24 * 60 * 60 * 1000;
 
 const BATCH_SIZE = 50;
 
+// Seuls les contacts inscrits depuis le site Studio Cartoon recoivent la sequence actuelle : les anciens
+// contacts sport (mini-guide Cadenzo) ne doivent pas recevoir des emails sur la formation.
+export const LEAD_SOURCE_PREFIX = "studio-cartoon";
+
 /**
  * Envoie les relances email dues (verifie periodiquement par le scheduler).
  * Traite un petit lot a chaque appel plutot que tout d'un coup, pour rester
@@ -22,7 +26,7 @@ export async function runLeadNurtureCheck(): Promise<void> {
   const now = new Date();
 
   const dueStep0 = await prisma.emailLead.findMany({
-    where: { nurtureStep: 0, nextNurtureAt: { lte: now } },
+    where: { nurtureStep: 0, nextNurtureAt: { lte: now }, source: { startsWith: LEAD_SOURCE_PREFIX } },
     take: BATCH_SIZE,
   });
   for (const lead of dueStep0) {
@@ -38,7 +42,7 @@ export async function runLeadNurtureCheck(): Promise<void> {
   }
 
   const dueStep1 = await prisma.emailLead.findMany({
-    where: { nurtureStep: 1, nextNurtureAt: { lte: now } },
+    where: { nurtureStep: 1, nextNurtureAt: { lte: now }, source: { startsWith: LEAD_SOURCE_PREFIX } },
     take: BATCH_SIZE,
   });
   for (const lead of dueStep1) {
