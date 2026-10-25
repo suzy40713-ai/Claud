@@ -1713,7 +1713,7 @@ def main():
         OUT = os.path.join(HERE, "videos-serie4")
     if a.serie == 7:
         from sketches7 import SKETCHES as sketches
-        OUT = os.path.join(HERE, "videos-sketchs-eleven")
+        OUT = os.path.join(HERE, "videos-sketchs-influenceur")
     if a.serie == 6:
         from sketches6 import SKETCHES as sketches
         OUT = os.path.join(HERE, "videos-gerard-bonus")

@@ -4,6 +4,11 @@
 from sketches import P, SKIN
 from sketches4 import sk as _sk, L
 from sketches5 import GERARD
+import os
+
+# Voix : françaises intégrées par défaut ; STUDIO_VOICES=eleven pour doubler avec ElevenLabs.
+VOICE_MODE = os.environ.get("STUDIO_VOICES", "fr")
+FR_EQUIV = {"adam": "pierre", "bella": "siwis", "elli": "siwis", "rachel": "jessica", "josh": "tom", "antoni": "tom"}
 
 MID = "Vs §Au fait, toi aussi tu peux lancer ta chaîne d'animation. Le guide est dans ma bio."
 END = "Vs Tu veux faire les mêmes sketchs ? Le guide est dans ma bio !"
@@ -11,9 +16,13 @@ END = "Vs Tu veux faire les mêmes sketchs ? Le guide est dans ma bio !"
 
 def ep(n, name, title, hook, scene, prop, amb, V, A, voices, lines, **kw):
     d = _sk("e%02d" % n, title, hook, scene, prop, amb, dict(E=GERARD, V=V, A=A), voices, lines,
-            voice_mode="eleven", cta_title="Lien dans la bio !", cta_sub="Le guide pour faire ces vidéos",
+            voice_mode=VOICE_MODE, cta_title="Lien dans la bio !", cta_sub="Le guide pour faire ces vidéos",
             cta_btn="Voir la bio", **kw)
     d["slug"] = "e%02d-%s" % (n, name)
+    if VOICE_MODE == "fr":
+        d["voices"] = {r: (FR_EQUIV.get(v, v), sp, se) for r, (v, sp, se) in d["voices"].items()}
+        if d["voices"]["A"][0] == d["voices"]["V"][0]:  # deux hommes : l'autorité parle plus grave et plus posément
+            d["voices"]["A"] = (d["voices"]["A"][0], 0.94, -2.5)
     return d
 
 
