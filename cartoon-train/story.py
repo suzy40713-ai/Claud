@@ -531,17 +531,20 @@ def mid_cta_svg(u, dur):
     s_.append(circle(170, y0 + 75, 52, "#ffd166", sw=5))
     s_.append(circle(152, y0 + 64, 9, INK, stroke="none", sw=0) + circle(188, y0 + 64, 9, INK, stroke="none", sw=0))
     s_.append(path("M 145 %s Q 170 %s 195 %s" % (f(y0 + 92), f(y0 + 116), f(y0 + 92)), sw=6))
-    s_.append(text_el(250, y0 + 62, "Ne rate pas la suite", 44, INK, anchor="start"))
-    s_.append(text_el(250, y0 + 112, "Abonne-toi maintenant", 34, "#555555", weight=700, anchor="start"))
+    s_.append(text_el(250, y0 + 62, STORY.get("mid_title", "Ne rate pas la suite"), 44, INK, anchor="start"))
+    s_.append(text_el(250, y0 + 112, STORY.get("mid_sub", "Abonne-toi maintenant"), 34, "#555555", weight=700,
+                      anchor="start"))
     tap = 1.1
-    followed = u > tap + 0.15
+    mid_btn = STORY.get("mid_btn")
+    followed = u > tap + 0.15 and not mid_btn
     pulse = 1 + (0.07 * math.sin(u * 10) if not followed else 0)
     if tap < u < tap + 0.15:
         pulse = 0.9
     cx, cy = 840, y0 + 75
     s_.append('<g transform="translate(%s %s) scale(%.3f) translate(%s %s)">' % (f(cx), f(cy), pulse, f(-cx), f(-cy)))
     s_.append(rect(cx - 115, cy - 42, 230, 84, "#9aa0a6" if followed else "#fe2c55", rx=42, sw=5))
-    s_.append(text_el(cx, cy + 15, "Abonné" if followed else "+ Suivre", 38, "#ffffff"))
+    s_.append(text_el(cx, cy + 15, mid_btn or ("Abonné" if followed else "+ Suivre"), 38 if not mid_btn else 34,
+                      "#ffffff"))
     s_.append("</g>")
     hx = lerp(1050, cx + 30, ease((u - 0.3) / 0.6))
     hy = lerp(y0 + 420, cy + 25, ease((u - 0.3) / 0.6))
@@ -558,13 +561,14 @@ def cta(u):
     dy = (1 - ease(u / 0.45)) * 520
     s = ['<g transform="translate(0 %s)">' % f(dy)]
     s.append(rect(110, 1176, 860, 250, "#ffffff", rx=44, sw=6))
-    s.append(text_el(540, 1262, "Partie 2 bientôt", 56, INK))
+    s.append(text_el(540, 1262, STORY.get("cta_title", "Partie 2 bientôt"), 56, INK))
     tap = 1.3
-    followed = u > tap + 0.15
+    cta_btn = STORY.get("cta_btn")
+    followed = u > tap + 0.15 and not cta_btn
     pulse = 1 + (0.06 * math.sin(u * 9) if not followed else 0)
     s.append('<g transform="translate(540 1352) scale(%.3f) translate(-540 -1352)">' % pulse)
     s.append(rect(375, 1310, 330, 84, "#9aa0a6" if followed else "#fe2c55", rx=42, sw=5))
-    s.append(text_el(540, 1368, "Abonné" if followed else "+ Suivre", 44, "#ffffff"))
+    s.append(text_el(540, 1368, cta_btn or ("Abonné" if followed else "+ Suivre"), 44, "#ffffff"))
     s.append("</g>")
     hx = lerp(900, 580, ease((u - 0.4) / 0.8))
     hy = lerp(1750, 1380, ease((u - 0.4) / 0.8))
@@ -685,6 +689,9 @@ def main():
     elif a.story.startswith("y"):
         from yscripts import STORIES as Y
         stories = [s_ for s_ in Y if a.story == "yall" or s_["slug"].startswith(a.story)]
+    elif a.story.startswith("b"):
+        from galere_bio import STORIES as Bs
+        stories = [s_ for s_ in Bs if a.story == "ball" or s_["slug"].startswith(a.story)]
     elif a.story.startswith("p"):
         from galere2 import STORIES as Ps
         stories = [s_ for s_ in Ps if a.story == "pall" or s_["slug"].startswith(a.story)]
