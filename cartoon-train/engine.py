@@ -1144,9 +1144,51 @@ def piper_say(text, voice, length, path_):
             speaker_id=spk, length_scale=length, noise_scale=0.667, noise_w_scale=0.8))
 
 
+# Voix ElevenLabs (voix « premade » multilingues, modèle qui parle français sans accent).
+# Chaque identifiant peut être remplacé par une variable d'environnement ELEVEN_VOICE_<CLÉ>.
+ELEVEN_VOICES = {
+    "adam": "pNInz6obpgDQGcFmaJgB",     # homme, voix grave et posée
+    "antoni": "ErXwobaYiN019PkySvjV",   # homme, voix chaleureuse
+    "josh": "TxGEqnHWrfWFTfGW9XjX",     # homme, jeune
+    "rachel": "21m00Tcm4TlvDq8ikWAM",   # femme, calme
+    "bella": "EXAVITQu4vr4xnSDxMaL",    # femme, douce
+    "elli": "MF3mGyEYCl7XYWbV9V6O",     # femme, jeune
+}
+ELEVEN_MODEL = os.environ.get("ELEVEN_MODEL", "eleven_multilingual_v2")
+
+
+def eleven_say(text, voice, path_):
+    """Synthèse ElevenLabs (clé dans ELEVENLABS_API_KEY) -> wav."""
+    import json as _json
+    import urllib.request
+    key = os.environ.get("ELEVENLABS_API_KEY")
+    if not key:
+        raise RuntimeError("ELEVENLABS_API_KEY absent : ajoute la clé dans les réglages de l'environnement.")
+    vid = os.environ.get("ELEVEN_VOICE_" + voice.upper(), ELEVEN_VOICES.get(voice, voice))
+    body = dict(text=text, model_id=ELEVEN_MODEL,
+                voice_settings=dict(stability=0.45, similarity_boost=0.8, style=0.35, use_speaker_boost=True))
+    if "2_5" in ELEVEN_MODEL:  # seuls les modèles v2.5 acceptent qu'on impose la langue
+        body["language_code"] = "fr"
+    req = urllib.request.Request(
+        "https://api.elevenlabs.io/v1/text-to-speech/%s?output_format=mp3_44100_128" % vid,
+        data=_json.dumps(body).encode("utf-8"),
+        headers={"xi-api-key": key, "Content-Type": "application/json", "Accept": "audio/mpeg"})
+    mp3 = path_ + ".mp3"
+    with urllib.request.urlopen(req, timeout=120) as r, open(mp3, "wb") as fh:
+        fh.write(r.read())
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", mp3, "-ac", "1", path_], check=True)
+    os.remove(mp3)
+
+
+def audio_dir(sk):
+    mode = sk.get("voice_mode")
+    return os.path.join(tts.BUILD, {"fr": "sk4", "eleven": "sk5"}.get(mode, "sk3"), sk["slug"])
+
+
 def synth(sk, speed_mul=1.0):
     fr = sk.get("voice_mode") == "fr"
-    d = os.path.join(tts.BUILD, "sk4" if fr else "sk3", sk["slug"])
+    eleven = sk.get("voice_mode") == "eleven"
+    d = audio_dir(sk)
     os.makedirs(d, exist_ok=True)
     loaded = {}
     out = []
@@ -1160,7 +1202,9 @@ def synth(sk, speed_mul=1.0):
         final = os.path.join(d, "%02d_%s_%.3f.wav" % (i, role, speed_mul))
         if not os.path.exists(final):
             raw = final.replace(".wav", "_raw.wav")
-            if fr and vkey in PIPER_FR:
+            if eleven:
+                eleven_say(text.replace("...", "…"), vkey, raw)
+            elif fr and vkey in PIPER_FR:
                 piper_say(text.replace("...", ","), vkey, 0.97 * speed, raw)
             elif fr:
                 kokoro_wav(text.replace("...", ","), "femme1", 1.0 / speed, raw)
@@ -1633,7 +1677,7 @@ def render(sk, frames=None):
         return paths
     os.makedirs(OUT, exist_ok=True)
     out = os.path.join(OUT, sk["slug"] + ".mp4")
-    audio = os.path.join(tts.BUILD, "sk4" if sk.get("voice_mode") == "fr" else "sk3", sk["slug"], "mix.wav")
+    audio = os.path.join(audio_dir(sk), "mix.wav")
     mix_audio(c, audio)
     nframes = int(c.total * FPS)
     ff = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
@@ -1667,6 +1711,9 @@ def main():
     elif a.serie == 4:
         from sketches4 import SKETCHES as sketches
         OUT = os.path.join(HERE, "videos-serie4")
+    if a.serie == 7:
+        from sketches7 import SKETCHES as sketches
+        OUT = os.path.join(HERE, "videos-sketchs-eleven")
     if a.serie == 6:
         from sketches6 import SKETCHES as sketches
         OUT = os.path.join(HERE, "videos-gerard-bonus")
