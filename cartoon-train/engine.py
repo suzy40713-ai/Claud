@@ -1182,12 +1182,24 @@ def eleven_say(text, voice, path_):
 
 def audio_dir(sk):
     mode = sk.get("voice_mode")
-    return os.path.join(tts.BUILD, {"fr": "sk4", "eleven": "sk5"}.get(mode, "sk3"), sk["slug"])
+    return os.path.join(tts.BUILD, {"fr": "sk4", "eleven": "sk5", "en": "sk6"}.get(mode, "sk3"), sk["slug"])
+
+
+def kokoro_en(text, voice, speed, path):
+    """Voix anglaises natives de Kokoro (am_michael, af_heart, bm_george…)."""
+    k = kokoro()
+    samples, sr = k.create(text, voice=voice, speed=speed, lang="en-us" if voice[0] == "a" else "en-gb")
+    with wave.open(path, "wb") as w_:
+        w_.setnchannels(1)
+        w_.setsampwidth(2)
+        w_.setframerate(sr)
+        w_.writeframes((np.clip(samples, -1, 1) * 32767).astype(np.int16).tobytes())
 
 
 def synth(sk, speed_mul=1.0):
     fr = sk.get("voice_mode") == "fr"
     eleven = sk.get("voice_mode") == "eleven"
+    english = sk.get("voice_mode") == "en"
     d = audio_dir(sk)
     os.makedirs(d, exist_ok=True)
     loaded = {}
@@ -1202,7 +1214,9 @@ def synth(sk, speed_mul=1.0):
         final = os.path.join(d, "%02d_%s_%.3f.wav" % (i, role, speed_mul))
         if not os.path.exists(final):
             raw = final.replace(".wav", "_raw.wav")
-            if eleven:
+            if english:
+                kokoro_en(text, vkey, speed, raw)
+            elif eleven:
                 eleven_say(text.replace("...", "…"), vkey, raw)
             elif fr and vkey in PIPER_FR:
                 piper_say(text.replace("...", ","), vkey, 0.97 * speed, raw)
@@ -1711,6 +1725,9 @@ def main():
     elif a.serie == 4:
         from sketches4 import SKETCHES as sketches
         OUT = os.path.join(HERE, "videos-serie4")
+    if a.serie == 8:
+        from sketches8 import SKETCHES as sketches
+        OUT = os.path.join(HERE, "videos-rift-ugc")
     if a.serie == 7:
         from sketches7 import SKETCHES as sketches
         OUT = os.path.join(HERE, "videos-sketchs-influenceur")
