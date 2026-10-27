@@ -5,7 +5,8 @@ import copy
 
 import galere2
 
-PICK = {"p01-grand": "l01-grand", "p06-retard": "l02-retard"}
+PICK = {"p01-grand": "l01-grand", "p06-retard": "l02-retard", "p02-roux": "l03-roux", "p04-timide": "l04-timide",
+        "p08-celibataire": "l05-celibataire", "p09-enfant-unique": "l06-enfant-unique", "p10-gourmand": "l07-gourmand"}
 STORIES = []
 for s in galere2.STORIES:
     if s["slug"] in PICK:
