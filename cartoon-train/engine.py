@@ -1483,6 +1483,9 @@ def cta_card(c, t):
     tap = 1.3
     btn = c.sk.get("cta_btn")
     followed = u > tap + 0.15 and not btn
+    if btn is None and c.sk.get("cta_follow"):  # bouton « suivre » traduit, qui passe à l'état « suivi »
+        btn = c.sk["cta_done"] if u > tap + 0.15 else c.sk["cta_follow"]
+        followed = u > tap + 0.15
     pulse = 1 + (0.06 * math.sin(u * 9) if not followed else 0)
     if u > tap and u < tap + 0.15:
         pulse = 0.92
@@ -1492,13 +1495,13 @@ def cta_card(c, t):
     s.append(rect(bx, by, bw, bh, "#9aa0a6" if followed else "#fe2c55", rx=42, sw=5))
     s.append(text_el(cx, cy + 16, btn or ("Abonné" if followed else "+ Suivre"), 44, "#ffffff"))
     s.append("</g>")
-    if not btn:
+    if not btn or c.sk.get("cta_follow"):
         # objectif 10 000
         prog = min(1.0, 0.82 + 0.17 * ease((u - tap) / 1.2)) if u > tap else 0.82
         s.append(rect(690, 1350, 250, 24, "#eeeeee", rx=12, sw=4))
         s.append(rect(690, 1350, 250 * prog, 24, "#25d366", rx=12, stroke="none", sw=0))
         s.append(text_el(815, 1408, "%d / 10 000" % int(prog * 10000), 30, INK, weight=800))
-        s.append(text_el(815, 1440, "objectif", 24, "#777777", weight=600))
+        s.append(text_el(815, 1440, c.sk.get("goal_word", "objectif"), 24, "#777777", weight=600))
     # main qui vient cliquer
     hx = lerp(900, cx + 40, ease((u - 0.4) / 0.8))
     hy = lerp(1700, cy + 30, ease((u - 0.4) / 0.8))
@@ -1539,7 +1542,7 @@ def overlay(c, cur, t):
     if c.sk.get("hook_text") and first is not None and t < first["t1"] + 0.3:
         s.append(overlays.hook_svg(c.sk["hook_text"], t + 0.25, first["t1"]))
     if cur["kind"] == "line" and cur.get("mid"):
-        s.append(overlays.mid_cta_svg(t - cur["t0"], cur["t1"] - cur["t0"]))
+        s.append(overlays.mid_cta_svg(t - cur["t0"], cur["t1"] - cur["t0"], c.sk.get("mid_texts")))
     if c.sk.get("cta"):
         s.append('<g transform="translate(0 %d)">%s</g>' % (c.sk.get("cta_dy", 0), cta_card(c, t)))
     if t > c.total - 0.5:
@@ -1725,6 +1728,9 @@ def main():
     elif a.serie == 4:
         from sketches4 import SKETCHES as sketches
         OUT = os.path.join(HERE, "videos-serie4")
+    if a.serie == 9:
+        from sketches9 import SKETCHES as sketches
+        OUT = os.path.join(HERE, "videos-sketchs-en")
     if a.serie == 8:
         from sketches8 import SKETCHES as sketches
         OUT = os.path.join(HERE, "videos-rift-ugc")

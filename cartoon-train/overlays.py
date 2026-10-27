@@ -42,7 +42,8 @@ def hook_svg(text, u, dur):
     return "".join(s_)
 
 
-def mid_cta_svg(u, dur):
+def mid_cta_svg(u, dur, texts=None):
+    texts = texts or {}
     """Bandeau d'abonnement compact au milieu de la vidéo, avec la main qui clique sur « + Suivre »."""
     if u < 0:
         return ""
@@ -57,8 +58,8 @@ def mid_cta_svg(u, dur):
     s_.append(circle(170, y0 + 75, 52, "#ffd166", sw=5))
     s_.append(circle(152, y0 + 64, 9, INK, stroke="none", sw=0) + circle(188, y0 + 64, 9, INK, stroke="none", sw=0))
     s_.append(path("M 145 %s Q 170 %s 195 %s" % (f(y0 + 92), f(y0 + 116), f(y0 + 92)), sw=6))
-    s_.append(text_el(250, y0 + 62, "Ne rate pas la suite", 44, INK, anchor="start"))
-    s_.append(text_el(250, y0 + 112, "Abonne-toi maintenant", 34, "#555555", weight=700, anchor="start"))
+    s_.append(text_el(250, y0 + 62, texts.get("title", "Ne rate pas la suite"), 44, INK, anchor="start"))
+    s_.append(text_el(250, y0 + 112, texts.get("sub", "Abonne-toi maintenant"), 34, "#555555", weight=700, anchor="start"))
     tap = 1.1
     followed = u > tap + 0.15
     pulse = 1 + (0.07 * math.sin(u * 10) if not followed else 0)
@@ -67,7 +68,7 @@ def mid_cta_svg(u, dur):
     cx, cy = 840, y0 + 75
     s_.append('<g transform="translate(%s %s) scale(%.3f) translate(%s %s)">' % (f(cx), f(cy), pulse, f(-cx), f(-cy)))
     s_.append(rect(cx - 115, cy - 42, 230, 84, "#9aa0a6" if followed else "#fe2c55", rx=42, sw=5))
-    s_.append(text_el(cx, cy + 15, "Abonné" if followed else "+ Suivre", 38, "#ffffff"))
+    s_.append(text_el(cx, cy + 15, texts.get("done", "Abonné") if followed else texts.get("btn", "+ Suivre"), 38, "#ffffff"))
     s_.append("</g>")
     hx = lerp(1050, cx + 30, ease((u - 0.3) / 0.6))
     hy = lerp(y0 + 420, cy + 25, ease((u - 0.3) / 0.6))
