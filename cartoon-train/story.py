@@ -255,15 +255,16 @@ def rings(x, y, t, col="#7ad7ff"):
     return "".join(s)
 
 
-def crowd_bubbles(texts, t, t0, center_x):
+def crowd_bubbles(texts, t, t0, center_x, top=430, sc=1.0):
     s = []
     for i, txt in enumerate(texts):
         appear = t0 + 0.25 * i
         if t < appear:
             continue
         sc = 0.9 * ease((t - appear) / 0.25)
-        bx = center_x - 330 + (i % 3) * 330 + (i // 3 % 2) * 120
-        by = 430 + (i // 3) * 190 + math.sin(t * 2 + i) * 12
+        dx = min(330, 250 / sc)  # reste dans l'écran même zoomé
+        bx = center_x - dx + (i % 3) * dx + (i // 3 % 2) * dx * 0.36
+        by = top + (i // 3) * 190 + math.sin(t * 2 + i) * 12
         s.append(bubble(bx, by, txt, sc))
     return "".join(s)
 
@@ -294,6 +295,7 @@ def frame_svg(segs, total, t):
         c0 = cam(prev)
         c1 = tuple(lerp(a, b, tr_u) for a, b in zip(c0, c1))
     cx, cy, sc = c1
+    top_ = cy + ((740 if cur["fx"].get("mid_cta") else 640) - H / 2) / sc  # hauteur (repère monde) qui tombe juste sous le titre « galère » à l'écran
 
     world = [scene.back(t), scene.seat_back(t)]
     standing, effects = [], []
@@ -336,14 +338,15 @@ def frame_svg(segs, total, t):
             if t >= ta:
                 pop = ease((t - ta) / 0.25)
                 bx = min(max(x + (110 if x < 540 else -110), 260), 820)
-                effects.append(bubble(bx, hy - 300 + math.sin(t * 2) * 8, o["bubble"], pop))
+                by_ = max(hy - 300, top_) if HEADER else hy - 300  # jamais sur le titre « galère »
+                effects.append(bubble(bx, by_ + math.sin(t * 2) * 8, o["bubble"], pop))
         if cur["fx"].get("rings") and spec is HERO:
             effects.append(rings(x, hy, t))
 
     world.append(scene.front(t))
     world.extend(standing)
     if cur["fx"].get("crowd"):
-        effects.append(crowd_bubbles(cur["fx"]["crowd"], t, cur["t0"] + 0.2, cx))
+        effects.append(crowd_bubbles(cur["fx"]["crowd"], t, cur["t0"] + 0.2, cx, top_ if HEADER else 430, sc))
 
     tr = "translate(%s %s) scale(%.4f) translate(%s %s)" % (f(W / 2), f(H / 2), sc, f(-cx), f(-cy))
     over = []
@@ -695,6 +698,9 @@ def main():
     elif a.story.startswith("b"):
         from galere_bio import STORIES as Bs
         stories = [s_ for s_ in Bs if a.story == "ball" or s_["slug"].startswith(a.story)]
+    elif a.story.startswith("q"):
+        from galere3 import STORIES as Qs
+        stories = [s_ for s_ in Qs if a.story == "qall" or s_["slug"].startswith(a.story)]
     elif a.story.startswith("p"):
         from galere2 import STORIES as Ps
         stories = [s_ for s_ in Ps if a.story == "pall" or s_["slug"].startswith(a.story)]
