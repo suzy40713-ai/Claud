@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import argparse
 """Essai de la voix gratuite « Miro » (Piper fr_FR-miro-high) sur la galère du réveil."""
 import copy
 import sys
