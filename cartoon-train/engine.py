@@ -1128,7 +1128,7 @@ LEAD_IN, END_HOLD = 0.8, 1.4
 ENTER_DUR, EXIT_DUR = 1.5, 2.6
 
 
-PIPER_FR = {"tom": ("fr_FR-tom-medium", None), "pierre": ("fr_FR-upmc-medium", 1),
+PIPER_FR = {"tom": ("fr_FR-tom-medium", None), "pierre": ("fr_FR-upmc-medium", 1), "miro": ("fr_FR-miro-high", None),
             "jessica": ("fr_FR-upmc-medium", 0)}
 _PIPER = {}
 
@@ -1728,6 +1728,9 @@ def main():
     elif a.serie == 4:
         from sketches4 import SKETCHES as sketches
         OUT = os.path.join(HERE, "videos-serie4")
+    if a.serie == 10:
+        from sketches10 import SKETCHES as sketches
+        OUT = os.path.join(HERE, "videos-gerard-s2")
     if a.serie == 9:
         from sketches9 import SKETCHES as sketches
         OUT = os.path.join(HERE, "videos-sketchs-en")
