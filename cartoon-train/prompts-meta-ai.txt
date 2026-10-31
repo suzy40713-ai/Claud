@@ -1,0 +1,36 @@
+10 PROMPTS DE SCÈNES DE 10 SECONDES POUR META AI — Gérard
+
+Conseils :
+- Colle le prompt en anglais tel quel : les générateurs vidéo le comprennent mieux.
+- La description de Gérard est répétée à l'identique dans chaque prompt pour qu'il garde le même look.
+- Format vertical 9:16. Les dialogues et la voix s'ajoutent ensuite au montage (Meta AI gère mal la parole).
+
+1. Le café (4 tables pour 1 café)
+2D cartoon animation, vertical 9:16, bright flat colors, thick black outlines. Gerard, a grumpy middle-aged man with a brown side-parted comb-over, round black glasses, a thick brown mustache, a navy blazer over a white shirt, sits in a cozy café surrounded by four tables covered with his laptop, papers and coffee cups. A young waitress with a blond ponytail and teal hoodie points at the empty cup; Gerard crosses his arms and smugly shakes his head. Static medium shot, slight camera push-in, comedic timing, 10 seconds.
+
+2. Le supermarché (il goûte tout)
+2D cartoon animation, vertical 9:16, bright flat colors, thick black outlines. Gerard, a grumpy middle-aged man with a brown side-parted comb-over, round black glasses, a thick brown mustache and a navy blazer, stands at a supermarket fruit stand eating grapes one by one, his cheeks full. A shop employee in a white apron watches in shock as the grape bunch shrinks to a bare stem. Gerard shrugs innocently. Medium shot, comedic exaggerated expressions, 10 seconds.
+
+3. Le cinéma (il raconte la fin)
+2D cartoon animation, vertical 9:16, dark cinema room lit by the screen glow, thick black outlines. Gerard, a grumpy middle-aged man with a brown side-parted comb-over, round black glasses, a thick brown mustache and a navy blazer, leans toward a woman with a pink hoodie and whispers excitedly while pointing at the screen, a popcorn bucket in his lap. She covers her ears in frustration. On the big screen, cartoon penguins slide on ice. 10 seconds, comedic.
+
+4. Le bus (son sac a un siège)
+2D cartoon animation, vertical 9:16, bright flat colors, thick black outlines. Inside a city bus, Gerard, a grumpy middle-aged man with a brown side-parted comb-over, round black glasses, a thick brown mustache and a navy blazer, sits next to his leather bag that occupies its own seat. An elderly woman with a grey bun and glasses stands holding the pole, staring at him. Gerard pats his bag protectively. The bus gently sways. 10 seconds, comedic.
+
+5. La plage (il fait payer son ombre)
+2D cartoon animation, vertical 9:16, sunny beach, blue sea, bright flat colors, thick black outlines. Gerard, a grumpy middle-aged man with a brown side-parted comb-over, round black glasses, a thick brown mustache and a navy blazer, stands under a red and white beach umbrella holding a hand-written sign "2 € / minute" next to a man sitting in the shade. The man looks up, confused. Waves move softly in the background. 10 seconds, comedic.
+
+6. Le restaurant (assiette vide)
+2D cartoon animation, vertical 9:16, warm restaurant interior, bright flat colors, thick black outlines. Gerard, a grumpy middle-aged man with a brown side-parted comb-over, round black glasses, a thick brown mustache and a navy blazer, sits at a table with a completely empty plate, wiping his mouth with a napkin, then dramatically pushes the plate away with a disgusted face. A waitress with a tray raises an eyebrow. 10 seconds, comedic timing.
+
+7. La salle d'attente (ticket d'hier)
+2D cartoon animation, vertical 9:16, waiting room with a ticket display showing "N° 42", bright flat colors, thick black outlines. Gerard, a grumpy middle-aged man with a brown side-parted comb-over, round black glasses, a thick brown mustache and a navy blazer, proudly holds up a crumpled ticket "N° 1" while walking past a line of waiting people who stare at him. 10 seconds, comedic.
+
+8. Le parc (glace trop froide)
+2D cartoon animation, vertical 9:16, sunny park with trees and an ice cream cart, bright flat colors, thick black outlines. Gerard, a grumpy middle-aged man with a brown side-parted comb-over, round black glasses, a thick brown mustache and a navy blazer, licks a vanilla ice cream cone, shivers exaggeratedly with frost appearing on his mustache, then angrily points the cone at the ice cream seller. 10 seconds, comedic.
+
+9. L'avion (mode avion)
+2D cartoon animation, vertical 9:16, airplane cabin, bright flat colors, thick black outlines. Gerard, a grumpy middle-aged man with a brown side-parted comb-over, round black glasses, a thick brown mustache and a navy blazer, sits by the window hugging his smartphone protectively against his chest while a flight attendant in a navy uniform with a red scarf holds out her hand, smiling patiently. 10 seconds, comedic.
+
+10. La piscine (zone anti-éclaboussures)
+2D cartoon animation, vertical 9:16, outdoor swimming pool, bright flat colors, thick black outlines. Gerard, a grumpy middle-aged man with a brown side-parted comb-over, round black glasses, a thick brown mustache and a navy blazer, sits stiffly in a small kids' pool holding a rubber duck, while children splash water at him from all sides and his glasses drip. A lifeguard in red blows a whistle. 10 seconds, comedic.
