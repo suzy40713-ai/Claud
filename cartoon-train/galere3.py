@@ -13,6 +13,7 @@ def q(slug, subject, beats, **kw):
     d = _p(slug, subject, beats, **kw)
     d["slug"] = "q" + slug
     d["out"] = "videos-galere3"
+    d["voice"] = ("fr_FR-miro-high", None, 0.92, 0.0)  # voix gratuite Miro
     return d
 
 
