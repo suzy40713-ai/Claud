@@ -218,7 +218,7 @@ def build(wavs):
     for b, w_ in zip(BEATS, wavs):
         x, sr = tts.read_wav(w_)
         dur = len(x) / sr
-        segs.append(dict(b, t0=t, t1=t + dur, wav=w_))
+        segs.append(dict(b, t0=t, t1=t + dur, wav=w_, track=engine.mouth_track(x, sr, FPS)))
         t += dur + 0.35
     return segs, t + 2.0
 
@@ -304,6 +304,8 @@ def frame_svg(segs, total, t):
                   tilt=math.sin(t * 0.9 + k * 1.7) * 1.8,
                   blink=o.get("blink", max(0.0, 1 - abs(((t + k * 0.7) % 3.4) - 0.09) / 0.09)
                               if ((t + k * 0.7) % 3.4) < 0.18 else 0.0))
+        if spec is HERO and cur["t0"] <= t < cur["t1"]:  # le héros raconte : sa bouche suit la voix
+            st["mouth"], st["shape"] = engine.track_at(cur["track"], t - cur["t0"], FPS)
         if cur["fx"].get("freeze") and spec is not HERO:
             st["blink"], st["tilt"] = 0.0, 0.0
         lk = o.get("look", (0, 0))

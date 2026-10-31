@@ -141,7 +141,7 @@ def rad_grad(col):
 
 
 def head2(x, hy, R, skin, expr, mouth, blink, look, back="", front="", after="", mustache=None, beard=None,
-          glasses=False, blush=0.25, mouth_color="#5a1a1a", tilt=0.0):
+          glasses=False, blush=0.25, mouth_color="#5a1a1a", tilt=0.0, shape=0.0):
     """Tête plus détaillée : volume, reflets dans les yeux, nez, oreilles, bouche continue (0..1)."""
     bl, br, curve, lids = EXPR[expr]
     fill, defs = rad_grad(skin)
@@ -203,8 +203,9 @@ def head2(x, hy, R, skin, expr, mouth, blink, look, back="", front="", after="",
             s.append(path("M %s %s Q %s %s %s %s" % (f(x - R * 0.17), f(my - c * 0.3 + skew), f(x), f(my + c),
                                                      f(x + R * 0.17), f(my - c * 0.3 - skew)), sw=6))
     else:
-        rx = R * (0.11 + 0.06 * m)
-        ry = R * (0.035 + 0.13 * m)
+        # shape : -1 = bouche ronde (o, ou), +1 = bouche large et serrée (i, é, s)
+        rx = R * (0.11 + 0.06 * m) * (1 + 0.22 * shape)
+        ry = R * (0.035 + 0.13 * m) * (1 - 0.18 * shape)
         top = my - ry * (0.6 if curve > 0.05 else 1.0)
         s.append(path("M %s %s Q %s %s %s %s Q %s %s %s %s Z" % (
             f(x - rx), f(my - ry * 0.1 - curve * R * 0.3), f(x), f(top - ry * 0.25), f(x + rx),
@@ -659,7 +660,8 @@ def person_rest(spec, st, t, seated, prop, hands, x, hy, sy, R, child, hback, hf
     s.append(head2(x, hy, R, skin, expr, mouth, st.get("blink", 0.0), st.get("look", (0, 0)), back=hback,
                    front=hfront, after=after, mustache=spec.get("mustache"), beard=spec.get("beard"),
                    glasses=spec.get("glasses"), blush=0.6 if child else 0.22,
-                   mouth_color="#a4161a" if spec.get("lipstick") else "#5a1a1a", tilt=st.get("tilt", 0.0)))
+                   mouth_color="#a4161a" if spec.get("lipstick") else "#5a1a1a", tilt=st.get("tilt", 0.0),
+                   shape=st.get("shape", 0.0)))
     return "".join(s)
 
 
@@ -1230,6 +1232,51 @@ def synth(sk, speed_mul=1.0):
     return out
 
 
+def mouth_track(x, sr, fps=FPS):
+    """Bouche calée sur la voix, image par image : ouverture d'après le volume, forme d'après le timbre
+    (sons graves o/ou -> bouche ronde, sons aigus i/é -> bouche large, s/ch/f -> dents presque serrées).
+    La bouche s'ouvre un poil avant le son, comme une vraie bouche."""
+    hop = sr / fps
+    n = int(math.ceil(len(x) / hop))
+    win = int(sr * 0.032)
+    freqs = np.fft.rfftfreq(win, 1.0 / sr)
+    hann = np.hanning(win)
+    rms, cent = np.zeros(n), np.zeros(n)
+    for k in range(n):
+        c = int((k + 0.5) * hop)
+        seg = x[max(0, c - win // 2): max(0, c - win // 2) + win]
+        if len(seg) < win:
+            seg = np.pad(seg, (0, win - len(seg)))
+        rms[k] = np.sqrt(np.mean(seg ** 2))
+        sp = np.abs(np.fft.rfft(seg * hann))
+        cent[k] = (sp * freqs).sum() / (sp.sum() + 1e-9)
+    ref = np.percentile(rms[rms > 1e-4], 90) if (rms > 1e-4).any() else 1.0
+    o = np.clip((rms / (ref + 1e-9) - 0.15) / 0.75, 0, 1) ** 1.3
+    fric = np.clip((cent - 3500) / 1500, 0, 1)
+    o *= 1 - 0.65 * fric
+    voiced = (o > 0.15) & (fric < 0.5)
+    lo, hi = np.percentile(cent[voiced], [20, 80]) if voiced.sum() > 10 else (900.0, 2200.0)
+    shape = np.clip((cent - lo) / max(hi - lo, 1.0), 0, 1) * 2 - 1  # timbre relatif à cette voix
+    shape = np.where(fric > 0, np.maximum(shape, fric), shape)
+    y, prev = np.zeros(n), 0.0
+    for k in range(n):  # attaque franche, fermeture rapide mais sans clignoter
+        prev = o[k] if o[k] > prev else prev + (o[k] - prev) * 0.8
+        y[k] = prev
+    y = np.concatenate([y[1:], [0.0]])
+    shape = np.concatenate([shape[1:], [0.0]])
+    return y.astype(np.float32), shape.astype(np.float32)
+
+
+def track_at(trk, t_rel, fps=FPS):
+    o, sh = trk
+    k = t_rel * fps
+    i0 = int(k)
+    if i0 >= len(o) - 1:
+        return float(o[-1]) if len(o) else 0.0, 0.0
+    u = k - i0
+    return float(lerp(o[i0], o[i0 + 1], u)), float(lerp(sh[i0], sh[i0 + 1], u))
+
+
 def build_timeline(sk, wavs, gap=0.3):
     segs = []
     t = 0.15 if sk.get("hook_text") else LEAD_IN
@@ -1253,6 +1300,7 @@ def build_timeline(sk, wavs, gap=0.3):
                         for k in range(int(math.ceil(len(x) / hop)))])
         env = env / (np.percentile(env, 90) + 1e-9)
         segs.append(dict(kind="line", t0=t, t1=t + dur, who=role, text=text, wav=wavs[i], env=env,
+                         track=mouth_track(x, sr),
                          moods=dict(moods), idx=i, mid=mid))
         t += dur + gap
     total = t + (2.2 if sk.get("cta") else END_HOLD)
@@ -1325,17 +1373,9 @@ def state(c, t):
                    moods={"E": "smile", "V": "neutral", "K": "neutral", "A": "neutral"})
     speaking = cur["kind"] == "line" and t < cur["t1"]
     who = cur.get("who") if speaking else None
-    mouth = 0.0
+    mouth, shape = 0.0, 0.0
     if speaking:
-        env = cur["env"]
-        k = (t - cur["t0"]) * FPS
-        i0 = int(k)
-        a = env[min(i0, len(env) - 1)]
-        b = env[min(i0 + 1, len(env) - 1)]
-        e = lerp(a, b, k - i0)
-        e = 0.6 * e + 0.4 * env[max(0, min(i0 - 2, len(env) - 1))]  # lissage
-        mouth = max(0.0, min(1.0, (e - 0.18) / 0.85))
-        mouth *= min(1.0, (cur["t1"] - t) / 0.08)  # fermeture douce en fin de phrase
+        mouth, shape = track_at(cur["track"], t - cur["t0"])
 
     en, ex = c.enter, c.exit
     E0, K0, A0 = 330, 150, 150
@@ -1371,6 +1411,7 @@ def state(c, t):
         ph = (t + "EVKA".index(r) * 0.63) % (3.3 + "EVKA".index(r) * 0.37)
         bk = max(0.0, 1.0 - abs(ph - 0.09) / 0.09) if ph < 0.18 else 0.0
         st[r] = dict(expr=cur["moods"].get(r, "neutral"), mouth=mouth if who == r else 0.0, blink=bk,
+                     shape=shape if who == r else 0.0,
                      walk=walk.get(r), pose="down", pose_amt=1.0,
                      tilt=math.sin(t * 0.9 + "EVKA".index(r) * 1.7) * 1.6)
         if who == r:
