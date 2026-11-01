@@ -7,6 +7,10 @@ Voix (dans cet ordre) :
   1. ELEVENLABS_API_KEY défini -> API ElevenLabs (eleven_multilingual_v2, "Louis - Narrator")
   2. commande `say` (macOS)   -> say -v Thomas
   3. sinon                     -> edge-tts, voix fr-FR-HenriNeural (pip install edge-tts)
+  4. edge-tts injoignable      -> Piper hors ligne, voix française masculine "gilles"
+     (modèle téléchargé depuis les releases GitHub de rhasspy/piper)
+
+VOIX=piper|edge|say|elevenlabs force un moteur.
 
 Variable optionnelle ELEVENLABS_VOICE_ID pour forcer un identifiant de voix.
 """
@@ -93,12 +97,54 @@ def voix_edge(texte, dest):
         "--text", texte, "--write-media", dest)
 
 
+PIPER_DIR = ICI / "piper"
+PIPER_MODELE = PIPER_DIR / "fr-gilles-low.onnx"
+PIPER_URL = "https://github.com/rhasspy/piper/releases/download/v0.0.2/voice-fr-gilles-low.tar.gz"
+# Graphies phonétiques pour que le moteur hors ligne prononce bien
+PRONONCIATION = {"SVT": "èss vé té", "CO2": "cé o deux", "El Niño": "El Ninio",
+                 "1,2 degré": "un virgule deux degré", "1,5 à 4": "un virgule cinq à quatre"}
+
+
+def voix_piper(texte, dest):
+    if not PIPER_MODELE.exists():
+        PIPER_DIR.mkdir(exist_ok=True)
+        run("sh", "-c", f"curl -sSL {PIPER_URL} | tar xz -C '{PIPER_DIR}'")
+    try:
+        import piper  # noqa: F401
+    except ImportError:
+        run(sys.executable, "-m", "pip", "install", "-q", "piper-tts")
+    for mot, dit in PRONONCIATION.items():
+        texte = texte.replace(mot, dit)
+    wav = dest.with_suffix(".wav")
+    subprocess.run([sys.executable, "-m", "piper", "-m", str(PIPER_MODELE), "-f", str(wav),
+                    "--length-scale", "1.0", "--sentence-silence", "0.2"],
+                   input=texte, text=True, check=True, capture_output=True)
+    run("ffmpeg", "-y", "-loglevel", "error", "-i", wav,
+        "-af", "silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse,highpass=f=70,loudnorm=I=-16:TP=-1.5", "-ar", "48000", "-b:a", "192k", dest)
+    wav.unlink()
+
+
+def voix_edge_ou_piper(texte, dest):
+    try:
+        voix_edge(texte, dest)
+        if dest.stat().st_size > 0:
+            return
+    except Exception:
+        pass
+    print("  edge-tts injoignable -> Piper (fr gilles)")
+    voix_piper(texte, dest)
+
+
 def choisir_voix():
+    force = os.environ.get("VOIX")
+    if force:
+        return force, {"piper": voix_piper, "edge": voix_edge, "say": voix_say,
+                       "elevenlabs": voix_elevenlabs}[force]
     if os.environ.get("ELEVENLABS_API_KEY"):
         return "ElevenLabs", voix_elevenlabs
     if shutil.which("say"):
         return "say -v Thomas", voix_say
-    return "edge-tts fr-FR-HenriNeural", voix_edge
+    return "edge-tts fr-FR-HenriNeural (repli Piper)", voix_edge_ou_piper
 
 
 # ---------- Montage ----------
@@ -114,7 +160,7 @@ def main():
     for i, (debut, dur, texte) in enumerate(SCENES, 1):
         audio = TRAVAIL / f"voix_{i:02d}.mp3"
         if not audio.exists() or audio.stat().st_size == 0:
-            tts(texte, audio)
+            tts(texte, audio)  # un fichier audio par scène
         d_voix = duree(audio)
         fin_voix = DELAI_VOIX + d_voix
         total = max(dur, fin_voix + MARGE_FIN) if fin_voix > dur else dur
