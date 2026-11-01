@@ -715,6 +715,9 @@ def main():
     a = ap.parse_args()
     if a.story == "h1":
         stories = [dict(title=TITLE, slug=SLUG, beats=BEATS, hero=TOI)]
+    elif a.story.startswith("y4"):
+        from histoires4 import STORIES as Y4
+        stories = [s_ for s_ in Y4 if a.story == "y4all" or s_["slug"].startswith(a.story)]
     elif a.story.startswith("y"):
         from yscripts import STORIES as Y
         stories = [s_ for s_ in Y if a.story == "yall" or s_["slug"].startswith(a.story)]
