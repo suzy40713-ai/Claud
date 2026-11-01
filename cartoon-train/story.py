@@ -187,14 +187,15 @@ BEATS = [
 _PV = {}
 
 
-def piper_wav(text, path_):
+def piper_wav(text, path_, voice=None):
     import wave
     from piper import PiperVoice, SynthesisConfig
-    if VOICE_MODEL not in _PV:
-        _PV[VOICE_MODEL] = PiperVoice.load(engine.voice_model(VOICE_MODEL))
+    model, spk, length = (voice or (VOICE_MODEL, VOICE_SPK, LENGTH, SEMIS))[:3]
+    if model not in _PV:
+        _PV[model] = PiperVoice.load(engine.voice_model(model))
     with wave.open(path_, "wb") as w_:
-        _PV[VOICE_MODEL].synthesize_wav(text, w_, syn_config=SynthesisConfig(speaker_id=VOICE_SPK, length_scale=LENGTH,
-                                                                     noise_scale=0.667, noise_w_scale=0.8))
+        _PV[model].synthesize_wav(text, w_, syn_config=SynthesisConfig(speaker_id=spk, length_scale=length,
+                                                               noise_scale=0.667, noise_w_scale=0.8))
 
 
 def synth_beats():
@@ -202,11 +203,12 @@ def synth_beats():
     os.makedirs(d, exist_ok=True)
     out = []
     for i, b in enumerate(BEATS):
-        final = os.path.join(d, "%02d.wav" % i)
+        v = b["fx"].get("voice")  # dialogue : chaque réplique peut avoir sa propre voix
+        final = os.path.join(d, "%02d.wav" % i if not v else "%02d_%s.wav" % (i, v[0]))
         if not os.path.exists(final):
             raw = final.replace(".wav", "_raw.wav")
-            piper_wav(b["text"].replace("...", ","), raw)
-            tts.to_sr(raw, final, SEMIS)
+            piper_wav(b["text"].replace("...", ","), raw, v)
+            tts.to_sr(raw, final, v[3] if v else SEMIS)
             os.remove(raw)
         out.append(final)
     return out
@@ -304,7 +306,8 @@ def frame_svg(segs, total, t):
                   tilt=math.sin(t * 0.9 + k * 1.7) * 1.8,
                   blink=o.get("blink", max(0.0, 1 - abs(((t + k * 0.7) % 3.4) - 0.09) / 0.09)
                               if ((t + k * 0.7) % 3.4) < 0.18 else 0.0))
-        if spec is HERO and cur["t0"] <= t < cur["t1"]:  # le héros raconte : sa bouche suit la voix
+        talk = cur["fx"].get("talk")
+        if (k == talk if talk is not None else spec is HERO) and cur["t0"] <= t < cur["t1"]:  # bouche calée sur la voix
             st["mouth"], st["shape"] = engine.track_at(cur["track"], t - cur["t0"], FPS)
         if cur["fx"].get("freeze") and spec is not HERO:
             st["blink"], st["tilt"] = 0.0, 0.0
@@ -345,6 +348,8 @@ def frame_svg(segs, total, t):
         if cur["fx"].get("rings") and spec is HERO:
             effects.append(rings(x, hy, t))
 
+    if STORY.get("sign"):
+        world.append(sign_svg(STORY["sign"]))
     world.append(scene.front(t))
     world.extend(standing)
     if cur["fx"].get("crowd"):
@@ -431,6 +436,25 @@ def frame_svg(segs, total, t):
     return ('<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d">%s'
             '<rect width="%d" height="%d" fill="#dfe7ec"/><g transform="%s">%s</g>%s<g transform="%s">%s</g>%s</svg>') % (
         W, H, W, H, defs, W, H, tr, "".join(world), "".join(over), tr, "".join(effects), "".join(ui))
+
+
+def sign_svg(txt, x=540, y=520):
+    """Petit panneau penché dans le décor, avec une blague à lire en faisant pause."""
+    words, lines_, cur_ = txt.split(), [], ""
+    for w_ in words:
+        if text_w(cur_ + " " + w_, 30) > 380 and cur_:
+            lines_.append(cur_)
+            cur_ = w_
+        else:
+            cur_ = (cur_ + " " + w_).strip()
+    lines_.append(cur_)
+    h_ = 34 * len(lines_) + 36
+    s_ = ['<g transform="translate(%s %s) rotate(-7)">' % (f(x), f(y)),
+          rect(-215, -h_ / 2, 430, h_, "#4a4e55", rx=10, stroke="#2b2d31", sw=8)]
+    for i, l_ in enumerate(lines_):
+        s_.append(text_el(0, -h_ / 2 + 44 + i * 34, l_, 28, "#f1f1f1", weight=600))
+    s_.append("</g>")
+    return "".join(s_)
 
 
 _FONT = {}
@@ -700,6 +724,9 @@ def main():
     elif a.story.startswith("b"):
         from galere_bio import STORIES as Bs
         stories = [s_ for s_ in Bs if a.story == "ball" or s_["slug"].startswith(a.story)]
+    elif a.story.startswith("m"):
+        from momo import STORIES as Ms
+        stories = [s_ for s_ in Ms if a.story == "mall" or s_["slug"].startswith(a.story)]
     elif a.story.startswith("q"):
         from galere3 import STORIES as Qs
         stories = [s_ for s_ in Qs if a.story == "qall" or s_["slug"].startswith(a.story)]
