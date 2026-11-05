@@ -25,7 +25,16 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
   return (
     <CustomerDetail
       timeZone={ctx.organization.timezone}
-      customer={{ id: c.id, firstName: c.firstName, lastName: c.lastName, email: c.email ?? "", phone: c.phone ?? "", notes: c.notes ?? "", emailOptIn: c.emailOptIn, createdAt: c.createdAt.toISOString() }}
+      customer={{
+        id: c.id,
+        firstName: c.firstName,
+        lastName: c.lastName,
+        email: c.email ?? "",
+        phone: c.phone ?? "",
+        notes: c.notes ?? "",
+        emailOptIn: c.emailOptIn,
+        createdAt: c.createdAt.toISOString(),
+      }}
       history={data.history.map((h) => ({ ...h, startsAt: h.startsAt.toISOString() }))}
       stats={data.stats}
     />
@@ -35,7 +44,10 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
 export default function CustomerPage(props: PageProps<"/tableau-de-bord/clients/[id]">) {
   return (
     <>
-      <Link href="/tableau-de-bord/clients" className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+      <Link
+        href="/tableau-de-bord/clients"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+      >
         <ArrowLeft className="size-4" /> Clients
       </Link>
       <Suspense fallback={<Skeleton className="h-96" />}>

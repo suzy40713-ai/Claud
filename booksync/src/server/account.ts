@@ -33,9 +33,16 @@ export async function exportUserData(userId: string) {
     })
     .from(user)
     .where(eq(user.id, userId));
-  const providers = await db.select({ providerId: account.providerId }).from(account).where(eq(account.userId, userId));
+  const providers = await db
+    .select({ providerId: account.providerId })
+    .from(account)
+    .where(eq(account.userId, userId));
   const memberships = await db
-    .select({ organizationId: member.organizationId, role: member.role, joinedAt: member.createdAt })
+    .select({
+      organizationId: member.organizationId,
+      role: member.role,
+      joinedAt: member.createdAt,
+    })
     .from(member)
     .where(eq(member.userId, userId));
 
@@ -47,10 +54,15 @@ export async function exportUserData(userId: string) {
       organization: { ...org, stripeCustomerId: undefined, stripeSubscriptionId: undefined },
       services: await db.select().from(service).where(eq(service.organizationId, orgId)),
       staff: await db.select().from(staff).where(eq(staff.organizationId, orgId)),
-      workingHours: await db.select().from(workingHours).where(eq(workingHours.organizationId, orgId)),
+      workingHours: await db
+        .select()
+        .from(workingHours)
+        .where(eq(workingHours.organizationId, orgId)),
       timeOff: await db.select().from(timeOff).where(eq(timeOff.organizationId, orgId)),
       customers: await db.select().from(customer).where(eq(customer.organizationId, orgId)),
-      appointments: (await db.select().from(appointment).where(eq(appointment.organizationId, orgId))).map((a) => ({
+      appointments: (
+        await db.select().from(appointment).where(eq(appointment.organizationId, orgId))
+      ).map((a) => ({
         ...a,
         manageTokenHash: undefined,
       })),
@@ -69,7 +81,11 @@ export async function exportUserData(userId: string) {
 
 export async function getAccountDeletionImpact(userId: string) {
   const owned = await db
-    .select({ id: organization.id, name: organization.name, subscriptionId: organization.stripeSubscriptionId })
+    .select({
+      id: organization.id,
+      name: organization.name,
+      subscriptionId: organization.stripeSubscriptionId,
+    })
     .from(member)
     .innerJoin(organization, eq(organization.id, member.organizationId))
     .where(and(eq(member.userId, userId), eq(member.role, "owner")));
@@ -87,7 +103,9 @@ export async function deleteAccount(
   cancelSubscription: (subscriptionId: string) => Promise<void>,
 ) {
   if (confirmation.trim().toUpperCase() !== "SUPPRIMER") {
-    throw new UserError("Saisissez SUPPRIMER pour confirmer.", { confirmation: "Saisissez SUPPRIMER pour confirmer." });
+    throw new UserError("Saisissez SUPPRIMER pour confirmer.", {
+      confirmation: "Saisissez SUPPRIMER pour confirmer.",
+    });
   }
   const owned = await getAccountDeletionImpact(userId);
   for (const org of owned) {
@@ -95,7 +113,12 @@ export async function deleteAccount(
   }
   await db.transaction(async (tx) => {
     if (owned.length) {
-      await tx.delete(organization).where(inArray(organization.id, owned.map((o) => o.id)));
+      await tx.delete(organization).where(
+        inArray(
+          organization.id,
+          owned.map((o) => o.id),
+        ),
+      );
     }
     await tx.delete(user).where(eq(user.id, userId));
   });

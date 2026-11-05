@@ -21,7 +21,13 @@ export async function listMyNotifications(ctx: OrgContext) {
     .from(notification)
     .leftJoin(appointment, eq(appointment.id, notification.appointmentId))
     .leftJoin(customer, eq(customer.id, appointment.customerId))
-    .where(and(eq(notification.organizationId, ctx.organization.id), eq(notification.audience, "staff"), eq(notification.recipient, ctx.user.email.toLowerCase())))
+    .where(
+      and(
+        eq(notification.organizationId, ctx.organization.id),
+        eq(notification.audience, "staff"),
+        eq(notification.recipient, ctx.user.email.toLowerCase()),
+      ),
+    )
     .orderBy(desc(notification.createdAt))
     .limit(100);
 }
@@ -41,7 +47,12 @@ export async function listCustomerDeliveries(ctx: OrgContext) {
       lastError: notification.lastError,
     })
     .from(notification)
-    .where(and(eq(notification.organizationId, ctx.organization.id), eq(notification.audience, "customer")))
+    .where(
+      and(
+        eq(notification.organizationId, ctx.organization.id),
+        eq(notification.audience, "customer"),
+      ),
+    )
     .orderBy(desc(notification.scheduledFor))
     .limit(100);
 }

@@ -105,7 +105,8 @@ export const auth = betterAuth({
         // (Inscription Google : l'acceptation est demandée avant l'accès à l'application.)
         async before(user, ctx) {
           if (ctx?.path === "/sign-up/email") {
-            const accepted = (ctx.body as { acceptTerms?: unknown } | undefined)?.acceptTerms === true;
+            const accepted =
+              (ctx.body as { acceptTerms?: unknown } | undefined)?.acceptTerms === true;
             if (!accepted) {
               throw new APIError("BAD_REQUEST", {
                 code: "TERMS_NOT_ACCEPTED",

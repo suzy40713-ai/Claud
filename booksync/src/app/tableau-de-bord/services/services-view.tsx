@@ -37,9 +37,24 @@ export type ServiceRow = {
 type StaffOption = { id: string; name: string; color: string; photoUrl: string | null };
 
 const DURATIONS = [10, 15, 20, 30, 45, 60, 75, 90, 120, 150, 180, 240, 300, 360, 480];
-const COLORS = ["#3563E9", "#7C3AED", "#DB2777", "#EA580C", "#16A34A", "#0891B2", "#CA8A04", "#475467"];
+const COLORS = [
+  "#3563E9",
+  "#7C3AED",
+  "#DB2777",
+  "#EA580C",
+  "#16A34A",
+  "#0891B2",
+  "#CA8A04",
+  "#475467",
+];
 
-export function ServicesView({ services, staff }: { services: ServiceRow[]; staff: StaffOption[] }) {
+export function ServicesView({
+  services,
+  staff,
+}: {
+  services: ServiceRow[];
+  staff: StaffOption[];
+}) {
   const [editing, setEditing] = useState<ServiceRow | "new" | null>(null);
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -66,10 +81,19 @@ export function ServicesView({ services, staff }: { services: ServiceRow[]; staf
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {services.map((s) => (
-            <li key={s.id} className="group flex flex-col overflow-hidden rounded-xl border bg-card shadow-xs" data-testid="service-card">
+            <li
+              key={s.id}
+              className="group flex flex-col overflow-hidden rounded-xl border bg-card shadow-xs"
+              data-testid="service-card"
+            >
               {s.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={s.imageUrl} alt="" className="aspect-[3/1] w-full object-cover" loading="lazy" />
+                <img
+                  src={s.imageUrl}
+                  alt=""
+                  className="aspect-[3/1] w-full object-cover"
+                  loading="lazy"
+                />
               ) : (
                 <div className="h-1.5" style={{ backgroundColor: s.color }} />
               )}
@@ -77,16 +101,26 @@ export function ServicesView({ services, staff }: { services: ServiceRow[]; staf
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <h3 className="font-semibold">{s.name}</h3>
-                    {s.description ? <p className="mt-0.5 line-clamp-2 text-[13px] text-muted-foreground">{s.description}</p> : null}
+                    {s.description ? (
+                      <p className="mt-0.5 line-clamp-2 text-[13px] text-muted-foreground">
+                        {s.description}
+                      </p>
+                    ) : null}
                   </div>
-                  <p className="shrink-0 font-semibold tabular-nums">{s.priceCents ? formatCents(s.priceCents) : "Gratuit"}</p>
+                  <p className="shrink-0 font-semibold tabular-nums">
+                    {s.priceCents ? formatCents(s.priceCents) : "Gratuit"}
+                  </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 text-[13px] text-muted-foreground">
                   <span className="inline-flex items-center gap-1">
                     <Clock className="size-3.5" /> {formatDuration(s.durationMinutes)}
                   </span>
-                  {s.bufferAfterMinutes ? <span>+ {s.bufferAfterMinutes} min de battement</span> : null}
-                  {!s.isActive ? <Badge>Désactivé</Badge> : !s.isOnlineBookable ? (
+                  {s.bufferAfterMinutes ? (
+                    <span>+ {s.bufferAfterMinutes} min de battement</span>
+                  ) : null}
+                  {!s.isActive ? (
+                    <Badge>Désactivé</Badge>
+                  ) : !s.isOnlineBookable ? (
                     <Badge>
                       <EyeOff className="size-3" /> Hors ligne
                     </Badge>
@@ -97,14 +131,27 @@ export function ServicesView({ services, staff }: { services: ServiceRow[]; staf
                     {s.staffIds.length ? (
                       s.staffIds.slice(0, 5).map((id) => {
                         const p = staff.find((x) => x.id === id);
-                        return p ? <Avatar key={id} name={p.name} src={p.photoUrl} color={p.color} className="size-7 border-2 border-card text-[10px]" /> : null;
+                        return p ? (
+                          <Avatar
+                            key={id}
+                            name={p.name}
+                            src={p.photoUrl}
+                            color={p.color}
+                            className="size-7 border-2 border-card text-[10px]"
+                          />
+                        ) : null;
                       })
                     ) : (
                       <span className="text-[13px] text-warning">Aucun employé attribué</span>
                     )}
                   </div>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" aria-label={`Modifier ${s.name}`} onClick={() => setEditing(s)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`Modifier ${s.name}`}
+                      onClick={() => setEditing(s)}
+                    >
                       <Pencil />
                     </Button>
                     <Button
@@ -113,7 +160,12 @@ export function ServicesView({ services, staff }: { services: ServiceRow[]; staf
                       aria-label={`Supprimer ${s.name}`}
                       disabled={pending}
                       onClick={() => {
-                        if (!confirm(`Supprimer le service « ${s.name} » ? Les rendez-vous passés sont conservés.`)) return;
+                        if (
+                          !confirm(
+                            `Supprimer le service « ${s.name} » ? Les rendez-vous passés sont conservés.`,
+                          )
+                        )
+                          return;
                         startTransition(async () => {
                           const res = await deleteServiceAction(s.id);
                           if (res.ok) toast.success(res.message);
@@ -149,7 +201,15 @@ export function ServicesView({ services, staff }: { services: ServiceRow[]; staf
   );
 }
 
-function ServiceForm({ service, staff, onDone }: { service: ServiceRow | null; staff: StaffOption[]; onDone: () => void }) {
+function ServiceForm({
+  service,
+  staff,
+  onDone,
+}: {
+  service: ServiceRow | null;
+  staff: StaffOption[];
+  onDone: () => void;
+}) {
   const [v, setV] = useState({
     name: service?.name ?? "",
     description: service?.description ?? "",
@@ -163,12 +223,16 @@ function ServiceForm({ service, staff, onDone }: { service: ServiceRow | null; s
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [pending, startTransition] = useTransition();
-  const durations = DURATIONS.includes(v.durationMinutes) ? DURATIONS : [...DURATIONS, v.durationMinutes].sort((a, b) => a - b);
+  const durations = DURATIONS.includes(v.durationMinutes)
+    ? DURATIONS
+    : [...DURATIONS, v.durationMinutes].sort((a, b) => a - b);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    const priceNum = v.price.trim() === "" ? 0 : Number(v.price.replace(/\s/g, "").replace(",", "."));
-    if (!Number.isFinite(priceNum) || priceNum < 0) return setErrors({ priceCents: "Prix invalide." });
+    const priceNum =
+      v.price.trim() === "" ? 0 : Number(v.price.replace(/\s/g, "").replace(",", "."));
+    if (!Number.isFinite(priceNum) || priceNum < 0)
+      return setErrors({ priceCents: "Prix invalide." });
     startTransition(async () => {
       const res = await saveServiceAction(service?.id ?? null, {
         name: v.name,
@@ -191,18 +255,37 @@ function ServiceForm({ service, staff, onDone }: { service: ServiceRow | null; s
   }
 
   return (
-    <DialogContent title={service ? "Modifier le service" : "Nouveau service"} className="sm:max-w-xl">
+    <DialogContent
+      title={service ? "Modifier le service" : "Nouveau service"}
+      className="sm:max-w-xl"
+    >
       <form onSubmit={submit} className="grid gap-5" noValidate>
         {errors.form ? <Alert variant="error">{errors.form}</Alert> : null}
         <Field id="svc-name" label="Nom" error={errors.name}>
-          <Input id="svc-name" value={v.name} onChange={(e) => setV({ ...v, name: e.target.value })} placeholder="Coupe femme" required />
+          <Input
+            id="svc-name"
+            value={v.name}
+            onChange={(e) => setV({ ...v, name: e.target.value })}
+            placeholder="Coupe femme"
+            required
+          />
         </Field>
         <Field id="svc-desc" label="Description (facultatif)" error={errors.description}>
-          <Textarea id="svc-desc" value={v.description} maxLength={500} onChange={(e) => setV({ ...v, description: e.target.value })} className="min-h-20" />
+          <Textarea
+            id="svc-desc"
+            value={v.description}
+            maxLength={500}
+            onChange={(e) => setV({ ...v, description: e.target.value })}
+            className="min-h-20"
+          />
         </Field>
         <div className="grid gap-4 sm:grid-cols-3">
           <Field id="svc-duration" label="Durée" error={errors.durationMinutes}>
-            <NativeSelect id="svc-duration" value={v.durationMinutes} onChange={(e) => setV({ ...v, durationMinutes: Number(e.target.value) })}>
+            <NativeSelect
+              id="svc-duration"
+              value={v.durationMinutes}
+              onChange={(e) => setV({ ...v, durationMinutes: Number(e.target.value) })}
+            >
               {durations.map((d) => (
                 <option key={d} value={d}>
                   {formatDuration(d)}
@@ -211,10 +294,20 @@ function ServiceForm({ service, staff, onDone }: { service: ServiceRow | null; s
             </NativeSelect>
           </Field>
           <Field id="svc-price" label="Prix (€)" error={errors.priceCents}>
-            <Input id="svc-price" inputMode="decimal" value={v.price} onChange={(e) => setV({ ...v, price: e.target.value })} placeholder="0,00" />
+            <Input
+              id="svc-price"
+              inputMode="decimal"
+              value={v.price}
+              onChange={(e) => setV({ ...v, price: e.target.value })}
+              placeholder="0,00"
+            />
           </Field>
           <Field id="svc-buffer" label="Battement après" error={errors.bufferAfterMinutes}>
-            <NativeSelect id="svc-buffer" value={v.bufferAfterMinutes} onChange={(e) => setV({ ...v, bufferAfterMinutes: Number(e.target.value) })}>
+            <NativeSelect
+              id="svc-buffer"
+              value={v.bufferAfterMinutes}
+              onChange={(e) => setV({ ...v, bufferAfterMinutes: Number(e.target.value) })}
+            >
               {[0, 5, 10, 15, 20, 30, 45, 60].map((m) => (
                 <option key={m} value={m}>
                   {m ? `${m} min` : "Aucun"}
@@ -255,7 +348,12 @@ function ServiceForm({ service, staff, onDone }: { service: ServiceRow | null; s
                         setV({ ...v, staffIds: next });
                       }}
                     />
-                    <Avatar name={s.name} src={s.photoUrl} color={s.color} className="size-6 text-[10px]" />
+                    <Avatar
+                      name={s.name}
+                      src={s.photoUrl}
+                      color={s.color}
+                      className="size-6 text-[10px]"
+                    />
                     <span className="truncate text-sm">{s.name}</span>
                   </label>
                 </li>
@@ -269,16 +367,28 @@ function ServiceForm({ service, staff, onDone }: { service: ServiceRow | null; s
           <label className="flex items-center justify-between gap-3 text-sm">
             <span>
               <span className="block font-medium">Réservable en ligne</span>
-              <span className="block text-[13px] text-muted-foreground">Visible sur votre page de réservation.</span>
+              <span className="block text-[13px] text-muted-foreground">
+                Visible sur votre page de réservation.
+              </span>
             </span>
-            <Switch checked={v.isOnlineBookable} onCheckedChange={(c) => setV({ ...v, isOnlineBookable: c })} aria-label="Réservable en ligne" />
+            <Switch
+              checked={v.isOnlineBookable}
+              onCheckedChange={(c) => setV({ ...v, isOnlineBookable: c })}
+              aria-label="Réservable en ligne"
+            />
           </label>
           <label className="flex items-center justify-between gap-3 text-sm">
             <span>
               <span className="block font-medium">Service actif</span>
-              <span className="block text-[13px] text-muted-foreground">Désactivé, il ne peut plus être réservé.</span>
+              <span className="block text-[13px] text-muted-foreground">
+                Désactivé, il ne peut plus être réservé.
+              </span>
             </span>
-            <Switch checked={v.isActive} onCheckedChange={(c) => setV({ ...v, isActive: c })} aria-label="Service actif" />
+            <Switch
+              checked={v.isActive}
+              onCheckedChange={(c) => setV({ ...v, isActive: c })}
+              aria-label="Service actif"
+            />
           </label>
         </div>
         {service ? (

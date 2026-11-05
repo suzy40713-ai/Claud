@@ -55,7 +55,9 @@ export function SignInForm() {
         </Alert>
       ) : null}
       {params.get("erreur") === "google" ? (
-        <Alert variant="error">La connexion avec Google n&apos;a pas abouti. Réessayez ou utilisez votre email.</Alert>
+        <Alert variant="error">
+          La connexion avec Google n&apos;a pas abouti. Réessayez ou utilisez votre email.
+        </Alert>
       ) : null}
       {formError ? <Alert variant="error">{formError}</Alert> : null}
       <Field id="email" label="Email" error={errors.email}>

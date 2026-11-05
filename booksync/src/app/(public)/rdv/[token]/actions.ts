@@ -12,7 +12,8 @@ import { clientIp, rateLimit } from "@/server/rate-limit";
 
 async function load(token: string) {
   const ip = clientIp(await headers());
-  if (!rateLimit(`manage:${ip}`, 30, 10 * 60_000)) throw new UserError("Trop de tentatives. Réessayez plus tard.");
+  if (!rateLimit(`manage:${ip}`, 30, 10 * 60_000))
+    throw new UserError("Trop de tentatives. Réessayez plus tard.");
   const data = await getAppointmentByToken(token);
   if (!data) throw new UserError("Lien invalide.");
   if (!data.canChange) {
@@ -42,14 +43,25 @@ export async function cancelByTokenAction(token: string, reason: string) {
 export async function slotsForTokenAction(token: string, fromDate: string) {
   const data = await getAppointmentByToken(token);
   if (!data?.appt.serviceId) return { ok: false as const, error: "Lien invalide." };
-  return getSlotsAction(data.org.slug, { serviceId: data.appt.serviceId, staffId: data.appt.staffId, fromDate, days: 7 });
+  return getSlotsAction(data.org.slug, {
+    serviceId: data.appt.serviceId,
+    staffId: data.appt.staffId,
+    fromDate,
+    days: 7,
+  });
 }
 
 export async function rescheduleByTokenAction(token: string, startsAt: string) {
   return runAction(async () => {
     const data = await load(token);
     const when = new Date(z.iso.datetime().parse(startsAt));
-    await rescheduleAppointment({ org: data.org, appointmentId: data.appt.id, startsAt: when, enforceSchedule: true, actor: { kind: "customer" } });
+    await rescheduleAppointment({
+      org: data.org,
+      appointmentId: data.appt.id,
+      startsAt: when,
+      enforceSchedule: true,
+      actor: { kind: "customer" },
+    });
     dispatchSoon();
     return { token: createManageToken(data.appt.id) };
   }, "Votre rendez-vous a été déplacé.");

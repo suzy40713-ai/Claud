@@ -12,7 +12,9 @@ import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { formatInTz } from "@/lib/format";
 
-type Result = { ok: true; message?: string } | { ok: false; error: string; fieldErrors?: Record<string, string> };
+type Result =
+  | { ok: true; message?: string }
+  | { ok: false; error: string; fieldErrors?: Record<string, string> };
 type Absence = { id: string; startsAt: string; endsAt: string; reason: string | null };
 
 export function TimeOffManager({
@@ -27,7 +29,14 @@ export function TimeOffManager({
   timeZone: string;
   emptyLabel: string;
   addLabel: string;
-  onAdd: (input: { startDate: string; endDate: string; allDay: boolean; startTime?: string; endTime?: string; reason: string }) => Promise<Result>;
+  onAdd: (input: {
+    startDate: string;
+    endDate: string;
+    allDay: boolean;
+    startTime?: string;
+    endTime?: string;
+    reason: string;
+  }) => Promise<Result>;
   onRemove: (id: string) => Promise<Result>;
 }) {
   const router = useRouter();
@@ -41,7 +50,9 @@ export function TimeOffManager({
     const s = new Date(a.startsAt);
     const e = new Date(new Date(a.endsAt).getTime() - 1);
     const sameDay = formatInTz(s, timeZone, "yyyy-MM-dd") === formatInTz(e, timeZone, "yyyy-MM-dd");
-    const isAllDay = formatInTz(s, timeZone, "HH:mm") === "00:00" && formatInTz(a.endsAt, timeZone, "HH:mm") === "00:00";
+    const isAllDay =
+      formatInTz(s, timeZone, "HH:mm") === "00:00" &&
+      formatInTz(a.endsAt, timeZone, "HH:mm") === "00:00";
     if (isAllDay) {
       return sameDay
         ? formatInTz(s, timeZone, "EEEE d MMMM yyyy")
@@ -57,11 +68,17 @@ export function TimeOffManager({
       {items.length ? (
         <ul className="divide-y rounded-lg border">
           {items.map((a) => (
-            <li key={a.id} className="flex items-center gap-3 px-3 py-2.5 sm:px-4" data-testid="time-off-row">
+            <li
+              key={a.id}
+              className="flex items-center gap-3 px-3 py-2.5 sm:px-4"
+              data-testid="time-off-row"
+            >
               <CalendarOff className="size-4 shrink-0 text-muted-foreground" aria-hidden />
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium first-letter:uppercase">{describe(a)}</p>
-                {a.reason ? <p className="truncate text-[13px] text-muted-foreground">{a.reason}</p> : null}
+                {a.reason ? (
+                  <p className="truncate text-[13px] text-muted-foreground">{a.reason}</p>
+                ) : null}
               </div>
               <Button
                 variant="ghost"
@@ -91,7 +108,10 @@ export function TimeOffManager({
             <Plus /> {addLabel}
           </Button>
         </DialogTrigger>
-        <DialogContent title={addLabel} description="Aucun créneau ne sera proposé pendant cette période.">
+        <DialogContent
+          title={addLabel}
+          description="Aucun créneau ne sera proposé pendant cette période."
+        >
           <form
             className="grid gap-5"
             onSubmit={(e) => {
@@ -125,15 +145,35 @@ export function TimeOffManager({
             </label>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field id="startDate" label="Du" error={errors.startDate}>
-                <Input id="startDate" name="startDate" type="date" min={today} defaultValue={today} required />
+                <Input
+                  id="startDate"
+                  name="startDate"
+                  type="date"
+                  min={today}
+                  defaultValue={today}
+                  required
+                />
               </Field>
               <Field id="endDate" label="Au" error={errors.endDate}>
-                <Input id="endDate" name="endDate" type="date" min={today} defaultValue={today} required />
+                <Input
+                  id="endDate"
+                  name="endDate"
+                  type="date"
+                  min={today}
+                  defaultValue={today}
+                  required
+                />
               </Field>
               {!allDay ? (
                 <>
                   <Field id="startTime" label="De" error={errors.startTime}>
-                    <Input id="startTime" name="startTime" type="time" defaultValue="12:00" required />
+                    <Input
+                      id="startTime"
+                      name="startTime"
+                      type="time"
+                      defaultValue="12:00"
+                      required
+                    />
                   </Field>
                   <Field id="endTime" label="À" error={errors.endTime}>
                     <Input id="endTime" name="endTime" type="time" defaultValue="14:00" required />
@@ -142,7 +182,12 @@ export function TimeOffManager({
               ) : null}
             </div>
             <Field id="reason" label="Motif (facultatif)" error={errors.reason}>
-              <Input id="reason" name="reason" placeholder="Congés, formation, jour férié…" maxLength={120} />
+              <Input
+                id="reason"
+                name="reason"
+                placeholder="Congés, formation, jour férié…"
+                maxLength={120}
+              />
             </Field>
             {errors.form ? <p className="text-sm text-destructive">{errors.form}</p> : null}
             <Button type="submit" size="lg" disabled={pending} className="w-full">

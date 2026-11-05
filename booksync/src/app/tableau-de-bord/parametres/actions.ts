@@ -16,14 +16,25 @@ function done<T>(res: T): T {
   return res;
 }
 
-export async function updateOrganizationInfoAction(input: Parameters<typeof updateOrganizationInfo>[1]) {
+export async function updateOrganizationInfoAction(
+  input: Parameters<typeof updateOrganizationInfo>[1],
+) {
   const ctx = await requireOrg();
-  return done(await runAction(() => updateOrganizationInfo(ctx, input), "Informations enregistrées."));
+  return done(
+    await runAction(() => updateOrganizationInfo(ctx, input), "Informations enregistrées."),
+  );
 }
 
-export async function updateBookingSettingsAction(input: Parameters<typeof updateBookingSettings>[1]) {
+export async function updateBookingSettingsAction(
+  input: Parameters<typeof updateBookingSettings>[1],
+) {
   const ctx = await requireOrg();
-  return done(await runAction(() => updateBookingSettings(ctx, input), "Réglages de réservation enregistrés."));
+  return done(
+    await runAction(
+      () => updateBookingSettings(ctx, input),
+      "Réglages de réservation enregistrés.",
+    ),
+  );
 }
 
 export async function updateBrandingAction(input: Parameters<typeof updateBranding>[1]) {
@@ -31,9 +42,16 @@ export async function updateBrandingAction(input: Parameters<typeof updateBrandi
   return done(await runAction(() => updateBranding(ctx, input), "Personnalisation enregistrée."));
 }
 
-export async function updateNotificationSettingsAction(input: Parameters<typeof updateNotificationSettings>[1]) {
+export async function updateNotificationSettingsAction(
+  input: Parameters<typeof updateNotificationSettings>[1],
+) {
   const ctx = await requireOrg();
-  return done(await runAction(() => updateNotificationSettings(ctx, input), "Préférences de notification enregistrées."));
+  return done(
+    await runAction(
+      () => updateNotificationSettings(ctx, input),
+      "Préférences de notification enregistrées.",
+    ),
+  );
 }
 
 export async function uploadOrganizationImageAction(formData: FormData) {

@@ -21,7 +21,9 @@ const weekdays = (ranges: Array<[number, number]>): WeeklyHours => {
 const at = (iso: string) => new Date(iso);
 const times = (input: AvailabilityInput, date: string) =>
   computeAvailability({ ...input, fromDate: date, toDate: date })[0].slots.map((s) =>
-    new Intl.DateTimeFormat("fr-FR", { timeZone: TZ, hour: "2-digit", minute: "2-digit" }).format(s.start),
+    new Intl.DateTimeFormat("fr-FR", { timeZone: TZ, hour: "2-digit", minute: "2-digit" }).format(
+      s.start,
+    ),
   );
 
 function base(overrides: Partial<AvailabilityInput> = {}): AvailabilityInput {
@@ -51,8 +53,12 @@ describe("utilitaires de dates", () => {
     expect(addDays("2028-02-28", 1)).toBe("2028-02-29");
   });
   it("heure locale → UTC (hiver et été)", () => {
-    expect(localMinuteToInstant("2026-11-16", h(9), TZ)?.toISOString()).toBe("2026-11-16T08:00:00.000Z");
-    expect(localMinuteToInstant("2026-07-16", h(9), TZ)?.toISOString()).toBe("2026-07-16T07:00:00.000Z");
+    expect(localMinuteToInstant("2026-11-16", h(9), TZ)?.toISOString()).toBe(
+      "2026-11-16T08:00:00.000Z",
+    );
+    expect(localMinuteToInstant("2026-07-16", h(9), TZ)?.toISOString()).toBe(
+      "2026-07-16T07:00:00.000Z",
+    );
   });
   it("une heure inexistante (passage à l'heure d'été) renvoie null", () => {
     expect(localMinuteToInstant("2026-03-29", h(2, 30), TZ)).toBeNull();
@@ -68,7 +74,18 @@ describe("calcul des créneaux", () => {
   });
 
   it("les pauses (deux plages) ne sont jamais proposées", () => {
-    const input = base({ staff: [{ id: "a", week: weekdays([[h(9), h(12)], [h(14), h(16)]]), busy: [] }] });
+    const input = base({
+      staff: [
+        {
+          id: "a",
+          week: weekdays([
+            [h(9), h(12)],
+            [h(14), h(16)],
+          ]),
+          busy: [],
+        },
+      ],
+    });
     const t = times(input, "2026-11-16");
     expect(t).toContain("11:00");
     expect(t).not.toContain("11:30");
@@ -85,15 +102,17 @@ describe("calcul des créneaux", () => {
 
   it("un rendez-vous existant bloque les créneaux qui le chevauchent", () => {
     const busy = [{ start: at("2026-11-16T09:00:00Z"), end: at("2026-11-16T10:00:00Z") }]; // 10:00–11:00 Paris
-    expect(times(base({ staff: [{ id: "a", week: weekdays([[h(9), h(12)]]), busy }] }), "2026-11-16")).toEqual([
-      "09:00",
-      "11:00",
-    ]);
+    expect(
+      times(base({ staff: [{ id: "a", week: weekdays([[h(9), h(12)]]), busy }] }), "2026-11-16"),
+    ).toEqual(["09:00", "11:00"]);
   });
 
   it("le battement après la prestation est respecté", () => {
     const busy = [{ start: at("2026-11-16T10:00:00Z"), end: at("2026-11-16T10:30:00Z") }]; // 11:00–11:30
-    const input = base({ bufferAfterMinutes: 15, staff: [{ id: "a", week: weekdays([[h(9), h(13)]]), busy }] });
+    const input = base({
+      bufferAfterMinutes: 15,
+      staff: [{ id: "a", week: weekdays([[h(9), h(13)]]), busy }],
+    });
     const t = times(input, "2026-11-16");
     expect(t).toContain("09:30"); // 9:30–10:30 + 15 min = 10:45 < 11:00
     expect(t).not.toContain("10:00"); // 10:00–11:00 + 15 min chevauche 11:00
@@ -138,7 +157,14 @@ describe("calcul des créneaux", () => {
     });
     const [day] = computeAvailability(input);
     const byTime = Object.fromEntries(
-      day.slots.map((s) => [new Intl.DateTimeFormat("fr-FR", { timeZone: TZ, hour: "2-digit", minute: "2-digit" }).format(s.start), s.staffIds]),
+      day.slots.map((s) => [
+        new Intl.DateTimeFormat("fr-FR", {
+          timeZone: TZ,
+          hour: "2-digit",
+          minute: "2-digit",
+        }).format(s.start),
+        s.staffIds,
+      ]),
     );
     expect(byTime["09:00"]).toEqual(["a"]);
     expect(byTime["10:00"]).toEqual(["a", "b"]);
@@ -146,7 +172,11 @@ describe("calcul des créneaux", () => {
   });
 
   it("intervalle de 15 minutes et plage commençant à une heure non alignée", () => {
-    const input = base({ slotIntervalMinutes: 15, durationMinutes: 30, staff: [{ id: "a", week: weekdays([[h(9, 10), h(10)]]), busy: [] }] });
+    const input = base({
+      slotIntervalMinutes: 15,
+      durationMinutes: 30,
+      staff: [{ id: "a", week: weekdays([[h(9, 10), h(10)]]), busy: [] }],
+    });
     expect(times(input, "2026-11-16")).toEqual(["09:15", "09:30"]);
   });
 });
@@ -161,7 +191,11 @@ describe("changements d'heure (Europe/Paris)", () => {
       staff: [{ id: "a", week: weekdays([[h(1), h(4)]]), busy: [] }],
     });
     const [day] = computeAvailability(input);
-    const t = day.slots.map((s) => new Intl.DateTimeFormat("fr-FR", { timeZone: TZ, hour: "2-digit", minute: "2-digit" }).format(s.start));
+    const t = day.slots.map((s) =>
+      new Intl.DateTimeFormat("fr-FR", { timeZone: TZ, hour: "2-digit", minute: "2-digit" }).format(
+        s.start,
+      ),
+    );
     expect(t).toEqual(["01:00", "01:30", "03:00", "03:30"]);
     // Les instants sont tous distincts et croissants.
     const ms = day.slots.map((s) => s.start.getTime());
@@ -182,8 +216,14 @@ describe("changements d'heure (Europe/Paris)", () => {
   });
 
   it("un créneau d'été à 9 h est bien à 07:00 UTC", () => {
-    const input = base({ fromDate: "2026-07-06", toDate: "2026-07-06", now: at("2026-07-01T00:00:00Z") });
-    expect(computeAvailability(input)[0].slots[0].start.toISOString()).toBe("2026-07-06T07:00:00.000Z");
+    const input = base({
+      fromDate: "2026-07-06",
+      toDate: "2026-07-06",
+      now: at("2026-07-01T00:00:00Z"),
+    });
+    expect(computeAvailability(input)[0].slots[0].start.toISOString()).toBe(
+      "2026-07-06T07:00:00.000Z",
+    );
   });
 });
 
@@ -211,9 +251,15 @@ describe("validation des horaires", () => {
     const w = emptyWeek();
     w[1] = [{ startMinute: h(14), endMinute: h(12) }];
     expect(validateWeek(w)?.message).toMatch(/fin doit être après/);
-    w[1] = [{ startMinute: h(9), endMinute: h(12) }, { startMinute: h(11), endMinute: h(14) }];
+    w[1] = [
+      { startMinute: h(9), endMinute: h(12) },
+      { startMinute: h(11), endMinute: h(14) },
+    ];
     expect(validateWeek(w)?.message).toMatch(/chevauchent/);
-    w[1] = [{ startMinute: h(9), endMinute: h(12) }, { startMinute: h(14), endMinute: h(18) }];
+    w[1] = [
+      { startMinute: h(9), endMinute: h(12) },
+      { startMinute: h(14), endMinute: h(18) },
+    ];
     expect(validateWeek(w)).toBeNull();
   });
 });

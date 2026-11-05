@@ -79,9 +79,18 @@ function manageNote(d: BookingEmailData) {
 }
 
 const h1 = (t: string) => `<h1 style="margin:0 0 6px;font-size:21px;line-height:28px;">${t}</h1>`;
-const p = (t: string) => `<p style="margin:0 0 12px;font-size:15px;line-height:23px;color:#475467;">${t}</p>`;
+const p = (t: string) =>
+  `<p style="margin:0 0 12px;font-size:15px;line-height:23px;color:#475467;">${t}</p>`;
 
-export function customerEmail(type: "booking_confirmation" | "booking_rescheduled" | "booking_cancelled" | "reminder_24h" | "reminder_2h", d: BookingEmailData): RenderedEmail {
+export function customerEmail(
+  type:
+    | "booking_confirmation"
+    | "booking_rescheduled"
+    | "booking_cancelled"
+    | "reminder_24h"
+    | "reminder_2h",
+  d: BookingEmailData,
+): RenderedEmail {
   const org = escapeHtml(d.organizationName);
   const color = d.brandColor ?? "#3563E9";
   const copy = {
@@ -117,7 +126,8 @@ export function customerEmail(type: "booking_confirmation" | "booking_reschedule
     p(copy.intro),
     detailsTable(d),
     cancelled
-      ? p(`Vous pouvez reprendre rendez-vous à tout moment.`) + `<p style="margin:20px 0 4px;">${btn(d.bookingUrl, "Reprendre rendez-vous", color)}</p>`
+      ? p(`Vous pouvez reprendre rendez-vous à tout moment.`) +
+        `<p style="margin:20px 0 4px;">${btn(d.bookingUrl, "Reprendre rendez-vous", color)}</p>`
       : `<p style="margin:20px 0 10px;">${btn(d.manageUrl, "Gérer mon rendez-vous", color)}</p>` +
         `<p style="margin:0;font-size:13px;color:#667085;">${escapeHtml(manageNote(d))}</p>`,
   ].join("");
@@ -128,16 +138,43 @@ ${copy.intro.replace(/<[^>]+>/g, "")}
 ${textDetails(d)}
 
 ${cancelled ? `Reprendre rendez-vous : ${d.bookingUrl}` : `Gérer mon rendez-vous : ${d.manageUrl}\n${manageNote(d)}`}`;
-  return { template: type, subject: copy.subject, html: shell(copy.title, `${d.dateLabel} à ${d.timeLabel}`, body, color), text };
+  return {
+    template: type,
+    subject: copy.subject,
+    html: shell(copy.title, `${d.dateLabel} à ${d.timeLabel}`, body, color),
+    text,
+  };
 }
 
-export function staffEmail(type: "staff_new_booking" | "staff_booking_cancelled" | "staff_booking_rescheduled", d: BookingEmailData): RenderedEmail {
+export function staffEmail(
+  type: "staff_new_booking" | "staff_booking_cancelled" | "staff_booking_rescheduled",
+  d: BookingEmailData,
+): RenderedEmail {
   const copy = {
-    staff_new_booking: { subject: `Nouvelle réservation : ${d.customerName}, ${d.dateLabel} à ${d.timeLabel}`, title: "Nouvelle réservation" },
-    staff_booking_rescheduled: { subject: `Rendez-vous déplacé : ${d.customerName}, ${d.dateLabel} à ${d.timeLabel}`, title: "Rendez-vous déplacé" },
-    staff_booking_cancelled: { subject: `Annulation : ${d.customerName}, ${d.dateLabel} à ${d.timeLabel}`, title: "Rendez-vous annulé" },
+    staff_new_booking: {
+      subject: `Nouvelle réservation : ${d.customerName}, ${d.dateLabel} à ${d.timeLabel}`,
+      title: "Nouvelle réservation",
+    },
+    staff_booking_rescheduled: {
+      subject: `Rendez-vous déplacé : ${d.customerName}, ${d.dateLabel} à ${d.timeLabel}`,
+      title: "Rendez-vous déplacé",
+    },
+    staff_booking_cancelled: {
+      subject: `Annulation : ${d.customerName}, ${d.dateLabel} à ${d.timeLabel}`,
+      title: "Rendez-vous annulé",
+    },
   }[type];
-  const body = [h1(copy.title), p(`Client : <strong>${escapeHtml(d.customerName)}</strong>`), detailsTable({ ...d, organizationAddress: null, organizationPhone: null }), `<p style="margin:20px 0 0;">${btn(d.dashboardUrl, "Ouvrir le calendrier")}</p>`].join("");
+  const body = [
+    h1(copy.title),
+    p(`Client : <strong>${escapeHtml(d.customerName)}</strong>`),
+    detailsTable({ ...d, organizationAddress: null, organizationPhone: null }),
+    `<p style="margin:20px 0 0;">${btn(d.dashboardUrl, "Ouvrir le calendrier")}</p>`,
+  ].join("");
   const text = `${copy.title}\n\nClient : ${d.customerName}\n${textDetails({ ...d, organizationAddress: null, organizationPhone: null })}\n\nCalendrier : ${d.dashboardUrl}`;
-  return { template: type, subject: copy.subject, html: shell(copy.title, copy.subject, body), text };
+  return {
+    template: type,
+    subject: copy.subject,
+    html: shell(copy.title, copy.subject, body),
+    text,
+  };
 }

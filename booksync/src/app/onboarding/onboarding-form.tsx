@@ -18,7 +18,8 @@ export function OnboardingForm({ publicBaseUrl }: { publicBaseUrl: string }) {
     null,
   );
   const fieldErrors: Record<string, string> = state && !state.ok ? (state.fieldErrors ?? {}) : {};
-  const formError = state && !state.ok && Object.keys(fieldErrors).length === 0 ? state.error : null;
+  const formError =
+    state && !state.ok && Object.keys(fieldErrors).length === 0 ? state.error : null;
   const [name, setName] = useState(state?.values?.name ?? "");
   const [slug, setSlug] = useState(state?.values?.slug ?? "");
   const [slugTouched, setSlugTouched] = useState(Boolean(state?.values?.slug));
@@ -66,6 +67,23 @@ export function OnboardingForm({ publicBaseUrl }: { publicBaseUrl: string }) {
           autoComplete="organization"
           required
         />
+      </Field>
+      <Field id="activity" label="Votre activité" error={fieldErrors.activity}>
+        <NativeSelect
+          id="activity"
+          name="activity"
+          defaultValue={state?.values?.activity ?? ""}
+          required
+        >
+          <option value="" disabled>
+            Choisissez votre activité
+          </option>
+          {ACTIVITIES.map((a) => (
+            <option key={a.value} value={a.value}>
+              {a.label}
+            </option>
+          ))}
+        </NativeSelect>
       </Field>
       <Field
         id="slug"

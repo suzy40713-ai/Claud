@@ -20,12 +20,23 @@ async function claimDue(limit: number): Promise<Row[]> {
   await db
     .update(notification)
     .set({ status: "pending" })
-    .where(and(eq(notification.status, "processing"), lt(notification.updatedAt, new Date(Date.now() - 10 * 60_000))));
+    .where(
+      and(
+        eq(notification.status, "processing"),
+        lt(notification.updatedAt, new Date(Date.now() - 10 * 60_000)),
+      ),
+    );
   return db.transaction(async (tx) => {
     const due = await tx
       .select({ id: notification.id })
       .from(notification)
-      .where(and(eq(notification.status, "pending"), lte(notification.scheduledFor, new Date()), eq(notification.channel, "email")))
+      .where(
+        and(
+          eq(notification.status, "pending"),
+          lte(notification.scheduledFor, new Date()),
+          eq(notification.channel, "email"),
+        ),
+      )
       .orderBy(notification.scheduledFor)
       .limit(limit)
       .for("update", { skipLocked: true });
@@ -33,7 +44,12 @@ async function claimDue(limit: number): Promise<Row[]> {
     return tx
       .update(notification)
       .set({ status: "processing", attempts: sql`${notification.attempts} + 1` })
-      .where(inArray(notification.id, due.map((d) => d.id)))
+      .where(
+        inArray(
+          notification.id,
+          due.map((d) => d.id),
+        ),
+      )
       .returning();
   });
 }
@@ -52,7 +68,10 @@ async function buildData(n: Row) {
   const plan = effectivePlan(org.plan, org.subscriptionStatus);
   const data: BookingEmailData = {
     organizationName: org.name,
-    organizationAddress: [org.addressLine1, [org.postalCode, org.city].filter(Boolean).join(" ")].filter(Boolean).join(", ") || null,
+    organizationAddress:
+      [org.addressLine1, [org.postalCode, org.city].filter(Boolean).join(" ")]
+        .filter(Boolean)
+        .join(", ") || null,
     organizationPhone: org.phone,
     customerFirstName: cust.firstName,
     customerName: `${cust.firstName} ${cust.lastName}`,
@@ -60,7 +79,9 @@ async function buildData(n: Row) {
     staffName: row.staffName,
     dateLabel: capitalize(formatDateLong(appt.startsAt, org.timezone)),
     timeLabel: formatTime(appt.startsAt, org.timezone),
-    durationLabel: formatDuration(Math.round((appt.endsAt.getTime() - appt.startsAt.getTime()) / 60_000)),
+    durationLabel: formatDuration(
+      Math.round((appt.endsAt.getTime() - appt.startsAt.getTime()) / 60_000),
+    ),
     priceLabel: appt.priceCents ? formatCents(appt.priceCents) : null,
     manageUrl: manageUrl(env.NEXT_PUBLIC_APP_URL, appt.id),
     bookingUrl: `${env.NEXT_PUBLIC_APP_URL}/${org.slug}`,
@@ -74,7 +95,10 @@ async function buildData(n: Row) {
 async function processOne(n: Row): Promise<"sent" | "failed" | "skipped"> {
   const built = await buildData(n);
   const finish = (status: "sent" | "failed" | "skipped" | "pending", extra: Partial<Row> = {}) =>
-    db.update(notification).set({ status, ...extra }).where(eq(notification.id, n.id));
+    db
+      .update(notification)
+      .set({ status, ...extra })
+      .where(eq(notification.id, n.id));
 
   if (!built) {
     await finish("skipped", { lastError: "Rendez-vous introuvable" });
@@ -83,7 +107,12 @@ async function processOne(n: Row): Promise<"sent" | "failed" | "skipped"> {
   const { data, appt, plan, cust } = built;
   const isReminder = n.type === "reminder_24h" || n.type === "reminder_2h";
   // Garde-fous au moment de l'envoi : rendez-vous annulé/déplacé, forfait changé, client désinscrit.
-  if (isReminder && (appt.status !== "confirmed" || appt.startsAt <= new Date() || !plan.features.automaticReminders)) {
+  if (
+    isReminder &&
+    (appt.status !== "confirmed" ||
+      appt.startsAt <= new Date() ||
+      !plan.features.automaticReminders)
+  ) {
     await finish("skipped", { lastError: "Rappel devenu sans objet" });
     return "skipped";
   }
@@ -100,7 +129,10 @@ async function processOne(n: Row): Promise<"sent" | "failed" | "skipped"> {
 
   if (result.status === "failed") {
     if (n.attempts >= MAX_ATTEMPTS) {
-      await finish("failed", { lastError: "Échec après plusieurs tentatives", emailMessageId: result.id });
+      await finish("failed", {
+        lastError: "Échec après plusieurs tentatives",
+        emailMessageId: result.id,
+      });
       return "failed";
     }
     // Nouvelle tentative avec un délai croissant : 2, 4, 8, 16 minutes.
@@ -111,7 +143,14 @@ async function processOne(n: Row): Promise<"sent" | "failed" | "skipped"> {
     });
     return "failed";
   }
-  await finish("sent", { sentAt: new Date(), emailMessageId: result.id, lastError: result.status === "logged" ? "Aucun fournisseur d'email configuré : email journalisé, non envoyé" : null });
+  await finish("sent", {
+    sentAt: new Date(),
+    emailMessageId: result.id,
+    lastError:
+      result.status === "logged"
+        ? "Aucun fournisseur d'email configuré : email journalisé, non envoyé"
+        : null,
+  });
   return "sent";
 }
 
@@ -128,7 +167,11 @@ export async function processDueNotifications(limit = 50) {
         console.error("[notifications] erreur de traitement", n.id, error);
         await db
           .update(notification)
-          .set({ status: n.attempts >= MAX_ATTEMPTS ? "failed" : "pending", scheduledFor: new Date(Date.now() + 5 * 60_000), lastError: String(error).slice(0, 500) })
+          .set({
+            status: n.attempts >= MAX_ATTEMPTS ? "failed" : "pending",
+            scheduledFor: new Date(Date.now() + 5 * 60_000),
+            lastError: String(error).slice(0, 500),
+          })
           .where(eq(notification.id, n.id));
         stats.failed++;
       }

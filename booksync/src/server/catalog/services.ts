@@ -10,14 +10,22 @@ import { NotFoundError, UserError } from "@/server/errors";
 import { deleteFile, storeImage } from "@/server/files";
 
 export const serviceSchema = z.object({
-  name: z.string().trim().min(2, "Le nom doit contenir au moins 2 caractères.").max(80, "80 caractères maximum."),
+  name: z
+    .string()
+    .trim()
+    .min(2, "Le nom doit contenir au moins 2 caractères.")
+    .max(80, "80 caractères maximum."),
   description: optionalText(500, "La description"),
   durationMinutes: z.coerce
     .number({ message: "Durée invalide." })
     .int("Durée invalide.")
     .min(5, "5 minutes minimum.")
     .max(720, "12 heures maximum."),
-  priceCents: z.coerce.number({ message: "Prix invalide." }).int().min(0, "Le prix ne peut pas être négatif.").max(10_000_000, "Prix trop élevé."),
+  priceCents: z.coerce
+    .number({ message: "Prix invalide." })
+    .int()
+    .min(0, "Le prix ne peut pas être négatif.")
+    .max(10_000_000, "Prix trop élevé."),
   bufferAfterMinutes: z.coerce.number().int().min(0).max(240, "4 heures maximum.").default(0),
   color: hexColor.default("#3563E9"),
   isActive: z.boolean().default(true),
@@ -37,7 +45,10 @@ export async function listServices(ctx: OrgContext) {
         .from(staffService)
         .where(eq(staffService.organizationId, ctx.organization.id))
     : [];
-  return rows.map((s) => ({ ...s, staffIds: links.filter((l) => l.serviceId === s.id).map((l) => l.staffId) }));
+  return rows.map((s) => ({
+    ...s,
+    staffIds: links.filter((l) => l.serviceId === s.id).map((l) => l.staffId),
+  }));
 }
 
 async function assertStaffInOrg(organizationId: string, staffIds: string[]) {
@@ -63,9 +74,13 @@ export async function createService(ctx: OrgContext, input: z.input<typeof servi
       .values({ ...data, organizationId: ctx.organization.id, position: Number(max) + 1 })
       .returning();
     if (staffIds.length) {
-      await tx
-        .insert(staffService)
-        .values(staffIds.map((staffId) => ({ organizationId: ctx.organization.id, staffId, serviceId: row.id })));
+      await tx.insert(staffService).values(
+        staffIds.map((staffId) => ({
+          organizationId: ctx.organization.id,
+          staffId,
+          serviceId: row.id,
+        })),
+      );
     }
     return row;
   });
@@ -75,24 +90,45 @@ async function getService(ctx: OrgContext, id: string) {
   const [row] = await db
     .select()
     .from(service)
-    .where(and(eq(service.id, id), eq(service.organizationId, ctx.organization.id), isNull(service.deletedAt)))
+    .where(
+      and(
+        eq(service.id, id),
+        eq(service.organizationId, ctx.organization.id),
+        isNull(service.deletedAt),
+      ),
+    )
     .limit(1);
   if (!row) throw new NotFoundError("Service introuvable.");
   return row;
 }
 
-export async function updateService(ctx: OrgContext, id: string, input: z.input<typeof serviceSchema>) {
+export async function updateService(
+  ctx: OrgContext,
+  id: string,
+  input: z.input<typeof serviceSchema>,
+) {
   assertCan(ctx.role, "services.manage");
   await getService(ctx, id);
   const { staffIds, ...data } = serviceSchema.parse(input);
   await assertStaffInOrg(ctx.organization.id, staffIds);
   await db.transaction(async (tx) => {
-    await tx.update(service).set(data).where(and(eq(service.id, id), eq(service.organizationId, ctx.organization.id)));
-    await tx.delete(staffService).where(and(eq(staffService.serviceId, id), eq(staffService.organizationId, ctx.organization.id)));
+    await tx
+      .update(service)
+      .set(data)
+      .where(and(eq(service.id, id), eq(service.organizationId, ctx.organization.id)));
+    await tx
+      .delete(staffService)
+      .where(
+        and(eq(staffService.serviceId, id), eq(staffService.organizationId, ctx.organization.id)),
+      );
     if (staffIds.length) {
-      await tx
-        .insert(staffService)
-        .values(staffIds.map((staffId) => ({ organizationId: ctx.organization.id, staffId, serviceId: id })));
+      await tx.insert(staffService).values(
+        staffIds.map((staffId) => ({
+          organizationId: ctx.organization.id,
+          staffId,
+          serviceId: id,
+        })),
+      );
     }
   });
 }
@@ -113,7 +149,9 @@ export async function deleteService(ctx: OrgContext, id: string) {
       .where(eq(service.id, id));
     await db.delete(staffService).where(eq(staffService.serviceId, id));
   } else {
-    await db.delete(service).where(and(eq(service.id, id), eq(service.organizationId, ctx.organization.id)));
+    await db
+      .delete(service)
+      .where(and(eq(service.id, id), eq(service.organizationId, ctx.organization.id)));
     await deleteFile(ctx.organization.id, row.imageFileId);
   }
 }

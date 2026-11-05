@@ -9,7 +9,12 @@ type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 export type BookingEvent = "created" | "rescheduled" | "cancelled";
 
 export type NotifyContext = {
-  organization: { id: string; notifyStaffOnBooking: boolean; reminder24h: boolean; reminder2h: boolean };
+  organization: {
+    id: string;
+    notifyStaffOnBooking: boolean;
+    reminder24h: boolean;
+    reminder2h: boolean;
+  };
   plan: Plan;
   appointment: { id: string; staffId: string; startsAt: Date; status: string };
   customer: { email: string | null; emailOptIn: boolean };
@@ -18,8 +23,16 @@ export type NotifyContext = {
 };
 
 const REMINDERS = [
-  { type: "reminder_24h" as const, hours: 24, enabled: (o: NotifyContext["organization"]) => o.reminder24h },
-  { type: "reminder_2h" as const, hours: 2, enabled: (o: NotifyContext["organization"]) => o.reminder2h },
+  {
+    type: "reminder_24h" as const,
+    hours: 24,
+    enabled: (o: NotifyContext["organization"]) => o.reminder24h,
+  },
+  {
+    type: "reminder_2h" as const,
+    hours: 2,
+    enabled: (o: NotifyContext["organization"]) => o.reminder2h,
+  },
 ];
 
 /** Destinataires internes : l'employé concerné + propriétaires et administrateurs (adresses uniques). */
@@ -34,7 +47,9 @@ async function staffRecipients(tx: Tx, organizationId: string, staffId: string) 
     .select({ email: user.email })
     .from(member)
     .innerJoin(user, eq(user.id, member.userId))
-    .where(and(eq(member.organizationId, organizationId), inArray(member.role, ["owner", "admin"])));
+    .where(
+      and(eq(member.organizationId, organizationId), inArray(member.role, ["owner", "admin"])),
+    );
   return [...new Set([...assigned, ...managers].map((r) => r.email.toLowerCase()))];
 }
 
@@ -62,10 +77,15 @@ export async function enqueueBookingNotifications(tx: Tx, event: BookingEvent, c
       );
   }
 
-  const canEmailCustomer = plan.features.emailNotifications && customer.email && customer.emailOptIn;
+  const canEmailCustomer =
+    plan.features.emailNotifications && customer.email && customer.emailOptIn;
   if (canEmailCustomer) {
     const type =
-      event === "created" ? "booking_confirmation" : event === "rescheduled" ? "booking_rescheduled" : "booking_cancelled";
+      event === "created"
+        ? "booking_confirmation"
+        : event === "rescheduled"
+          ? "booking_rescheduled"
+          : "booking_cancelled";
     rows.push({
       organizationId: org.id,
       appointmentId: appt.id,
@@ -98,7 +118,11 @@ export async function enqueueBookingNotifications(tx: Tx, event: BookingEvent, c
 
   if (org.notifyStaffOnBooking) {
     const type =
-      event === "created" ? "staff_new_booking" : event === "rescheduled" ? "staff_booking_rescheduled" : "staff_booking_cancelled";
+      event === "created"
+        ? "staff_new_booking"
+        : event === "rescheduled"
+          ? "staff_booking_rescheduled"
+          : "staff_booking_cancelled";
     const actorEmail = ctx.actor.kind === "staff" ? ctx.actor.email.toLowerCase() : null;
     for (const email of await staffRecipients(tx, org.id, appt.staffId)) {
       if (email === actorEmail) continue;
@@ -116,7 +140,11 @@ export async function enqueueBookingNotifications(tx: Tx, event: BookingEvent, c
     }
   }
 
-  if (rows.length) await tx.insert(notification).values(rows).onConflictDoNothing({ target: notification.dedupeKey });
+  if (rows.length)
+    await tx
+      .insert(notification)
+      .values(rows)
+      .onConflictDoNothing({ target: notification.dedupeKey });
   return rows.length;
 }
 

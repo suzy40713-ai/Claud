@@ -10,16 +10,22 @@ function refresh<T>(res: T): T {
   return res;
 }
 
-export async function saveCustomerAction(id: string | null, input: Parameters<typeof createCustomer>[1]) {
+export async function saveCustomerAction(
+  id: string | null,
+  input: Parameters<typeof createCustomer>[1],
+) {
   const ctx = await requireOrg();
   return refresh(
-    await runAction(async () => {
-      if (id) {
-        await updateCustomer(ctx, id, input);
-        return { id };
-      }
-      return { id: (await createCustomer(ctx, input)).id };
-    }, id ? "Client modifié." : "Client créé."),
+    await runAction(
+      async () => {
+        if (id) {
+          await updateCustomer(ctx, id, input);
+          return { id };
+        }
+        return { id: (await createCustomer(ctx, input)).id };
+      },
+      id ? "Client modifié." : "Client créé.",
+    ),
   );
 }
 

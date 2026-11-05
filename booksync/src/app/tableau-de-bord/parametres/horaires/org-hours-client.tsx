@@ -7,7 +7,11 @@ import { addTimeOffAction, removeTimeOffAction, saveHoursAction } from "../../sc
 
 type Props =
   | { kind: "hours"; week: WeeklyHours }
-  | { kind: "closures"; timeZone: string; closures: { id: string; startsAt: string; endsAt: string; reason: string | null }[] };
+  | {
+      kind: "closures";
+      timeZone: string;
+      closures: { id: string; startsAt: string; endsAt: string; reason: string | null }[];
+    };
 
 export function OrgHoursClient(props: Props) {
   if (props.kind === "hours") {

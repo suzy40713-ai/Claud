@@ -32,7 +32,12 @@ export function RangePicker({ from, to, today }: { from: string; to: string; tod
             key={p.label}
             type="button"
             onClick={() => go(p.from, p.to)}
-            className={cn("h-8 rounded-md border px-3 text-sm font-medium", p.from === from && p.to === to ? "border-primary bg-primary-soft text-primary-soft-foreground" : "bg-card text-muted-foreground hover:text-foreground")}
+            className={cn(
+              "h-8 rounded-md border px-3 text-sm font-medium",
+              p.from === from && p.to === to
+                ? "border-primary bg-primary-soft text-primary-soft-foreground"
+                : "bg-card text-muted-foreground hover:text-foreground",
+            )}
           >
             {p.label}
           </button>
@@ -45,9 +50,23 @@ export function RangePicker({ from, to, today }: { from: string; to: string; tod
           go(f, t);
         }}
       >
-        <Input type="date" aria-label="Du" value={f} max={today} onChange={(e) => setF(e.target.value)} className="h-9 w-[9.5rem]" />
+        <Input
+          type="date"
+          aria-label="Du"
+          value={f}
+          max={today}
+          onChange={(e) => setF(e.target.value)}
+          className="h-9 w-[9.5rem]"
+        />
         <span className="text-muted-foreground">→</span>
-        <Input type="date" aria-label="Au" value={t} max={today} onChange={(e) => setT(e.target.value)} className="h-9 w-[9.5rem]" />
+        <Input
+          type="date"
+          aria-label="Au"
+          value={t}
+          max={today}
+          onChange={(e) => setT(e.target.value)}
+          className="h-9 w-[9.5rem]"
+        />
         <Button type="submit" variant="secondary" size="sm">
           Appliquer
         </Button>

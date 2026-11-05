@@ -109,7 +109,11 @@ export function computeAvailability(input: AvailabilityInput): DaySlots[] {
         if (rangeEnd === undefined) continue;
         // Créneaux alignés sur la grille de l'intervalle, à partir de minuit.
         const first = Math.ceil(range.startMinute / step) * step;
-        for (let minute = first; minute + input.durationMinutes <= range.endMinute; minute += step) {
+        for (
+          let minute = first;
+          minute + input.durationMinutes <= range.endMinute;
+          minute += step
+        ) {
           const instant = localMinuteToInstant(date, minute, input.timeZone);
           if (!instant) continue;
           const s = instant.getTime();
@@ -135,12 +139,21 @@ export function computeAvailability(input: AvailabilityInput): DaySlots[] {
 export function isSlotAvailable(input: AvailabilityInput, start: Date, staffId: string) {
   const date = localDateOf(start, input.timeZone);
   const [day] = computeAvailability({ ...input, fromDate: date, toDate: date });
-  return day.slots.some((s) => s.start.getTime() === start.getTime() && s.staffIds.includes(staffId));
+  return day.slots.some(
+    (s) => s.start.getTime() === start.getTime() && s.staffIds.includes(staffId),
+  );
 }
 
 /** Choix de l'employé quand le client n'a pas de préférence : le moins occupé ce jour-là. */
-export function pickStaff(candidates: string[], busyByStaff: Record<string, Interval[]>, date: string, timeZone: string) {
+export function pickStaff(
+  candidates: string[],
+  busyByStaff: Record<string, Interval[]>,
+  date: string,
+  timeZone: string,
+) {
   const load = (id: string) =>
-    (busyByStaff[id] ?? []).filter((i) => localDateOf(i.start, timeZone) === date).reduce((sum, i) => sum + (i.end.getTime() - i.start.getTime()), 0);
+    (busyByStaff[id] ?? [])
+      .filter((i) => localDateOf(i.start, timeZone) === date)
+      .reduce((sum, i) => sum + (i.end.getTime() - i.start.getTime()), 0);
   return [...candidates].sort((a, b) => load(a) - load(b))[0];
 }

@@ -12,7 +12,8 @@ async function handle(req: Request) {
   await connection();
   const expected = env.CRON_SECRET;
   const given = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
-  if (!expected || !safeEqual(given, expected)) return Response.json({ error: "Non autorisé" }, { status: 401 });
+  if (!expected || !safeEqual(given, expected))
+    return Response.json({ error: "Non autorisé" }, { status: 401 });
   const stats = await processDueNotifications();
   return Response.json({ ok: true, ...stats }, { headers: { "Cache-Control": "no-store" } });
 }

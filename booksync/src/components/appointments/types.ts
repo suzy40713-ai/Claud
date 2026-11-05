@@ -23,7 +23,13 @@ export type ApptView = {
 };
 
 export type StaffOpt = { id: string; name: string; color: string };
-export type ServiceOpt = { id: string; name: string; durationMinutes: number; priceCents: number; staffIds: string[] };
+export type ServiceOpt = {
+  id: string;
+  name: string;
+  durationMinutes: number;
+  priceCents: number;
+  staffIds: string[];
+};
 
 export const STATUS_LABELS: Record<ApptView["status"], string> = {
   confirmed: "Confirmé",

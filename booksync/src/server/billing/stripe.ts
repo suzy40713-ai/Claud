@@ -7,7 +7,10 @@ let client: Stripe | null = null;
 /** Client Stripe (null si STRIPE_SECRET_KEY n'est pas configurée). */
 export function getStripe(): Stripe | null {
   if (!env.STRIPE_SECRET_KEY) return null;
-  client ??= new Stripe(env.STRIPE_SECRET_KEY, { appInfo: { name: "BookSync" }, maxNetworkRetries: 2 });
+  client ??= new Stripe(env.STRIPE_SECRET_KEY, {
+    appInfo: { name: "BookSync" },
+    maxNetworkRetries: 2,
+  });
   return client;
 }
 

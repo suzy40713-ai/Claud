@@ -30,7 +30,14 @@ export async function getPublicBookingPage(slug: string) {
       color: service.color,
     })
     .from(service)
-    .where(and(eq(service.organizationId, org.id), eq(service.isActive, true), eq(service.isOnlineBookable, true), isNull(service.deletedAt)))
+    .where(
+      and(
+        eq(service.organizationId, org.id),
+        eq(service.isActive, true),
+        eq(service.isOnlineBookable, true),
+        isNull(service.deletedAt),
+      ),
+    )
     .orderBy(asc(service.position), asc(service.createdAt));
 
   const links = services.length
@@ -41,7 +48,10 @@ export async function getPublicBookingPage(slug: string) {
         .where(
           and(
             eq(staffService.organizationId, org.id),
-            inArray(staffService.serviceId, services.map((s) => s.id)),
+            inArray(
+              staffService.serviceId,
+              services.map((s) => s.id),
+            ),
             eq(staff.isActive, true),
             eq(staff.isBookable, true),
           ),
@@ -50,7 +60,13 @@ export async function getPublicBookingPage(slug: string) {
   const staffIds = [...new Set(links.map((l) => l.staffId))];
   const team = staffIds.length
     ? await db
-        .select({ id: staff.id, displayName: staff.displayName, photoFileId: staff.photoFileId, color: staff.color, bio: staff.bio })
+        .select({
+          id: staff.id,
+          displayName: staff.displayName,
+          photoFileId: staff.photoFileId,
+          color: staff.color,
+          bio: staff.bio,
+        })
         .from(staff)
         .where(and(eq(staff.organizationId, org.id), inArray(staff.id, staffIds)))
         .orderBy(asc(staff.position), asc(staff.createdAt))
@@ -64,7 +80,13 @@ export async function getPublicBookingPage(slug: string) {
       description: org.description,
       phone: org.phone,
       email: org.email,
-      address: [org.addressLine1, org.addressLine2, [org.postalCode, org.city].filter(Boolean).join(" ")].filter(Boolean).join(", "),
+      address: [
+        org.addressLine1,
+        org.addressLine2,
+        [org.postalCode, org.city].filter(Boolean).join(" "),
+      ]
+        .filter(Boolean)
+        .join(", "),
       timezone: org.timezone,
       logoUrl: fileUrl(org.logoFileId),
       bookingEnabled: org.bookingEnabled,
@@ -76,9 +98,19 @@ export async function getPublicBookingPage(slug: string) {
     },
     hours: await getOrganizationHours(org.id),
     services: services
-      .map((s) => ({ ...s, imageUrl: fileUrl(s.imageFileId), staffIds: links.filter((l) => l.serviceId === s.id).map((l) => l.staffId) }))
+      .map((s) => ({
+        ...s,
+        imageUrl: fileUrl(s.imageFileId),
+        staffIds: links.filter((l) => l.serviceId === s.id).map((l) => l.staffId),
+      }))
       .filter((s) => s.staffIds.length > 0),
-    staff: team.map((t) => ({ id: t.id, name: t.displayName, photoUrl: fileUrl(t.photoFileId), color: t.color, bio: t.bio })),
+    staff: team.map((t) => ({
+      id: t.id,
+      name: t.displayName,
+      photoUrl: fileUrl(t.photoFileId),
+      color: t.color,
+      bio: t.bio,
+    })),
   };
 }
 

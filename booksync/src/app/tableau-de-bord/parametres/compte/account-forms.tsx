@@ -34,7 +34,10 @@ export function AccountForms({
 
   return (
     <div className="grid gap-8">
-      <SettingsSection title="Profil" description="Votre nom apparaît auprès de votre équipe et, si vous recevez des rendez-vous, de vos clients.">
+      <SettingsSection
+        title="Profil"
+        description="Votre nom apparaît auprès de votre équipe et, si vous recevez des rendez-vous, de vos clients."
+      >
         <form
           className="grid gap-5"
           onSubmit={(e) => {
@@ -43,9 +46,18 @@ export function AccountForms({
           }}
         >
           <Field id="profile-name" label="Nom complet" error={profile.errors.form}>
-            <Input id="profile-name" value={n} onChange={(e) => setN(e.target.value)} autoComplete="name" />
+            <Input
+              id="profile-name"
+              value={n}
+              onChange={(e) => setN(e.target.value)}
+              autoComplete="name"
+            />
           </Field>
-          <Field id="profile-email" label="Email" hint="L'adresse de connexion ne peut pas être modifiée.">
+          <Field
+            id="profile-email"
+            label="Email"
+            hint="L'adresse de connexion ne peut pas être modifiée."
+          >
             <Input id="profile-email" value={email} disabled />
           </Field>
           <Button type="submit" disabled={profile.pending} className="sm:justify-self-end">
@@ -55,17 +67,24 @@ export function AccountForms({
         </form>
       </SettingsSection>
 
-      <SettingsSection title="Mot de passe" description="Les autres appareils connectés seront déconnectés après le changement.">
+      <SettingsSection
+        title="Mot de passe"
+        description="Les autres appareils connectés seront déconnectés après le changement."
+      >
         {hasPassword ? (
           <PasswordForm />
         ) : (
           <p className="text-sm text-muted-foreground">
-            Vous vous connectez avec Google. Pour définir un mot de passe, utilisez « Mot de passe oublié » depuis la page de connexion.
+            Vous vous connectez avec Google. Pour définir un mot de passe, utilisez « Mot de passe
+            oublié » depuis la page de connexion.
           </p>
         )}
       </SettingsSection>
 
-      <SettingsSection title="Vos données" description="Téléchargez une copie de vos données (RGPD : droit d'accès et de portabilité).">
+      <SettingsSection
+        title="Vos données"
+        description="Téléchargez une copie de vos données (RGPD : droit d'accès et de portabilité)."
+      >
         <Button asChild variant="secondary">
           <a href="/api/compte/export" download>
             <Download /> Exporter mes données (JSON)
@@ -73,7 +92,10 @@ export function AccountForms({
         </Button>
       </SettingsSection>
 
-      <SettingsSection title="Supprimer mon compte" description="Action définitive et irréversible.">
+      <SettingsSection
+        title="Supprimer mon compte"
+        description="Action définitive et irréversible."
+      >
         <DeleteAccount ownedOrganizations={ownedOrganizations} />
       </SettingsSection>
     </div>
@@ -97,9 +119,18 @@ function PasswordForm() {
         if (!parsed.success) return setErrors({ next: parsed.error.issues[0].message });
         setErrors({});
         startTransition(async () => {
-          const { error } = await authClient.changePassword({ currentPassword: current, newPassword: next, revokeOtherSessions: true });
+          const { error } = await authClient.changePassword({
+            currentPassword: current,
+            newPassword: next,
+            revokeOtherSessions: true,
+          });
           if (error) {
-            setErrors({ form: error.code === "INVALID_PASSWORD" ? "Mot de passe actuel incorrect." : authErrorMessage(error) });
+            setErrors({
+              form:
+                error.code === "INVALID_PASSWORD"
+                  ? "Mot de passe actuel incorrect."
+                  : authErrorMessage(error),
+            });
             return;
           }
           form.reset();
@@ -131,7 +162,9 @@ function DeleteAccount({ ownedOrganizations }: { ownedOrganizations: string[] })
     <div className="grid gap-4">
       <p className="text-sm text-muted-foreground">
         Votre compte, vos accès et vos données personnelles seront supprimés.
-        {ownedOrganizations.length ? " Les entreprises dont vous êtes propriétaire seront supprimées avec toutes leurs données." : ""}
+        {ownedOrganizations.length
+          ? " Les entreprises dont vous êtes propriétaire seront supprimées avec toutes leurs données."
+          : ""}
       </p>
       <Dialog>
         <DialogTrigger asChild>
@@ -139,17 +172,26 @@ function DeleteAccount({ ownedOrganizations }: { ownedOrganizations: string[] })
             <Trash2 /> Supprimer mon compte
           </Button>
         </DialogTrigger>
-        <DialogContent title="Supprimer définitivement votre compte ?" description="Cette action ne peut pas être annulée. Pensez à exporter vos données avant.">
+        <DialogContent
+          title="Supprimer définitivement votre compte ?"
+          description="Cette action ne peut pas être annulée. Pensez à exporter vos données avant."
+        >
           <div className="grid gap-5">
             {ownedOrganizations.length ? (
               <Alert variant="error">
-                Seront également supprimées, avec leurs rendez-vous, clients, services et abonnement :{" "}
-                <strong>{ownedOrganizations.join(", ")}</strong>. Vos collaborateurs perdront leur accès.
+                Seront également supprimées, avec leurs rendez-vous, clients, services et abonnement
+                : <strong>{ownedOrganizations.join(", ")}</strong>. Vos collaborateurs perdront leur
+                accès.
               </Alert>
             ) : null}
             {error ? <Alert variant="error">{error}</Alert> : null}
             <Field id="confirm-delete" label="Pour confirmer, saisissez SUPPRIMER">
-              <Input id="confirm-delete" value={confirmation} onChange={(e) => setConfirmation(e.target.value)} autoComplete="off" />
+              <Input
+                id="confirm-delete"
+                value={confirmation}
+                onChange={(e) => setConfirmation(e.target.value)}
+                autoComplete="off"
+              />
             </Field>
             <Button
               variant="destructive"

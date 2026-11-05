@@ -21,13 +21,19 @@ export type CustomerInput = z.input<typeof customerInputSchema>;
 
 /** Verrou transactionnel par entreprise : sérialise la création de clients (respect strict de la limite). */
 export async function lockCustomers(tx: Tx, organizationId: string) {
-  await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${`customers:${organizationId}`}, 0))`);
+  await tx.execute(
+    sql`select pg_advisory_xact_lock(hashtextextended(${`customers:${organizationId}`}, 0))`,
+  );
 }
 
 export async function assertCustomerRoom(tx: Tx, organizationId: string, plan: Plan) {
   if (plan.limits.customers === null) return;
-  const [row] = await tx.select({ n: count() }).from(customer).where(eq(customer.organizationId, organizationId));
-  if (!hasRoom(plan.limits.customers, row.n)) throw new PlanLimitError("customers", LIMIT_MESSAGES.customers(plan));
+  const [row] = await tx
+    .select({ n: count() })
+    .from(customer)
+    .where(eq(customer.organizationId, organizationId));
+  if (!hasRoom(plan.limits.customers, row.n))
+    throw new PlanLimitError("customers", LIMIT_MESSAGES.customers(plan));
 }
 
 /**
@@ -38,14 +44,25 @@ export async function findOrCreateCustomer(
   tx: Tx,
   organizationId: string,
   plan: Plan,
-  input: { firstName: string; lastName: string; email: string | null; phone: string | null; emailOptIn?: boolean },
+  input: {
+    firstName: string;
+    lastName: string;
+    email: string | null;
+    phone: string | null;
+    emailOptIn?: boolean;
+  },
 ) {
   await lockCustomers(tx, organizationId);
   if (input.email) {
     const [existing] = await tx
       .select()
       .from(customer)
-      .where(and(eq(customer.organizationId, organizationId), sql`lower(${customer.email}) = ${input.email.toLowerCase()}`))
+      .where(
+        and(
+          eq(customer.organizationId, organizationId),
+          sql`lower(${customer.email}) = ${input.email.toLowerCase()}`,
+        ),
+      )
       .limit(1);
     if (existing) {
       if (!existing.phone && input.phone) {

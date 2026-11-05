@@ -7,13 +7,18 @@ import { getStripe } from "@/server/billing/stripe";
 export async function POST(req: Request) {
   await connection();
   const stripe = getStripe();
-  if (!stripe || !env.STRIPE_WEBHOOK_SECRET) return Response.json({ error: "Facturation non configurée" }, { status: 503 });
+  if (!stripe || !env.STRIPE_WEBHOOK_SECRET)
+    return Response.json({ error: "Facturation non configurée" }, { status: 503 });
   const signature = req.headers.get("stripe-signature");
   if (!signature) return Response.json({ error: "Signature manquante" }, { status: 400 });
   const payload = await req.text();
   let event;
   try {
-    event = await stripe.webhooks.constructEventAsync(payload, signature, env.STRIPE_WEBHOOK_SECRET);
+    event = await stripe.webhooks.constructEventAsync(
+      payload,
+      signature,
+      env.STRIPE_WEBHOOK_SECRET,
+    );
   } catch {
     return Response.json({ error: "Signature invalide" }, { status: 400 });
   }

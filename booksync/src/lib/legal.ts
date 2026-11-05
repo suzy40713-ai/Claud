@@ -16,9 +16,21 @@ export const PUBLISHER = {
 };
 
 export const SUBPROCESSORS = [
-  { name: "Render Services, Inc.", role: "Hébergement de l'application", location: "Union européenne (Francfort)" },
+  {
+    name: "Render Services, Inc.",
+    role: "Hébergement de l'application",
+    location: "Union européenne (Francfort)",
+  },
   { name: "Supabase, Inc.", role: "Base de données", location: "Union européenne" },
-  { name: "Resend (Plus Five Five, Inc.)", role: "Envoi des emails transactionnels", location: "États-Unis (clauses contractuelles types)" },
-  { name: "Stripe Payments Europe, Ltd.", role: "Paiement des abonnements BookSync", location: "Irlande" },
+  {
+    name: "Resend (Plus Five Five, Inc.)",
+    role: "Envoi des emails transactionnels",
+    location: "États-Unis (clauses contractuelles types)",
+  },
+  {
+    name: "Stripe Payments Europe, Ltd.",
+    role: "Paiement des abonnements BookSync",
+    location: "Irlande",
+  },
   { name: "Google Ireland Ltd.", role: "Connexion avec Google (facultative)", location: "Irlande" },
 ];

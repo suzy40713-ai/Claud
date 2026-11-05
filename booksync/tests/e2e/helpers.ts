@@ -2,7 +2,8 @@ import postgres from "postgres";
 import { expect, type Page } from "@playwright/test";
 
 const url = process.env.DATABASE_URL ?? "postgres://postgres@localhost:5432/booksync_dev";
-export const sql = postgres(url, { max: 2, onnotice: () => {} });
+// Connexion partagée par tous les tests d'un même processus : fermée automatiquement quand inactive.
+export const sql = postgres(url, { max: 4, idle_timeout: 2, onnotice: () => {} });
 
 export function uniqueEmail(prefix = "e2e") {
   return `${prefix}.${Date.now()}.${Math.random().toString(36).slice(2, 8)}@example.com`;
@@ -43,6 +44,7 @@ export async function signUp(
   await page.getByLabel("Nom complet").fill(name);
   await page.getByLabel("Email professionnel").fill(email);
   await page.getByLabel("Mot de passe", { exact: true }).fill(password);
+  await page.getByRole("checkbox", { name: /J'accepte les conditions générales/ }).check();
   await page.getByRole("button", { name: "Créer mon compte" }).click();
   await expect(page).toHaveURL(/\/verifier-email\?email=/);
   return { name, email, password };
@@ -56,11 +58,22 @@ export async function signUpAndVerify(page: Page, opts?: Parameters<typeof signU
   return user;
 }
 
-export async function createOrganization(page: Page, name: string, slug?: string) {
+export async function createOrganization(
+  page: Page,
+  name: string,
+  slug?: string,
+  activity = "coiffure",
+) {
   await page.getByLabel("Nom de l'entreprise").fill(name);
+  await page.getByLabel("Votre activité").selectOption(activity);
   if (slug) await page.getByLabel("Adresse de votre page de réservation").fill(slug);
   await page.getByRole("button", { name: "Créer mon entreprise" }).click();
-  await expect(page).toHaveURL(/\/tableau-de-bord$/);
+  await expect(page).toHaveURL(/\/tableau-de-bord\/demarrage$/);
+}
+
+/** Passe une entreprise au forfait indiqué (préparation de test, équivalent d'un webhook Stripe). */
+export async function setPlan(slug: string, plan: "free" | "starter" | "pro") {
+  await sql`update organization set plan = ${plan}, subscription_status = ${plan === "free" ? null : "active"} where slug = ${slug}`;
 }
 
 export async function signIn(page: Page, email: string, password = PASSWORD) {

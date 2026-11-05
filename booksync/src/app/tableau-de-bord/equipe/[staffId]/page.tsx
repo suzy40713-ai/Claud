@@ -31,7 +31,10 @@ async function Content({ params }: { params: Promise<{ staffId: string }> }) {
   return (
     <>
       {can(ctx.role, "team.view") ? (
-        <Link href="/tableau-de-bord/equipe" className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+        <Link
+          href="/tableau-de-bord/equipe"
+          className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
           <ArrowLeft className="size-4" /> Employés
         </Link>
       ) : null}
@@ -40,7 +43,11 @@ async function Content({ params }: { params: Promise<{ staffId: string }> }) {
         description={
           <span className="flex flex-wrap items-center gap-2">
             {detail.email ?? "Ancien membre de l'équipe"}
-            {detail.role ? <Badge variant="outline">{ROLE_LABELS[detail.role]}</Badge> : <Badge>Inactif</Badge>}
+            {detail.role ? (
+              <Badge variant="outline">{ROLE_LABELS[detail.role]}</Badge>
+            ) : (
+              <Badge>Inactif</Badge>
+            )}
           </span>
         }
       />
@@ -59,14 +66,25 @@ async function Content({ params }: { params: Promise<{ staffId: string }> }) {
           week={detail.week}
           services={detail.services}
           serviceIds={detail.serviceIds}
-          absences={detail.absences.map((a) => ({ id: a.id, startsAt: a.startsAt.toISOString(), endsAt: a.endsAt.toISOString(), reason: a.reason }))}
+          absences={detail.absences.map((a) => ({
+            id: a.id,
+            startsAt: a.startsAt.toISOString(),
+            endsAt: a.endsAt.toISOString(),
+            reason: a.reason,
+          }))}
         />
       </div>
       {!manageAll ? (
         <div className="mt-8">
-          <SettingsSection title="Services" description="Les prestations que vous réalisez sont définies par votre responsable.">
+          <SettingsSection
+            title="Services"
+            description="Les prestations que vous réalisez sont définies par votre responsable."
+          >
             <p className="text-sm text-muted-foreground">
-              {detail.services.filter((s) => detail.serviceIds.includes(s.id)).map((s) => s.name).join(", ") || "Aucun service attribué."}
+              {detail.services
+                .filter((s) => detail.serviceIds.includes(s.id))
+                .map((s) => s.name)
+                .join(", ") || "Aucun service attribué."}
             </p>
           </SettingsSection>
         </div>

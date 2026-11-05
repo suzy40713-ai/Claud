@@ -25,7 +25,10 @@ const DELIVERY_LABELS: Record<string, string> = {
   reminder_24h: "Rappel 24 h",
   reminder_2h: "Rappel 2 h",
 };
-const STATUS: Record<string, { label: string; variant: "success" | "primary" | "destructive" | "neutral" | "warning" }> = {
+const STATUS: Record<
+  string,
+  { label: string; variant: "success" | "primary" | "destructive" | "neutral" | "warning" }
+> = {
   sent: { label: "Envoyé", variant: "success" },
   pending: { label: "Programmé", variant: "primary" },
   processing: { label: "En cours", variant: "primary" },
@@ -37,25 +40,48 @@ const STATUS: Record<string, { label: string; variant: "success" | "primary" | "
 async function Content() {
   const ctx = await requireOrg();
   const tz = ctx.organization.timezone;
-  const [feed, deliveries] = await Promise.all([listMyNotifications(ctx), listCustomerDeliveries(ctx)]);
+  const [feed, deliveries] = await Promise.all([
+    listMyNotifications(ctx),
+    listCustomerDeliveries(ctx),
+  ]);
   const unread = feed.filter((f) => !f.readAt).length;
   return (
     <div className="grid gap-8">
       <section className="grid gap-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-[15px] font-semibold">Activité {unread ? <Badge variant="primary" className="ml-1">{unread} non lue{unread > 1 ? "s" : ""}</Badge> : null}</h2>
+          <h2 className="text-[15px] font-semibold">
+            Activité{" "}
+            {unread ? (
+              <Badge variant="primary" className="ml-1">
+                {unread} non lue{unread > 1 ? "s" : ""}
+              </Badge>
+            ) : null}
+          </h2>
           {unread ? <MarkAllRead /> : null}
         </div>
         {feed.length === 0 ? (
-          <EmptyState icon={<Bell />} title="Aucune notification" description="Vous serez prévenu ici à chaque nouvelle réservation, modification ou annulation." />
+          <EmptyState
+            icon={<Bell />}
+            title="Aucune notification"
+            description="Vous serez prévenu ici à chaque nouvelle réservation, modification ou annulation."
+          />
         ) : (
           <ul className="divide-y overflow-hidden rounded-xl border bg-card">
             {feed.map((n) => {
-              const meta = FEED[n.type as keyof typeof FEED] ?? { icon: Bell, label: "Notification" };
+              const meta = FEED[n.type as keyof typeof FEED] ?? {
+                icon: Bell,
+                label: "Notification",
+              };
               const Icon = meta.icon;
               return (
-                <li key={n.id} className="flex gap-3 px-4 py-3 sm:px-5" data-testid="notification-row">
-                  <span className={`mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-full ${n.readAt ? "bg-muted text-muted-foreground" : "bg-primary-soft text-primary-soft-foreground"}`}>
+                <li
+                  key={n.id}
+                  className="flex gap-3 px-4 py-3 sm:px-5"
+                  data-testid="notification-row"
+                >
+                  <span
+                    className={`mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-full ${n.readAt ? "bg-muted text-muted-foreground" : "bg-primary-soft text-primary-soft-foreground"}`}
+                  >
                     <Icon className="size-4" />
                   </span>
                   <div className="min-w-0 flex-1">
@@ -69,8 +95,15 @@ async function Content() {
                       </p>
                     ) : null}
                   </div>
-                  <span className="shrink-0 text-xs text-muted-foreground">{fromNow(n.createdAt)}</span>
-                  {!n.readAt ? <span className="mt-2 size-2 shrink-0 rounded-full bg-primary" aria-label="Non lue" /> : null}
+                  <span className="shrink-0 text-xs text-muted-foreground">
+                    {fromNow(n.createdAt)}
+                  </span>
+                  {!n.readAt ? (
+                    <span
+                      className="mt-2 size-2 shrink-0 rounded-full bg-primary"
+                      aria-label="Non lue"
+                    />
+                  ) : null}
                 </li>
               );
             })}
@@ -82,7 +115,10 @@ async function Content() {
         <section className="grid gap-3">
           <div>
             <h2 className="text-[15px] font-semibold">Emails envoyés à vos clients</h2>
-            <p className="text-sm text-muted-foreground">Confirmations et rappels, avec leur statut d&apos;envoi. Les échecs sont retentés automatiquement.</p>
+            <p className="text-sm text-muted-foreground">
+              Confirmations et rappels, avec leur statut d&apos;envoi. Les échecs sont retentés
+              automatiquement.
+            </p>
           </div>
           {deliveries.length ? (
             <div className="overflow-x-auto rounded-xl border bg-card">
@@ -100,9 +136,13 @@ async function Content() {
                     <tr key={d.id}>
                       <td className="px-4 py-2.5">{DELIVERY_LABELS[d.type] ?? d.type}</td>
                       <td className="max-w-48 truncate px-4 py-2.5">{d.recipient}</td>
-                      <td className="px-4 py-2.5 whitespace-nowrap text-muted-foreground">{formatInTz(d.sentAt ?? d.scheduledFor, tz, "d MMM HH:mm")}</td>
+                      <td className="px-4 py-2.5 whitespace-nowrap text-muted-foreground">
+                        {formatInTz(d.sentAt ?? d.scheduledFor, tz, "d MMM HH:mm")}
+                      </td>
                       <td className="px-4 py-2.5" title={d.lastError ?? undefined}>
-                        <Badge variant={STATUS[d.status]?.variant ?? "neutral"}>{STATUS[d.status]?.label ?? d.status}</Badge>
+                        <Badge variant={STATUS[d.status]?.variant ?? "neutral"}>
+                          {STATUS[d.status]?.label ?? d.status}
+                        </Badge>
                       </td>
                     </tr>
                   ))}
@@ -111,7 +151,9 @@ async function Content() {
             </div>
           ) : (
             <p className="rounded-xl border border-dashed bg-card px-4 py-6 text-center text-sm text-muted-foreground">
-              {ctx.plan.features.emailNotifications ? "Aucun email envoyé pour l'instant." : "Les emails aux clients sont inclus à partir du forfait Starter."}
+              {ctx.plan.features.emailNotifications
+                ? "Aucun email envoyé pour l'instant."
+                : "Les emails aux clients sont inclus à partir du forfait Starter."}
             </p>
           )}
         </section>
@@ -123,7 +165,10 @@ async function Content() {
 export default function NotificationsPage() {
   return (
     <>
-      <PageHeader title="Notifications" description="Ce qui s'est passé récemment dans votre agenda." />
+      <PageHeader
+        title="Notifications"
+        description="Ce qui s'est passé récemment dans votre agenda."
+      />
       <Suspense fallback={<Skeleton className="h-96" />}>
         <Content />
       </Suspense>

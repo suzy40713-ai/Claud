@@ -1,4 +1,12 @@
-export function LegalPage({ title, updated, children }: { title: string; updated: string; children: React.ReactNode }) {
+export function LegalPage({
+  title,
+  updated,
+  children,
+}: {
+  title: string;
+  updated: string;
+  children: React.ReactNode;
+}) {
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
       <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>

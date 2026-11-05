@@ -76,7 +76,11 @@ export async function loadOrgContext(
   active: Membership,
   memberships: Membership[] = [active],
 ): Promise<OrgContext> {
-  const [org] = await db.select().from(organization).where(eq(organization.id, active.organizationId)).limit(1);
+  const [org] = await db
+    .select()
+    .from(organization)
+    .where(eq(organization.id, active.organizationId))
+    .limit(1);
   const [staffRow] = await db
     .select({ id: staff.id })
     .from(staff)

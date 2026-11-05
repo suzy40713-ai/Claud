@@ -25,7 +25,10 @@ export const optionalPhone = z
     if (!v) return null;
     const n = normalizePhone(v);
     if (!n) {
-      ctx.addIssue({ code: "custom", message: "Numéro de téléphone invalide (ex. 06 12 34 56 78 ou +33 6 12 34 56 78)." });
+      ctx.addIssue({
+        code: "custom",
+        message: "Numéro de téléphone invalide (ex. 06 12 34 56 78 ou +33 6 12 34 56 78).",
+      });
       return z.NEVER;
     }
     return n;

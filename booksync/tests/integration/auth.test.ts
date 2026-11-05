@@ -35,6 +35,7 @@ describe("authentification (API réelle + base PostgreSQL)", () => {
       name: "Camille",
       email: address,
       password: "MotDePasse2026",
+      acceptTerms: true,
     });
     expect(res.status).toBe(200);
 
@@ -54,15 +55,53 @@ describe("authentification (API réelle + base PostgreSQL)", () => {
     expect(emails[0].text).toMatch(/http:\/\/localhost:3000\/api\/auth\/verify-email\?token=/);
   });
 
+  it("refuse l'inscription sans acceptation des conditions générales (côté serveur)", async () => {
+    const address = email("noterms");
+    const res = await post("/sign-up/email", {
+      name: "Sans CGU",
+      email: address,
+      password: "MotDePasse2026",
+    });
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({ code: "TERMS_NOT_ACCEPTED" });
+    const rows = await sql`select id from "user" where email = ${address}`;
+    expect(rows).toHaveLength(0);
+  });
+
+  it("enregistre la date et la version des CGU acceptées", async () => {
+    const address = email("terms");
+    await post("/sign-up/email", {
+      name: "Avec CGU",
+      email: address,
+      password: "MotDePasse2026",
+      acceptTerms: true,
+    });
+    const [u] = await sql<
+      { terms_accepted_at: Date; terms_version: string }[]
+    >`select terms_accepted_at, terms_version from "user" where email = ${address}`;
+    expect(u.terms_accepted_at).toBeInstanceOf(Date);
+    expect(u.terms_version).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
   it("refuse un mot de passe trop court côté serveur (même si le client est contourné)", async () => {
-    const res = await post("/sign-up/email", { name: "X", email: email("short"), password: "abc" });
+    const res = await post("/sign-up/email", {
+      name: "X",
+      email: email("short"),
+      password: "abc",
+      acceptTerms: true,
+    });
     expect(res.status).toBe(400);
     expect(await res.json()).toMatchObject({ code: "PASSWORD_TOO_SHORT" });
   });
 
   it("refuse la connexion tant que l'email n'est pas confirmé", async () => {
     const address = email("unverified");
-    await post("/sign-up/email", { name: "Léa", email: address, password: "MotDePasse2026" });
+    await post("/sign-up/email", {
+      name: "Léa",
+      email: address,
+      password: "MotDePasse2026",
+      acceptTerms: true,
+    });
     const res = await post("/sign-in/email", { email: address, password: "MotDePasse2026" });
     expect(res.status).toBe(403);
     expect(await res.json()).toMatchObject({ code: "EMAIL_NOT_VERIFIED" });

@@ -17,21 +17,35 @@ export function AcceptTermsForm({ alreadyAccepted }: { alreadyAccepted: boolean 
   const redirection = params.get("redirection");
 
   useEffect(() => {
-    if (alreadyAccepted) startTransition(() => acceptTermsAction(true, redirection).then(() => undefined));
+    if (alreadyAccepted)
+      startTransition(() => acceptTermsAction(true, redirection).then(() => undefined));
   }, [alreadyAccepted, redirection]);
 
   return (
     <div className="mt-7 grid gap-5">
       {error ? <Alert variant="error">{error}</Alert> : null}
       <div className="flex items-start gap-2.5">
-        <Checkbox id="terms" checked={checked} onCheckedChange={(v) => setChecked(v === true)} className="mt-0.5" />
+        <Checkbox
+          id="terms"
+          checked={checked}
+          onCheckedChange={(v) => setChecked(v === true)}
+          className="mt-0.5"
+        />
         <label htmlFor="terms" className="text-sm leading-snug text-muted-foreground">
           J&apos;accepte les{" "}
-          <Link href="/conditions-generales" target="_blank" className="font-medium text-foreground underline underline-offset-2">
+          <Link
+            href="/conditions-generales"
+            target="_blank"
+            className="font-medium text-foreground underline underline-offset-2"
+          >
             conditions générales
           </Link>{" "}
           et la{" "}
-          <Link href="/confidentialite" target="_blank" className="font-medium text-foreground underline underline-offset-2">
+          <Link
+            href="/confidentialite"
+            target="_blank"
+            className="font-medium text-foreground underline underline-offset-2"
+          >
             politique de confidentialité
           </Link>
           .

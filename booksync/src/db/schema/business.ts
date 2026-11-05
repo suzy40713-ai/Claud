@@ -111,9 +111,10 @@ export const staffService = pgTable(
   },
   (t) => [
     primaryKey({ columns: [t.staffId, t.serviceId] }),
-    foreignKey({ columns: [t.organizationId, t.staffId], foreignColumns: [staff.organizationId, staff.id] }).onDelete(
-      "cascade",
-    ),
+    foreignKey({
+      columns: [t.organizationId, t.staffId],
+      foreignColumns: [staff.organizationId, staff.id],
+    }).onDelete("cascade"),
     foreignKey({
       columns: [t.organizationId, t.serviceId],
       foreignColumns: [service.organizationId, service.id],
@@ -138,12 +139,16 @@ export const workingHours = pgTable(
     endMinute: smallint().notNull(),
   },
   (t) => [
-    foreignKey({ columns: [t.organizationId, t.staffId], foreignColumns: [staff.organizationId, staff.id] }).onDelete(
-      "cascade",
-    ),
+    foreignKey({
+      columns: [t.organizationId, t.staffId],
+      foreignColumns: [staff.organizationId, staff.id],
+    }).onDelete("cascade"),
     index("working_hours_org_staff_idx").on(t.organizationId, t.staffId),
     check("working_hours_weekday_ck", sql`${t.weekday} between 1 and 7`),
-    check("working_hours_range_ck", sql`${t.startMinute} >= 0 and ${t.endMinute} <= 1440 and ${t.startMinute} < ${t.endMinute}`),
+    check(
+      "working_hours_range_ck",
+      sql`${t.startMinute} >= 0 and ${t.endMinute} <= 1440 and ${t.startMinute} < ${t.endMinute}`,
+    ),
   ],
 );
 
@@ -160,9 +165,10 @@ export const timeOff = pgTable(
     createdAt: createdAt(),
   },
   (t) => [
-    foreignKey({ columns: [t.organizationId, t.staffId], foreignColumns: [staff.organizationId, staff.id] }).onDelete(
-      "cascade",
-    ),
+    foreignKey({
+      columns: [t.organizationId, t.staffId],
+      foreignColumns: [staff.organizationId, staff.id],
+    }).onDelete("cascade"),
     index("time_off_org_range_idx").on(t.organizationId, t.startsAt, t.endsAt),
     check("time_off_range_ck", sql`${t.startsAt} < ${t.endsAt}`),
   ],
@@ -227,9 +233,10 @@ export const appointment = pgTable(
     updatedAt: updatedAt(),
   },
   (t) => [
-    foreignKey({ columns: [t.organizationId, t.staffId], foreignColumns: [staff.organizationId, staff.id] }).onDelete(
-      "cascade",
-    ),
+    foreignKey({
+      columns: [t.organizationId, t.staffId],
+      foreignColumns: [staff.organizationId, staff.id],
+    }).onDelete("cascade"),
     foreignKey({
       columns: [t.organizationId, t.serviceId],
       foreignColumns: [service.organizationId, service.id],
@@ -241,7 +248,10 @@ export const appointment = pgTable(
     index("appointment_org_starts_idx").on(t.organizationId, t.startsAt),
     index("appointment_staff_starts_idx").on(t.staffId, t.startsAt),
     index("appointment_customer_idx").on(t.customerId),
-    check("appointment_range_ck", sql`${t.startsAt} < ${t.endsAt} and ${t.endsAt} <= ${t.blockedUntil}`),
+    check(
+      "appointment_range_ck",
+      sql`${t.startsAt} < ${t.endsAt} and ${t.endsAt} <= ${t.blockedUntil}`,
+    ),
   ],
 );
 
@@ -267,7 +277,9 @@ export const notification = pgTable(
     id: uuid().primaryKey().defaultRandom(),
     organizationId: orgId(),
     appointmentId: uuid().references(() => appointment.id, { onDelete: "cascade" }),
-    channel: text({ enum: ["email", "sms", "in_app"] }).notNull().default("email"),
+    channel: text({ enum: ["email", "sms", "in_app"] })
+      .notNull()
+      .default("email"),
     type: text({
       enum: [
         "booking_confirmation",

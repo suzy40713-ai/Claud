@@ -12,7 +12,10 @@ export const metadata: Metadata = { title: "Services" };
 
 async function Content() {
   const ctx = await requirePermission("services.manage");
-  const [services, staff] = await Promise.all([listServices(ctx), listStaff(ctx.organization.id, { activeOnly: true })]);
+  const [services, staff] = await Promise.all([
+    listServices(ctx),
+    listStaff(ctx.organization.id, { activeOnly: true }),
+  ]);
   return (
     <ServicesView
       services={services.map((s) => ({
@@ -28,7 +31,12 @@ async function Content() {
         staffIds: s.staffIds,
         imageUrl: fileUrl(s.imageFileId),
       }))}
-      staff={staff.map((s) => ({ id: s.id, name: s.displayName, color: s.color, photoUrl: fileUrl(s.photoFileId) }))}
+      staff={staff.map((s) => ({
+        id: s.id,
+        name: s.displayName,
+        color: s.color,
+        photoUrl: fileUrl(s.photoFileId),
+      }))}
     />
   );
 }
@@ -36,7 +44,10 @@ async function Content() {
 export default function ServicesPage() {
   return (
     <>
-      <PageHeader title="Services" description="Vos prestations : durée, prix et employés qui les réalisent." />
+      <PageHeader
+        title="Services"
+        description="Vos prestations : durée, prix et employés qui les réalisent."
+      />
       <Suspense fallback={<Skeleton className="h-96" />}>
         <Content />
       </Suspense>

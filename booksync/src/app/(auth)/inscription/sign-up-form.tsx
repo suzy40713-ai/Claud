@@ -32,7 +32,9 @@ export function SignUpForm() {
     const result = validateSignUp(data);
     setErrors(result.errors);
     setFormError(null);
-    setTermsError(terms ? null : "Vous devez accepter les conditions générales pour créer un compte.");
+    setTermsError(
+      terms ? null : "Vous devez accepter les conditions générales pour créer un compte.",
+    );
     if (!result.ok || !terms) return;
 
     startTransition(async () => {
@@ -86,11 +88,19 @@ export function SignUpForm() {
           />
           <label htmlFor="terms" className="text-sm leading-snug text-muted-foreground">
             J&apos;accepte les{" "}
-            <Link href="/conditions-generales" target="_blank" className="font-medium text-foreground underline underline-offset-2">
+            <Link
+              href="/conditions-generales"
+              target="_blank"
+              className="font-medium text-foreground underline underline-offset-2"
+            >
               conditions générales
             </Link>{" "}
             et la{" "}
-            <Link href="/confidentialite" target="_blank" className="font-medium text-foreground underline underline-offset-2">
+            <Link
+              href="/confidentialite"
+              target="_blank"
+              className="font-medium text-foreground underline underline-offset-2"
+            >
               politique de confidentialité
             </Link>
             .

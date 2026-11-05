@@ -27,7 +27,10 @@ export function planForPrice(priceId: string | null | undefined): PaidPlan | nul
 
 function requireStripe() {
   const stripe = getStripe();
-  if (!stripe || !isBillingConfigured()) throw new UserError("La facturation n'est pas encore configurée. Contactez le support BookSync.");
+  if (!stripe || !isBillingConfigured())
+    throw new UserError(
+      "La facturation n'est pas encore configurée. Contactez le support BookSync.",
+    );
   return stripe;
 }
 
@@ -44,20 +47,28 @@ async function ensureCustomer(stripe: Stripe, ctx: OrgContext) {
     },
     { idempotencyKey: `customer-${ctx.organization.id}` },
   );
-  await db.update(organization).set({ stripeCustomerId: customer.id }).where(eq(organization.id, ctx.organization.id));
+  await db
+    .update(organization)
+    .set({ stripeCustomerId: customer.id })
+    .where(eq(organization.id, ctx.organization.id));
   return customer.id;
 }
 
 function hasLiveSubscription(ctx: OrgContext) {
   const s = ctx.organization.subscriptionStatus;
-  return Boolean(ctx.organization.stripeSubscriptionId && s && !["canceled", "incomplete_expired"].includes(s));
+  return Boolean(
+    ctx.organization.stripeSubscriptionId && s && !["canceled", "incomplete_expired"].includes(s),
+  );
 }
 
 /**
  * Souscription (redirection vers Stripe Checkout) ou changement d'offre si un abonnement existe déjà
  * (mise à jour immédiate avec prorata).
  */
-export async function startSubscription(ctx: OrgContext, plan: PaidPlan): Promise<{ url: string } | { changed: true }> {
+export async function startSubscription(
+  ctx: OrgContext,
+  plan: PaidPlan,
+): Promise<{ url: string } | { changed: true }> {
   assertCan(ctx.role, "billing.manage");
   const stripe = requireStripe();
   const price = priceIdFor(plan);
@@ -65,7 +76,8 @@ export async function startSubscription(ctx: OrgContext, plan: PaidPlan): Promis
   if (hasLiveSubscription(ctx)) {
     const sub = await stripe.subscriptions.retrieve(ctx.organization.stripeSubscriptionId!);
     const item = sub.items.data[0];
-    if (item.price.id === price && !sub.cancel_at_period_end) throw new UserError("Vous êtes déjà sur ce forfait.");
+    if (item.price.id === price && !sub.cancel_at_period_end)
+      throw new UserError("Vous êtes déjà sur ce forfait.");
     const updated = await stripe.subscriptions.update(sub.id, {
       items: [{ id: item.id, price }],
       cancel_at_period_end: false,
@@ -87,7 +99,9 @@ export async function startSubscription(ctx: OrgContext, plan: PaidPlan): Promis
     client_reference_id: ctx.organization.id,
     subscription_data: { metadata: { organizationId: ctx.organization.id } },
     metadata: { organizationId: ctx.organization.id },
-    success_url: appUrl("/tableau-de-bord/abonnement?paiement=succes&session={CHECKOUT_SESSION_ID}"),
+    success_url: appUrl(
+      "/tableau-de-bord/abonnement?paiement=succes&session={CHECKOUT_SESSION_ID}",
+    ),
     cancel_url: appUrl("/tableau-de-bord/abonnement?paiement=annule"),
   });
   if (!session.url) throw new UserError("Impossible d'ouvrir la page de paiement.");
@@ -99,7 +113,9 @@ export async function setCancelAtPeriodEnd(ctx: OrgContext, cancel: boolean) {
   assertCan(ctx.role, "billing.manage");
   const stripe = requireStripe();
   if (!ctx.organization.stripeSubscriptionId) throw new UserError("Aucun abonnement en cours.");
-  const sub = await stripe.subscriptions.update(ctx.organization.stripeSubscriptionId, { cancel_at_period_end: cancel });
+  const sub = await stripe.subscriptions.update(ctx.organization.stripeSubscriptionId, {
+    cancel_at_period_end: cancel,
+  });
   await syncSubscription(sub);
 }
 
@@ -108,7 +124,11 @@ export async function createPortalSession(ctx: OrgContext) {
   assertCan(ctx.role, "billing.manage");
   const stripe = requireStripe();
   const customer = await ensureCustomer(stripe, ctx);
-  const session = await stripe.billingPortal.sessions.create({ customer, locale: "fr", return_url: appUrl("/tableau-de-bord/abonnement") });
+  const session = await stripe.billingPortal.sessions.create({
+    customer,
+    locale: "fr",
+    return_url: appUrl("/tableau-de-bord/abonnement"),
+  });
   return session.url;
 }
 
@@ -118,14 +138,22 @@ export async function confirmCheckout(ctx: OrgContext, sessionId: string) {
   if (!stripe || !/^cs_[A-Za-z0-9_]+$/.test(sessionId)) return;
   const session = await stripe.checkout.sessions.retrieve(sessionId, { expand: ["subscription"] });
   if (session.metadata?.organizationId !== ctx.organization.id) return;
-  if (session.subscription && typeof session.subscription !== "string") await syncSubscription(session.subscription);
+  if (session.subscription && typeof session.subscription !== "string")
+    await syncSubscription(session.subscription);
 }
 
 async function findOrganization(customerId: string | null, orgId?: string | null) {
   const [org] = await db
     .select()
     .from(organization)
-    .where(orgId ? or(eq(organization.id, orgId), customerId ? eq(organization.stripeCustomerId, customerId) : undefined) : eq(organization.stripeCustomerId, customerId ?? "__none__"))
+    .where(
+      orgId
+        ? or(
+            eq(organization.id, orgId),
+            customerId ? eq(organization.stripeCustomerId, customerId) : undefined,
+          )
+        : eq(organization.stripeCustomerId, customerId ?? "__none__"),
+    )
     .limit(1);
   return org ?? null;
 }
@@ -136,7 +164,8 @@ export async function syncSubscription(sub: Stripe.Subscription) {
   const org = await findOrganization(customerId, sub.metadata?.organizationId);
   if (!org) return null;
   // Un ancien abonnement terminé ne doit pas écraser un abonnement plus récent.
-  if (org.stripeSubscriptionId && org.stripeSubscriptionId !== sub.id && sub.status === "canceled") return org.id;
+  if (org.stripeSubscriptionId && org.stripeSubscriptionId !== sub.id && sub.status === "canceled")
+    return org.id;
   const item = sub.items.data[0];
   const plan = planForPrice(item?.price.id);
   const ended = ["canceled", "incomplete_expired", "unpaid"].includes(sub.status);
@@ -156,7 +185,10 @@ export async function syncSubscription(sub: Stripe.Subscription) {
 
 export async function upsertInvoice(inv: Stripe.Invoice) {
   const customerId = typeof inv.customer === "string" ? inv.customer : (inv.customer?.id ?? null);
-  const org = await findOrganization(customerId, inv.parent?.subscription_details?.metadata?.organizationId ?? null);
+  const org = await findOrganization(
+    customerId,
+    inv.parent?.subscription_details?.metadata?.organizationId ?? null,
+  );
   if (!org || !inv.id) return;
   const line = inv.lines?.data?.[0];
   const values = {
@@ -173,7 +205,10 @@ export async function upsertInvoice(inv: Stripe.Invoice) {
     periodEnd: line?.period?.end ? new Date(line.period.end * 1000) : null,
     issuedAt: new Date(inv.created * 1000),
   };
-  await db.insert(invoice).values(values).onConflictDoUpdate({ target: invoice.stripeInvoiceId, set: values });
+  await db
+    .insert(invoice)
+    .values(values)
+    .onConflictDoUpdate({ target: invoice.stripeInvoiceId, set: values });
 }
 
 /**
@@ -181,14 +216,20 @@ export async function upsertInvoice(inv: Stripe.Invoice) {
  * Renvoie false si l'événement avait déjà été traité.
  */
 export async function handleStripeEvent(event: Stripe.Event, stripe: Stripe) {
-  const [fresh] = await db.insert(stripeEvent).values({ id: event.id, type: event.type }).onConflictDoNothing().returning();
+  const [fresh] = await db
+    .insert(stripeEvent)
+    .values({ id: event.id, type: event.type })
+    .onConflictDoNothing()
+    .returning();
   if (!fresh) return false;
   try {
     switch (event.type) {
       case "checkout.session.completed": {
         const s = event.data.object;
         if (s.mode === "subscription" && s.subscription) {
-          const sub = await stripe.subscriptions.retrieve(typeof s.subscription === "string" ? s.subscription : s.subscription.id);
+          const sub = await stripe.subscriptions.retrieve(
+            typeof s.subscription === "string" ? s.subscription : s.subscription.id,
+          );
           await syncSubscription(sub);
         }
         break;
@@ -220,5 +261,10 @@ export async function handleStripeEvent(event: Stripe.Event, stripe: Stripe) {
 
 export async function listInvoices(ctx: OrgContext) {
   assertCan(ctx.role, "billing.manage");
-  return db.select().from(invoice).where(eq(invoice.organizationId, ctx.organization.id)).orderBy(desc(invoice.issuedAt)).limit(50);
+  return db
+    .select()
+    .from(invoice)
+    .where(eq(invoice.organizationId, ctx.organization.id))
+    .orderBy(desc(invoice.issuedAt))
+    .limit(50);
 }

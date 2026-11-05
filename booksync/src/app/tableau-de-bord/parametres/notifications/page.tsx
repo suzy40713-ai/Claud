@@ -13,7 +13,11 @@ async function Content() {
     <NotificationSettingsForm
       features={ctx.plan.features}
       planName={ctx.plan.name}
-      initial={{ notifyStaffOnBooking: o.notifyStaffOnBooking, reminder24h: o.reminder24h, reminder2h: o.reminder2h }}
+      initial={{
+        notifyStaffOnBooking: o.notifyStaffOnBooking,
+        reminder24h: o.reminder24h,
+        reminder2h: o.reminder2h,
+      }}
     />
   );
 }

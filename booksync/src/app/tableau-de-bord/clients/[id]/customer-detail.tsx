@@ -13,7 +13,12 @@ import { formatCents, formatInTz } from "@/lib/format";
 import { CustomerForm, type CustomerValues } from "../customer-form";
 import { deleteCustomerAction } from "../actions";
 
-const variant = { confirmed: "primary", cancelled: "destructive", completed: "success", no_show: "warning" } as const;
+const variant = {
+  confirmed: "primary",
+  cancelled: "destructive",
+  completed: "success",
+  no_show: "warning",
+} as const;
 
 export function CustomerDetail({
   timeZone,
@@ -23,8 +28,21 @@ export function CustomerDetail({
 }: {
   timeZone: string;
   customer: CustomerValues & { id: string; createdAt: string };
-  history: { id: string; startsAt: string; status: keyof typeof STATUS_LABELS; serviceName: string; priceCents: number; staffName: string }[];
-  stats: { total: number; completed: number; noShow: number; cancelled: number; revenueCents: number };
+  history: {
+    id: string;
+    startsAt: string;
+    status: keyof typeof STATUS_LABELS;
+    serviceName: string;
+    priceCents: number;
+    staffName: string;
+  }[];
+  stats: {
+    total: number;
+    completed: number;
+    noShow: number;
+    cancelled: number;
+    revenueCents: number;
+  };
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
@@ -38,7 +56,9 @@ export function CustomerDetail({
           <Avatar name={name} className="size-14 text-lg" />
           <div className="min-w-0">
             <h1 className="text-2xl font-semibold tracking-tight">{name}</h1>
-            <p className="text-sm text-muted-foreground">Client depuis le {formatInTz(customer.createdAt, timeZone, "d MMMM yyyy")}</p>
+            <p className="text-sm text-muted-foreground">
+              Client depuis le {formatInTz(customer.createdAt, timeZone, "d MMMM yyyy")}
+            </p>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -65,7 +85,12 @@ export function CustomerDetail({
             className="text-destructive"
             disabled={pending}
             onClick={() => {
-              if (!confirm(`Supprimer définitivement la fiche de ${name} et son historique de rendez-vous ?`)) return;
+              if (
+                !confirm(
+                  `Supprimer définitivement la fiche de ${name} et son historique de rendez-vous ?`,
+                )
+              )
+                return;
               startTransition(async () => {
                 const res = await deleteCustomerAction(customer.id);
                 if (!res.ok) return void toast.error(res.error);
@@ -95,7 +120,9 @@ export function CustomerDetail({
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <section className="overflow-hidden rounded-xl border bg-card">
-          <h2 className="border-b px-4 py-3 text-sm font-semibold sm:px-5">Historique des rendez-vous</h2>
+          <h2 className="border-b px-4 py-3 text-sm font-semibold sm:px-5">
+            Historique des rendez-vous
+          </h2>
           {history.length ? (
             <ul className="divide-y">
               {history.map((h) => (
@@ -106,13 +133,17 @@ export function CustomerDetail({
                       {formatInTz(h.startsAt, timeZone, "EEE d MMM yyyy, HH:mm")} · {h.staffName}
                     </p>
                   </div>
-                  <span className="hidden text-sm tabular-nums sm:block">{h.priceCents ? formatCents(h.priceCents) : ""}</span>
+                  <span className="hidden text-sm tabular-nums sm:block">
+                    {h.priceCents ? formatCents(h.priceCents) : ""}
+                  </span>
                   <Badge variant={variant[h.status]}>{STATUS_LABELS[h.status]}</Badge>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="px-5 py-8 text-center text-sm text-muted-foreground">Aucun rendez-vous.</p>
+            <p className="px-5 py-8 text-center text-sm text-muted-foreground">
+              Aucun rendez-vous.
+            </p>
           )}
         </section>
         <aside className="grid h-fit gap-4">
@@ -135,7 +166,9 @@ export function CustomerDetail({
           </section>
           <section className="rounded-xl border bg-card p-4 sm:p-5">
             <h2 className="mb-2 text-sm font-semibold">Notes internes</h2>
-            <p className="text-sm whitespace-pre-line text-muted-foreground">{customer.notes || "Aucune note."}</p>
+            <p className="text-sm whitespace-pre-line text-muted-foreground">
+              {customer.notes || "Aucune note."}
+            </p>
           </section>
         </aside>
       </div>

@@ -8,7 +8,8 @@ import { acceptInvitation, declineInvitation } from "@/server/team/service";
 
 export async function acceptInvitationAction(token: string) {
   const session = await getSession();
-  if (!session) redirect(`/connexion?redirection=${encodeURIComponent(`/invitation/${token}`)}` as never);
+  if (!session)
+    redirect(`/connexion?redirection=${encodeURIComponent(`/invitation/${token}`)}` as never);
   const res = await runAction(() => acceptInvitation(token, session.user));
   if (!res.ok) return res;
   (await cookies()).set(ACTIVE_ORG_COOKIE, res.data.organizationId, {

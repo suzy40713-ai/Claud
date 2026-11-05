@@ -3,14 +3,22 @@
 import { revalidatePath } from "next/cache";
 import { requireOrg } from "@/server/auth/session";
 import { runAction } from "@/server/errors";
-import { createService, deleteService, setServiceImage, updateService } from "@/server/catalog/services";
+import {
+  createService,
+  deleteService,
+  setServiceImage,
+  updateService,
+} from "@/server/catalog/services";
 
 function refresh<T>(res: T): T {
   revalidatePath("/tableau-de-bord/services");
   return res;
 }
 
-export async function saveServiceAction(id: string | null, input: Parameters<typeof createService>[1]) {
+export async function saveServiceAction(
+  id: string | null,
+  input: Parameters<typeof createService>[1],
+) {
   const ctx = await requireOrg();
   return refresh(
     await runAction(
@@ -31,5 +39,10 @@ export async function deleteServiceAction(id: string) {
 export async function setServiceImageAction(id: string, formData: FormData) {
   const ctx = await requireOrg();
   const file = formData.get("file");
-  return refresh(await runAction(() => setServiceImage(ctx, id, file instanceof File ? file : null), "Image enregistrée."));
+  return refresh(
+    await runAction(
+      () => setServiceImage(ctx, id, file instanceof File ? file : null),
+      "Image enregistrée.",
+    ),
+  );
 }

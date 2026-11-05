@@ -14,7 +14,11 @@ async function Content({ searchParams }: { searchParams: Promise<{ q?: string; p
   const data = await listCustomers(ctx, { q: sp.q, page: sp.page ? Number(sp.page) : 1 });
   return (
     <CustomersView
-      rows={data.rows.map((r) => ({ ...r, lastVisit: r.lastVisit ? new Date(r.lastVisit).toISOString() : null, createdAt: r.createdAt.toISOString() }))}
+      rows={data.rows.map((r) => ({
+        ...r,
+        lastVisit: r.lastVisit ? new Date(r.lastVisit).toISOString() : null,
+        createdAt: r.createdAt.toISOString(),
+      }))}
       total={data.total}
       limit={ctx.plan.limits.customers}
       planName={ctx.plan.name}

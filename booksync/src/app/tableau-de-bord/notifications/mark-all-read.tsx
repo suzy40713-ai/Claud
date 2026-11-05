@@ -10,7 +10,12 @@ export function MarkAllRead() {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   return (
-    <Button variant="ghost" size="sm" disabled={pending} onClick={() => startTransition(async () => (await markAllReadAction(), router.refresh()))}>
+    <Button
+      variant="ghost"
+      size="sm"
+      disabled={pending}
+      onClick={() => startTransition(async () => (await markAllReadAction(), router.refresh()))}
+    >
       <CheckCheck /> Tout marquer comme lu
     </Button>
   );

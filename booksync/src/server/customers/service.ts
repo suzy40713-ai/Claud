@@ -26,7 +26,10 @@ export async function listCustomers(ctx: OrgContext, opts: { q?: string; page?: 
       lastVisit: max(appointment.startsAt),
     })
     .from(customer)
-    .leftJoin(appointment, and(eq(appointment.customerId, customer.id), sql`${appointment.status} <> 'cancelled'`))
+    .leftJoin(
+      appointment,
+      and(eq(appointment.customerId, customer.id), sql`${appointment.status} <> 'cancelled'`),
+    )
     .where(
       and(
         eq(customer.organizationId, ctx.organization.id),
@@ -45,13 +48,20 @@ export async function listCustomers(ctx: OrgContext, opts: { q?: string; page?: 
     .orderBy(asc(customer.lastName), asc(customer.firstName))
     .limit(size + 1)
     .offset((page - 1) * size);
-  const [total] = await db.select({ n: count() }).from(customer).where(eq(customer.organizationId, ctx.organization.id));
+  const [total] = await db
+    .select({ n: count() })
+    .from(customer)
+    .where(eq(customer.organizationId, ctx.organization.id));
   return { rows: rows.slice(0, size), hasMore: rows.length > size, total: total.n, page };
 }
 
 export async function getCustomer(ctx: OrgContext, id: string) {
   assertCan(ctx.role, "customers.view_all");
-  const [row] = await db.select().from(customer).where(and(eq(customer.id, id), eq(customer.organizationId, ctx.organization.id))).limit(1);
+  const [row] = await db
+    .select()
+    .from(customer)
+    .where(and(eq(customer.id, id), eq(customer.organizationId, ctx.organization.id)))
+    .limit(1);
   if (!row) throw new NotFoundError("Client introuvable.");
   const history = await db
     .select({
@@ -72,7 +82,9 @@ export async function getCustomer(ctx: OrgContext, id: string) {
     completed: history.filter((h) => h.status === "completed").length,
     noShow: history.filter((h) => h.status === "no_show").length,
     cancelled: history.filter((h) => h.status === "cancelled").length,
-    revenueCents: history.filter((h) => h.status === "completed").reduce((s, h) => s + h.priceCents, 0),
+    revenueCents: history
+      .filter((h) => h.status === "completed")
+      .reduce((s, h) => s + h.priceCents, 0),
   };
   return { customer: row, history, stats };
 }
@@ -82,14 +94,26 @@ export async function searchCustomers(ctx: OrgContext, q: string) {
   const like = `%${q.trim().slice(0, 60).replace(/[%_]/g, "")}%`;
   const own = ctx.role === "employee";
   return db
-    .selectDistinct({ id: customer.id, firstName: customer.firstName, lastName: customer.lastName, email: customer.email, phone: customer.phone })
+    .selectDistinct({
+      id: customer.id,
+      firstName: customer.firstName,
+      lastName: customer.lastName,
+      email: customer.email,
+      phone: customer.phone,
+    })
     .from(customer)
     .leftJoin(appointment, eq(appointment.customerId, customer.id))
     .where(
       and(
         eq(customer.organizationId, ctx.organization.id),
         own ? eq(appointment.staffId, ctx.staffId ?? "") : undefined,
-        or(ilike(customer.firstName, like), ilike(customer.lastName, like), ilike(customer.email, like), ilike(customer.phone, like), ilike(sql`${customer.firstName} || ' ' || ${customer.lastName}`, like)),
+        or(
+          ilike(customer.firstName, like),
+          ilike(customer.lastName, like),
+          ilike(customer.email, like),
+          ilike(customer.phone, like),
+          ilike(sql`${customer.firstName} || ' ' || ${customer.lastName}`, like),
+        ),
       ),
     )
     .limit(8);
@@ -102,16 +126,26 @@ export async function createCustomer(ctx: OrgContext, input: z.input<typeof cust
     return await db.transaction(async (tx) => {
       await lockCustomers(tx, ctx.organization.id);
       await assertCustomerRoom(tx, ctx.organization.id, ctx.plan);
-      const [row] = await tx.insert(customer).values({ ...data, organizationId: ctx.organization.id }).returning();
+      const [row] = await tx
+        .insert(customer)
+        .values({ ...data, organizationId: ctx.organization.id })
+        .returning();
       return row;
     });
   } catch (error) {
-    if (pgErrorCode(error) === "23505") throw new UserError("Un client existe déjà avec cet email.", { email: "Un client existe déjà avec cet email." });
+    if (pgErrorCode(error) === "23505")
+      throw new UserError("Un client existe déjà avec cet email.", {
+        email: "Un client existe déjà avec cet email.",
+      });
     throw error;
   }
 }
 
-export async function updateCustomer(ctx: OrgContext, id: string, input: z.input<typeof customerInputSchema>) {
+export async function updateCustomer(
+  ctx: OrgContext,
+  id: string,
+  input: z.input<typeof customerInputSchema>,
+) {
   assertCan(ctx.role, "customers.manage");
   const data = customerInputSchema.parse(input);
   try {
@@ -122,7 +156,10 @@ export async function updateCustomer(ctx: OrgContext, id: string, input: z.input
       .returning({ id: customer.id });
     if (!res.length) throw new NotFoundError("Client introuvable.");
   } catch (error) {
-    if (pgErrorCode(error) === "23505") throw new UserError("Un client existe déjà avec cet email.", { email: "Un client existe déjà avec cet email." });
+    if (pgErrorCode(error) === "23505")
+      throw new UserError("Un client existe déjà avec cet email.", {
+        email: "Un client existe déjà avec cet email.",
+      });
     throw error;
   }
 }
@@ -133,8 +170,21 @@ export async function deleteCustomer(ctx: OrgContext, id: string) {
   const [upcoming] = await db
     .select({ n: count() })
     .from(appointment)
-    .where(and(eq(appointment.customerId, id), eq(appointment.organizationId, ctx.organization.id), eq(appointment.status, "confirmed"), sql`${appointment.startsAt} > now()`));
-  if (upcoming.n > 0) throw new UserError("Ce client a des rendez-vous à venir. Annulez-les avant de supprimer sa fiche.");
-  const res = await db.delete(customer).where(and(eq(customer.id, id), eq(customer.organizationId, ctx.organization.id))).returning({ id: customer.id });
+    .where(
+      and(
+        eq(appointment.customerId, id),
+        eq(appointment.organizationId, ctx.organization.id),
+        eq(appointment.status, "confirmed"),
+        sql`${appointment.startsAt} > now()`,
+      ),
+    );
+  if (upcoming.n > 0)
+    throw new UserError(
+      "Ce client a des rendez-vous à venir. Annulez-les avant de supprimer sa fiche.",
+    );
+  const res = await db
+    .delete(customer)
+    .where(and(eq(customer.id, id), eq(customer.organizationId, ctx.organization.id)))
+    .returning({ id: customer.id });
   if (!res.length) throw new NotFoundError("Client introuvable.");
 }

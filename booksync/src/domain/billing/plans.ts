@@ -35,7 +35,13 @@ export const PLANS: Record<PlanId, Plan> = {
       advancedStats: false,
       bookingPageCustomization: false,
     },
-    highlights: ["5 réservations par mois", "1 employé", "20 clients", "Page de réservation en ligne", "Statistiques basiques"],
+    highlights: [
+      "5 réservations par mois",
+      "1 employé",
+      "20 clients",
+      "Page de réservation en ligne",
+      "Statistiques basiques",
+    ],
   },
   starter: {
     id: "starter",
@@ -49,7 +55,13 @@ export const PLANS: Record<PlanId, Plan> = {
       advancedStats: false,
       bookingPageCustomization: false,
     },
-    highlights: ["Réservations illimitées", "2 employés", "Clients illimités", "Notifications email", "Statistiques basiques"],
+    highlights: [
+      "Réservations illimitées",
+      "2 employés",
+      "Clients illimités",
+      "Notifications email",
+      "Statistiques basiques",
+    ],
   },
   pro: {
     id: "pro",
@@ -84,7 +96,10 @@ export function getPlan(id: string | null | undefined): Plan {
 /** Abonnement Stripe encore valable ? Sinon l'entreprise retombe sur Free. */
 export function effectivePlan(plan: string, subscriptionStatus: string | null | undefined): Plan {
   if (plan === "free") return PLANS.free;
-  const ok = subscriptionStatus === "active" || subscriptionStatus === "trialing" || subscriptionStatus === "past_due";
+  const ok =
+    subscriptionStatus === "active" ||
+    subscriptionStatus === "trialing" ||
+    subscriptionStatus === "past_due";
   return ok ? getPlan(plan) : PLANS.free;
 }
 

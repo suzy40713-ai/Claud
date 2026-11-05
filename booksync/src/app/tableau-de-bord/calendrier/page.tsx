@@ -31,7 +31,15 @@ async function Content() {
     <Calendar
       timeZone={ctx.organization.timezone}
       staff={visible.map((s) => ({ id: s.id, name: s.displayName, color: s.color }))}
-      services={services.filter((s) => s.isActive).map((s) => ({ id: s.id, name: s.name, durationMinutes: s.durationMinutes, priceCents: s.priceCents, staffIds: s.staffIds }))}
+      services={services
+        .filter((s) => s.isActive)
+        .map((s) => ({
+          id: s.id,
+          name: s.name,
+          durationMinutes: s.durationMinutes,
+          priceCents: s.priceCents,
+          staffIds: s.staffIds,
+        }))}
       canManageAll={manageAll}
       canSeeCustomers={can(ctx.role, "customers.view_all")}
       ownStaffId={ctx.staffId}
@@ -43,7 +51,10 @@ async function Content() {
 export default function CalendarPage() {
   return (
     <>
-      <PageHeader title="Calendrier" description="Touchez un horaire libre pour ajouter un rendez-vous." />
+      <PageHeader
+        title="Calendrier"
+        description="Touchez un horaire libre pour ajouter un rendez-vous."
+      />
       <Suspense fallback={<Skeleton className="h-[600px]" />}>
         <Content />
       </Suspense>

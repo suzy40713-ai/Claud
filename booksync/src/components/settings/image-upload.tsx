@@ -44,24 +44,46 @@ export function ImageUpload({
       <div
         className={cn(
           "flex shrink-0 items-center justify-center overflow-hidden border bg-subtle text-muted-foreground",
-          shape === "round" ? "size-16 rounded-full" : shape === "wide" ? "h-20 w-40 rounded-lg" : "size-16 rounded-xl",
+          shape === "round"
+            ? "size-16 rounded-full"
+            : shape === "wide"
+              ? "h-20 w-40 rounded-lg"
+              : "size-16 rounded-xl",
         )}
       >
         {url ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt={label} className={shape === "square" ? "size-full object-contain p-1" : "size-full object-cover"} />
+          <img
+            src={url}
+            alt={label}
+            className={
+              shape === "square" ? "size-full object-contain p-1" : "size-full object-cover"
+            }
+          />
         ) : (
           <ImagePlus className="size-5" aria-hidden />
         )}
       </div>
       <div className="grid gap-2">
         <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="secondary" size="sm" disabled={pending} onClick={() => input.current?.click()}>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={pending}
+            onClick={() => input.current?.click()}
+          >
             {pending ? <Spinner /> : null}
             {url ? "Remplacer" : "Ajouter"}
           </Button>
           {url ? (
-            <Button type="button" variant="ghost" size="sm" disabled={pending} onClick={() => handle(onRemove)}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={pending}
+              onClick={() => handle(onRemove)}
+            >
               <Trash2 /> Supprimer
             </Button>
           ) : null}

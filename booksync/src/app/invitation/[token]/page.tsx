@@ -45,10 +45,15 @@ async function InvitationContent({ params }: { params: Promise<{ token: string }
       <span className="mb-5 inline-flex size-12 items-center justify-center rounded-xl bg-primary-soft text-primary-soft-foreground">
         <Users className="size-6" />
       </span>
-      <h1 className="text-2xl font-semibold tracking-tight">Rejoindre {invitation.organizationName}</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">
+        Rejoindre {invitation.organizationName}
+      </h1>
       <p className="mt-2 text-[15px] text-muted-foreground">
         {invitation.inviterName} vous invite à rejoindre l&apos;équipe en tant que{" "}
-        <strong className="font-medium text-foreground">{ROLE_LABELS[invitation.role].toLowerCase()}</strong>.
+        <strong className="font-medium text-foreground">
+          {ROLE_LABELS[invitation.role].toLowerCase()}
+        </strong>
+        .
       </p>
       <p className="mt-3 rounded-lg bg-muted px-3 py-2 text-sm break-all">{invitation.email}</p>
 
@@ -57,7 +62,8 @@ async function InvitationContent({ params }: { params: Promise<{ token: string }
       ) : session ? (
         <div className="mt-6 grid gap-3">
           <p className="text-sm text-muted-foreground">
-            Vous êtes connecté avec <strong className="text-foreground">{session.user.email}</strong>. Cette invitation est
+            Vous êtes connecté avec{" "}
+            <strong className="text-foreground">{session.user.email}</strong>. Cette invitation est
             destinée à une autre adresse.
           </p>
           <InvitationActions token={token} signOutOnly />
@@ -66,13 +72,17 @@ async function InvitationContent({ params }: { params: Promise<{ token: string }
         <div className="mt-7 grid gap-3">
           <Button asChild size="lg" className="w-full">
             <Link
-              href={`/inscription?email=${encodeURIComponent(invitation.email)}&redirection=${encodeURIComponent(returnTo)}` as Route}
+              href={
+                `/inscription?email=${encodeURIComponent(invitation.email)}&redirection=${encodeURIComponent(returnTo)}` as Route
+              }
             >
               Créer mon compte
             </Link>
           </Button>
           <Button asChild size="lg" variant="secondary" className="w-full">
-            <Link href={`/connexion?redirection=${encodeURIComponent(returnTo)}` as Route}>J&apos;ai déjà un compte</Link>
+            <Link href={`/connexion?redirection=${encodeURIComponent(returnTo)}` as Route}>
+              J&apos;ai déjà un compte
+            </Link>
           </Button>
         </div>
       )}

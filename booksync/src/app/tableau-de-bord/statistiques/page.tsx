@@ -33,18 +33,46 @@ async function Content({ searchParams }: { searchParams: Promise<{ du?: string; 
     <div className="grid gap-6">
       <RangePicker from={from} to={to} today={today} />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatCard label="Rendez-vous" value={String(a.totals.bookings)} hint="hors annulations" icon={<CalendarCheck2 />} />
-        <StatCard label="Chiffre d'affaires enregistré" value={formatCents(a.totals.revenueCents)} hint="rendez-vous passés non annulés" icon={<Euro />} />
-        <StatCard label="Taux d'annulation" value={pct(a.totals.cancellationRate)} hint={`${a.totals.cancelled} annulation${a.totals.cancelled > 1 ? "s" : ""}`} icon={<Ban />} />
-        <StatCard label="Taux d'absence" value={pct(a.totals.noShowRate)} hint={`${a.totals.noShow} absence${a.totals.noShow > 1 ? "s" : ""} signalée${a.totals.noShow > 1 ? "s" : ""}`} icon={<UserX />} />
+        <StatCard
+          label="Rendez-vous"
+          value={String(a.totals.bookings)}
+          hint="hors annulations"
+          icon={<CalendarCheck2 />}
+        />
+        <StatCard
+          label="Chiffre d'affaires enregistré"
+          value={formatCents(a.totals.revenueCents)}
+          hint="rendez-vous passés non annulés"
+          icon={<Euro />}
+        />
+        <StatCard
+          label="Taux d'annulation"
+          value={pct(a.totals.cancellationRate)}
+          hint={`${a.totals.cancelled} annulation${a.totals.cancelled > 1 ? "s" : ""}`}
+          icon={<Ban />}
+        />
+        <StatCard
+          label="Taux d'absence"
+          value={pct(a.totals.noShowRate)}
+          hint={`${a.totals.noShow} absence${a.totals.noShow > 1 ? "s" : ""} signalée${a.totals.noShow > 1 ? "s" : ""}`}
+          icon={<UserX />}
+        />
       </div>
 
       <section className="rounded-xl border bg-card p-4 sm:p-5">
         <h2 className="mb-4 text-[15px] font-semibold">Services les plus réservés</h2>
         {a.services.length ? (
-          <RankBars rows={a.services.map((s) => ({ label: s.name, value: s.n, sub: formatCents(s.revenue) }))} />
+          <RankBars
+            rows={a.services.map((s) => ({
+              label: s.name,
+              value: s.n,
+              sub: formatCents(s.revenue),
+            }))}
+          />
         ) : (
-          <p className="py-6 text-center text-sm text-muted-foreground">Aucun rendez-vous sur cette période.</p>
+          <p className="py-6 text-center text-sm text-muted-foreground">
+            Aucun rendez-vous sur cette période.
+          </p>
         )}
       </section>
 
@@ -53,11 +81,17 @@ async function Content({ searchParams }: { searchParams: Promise<{ du?: string; 
           <div className="grid gap-6 lg:grid-cols-2">
             <section className="rounded-xl border bg-card p-4 sm:p-5">
               <h2 className="text-[15px] font-semibold">Évolution mensuelle</h2>
-              <p className="mb-4 text-[13px] text-muted-foreground">Rendez-vous des 12 derniers mois, hors annulations</p>
+              <p className="mb-4 text-[13px] text-muted-foreground">
+                Rendez-vous des 12 derniers mois, hors annulations
+              </p>
               <SimpleBarChart
                 caption="Rendez-vous par mois"
                 valueLabel="Rendez-vous"
-                data={a.monthly.map((m) => ({ label: formatInTz(`${m.month}-15T12:00:00Z`, tz, "MMM"), value: m.n, tooltipLabel: formatInTz(`${m.month}-15T12:00:00Z`, tz, "MMMM yyyy") }))}
+                data={a.monthly.map((m) => ({
+                  label: formatInTz(`${m.month}-15T12:00:00Z`, tz, "MMM"),
+                  value: m.n,
+                  tooltipLabel: formatInTz(`${m.month}-15T12:00:00Z`, tz, "MMMM yyyy"),
+                }))}
               />
             </section>
             <section className="rounded-xl border bg-card p-4 sm:p-5">
@@ -67,7 +101,11 @@ async function Content({ searchParams }: { searchParams: Promise<{ du?: string; 
                 caption="Chiffre d'affaires par mois"
                 valueLabel="CA"
                 format={(v) => formatCents(v).replace(/,00\s/, " ")}
-                data={a.monthly.map((m) => ({ label: formatInTz(`${m.month}-15T12:00:00Z`, tz, "MMM"), value: m.revenue, tooltipLabel: formatInTz(`${m.month}-15T12:00:00Z`, tz, "MMMM yyyy") }))}
+                data={a.monthly.map((m) => ({
+                  label: formatInTz(`${m.month}-15T12:00:00Z`, tz, "MMM"),
+                  value: m.revenue,
+                  tooltipLabel: formatInTz(`${m.month}-15T12:00:00Z`, tz, "MMMM yyyy"),
+                }))}
               />
             </section>
           </div>
@@ -89,7 +127,10 @@ async function Content({ searchParams }: { searchParams: Promise<{ du?: string; 
                       {a.staff.map((s) => (
                         <tr key={s.name}>
                           <td className="py-2">
-                            <span className="mr-2 inline-block size-2 rounded-full" style={{ backgroundColor: s.color }} />
+                            <span
+                              className="mr-2 inline-block size-2 rounded-full"
+                              style={{ backgroundColor: s.color }}
+                            />
                             {s.name}
                           </td>
                           <td className="py-2 text-right tabular-nums">{s.n}</td>
@@ -107,9 +148,15 @@ async function Content({ searchParams }: { searchParams: Promise<{ du?: string; 
             <section className="rounded-xl border bg-card p-4 sm:p-5">
               <h2 className="text-[15px] font-semibold">Jours les plus demandés</h2>
               <p className="mb-4 text-[13px] text-muted-foreground">
-                {a.sources.find((s) => s.source === "online")?.n ?? 0} réservations en ligne · {a.sources.find((s) => s.source === "manual")?.n ?? 0} ajoutées manuellement
+                {a.sources.find((s) => s.source === "online")?.n ?? 0} réservations en ligne ·{" "}
+                {a.sources.find((s) => s.source === "manual")?.n ?? 0} ajoutées manuellement
               </p>
-              <SimpleBarChart caption="Rendez-vous par jour de la semaine" valueLabel="Rendez-vous" height={180} data={a.weekdays.map((w) => ({ label: DOW[w.dow - 1], value: w.n }))} />
+              <SimpleBarChart
+                caption="Rendez-vous par jour de la semaine"
+                valueLabel="Rendez-vous"
+                height={180}
+                data={a.weekdays.map((w) => ({ label: DOW[w.dow - 1], value: w.n }))}
+              />
             </section>
           </div>
         </>

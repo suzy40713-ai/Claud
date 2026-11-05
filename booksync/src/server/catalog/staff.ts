@@ -5,7 +5,12 @@ import { z } from "zod";
 import { db } from "@/db/client";
 import { member, service, staff, staffService, timeOff, user, workingHours } from "@/db/schema";
 import { assertCan, can, ForbiddenError } from "@/domain/permissions";
-import { groupByWeekday, validateWeek, weekToRows, type WeeklyHours } from "@/domain/schedule/hours";
+import {
+  groupByWeekday,
+  validateWeek,
+  weekToRows,
+  type WeeklyHours,
+} from "@/domain/schedule/hours";
 import { hexColor, optionalText } from "@/domain/validation";
 import type { OrgContext } from "@/server/auth/session";
 import { NotFoundError, UserError } from "@/server/errors";
@@ -34,7 +39,12 @@ export async function listStaff(organizationId: string, opts: { activeOnly?: boo
     .from(staff)
     .leftJoin(member, eq(member.id, staff.memberId))
     .leftJoin(user, eq(user.id, member.userId))
-    .where(and(eq(staff.organizationId, organizationId), opts.activeOnly ? eq(staff.isActive, true) : undefined))
+    .where(
+      and(
+        eq(staff.organizationId, organizationId),
+        opts.activeOnly ? eq(staff.isActive, true) : undefined,
+      ),
+    )
     .orderBy(asc(staff.position), asc(staff.createdAt));
 }
 
@@ -51,11 +61,15 @@ export async function getStaffDetail(ctx: OrgContext, staffId: string) {
   const hours = await db
     .select()
     .from(workingHours)
-    .where(and(eq(workingHours.organizationId, ctx.organization.id), eq(workingHours.staffId, staffId)));
+    .where(
+      and(eq(workingHours.organizationId, ctx.organization.id), eq(workingHours.staffId, staffId)),
+    );
   const serviceIds = await db
     .select({ id: staffService.serviceId })
     .from(staffService)
-    .where(and(eq(staffService.organizationId, ctx.organization.id), eq(staffService.staffId, staffId)));
+    .where(
+      and(eq(staffService.organizationId, ctx.organization.id), eq(staffService.staffId, staffId)),
+    );
   const services = await db
     .select({ id: service.id, name: service.name, durationMinutes: service.durationMinutes })
     .from(service)
@@ -80,7 +94,11 @@ export const staffProfileSchema = z.object({
   isBookable: z.boolean(),
 });
 
-export async function updateStaffProfile(ctx: OrgContext, staffId: string, input: z.input<typeof staffProfileSchema>) {
+export async function updateStaffProfile(
+  ctx: OrgContext,
+  staffId: string,
+  input: z.input<typeof staffProfileSchema>,
+) {
   assertCanManageStaff(ctx, staffId);
   const data = staffProfileSchema.parse(input);
   // Seuls propriétaire et administrateurs décident qui est réservable en ligne.
@@ -109,10 +127,21 @@ export async function setStaffServices(ctx: OrgContext, staffId: string, service
   assertCan(ctx.role, "staff.manage_all");
   const ids = z.array(z.uuid()).max(200).parse(serviceIds);
   await db.transaction(async (tx) => {
-    await tx.delete(staffService).where(and(eq(staffService.organizationId, ctx.organization.id), eq(staffService.staffId, staffId)));
+    await tx
+      .delete(staffService)
+      .where(
+        and(
+          eq(staffService.organizationId, ctx.organization.id),
+          eq(staffService.staffId, staffId),
+        ),
+      );
     // Les clés étrangères composites garantissent que service et employé sont de la même entreprise.
     if (ids.length) {
-      await tx.insert(staffService).values(ids.map((serviceId) => ({ organizationId: ctx.organization.id, staffId, serviceId })));
+      await tx
+        .insert(staffService)
+        .values(
+          ids.map((serviceId) => ({ organizationId: ctx.organization.id, staffId, serviceId })),
+        );
     }
   });
 }
@@ -132,7 +161,10 @@ export async function setWeeklyHours(ctx: OrgContext, staffId: string | null, in
   const error = validateWeek(week);
   if (error) throw new UserError(error.message);
   if (staffId) {
-    const [s] = await db.select({ id: staff.id }).from(staff).where(and(eq(staff.id, staffId), eq(staff.organizationId, ctx.organization.id)));
+    const [s] = await db
+      .select({ id: staff.id })
+      .from(staff)
+      .where(and(eq(staff.id, staffId), eq(staff.organizationId, ctx.organization.id)));
     if (!s) throw new NotFoundError("Employé introuvable.");
   }
   await db.transaction(async (tx) => {
@@ -146,7 +178,9 @@ export async function setWeeklyHours(ctx: OrgContext, staffId: string | null, in
       );
     const rows = weekToRows(week);
     if (rows.length) {
-      await tx.insert(workingHours).values(rows.map((r) => ({ ...r, organizationId: ctx.organization.id, staffId })));
+      await tx
+        .insert(workingHours)
+        .values(rows.map((r) => ({ ...r, organizationId: ctx.organization.id, staffId })));
     }
   });
 }
@@ -181,11 +215,20 @@ export const timeOffSchema = z
     startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date de début invalide."),
     endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date de fin invalide."),
     allDay: z.boolean().default(true),
-    startTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
-    endTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+    startTime: z
+      .string()
+      .regex(/^\d{2}:\d{2}$/)
+      .optional(),
+    endTime: z
+      .string()
+      .regex(/^\d{2}:\d{2}$/)
+      .optional(),
     reason: optionalText(120, "Le motif"),
   })
-  .refine((v) => v.allDay || (v.startTime && v.endTime), { message: "Indiquez les heures.", path: ["startTime"] });
+  .refine((v) => v.allDay || (v.startTime && v.endTime), {
+    message: "Indiquez les heures.",
+    path: ["startTime"],
+  });
 
 /** Convertit une date et une heure locales (fuseau de l'entreprise) en instant UTC. */
 export function addDaysToIsoDate(date: string, days: number) {
@@ -200,22 +243,40 @@ export function localToUtc(date: string, time: string, timeZone: string) {
   return new Date(new TZDate(y, m - 1, d, hh, mm, 0, timeZone).getTime());
 }
 
-export async function addTimeOff(ctx: OrgContext, staffId: string | null, input: z.input<typeof timeOffSchema>) {
+export async function addTimeOff(
+  ctx: OrgContext,
+  staffId: string | null,
+  input: z.input<typeof timeOffSchema>,
+) {
   if (staffId) assertCanManageStaff(ctx, staffId);
   else assertCan(ctx.role, "closures.manage");
   const data = timeOffSchema.parse(input);
   const tz = ctx.organization.timezone;
   const startsAt = localToUtc(data.startDate, data.allDay ? "00:00" : data.startTime!, tz);
   // Journée entière : de minuit le premier jour à minuit le lendemain du dernier jour (heure locale).
-  const endsAt = data.allDay ? localToUtc(addDaysToIsoDate(data.endDate, 1), "00:00", tz) : localToUtc(data.endDate, data.endTime!, tz);
-  if (endsAt <= startsAt) throw new UserError("La fin doit être après le début.", { endDate: "La fin doit être après le début." });
+  const endsAt = data.allDay
+    ? localToUtc(addDaysToIsoDate(data.endDate, 1), "00:00", tz)
+    : localToUtc(data.endDate, data.endTime!, tz);
+  if (endsAt <= startsAt)
+    throw new UserError("La fin doit être après le début.", {
+      endDate: "La fin doit être après le début.",
+    });
   if (staffId) {
-    const [s] = await db.select({ id: staff.id }).from(staff).where(and(eq(staff.id, staffId), eq(staff.organizationId, ctx.organization.id)));
+    const [s] = await db
+      .select({ id: staff.id })
+      .from(staff)
+      .where(and(eq(staff.id, staffId), eq(staff.organizationId, ctx.organization.id)));
     if (!s) throw new NotFoundError("Employé introuvable.");
   }
   const [row] = await db
     .insert(timeOff)
-    .values({ organizationId: ctx.organization.id, staffId, startsAt, endsAt, reason: data.reason ?? null })
+    .values({
+      organizationId: ctx.organization.id,
+      staffId,
+      startsAt,
+      endsAt,
+      reason: data.reason ?? null,
+    })
     .returning();
   return row;
 }
@@ -230,4 +291,3 @@ export async function removeTimeOff(ctx: OrgContext, id: string) {
   else assertCan(ctx.role, "closures.manage");
   await db.delete(timeOff).where(eq(timeOff.id, id));
 }
-

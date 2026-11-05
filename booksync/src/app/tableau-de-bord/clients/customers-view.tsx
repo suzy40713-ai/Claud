@@ -15,7 +15,15 @@ import { Input } from "@/components/ui/input";
 import { formatInTz } from "@/lib/format";
 import { CustomerForm } from "./customer-form";
 
-type Row = { id: string; firstName: string; lastName: string; email: string | null; phone: string | null; bookings: number; lastVisit: string | null };
+type Row = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string | null;
+  phone: string | null;
+  bookings: number;
+  lastVisit: string | null;
+};
 
 export function CustomersView({
   rows,
@@ -42,7 +50,8 @@ export function CustomersView({
   const [open, setOpen] = useState(false);
   const full = limit !== null && total >= limit;
 
-  const go = (params: Record<string, string>) => router.push(`${pathname}?${new URLSearchParams(params).toString()}` as Route);
+  const go = (params: Record<string, string>) =>
+    router.push(`${pathname}?${new URLSearchParams(params).toString()}` as Route);
 
   return (
     <div className="grid gap-4">
@@ -55,7 +64,13 @@ export function CustomersView({
           }}
         >
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input aria-label="Rechercher un client" placeholder="Nom, email ou téléphone…" value={query} onChange={(e) => setQuery(e.target.value)} className="pl-9" />
+          <Input
+            aria-label="Rechercher un client"
+            placeholder="Nom, email ou téléphone…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="pl-9"
+          />
         </form>
         <p className="text-sm text-muted-foreground sm:ml-auto" data-testid="customer-count">
           {total} client{total > 1 ? "s" : ""}
@@ -93,7 +108,11 @@ export function CustomersView({
         <EmptyState
           icon={<UsersRound />}
           title={q ? "Aucun résultat" : "Aucun client pour l'instant"}
-          description={q ? "Essayez une autre recherche." : "Vos clients apparaissent ici dès leur première réservation, ou ajoutez-les manuellement."}
+          description={
+            q
+              ? "Essayez une autre recherche."
+              : "Vos clients apparaissent ici dès leur première réservation, ou ajoutez-les manuellement."
+          }
         />
       ) : (
         <div className="overflow-hidden rounded-xl border bg-card">
@@ -107,22 +126,34 @@ export function CustomersView({
           <ul className="divide-y">
             {rows.map((c) => (
               <li key={c.id}>
-                <Link href={`/tableau-de-bord/clients/${c.id}` as Route} className="grid grid-cols-[1fr_auto] items-center gap-3 px-4 py-3 hover:bg-accent md:grid-cols-[1fr_1fr_120px_140px_24px] md:gap-4 md:px-5" data-testid="customer-row">
+                <Link
+                  href={`/tableau-de-bord/clients/${c.id}` as Route}
+                  className="grid grid-cols-[1fr_auto] items-center gap-3 px-4 py-3 hover:bg-accent md:grid-cols-[1fr_1fr_120px_140px_24px] md:gap-4 md:px-5"
+                  data-testid="customer-row"
+                >
                   <span className="flex min-w-0 items-center gap-3">
                     <Avatar name={`${c.firstName} ${c.lastName}`} className="size-8 text-[11px]" />
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-medium">
                         {c.firstName} {c.lastName}
                       </span>
-                      <span className="block truncate text-[13px] text-muted-foreground md:hidden">{c.email ?? c.phone ?? "—"}</span>
+                      <span className="block truncate text-[13px] text-muted-foreground md:hidden">
+                        {c.email ?? c.phone ?? "—"}
+                      </span>
                     </span>
                   </span>
                   <span className="hidden min-w-0 md:block">
                     <span className="block truncate text-sm">{c.email ?? "—"}</span>
-                    <span className="block truncate text-[13px] text-muted-foreground">{c.phone ?? ""}</span>
+                    <span className="block truncate text-[13px] text-muted-foreground">
+                      {c.phone ?? ""}
+                    </span>
                   </span>
-                  <span className="hidden text-right text-sm tabular-nums md:block">{c.bookings}</span>
-                  <span className="hidden text-sm text-muted-foreground md:block">{c.lastVisit ? formatInTz(c.lastVisit, timeZone, "d MMM yyyy") : "—"}</span>
+                  <span className="hidden text-right text-sm tabular-nums md:block">
+                    {c.bookings}
+                  </span>
+                  <span className="hidden text-sm text-muted-foreground md:block">
+                    {c.lastVisit ? formatInTz(c.lastVisit, timeZone, "d MMM yyyy") : "—"}
+                  </span>
                   <ChevronRight className="size-4 text-muted-foreground" />
                 </Link>
               </li>
@@ -132,10 +163,18 @@ export function CustomersView({
       )}
       {page > 1 || hasMore ? (
         <div className="flex justify-between">
-          <Button variant="secondary" disabled={page <= 1} onClick={() => go({ ...(q ? { q } : {}), page: String(page - 1) })}>
+          <Button
+            variant="secondary"
+            disabled={page <= 1}
+            onClick={() => go({ ...(q ? { q } : {}), page: String(page - 1) })}
+          >
             Précédent
           </Button>
-          <Button variant="secondary" disabled={!hasMore} onClick={() => go({ ...(q ? { q } : {}), page: String(page + 1) })}>
+          <Button
+            variant="secondary"
+            disabled={!hasMore}
+            onClick={() => go({ ...(q ? { q } : {}), page: String(page + 1) })}
+          >
             Suivant
           </Button>
         </div>

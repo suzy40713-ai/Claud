@@ -47,7 +47,10 @@ export function MobileTabBar({ items, moreItems }: { items: NavItem[]; moreItems
       aria-label="Navigation principale"
       className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden"
     >
-      <ul className="mx-auto grid max-w-lg" style={{ gridTemplateColumns: `repeat(${items.length + 1}, minmax(0, 1fr))` }}>
+      <ul
+        className="mx-auto grid max-w-lg"
+        style={{ gridTemplateColumns: `repeat(${items.length + 1}, minmax(0, 1fr))` }}
+      >
         {items.map((item) => {
           const active = isActive(pathname, item.href);
           return (
@@ -72,7 +75,9 @@ export function MobileTabBar({ items, moreItems }: { items: NavItem[]; moreItems
             aria-current={moreActive ? "page" : undefined}
             className={cn(
               "flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium",
-              moreActive || pathname === "/tableau-de-bord/menu" ? "text-primary" : "text-muted-foreground",
+              moreActive || pathname === "/tableau-de-bord/menu"
+                ? "text-primary"
+                : "text-muted-foreground",
             )}
           >
             <svg aria-hidden viewBox="0 0 24 24" className="size-5" fill="currentColor">

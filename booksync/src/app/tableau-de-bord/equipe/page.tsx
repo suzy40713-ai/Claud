@@ -39,7 +39,10 @@ async function Team() {
 export default function TeamPage() {
   return (
     <>
-      <PageHeader title="Employés" description="Invitez votre équipe et gérez les accès de chacun." />
+      <PageHeader
+        title="Employés"
+        description="Invitez votre équipe et gérez les accès de chacun."
+      />
       <Suspense fallback={<Skeleton className="h-96" />}>
         <Team />
       </Suspense>

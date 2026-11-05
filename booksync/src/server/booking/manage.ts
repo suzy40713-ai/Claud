@@ -18,16 +18,34 @@ export async function getAppointmentByToken(token: string) {
     .where(eq(appointment.id, id))
     .limit(1);
   if (!row) return null;
-  const deadline = new Date(row.appt.startsAt.getTime() - row.org.cancellationNoticeHours * 3_600_000);
-  const canChange = row.appt.status === "confirmed" && new Date() < deadline && new Date() < row.appt.startsAt;
+  const deadline = new Date(
+    row.appt.startsAt.getTime() - row.org.cancellationNoticeHours * 3_600_000,
+  );
+  const canChange =
+    row.appt.status === "confirmed" && new Date() < deadline && new Date() < row.appt.startsAt;
   return { ...row, canChange, deadline, logoUrl: fileUrl(row.org.logoFileId) };
 }
 
 /** Fichier iCalendar (.ics) pour ajouter le rendez-vous à son agenda. */
-export function toIcs(a: { id: string; startsAt: Date; endsAt: Date; serviceName: string; status: string }, org: { name: string; addressLine1: string | null; postalCode: string | null; city: string | null }, staffName: string) {
-  const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+export function toIcs(
+  a: { id: string; startsAt: Date; endsAt: Date; serviceName: string; status: string },
+  org: {
+    name: string;
+    addressLine1: string | null;
+    postalCode: string | null;
+    city: string | null;
+  },
+  staffName: string,
+) {
+  const fmt = (d: Date) =>
+    d
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .replace(/\.\d{3}/, "");
   const esc = (s: string) => s.replace(/[\\,;]/g, (m) => `\\${m}`).replace(/\n/g, "\\n");
-  const location = [org.addressLine1, [org.postalCode, org.city].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+  const location = [org.addressLine1, [org.postalCode, org.city].filter(Boolean).join(" ")]
+    .filter(Boolean)
+    .join(", ");
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",

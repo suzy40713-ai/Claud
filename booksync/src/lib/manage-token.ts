@@ -13,7 +13,10 @@ function secret() {
 }
 
 function sign(appointmentId: string) {
-  return createHmac("sha256", secret()).update(`booksync:rdv:${appointmentId}`).digest("base64url").slice(0, 32);
+  return createHmac("sha256", secret())
+    .update(`booksync:rdv:${appointmentId}`)
+    .digest("base64url")
+    .slice(0, 32);
 }
 
 export function createManageToken(appointmentId: string) {

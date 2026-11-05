@@ -14,7 +14,9 @@ export async function generateMetadata(props: PageProps<"/[slug]">): Promise<Met
   if (!page) return { title: "Page introuvable" };
   return {
     title: `Réserver — ${page.organization.name}`,
-    description: page.organization.description ?? `Prenez rendez-vous en ligne avec ${page.organization.name}.`,
+    description:
+      page.organization.description ??
+      `Prenez rendez-vous en ligne avec ${page.organization.name}.`,
   };
 }
 
@@ -26,19 +28,41 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
   const brand = o.brandColor ?? undefined;
 
   return (
-    <div className="min-h-dvh bg-subtle" style={brand ? ({ "--primary": brand, "--ring": brand, "--primary-hover": brand } as React.CSSProperties) : undefined}>
+    <div
+      className="min-h-dvh bg-subtle"
+      style={
+        brand
+          ? ({
+              "--primary": brand,
+              "--ring": brand,
+              "--primary-hover": brand,
+            } as React.CSSProperties)
+          : undefined
+      }
+    >
       {o.coverUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={o.coverUrl} alt="" className="h-36 w-full object-cover sm:h-56" />
       ) : (
-        <div className="h-20 bg-gradient-to-b from-primary-soft to-transparent sm:h-28" style={brand ? { background: `linear-gradient(to bottom, ${brand}26, transparent)` } : undefined} />
+        <div
+          className="h-20 bg-gradient-to-b from-primary-soft to-transparent sm:h-28"
+          style={
+            brand
+              ? { background: `linear-gradient(to bottom, ${brand}26, transparent)` }
+              : undefined
+          }
+        />
       )}
       <div className="mx-auto -mt-10 grid w-full max-w-5xl gap-6 px-4 pb-16 sm:-mt-14 sm:px-6 lg:grid-cols-[300px_1fr]">
         <aside className="h-fit rounded-2xl border bg-card p-5 shadow-sm lg:sticky lg:top-6">
           <div className="flex items-center gap-3 lg:flex-col lg:items-start">
             {o.logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={o.logoUrl} alt={`Logo ${o.name}`} className="size-14 rounded-xl border bg-white object-contain p-1" />
+              <img
+                src={o.logoUrl}
+                alt={`Logo ${o.name}`}
+                className="size-14 rounded-xl border bg-white object-contain p-1"
+              />
             ) : (
               <span className="flex size-14 items-center justify-center rounded-xl bg-primary text-xl font-semibold text-primary-foreground">
                 {o.name.charAt(0).toUpperCase()}
@@ -50,13 +74,20 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
             </div>
           </div>
           {o.welcomeMessage || o.description ? (
-            <p className="mt-4 text-sm whitespace-pre-line text-muted-foreground">{o.welcomeMessage ?? o.description}</p>
+            <p className="mt-4 text-sm whitespace-pre-line text-muted-foreground">
+              {o.welcomeMessage ?? o.description}
+            </p>
           ) : null}
           <ul className="mt-4 grid gap-2 text-sm">
             {o.address ? (
               <li className="flex gap-2">
                 <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-                <a className="hover:underline" target="_blank" rel="noreferrer" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.address)}`}>
+                <a
+                  className="hover:underline"
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.address)}`}
+                >
                   {o.address}
                 </a>
               </li>
@@ -70,7 +101,7 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
               </li>
             ) : null}
           </ul>
-          <details className="mt-4 group">
+          <details className="group mt-4">
             <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-medium">
               <Clock className="size-4 text-muted-foreground" /> Horaires d&apos;ouverture
             </summary>
@@ -91,7 +122,9 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
               <CalendarX2 className="mb-4 size-8 text-muted-foreground" />
               <h2 className="text-lg font-semibold">Réservation en ligne indisponible</h2>
               <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-                {o.phone ? `Contactez l'établissement au ${o.phone} pour prendre rendez-vous.` : "Contactez directement l'établissement pour prendre rendez-vous."}
+                {o.phone
+                  ? `Contactez l'établissement au ${o.phone} pour prendre rendez-vous.`
+                  : "Contactez directement l'établissement pour prendre rendez-vous."}
               </p>
             </div>
           ) : (

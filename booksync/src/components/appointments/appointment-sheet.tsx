@@ -53,7 +53,12 @@ export function AppointmentSheet({
     });
   }
 
-  const statusVariant = { confirmed: "primary", cancelled: "destructive", completed: "success", no_show: "warning" } as const;
+  const statusVariant = {
+    confirmed: "primary",
+    cancelled: "destructive",
+    completed: "success",
+    no_show: "warning",
+  } as const;
 
   return (
     <DialogContent
@@ -69,7 +74,10 @@ export function AppointmentSheet({
         <dl className="grid gap-2.5 rounded-xl border bg-subtle p-4 text-sm">
           <Row k="Prestation" v={appt.serviceName} />
           <Row k="Date" v={capitalize(formatInTz(start, timeZone, "EEEE d MMMM yyyy"))} />
-          <Row k="Heure" v={`${formatInTz(start, timeZone, "HH:mm")} – ${formatInTz(appt.endsAt, timeZone, "HH:mm")}`} />
+          <Row
+            k="Heure"
+            v={`${formatInTz(start, timeZone, "HH:mm")} – ${formatInTz(appt.endsAt, timeZone, "HH:mm")}`}
+          />
           <Row k="Avec" v={appt.staffName} />
           {appt.priceCents ? <Row k="Prix" v={formatCents(appt.priceCents)} /> : null}
           {appt.customerNote ? <Row k="Message" v={appt.customerNote} /> : null}
@@ -93,13 +101,22 @@ export function AppointmentSheet({
           ) : null}
           {canSeeCustomers ? (
             <Button asChild variant="ghost" size="sm">
-              <Link href={`/tableau-de-bord/clients/${appt.customerId}` as Route}>Fiche client →</Link>
+              <Link href={`/tableau-de-bord/clients/${appt.customerId}` as Route}>
+                Fiche client →
+              </Link>
             </Button>
           ) : null}
         </div>
 
         {mode === "move" ? (
-          <MoveForm appt={appt} timeZone={timeZone} staff={staff} pending={pending} onCancel={() => setMode("view")} onSubmit={(input) => run(() => rescheduleAppointmentAction(appt.id, input))} />
+          <MoveForm
+            appt={appt}
+            timeZone={timeZone}
+            staff={staff}
+            pending={pending}
+            onCancel={() => setMode("view")}
+            onSubmit={(input) => run(() => rescheduleAppointmentAction(appt.id, input))}
+          />
         ) : mode === "cancel" ? (
           <form
             className="grid gap-3"
@@ -109,7 +126,11 @@ export function AppointmentSheet({
               run(() => cancelAppointmentAction(appt.id, reason));
             }}
           >
-            <Field id="cancel-reason" label="Motif de l'annulation (facultatif)" hint="Communiqué au client dans l'email d'annulation.">
+            <Field
+              id="cancel-reason"
+              label="Motif de l'annulation (facultatif)"
+              hint="Communiqué au client dans l'email d'annulation."
+            >
               <Textarea id="cancel-reason" name="reason" maxLength={300} className="min-h-16" />
             </Field>
             <div className="flex gap-2">
@@ -129,23 +150,39 @@ export function AppointmentSheet({
                 <Button variant="secondary" onClick={() => setMode("move")}>
                   <CalendarClock /> Déplacer
                 </Button>
-                <Button variant="secondary" className="text-destructive" onClick={() => setMode("cancel")}>
+                <Button
+                  variant="secondary"
+                  className="text-destructive"
+                  onClick={() => setMode("cancel")}
+                >
                   <Ban /> Annuler
                 </Button>
               </>
             ) : null}
             {isPast && appt.status === "confirmed" ? (
               <>
-                <Button variant="secondary" disabled={pending} onClick={() => run(() => setAttendanceAction(appt.id, "completed"))}>
+                <Button
+                  variant="secondary"
+                  disabled={pending}
+                  onClick={() => run(() => setAttendanceAction(appt.id, "completed"))}
+                >
                   <Check /> Honoré
                 </Button>
-                <Button variant="secondary" disabled={pending} onClick={() => run(() => setAttendanceAction(appt.id, "no_show"))}>
+                <Button
+                  variant="secondary"
+                  disabled={pending}
+                  onClick={() => run(() => setAttendanceAction(appt.id, "no_show"))}
+                >
                   <UserX /> Absent
                 </Button>
               </>
             ) : null}
             {appt.status === "completed" || appt.status === "no_show" ? (
-              <Button variant="secondary" disabled={pending} onClick={() => run(() => setAttendanceAction(appt.id, "confirmed"))}>
+              <Button
+                variant="secondary"
+                disabled={pending}
+                onClick={() => run(() => setAttendanceAction(appt.id, "confirmed"))}
+              >
                 <Undo2 /> Rétablir « confirmé »
               </Button>
             ) : null}
@@ -159,10 +196,26 @@ export function AppointmentSheet({
             run(() => updateNoteAction(appt.id, note));
           }}
         >
-          <Field id="internal-note" label="Note interne" hint="Visible uniquement par votre équipe. Pas de données de santé.">
-            <Textarea id="internal-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={1000} className="min-h-16" />
+          <Field
+            id="internal-note"
+            label="Note interne"
+            hint="Visible uniquement par votre équipe. Pas de données de santé."
+          >
+            <Textarea
+              id="internal-note"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              maxLength={1000}
+              className="min-h-16"
+            />
           </Field>
-          <Button type="submit" variant="ghost" size="sm" disabled={pending || note === (appt.internalNote ?? "")} className="justify-self-end">
+          <Button
+            type="submit"
+            variant="ghost"
+            size="sm"
+            disabled={pending || note === (appt.internalNote ?? "")}
+            className="justify-self-end"
+          >
             Enregistrer la note
           </Button>
         </form>
@@ -208,15 +261,32 @@ function MoveForm({
     >
       <div className="grid grid-cols-2 gap-3">
         <Field id="move-date" label="Date">
-          <Input id="move-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+          <Input
+            id="move-date"
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+          />
         </Field>
         <Field id="move-time" label="Heure">
-          <Input id="move-time" type="time" step={300} value={time} onChange={(e) => setTime(e.target.value)} required />
+          <Input
+            id="move-time"
+            type="time"
+            step={300}
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            required
+          />
         </Field>
       </div>
       {staff.length > 1 ? (
         <Field id="move-staff" label="Avec">
-          <NativeSelect id="move-staff" value={staffId} onChange={(e) => setStaffId(e.target.value)}>
+          <NativeSelect
+            id="move-staff"
+            value={staffId}
+            onChange={(e) => setStaffId(e.target.value)}
+          >
             {staff.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
@@ -225,7 +295,9 @@ function MoveForm({
           </NativeSelect>
         </Field>
       ) : null}
-      <p className="text-[13px] text-muted-foreground">Le client sera prévenu par email (selon votre forfait). Les chevauchements sont refusés.</p>
+      <p className="text-[13px] text-muted-foreground">
+        Le client sera prévenu par email (selon votre forfait). Les chevauchements sont refusés.
+      </p>
       <div className="flex gap-2">
         <Button type="button" variant="ghost" onClick={onCancel}>
           Retour

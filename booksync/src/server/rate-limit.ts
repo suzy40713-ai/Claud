@@ -7,6 +7,8 @@ import "server-only";
 const buckets = new Map<string, number[]>();
 
 export function rateLimit(key: string, max: number, windowMs: number) {
+  // Désactivable uniquement pour les tests de bout en bout (même variable que l'authentification).
+  if (process.env.AUTH_RATE_LIMIT === "off") return true;
   const now = Date.now();
   const hits = (buckets.get(key) ?? []).filter((t) => now - t < windowMs);
   if (hits.length >= max) {
@@ -22,5 +24,7 @@ export function rateLimit(key: string, max: number, windowMs: number) {
 }
 
 export function clientIp(headers: Headers) {
-  return headers.get("x-forwarded-for")?.split(",")[0]?.trim() || headers.get("x-real-ip") || "inconnu";
+  return (
+    headers.get("x-forwarded-for")?.split(",")[0]?.trim() || headers.get("x-real-ip") || "inconnu"
+  );
 }

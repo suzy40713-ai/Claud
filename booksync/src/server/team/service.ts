@@ -22,7 +22,10 @@ import { NotFoundError, pgErrorCode, UserError } from "@/server/errors";
 export const INVITATION_TTL_DAYS = 7;
 
 export async function countSeats(organizationId: string) {
-  const [members] = await db.select({ n: count() }).from(member).where(eq(member.organizationId, organizationId));
+  const [members] = await db
+    .select({ n: count() })
+    .from(member)
+    .where(eq(member.organizationId, organizationId));
   const [pending] = await db
     .select({ n: count() })
     .from(invitation)
@@ -56,7 +59,10 @@ export async function listTeam(ctx: OrgContext) {
     .innerJoin(user, eq(user.id, member.userId))
     .leftJoin(staff, eq(staff.memberId, member.id))
     .where(eq(member.organizationId, ctx.organization.id))
-    .orderBy(sql`case ${member.role} when 'owner' then 0 when 'admin' then 1 else 2 end`, asc(member.createdAt));
+    .orderBy(
+      sql`case ${member.role} when 'owner' then 0 when 'admin' then 1 else 2 end`,
+      asc(member.createdAt),
+    );
 
   const invitations = await db
     .select({
@@ -67,7 +73,9 @@ export async function listTeam(ctx: OrgContext) {
       createdAt: invitation.createdAt,
     })
     .from(invitation)
-    .where(and(eq(invitation.organizationId, ctx.organization.id), eq(invitation.status, "pending")))
+    .where(
+      and(eq(invitation.organizationId, ctx.organization.id), eq(invitation.status, "pending")),
+    )
     .orderBy(asc(invitation.createdAt));
 
   return { members, invitations, seats: await countSeats(ctx.organization.id) };
@@ -103,9 +111,17 @@ export async function inviteMember(ctx: OrgContext, input: z.input<typeof invite
     .select({ id: member.id })
     .from(member)
     .innerJoin(user, eq(user.id, member.userId))
-    .where(and(eq(member.organizationId, ctx.organization.id), sql`lower(${user.email}) = ${data.email}`))
+    .where(
+      and(
+        eq(member.organizationId, ctx.organization.id),
+        sql`lower(${user.email}) = ${data.email}`,
+      ),
+    )
     .limit(1);
-  if (existing) throw new UserError("Cette personne fait déjà partie de votre équipe.", { email: "Déjà membre de l'équipe." });
+  if (existing)
+    throw new UserError("Cette personne fait déjà partie de votre équipe.", {
+      email: "Déjà membre de l'équipe.",
+    });
 
   const token = generateToken();
   const row = await db.transaction(async (tx) => {
@@ -122,7 +138,10 @@ export async function inviteMember(ctx: OrgContext, input: z.input<typeof invite
           sql`lower(${invitation.email}) = ${data.email}`,
         ),
       );
-    const [m] = await tx.select({ n: count() }).from(member).where(eq(member.organizationId, ctx.organization.id));
+    const [m] = await tx
+      .select({ n: count() })
+      .from(member)
+      .where(eq(member.organizationId, ctx.organization.id));
     const [p] = await tx
       .select({ n: count() })
       .from(invitation)
@@ -176,7 +195,10 @@ export async function resendInvitation(ctx: OrgContext, invitationId: string) {
   const token = generateToken();
   await db
     .update(invitation)
-    .set({ tokenHash: hashToken(token), expiresAt: new Date(Date.now() + INVITATION_TTL_DAYS * 86_400_000) })
+    .set({
+      tokenHash: hashToken(token),
+      expiresAt: new Date(Date.now() + INVITATION_TTL_DAYS * 86_400_000),
+    })
     .where(eq(invitation.id, inv.id));
   await sendInvitationEmail(ctx, inv.email, inv.role, token);
 }
@@ -218,7 +240,10 @@ export async function removeMember(ctx: OrgContext, memberId: string) {
     );
   }
   await db.transaction(async (tx) => {
-    await tx.update(staff).set({ isActive: false, isBookable: false }).where(eq(staff.memberId, m.id));
+    await tx
+      .update(staff)
+      .set({ isActive: false, isBookable: false })
+      .where(eq(staff.memberId, m.id));
     await tx.delete(member).where(eq(member.id, m.id));
   });
 }
@@ -260,13 +285,19 @@ export async function getInvitationByToken(token: string): Promise<InvitationVie
  * Accepte une invitation : le compte connecté doit correspondre à l'adresse invitée.
  * Crée le membre et son profil de réservation (horaires de l'entreprise par défaut).
  */
-export async function acceptInvitation(token: string, current: { id: string; email: string; name: string }) {
+export async function acceptInvitation(
+  token: string,
+  current: { id: string; email: string; name: string },
+) {
   const view = await getInvitationByToken(token);
   if (!view) throw new UserError("Ce lien d'invitation n'est pas valide.");
-  if (view.status === "expired") throw new UserError("Cette invitation a expiré. Demandez-en une nouvelle.");
+  if (view.status === "expired")
+    throw new UserError("Cette invitation a expiré. Demandez-en une nouvelle.");
   if (view.status !== "pending") throw new UserError("Cette invitation n'est plus valable.");
   if (view.email.toLowerCase() !== current.email.toLowerCase()) {
-    throw new UserError(`Cette invitation est destinée à ${view.email}. Connectez-vous avec cette adresse.`);
+    throw new UserError(
+      `Cette invitation est destinée à ${view.email}. Connectez-vous avec cette adresse.`,
+    );
   }
 
   return db.transaction(async (tx) => {
@@ -288,7 +319,12 @@ export async function acceptInvitation(token: string, current: { id: string; ema
       const orgHours = await tx
         .select()
         .from(workingHours)
-        .where(and(eq(workingHours.organizationId, inv.organizationId), sql`${workingHours.staffId} is null`));
+        .where(
+          and(
+            eq(workingHours.organizationId, inv.organizationId),
+            sql`${workingHours.staffId} is null`,
+          ),
+        );
       if (orgHours.length) {
         await tx.insert(workingHours).values(
           orgHours.map((h) => ({
@@ -302,7 +338,8 @@ export async function acceptInvitation(token: string, current: { id: string; ema
       }
       return { organizationId: inv.organizationId };
     } catch (error) {
-      if (pgErrorCode(error) === "23505") throw new UserError("Vous faites déjà partie de cette équipe.");
+      if (pgErrorCode(error) === "23505")
+        throw new UserError("Vous faites déjà partie de cette équipe.");
       throw error;
     }
   });
@@ -310,6 +347,7 @@ export async function acceptInvitation(token: string, current: { id: string; ema
 
 export async function declineInvitation(token: string) {
   const view = await getInvitationByToken(token);
-  if (!view || view.status !== "pending") throw new UserError("Cette invitation n'est plus valable.");
+  if (!view || view.status !== "pending")
+    throw new UserError("Cette invitation n'est plus valable.");
   await db.update(invitation).set({ status: "declined" }).where(eq(invitation.id, view.id));
 }

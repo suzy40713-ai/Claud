@@ -13,7 +13,11 @@ import { ImageUpload } from "@/components/settings/image-upload";
 import { SettingsSection, UpgradeNotice } from "@/components/settings/section";
 import { useSave } from "@/components/settings/use-save";
 import { CopyButton } from "@/components/ui/copy-button";
-import { updateBookingSettingsAction, updateBrandingAction, uploadOrganizationImageAction } from "../actions";
+import {
+  updateBookingSettingsAction,
+  updateBrandingAction,
+  uploadOrganizationImageAction,
+} from "../actions";
 
 const NOTICE = [
   [0, "Aucun délai"],
@@ -56,10 +60,16 @@ export function BookingSettingsForm({
 
   return (
     <div className="grid gap-8">
-      <SettingsSection title="Votre page de réservation" description="Partagez ce lien avec vos clients : sur votre site, vos réseaux sociaux ou par message.">
+      <SettingsSection
+        title="Votre page de réservation"
+        description="Partagez ce lien avec vos clients : sur votre site, vos réseaux sociaux ou par message."
+      >
         <div className="grid gap-3">
           <div className="flex min-w-0 items-center gap-2 rounded-lg border bg-subtle px-3 py-2.5">
-            <span className="min-w-0 flex-1 truncate font-mono text-[13px]" data-testid="public-url">
+            <span
+              className="min-w-0 flex-1 truncate font-mono text-[13px]"
+              data-testid="public-url"
+            >
               {publicUrl}
             </span>
             <CopyButton value={publicUrl} />
@@ -79,18 +89,35 @@ export function BookingSettingsForm({
           settings.save(() => updateBookingSettingsAction(v));
         }}
       >
-        <SettingsSection title="Règles de réservation" description="Elles s'appliquent à toutes les réservations faites en ligne par vos clients.">
+        <SettingsSection
+          title="Règles de réservation"
+          description="Elles s'appliquent à toutes les réservations faites en ligne par vos clients."
+        >
           <div className="grid gap-5">
             <label className="flex items-center justify-between gap-4">
               <span>
                 <span className="block text-sm font-medium">Réservation en ligne activée</span>
-                <span className="block text-[13px] text-muted-foreground">Désactivez-la pour suspendre temporairement les réservations.</span>
+                <span className="block text-[13px] text-muted-foreground">
+                  Désactivez-la pour suspendre temporairement les réservations.
+                </span>
               </span>
-              <Switch checked={v.bookingEnabled} onCheckedChange={(c) => setV((p) => ({ ...p, bookingEnabled: c }))} aria-label="Réservation en ligne activée" />
+              <Switch
+                checked={v.bookingEnabled}
+                onCheckedChange={(c) => setV((p) => ({ ...p, bookingEnabled: c }))}
+                aria-label="Réservation en ligne activée"
+              />
             </label>
             <div className="grid gap-5 sm:grid-cols-2">
-              <Field id="minNotice" label="Délai minimum avant un rendez-vous" error={settings.errors.minNoticeMinutes}>
-                <NativeSelect id="minNotice" value={v.minNoticeMinutes} onChange={num("minNoticeMinutes")}>
+              <Field
+                id="minNotice"
+                label="Délai minimum avant un rendez-vous"
+                error={settings.errors.minNoticeMinutes}
+              >
+                <NativeSelect
+                  id="minNotice"
+                  value={v.minNoticeMinutes}
+                  onChange={num("minNoticeMinutes")}
+                >
                   {NOTICE.map(([m, l]) => (
                     <option key={m} value={m}>
                       {l}
@@ -98,8 +125,16 @@ export function BookingSettingsForm({
                   ))}
                 </NativeSelect>
               </Field>
-              <Field id="maxAdvance" label="Réservation possible jusqu'à" error={settings.errors.maxAdvanceDays}>
-                <NativeSelect id="maxAdvance" value={v.maxAdvanceDays} onChange={num("maxAdvanceDays")}>
+              <Field
+                id="maxAdvance"
+                label="Réservation possible jusqu'à"
+                error={settings.errors.maxAdvanceDays}
+              >
+                <NativeSelect
+                  id="maxAdvance"
+                  value={v.maxAdvanceDays}
+                  onChange={num("maxAdvanceDays")}
+                >
                   {ADVANCE.map((d) => (
                     <option key={d} value={d}>
                       {d} jours à l&apos;avance
@@ -107,8 +142,16 @@ export function BookingSettingsForm({
                   ))}
                 </NativeSelect>
               </Field>
-              <Field id="interval" label="Intervalle entre les créneaux proposés" error={settings.errors.slotIntervalMinutes}>
-                <NativeSelect id="interval" value={v.slotIntervalMinutes} onChange={num("slotIntervalMinutes")}>
+              <Field
+                id="interval"
+                label="Intervalle entre les créneaux proposés"
+                error={settings.errors.slotIntervalMinutes}
+              >
+                <NativeSelect
+                  id="interval"
+                  value={v.slotIntervalMinutes}
+                  onChange={num("slotIntervalMinutes")}
+                >
                   {[5, 10, 15, 20, 30, 45, 60].map((m) => (
                     <option key={m} value={m}>
                       Toutes les {m} minutes
@@ -116,8 +159,16 @@ export function BookingSettingsForm({
                   ))}
                 </NativeSelect>
               </Field>
-              <Field id="cancelNotice" label="Annulation ou modification par le client" error={settings.errors.cancellationNoticeHours}>
-                <NativeSelect id="cancelNotice" value={v.cancellationNoticeHours} onChange={num("cancellationNoticeHours")}>
+              <Field
+                id="cancelNotice"
+                label="Annulation ou modification par le client"
+                error={settings.errors.cancellationNoticeHours}
+              >
+                <NativeSelect
+                  id="cancelNotice"
+                  value={v.cancellationNoticeHours}
+                  onChange={num("cancellationNoticeHours")}
+                >
                   {CANCEL.map((h) => (
                     <option key={h} value={h}>
                       {h === 0 ? "Jusqu'au début du rendez-vous" : `Jusqu'à ${h} h avant`}
@@ -134,7 +185,10 @@ export function BookingSettingsForm({
         </SettingsSection>
       </form>
 
-      <SettingsSection title="Personnalisation" description="Couleur, message d'accueil et visuel de couverture de votre page de réservation.">
+      <SettingsSection
+        title="Personnalisation"
+        description="Couleur, message d'accueil et visuel de couverture de votre page de réservation."
+      >
         {canCustomize ? (
           <form
             className="grid gap-5"
@@ -152,11 +206,27 @@ export function BookingSettingsForm({
                   onChange={(e) => setB((p) => ({ ...p, brandColor: e.target.value }))}
                   className="h-10 w-14 cursor-pointer rounded-md border bg-card p-1"
                 />
-                <Input id="brandColor" value={b.brandColor} onChange={(e) => setB((p) => ({ ...p, brandColor: e.target.value }))} className="max-w-36 font-mono" />
+                <Input
+                  id="brandColor"
+                  value={b.brandColor}
+                  onChange={(e) => setB((p) => ({ ...p, brandColor: e.target.value }))}
+                  className="max-w-36 font-mono"
+                />
               </div>
             </Field>
-            <Field id="welcome" label="Message d'accueil" error={brand.errors.welcomeMessage} hint="300 caractères maximum.">
-              <Textarea id="welcome" value={b.welcomeMessage} onChange={(e) => setB((p) => ({ ...p, welcomeMessage: e.target.value }))} maxLength={300} placeholder="Bienvenue ! Choisissez votre prestation et réservez en quelques secondes." />
+            <Field
+              id="welcome"
+              label="Message d'accueil"
+              error={brand.errors.welcomeMessage}
+              hint="300 caractères maximum."
+            >
+              <Textarea
+                id="welcome"
+                value={b.welcomeMessage}
+                onChange={(e) => setB((p) => ({ ...p, welcomeMessage: e.target.value }))}
+                maxLength={300}
+                placeholder="Bienvenue ! Choisissez votre prestation et réservez en quelques secondes."
+              />
             </Field>
             <div className="grid gap-2">
               <p className="text-sm font-medium">Visuel de couverture</p>

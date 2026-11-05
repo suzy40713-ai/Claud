@@ -4,7 +4,9 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-type Result = { ok: true; message?: string } | { ok: false; error: string; fieldErrors?: Record<string, string> };
+type Result =
+  | { ok: true; message?: string }
+  | { ok: false; error: string; fieldErrors?: Record<string, string> };
 
 /** Soumission d'un formulaire de paramètres : erreurs par champ, notification, rafraîchissement. */
 export function useSave() {

@@ -22,7 +22,8 @@ export function emptyWeek(): WeeklyHours {
 
 export function groupByWeekday(rows: Array<{ weekday: number } & Range>): WeeklyHours {
   const week = emptyWeek();
-  for (const r of rows) week[r.weekday].push({ startMinute: r.startMinute, endMinute: r.endMinute });
+  for (const r of rows)
+    week[r.weekday].push({ startMinute: r.startMinute, endMinute: r.endMinute });
   for (const d of Object.keys(week)) week[Number(d)].sort((a, b) => a.startMinute - b.startMinute);
   return week;
 }
@@ -36,11 +37,19 @@ export function validateWeek(week: WeeklyHours): HoursError | null {
     if (ranges.length > 6) return { weekday: value, message: `${label} : 6 plages maximum.` };
     for (let i = 0; i < ranges.length; i++) {
       const r = ranges[i];
-      if (!Number.isInteger(r.startMinute) || !Number.isInteger(r.endMinute) || r.startMinute < 0 || r.endMinute > 1440) {
+      if (
+        !Number.isInteger(r.startMinute) ||
+        !Number.isInteger(r.endMinute) ||
+        r.startMinute < 0 ||
+        r.endMinute > 1440
+      ) {
         return { weekday: value, message: `${label} : horaire invalide.` };
       }
       if (r.startMinute >= r.endMinute) {
-        return { weekday: value, message: `${label} : l'heure de fin doit être après l'heure de début.` };
+        return {
+          weekday: value,
+          message: `${label} : l'heure de fin doit être après l'heure de début.`,
+        };
       }
       if (i > 0 && r.startMinute < ranges[i - 1].endMinute) {
         return { weekday: value, message: `${label} : deux plages se chevauchent.` };
@@ -51,7 +60,9 @@ export function validateWeek(week: WeeklyHours): HoursError | null {
 }
 
 export function weekToRows(week: WeeklyHours) {
-  return WEEKDAYS.flatMap(({ value }) => (week[value] ?? []).map((r) => ({ weekday: value, ...r })));
+  return WEEKDAYS.flatMap(({ value }) =>
+    (week[value] ?? []).map((r) => ({ weekday: value, ...r })),
+  );
 }
 
 /** Résumé lisible : « 9:00–12:00, 14:00–18:00 » ou « Fermé ». */

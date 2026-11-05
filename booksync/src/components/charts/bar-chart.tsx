@@ -23,20 +23,45 @@ export function SimpleBarChart({
     <figure>
       <div style={{ height }} aria-hidden>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: -18 }} barCategoryGap={2}>
+          <BarChart
+            data={data}
+            margin={{ top: 8, right: 4, bottom: 0, left: -18 }}
+            barCategoryGap={2}
+          >
             <CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="0" />
-            <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} interval="preserveStartEnd" minTickGap={12} />
-            <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} width={48} tickFormatter={(v: number) => format(v)} />
+            <XAxis
+              dataKey="label"
+              tickLine={false}
+              axisLine={false}
+              tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+              interval="preserveStartEnd"
+              minTickGap={12}
+            />
+            <YAxis
+              allowDecimals={false}
+              tickLine={false}
+              axisLine={false}
+              tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+              width={48}
+              tickFormatter={(v: number) => format(v)}
+            />
             <Tooltip
               cursor={{ fill: "var(--accent)" }}
               content={({ active, payload }) => {
                 if (!active || !payload?.length) return null;
-                const p = payload[0].payload as { label: string; value: number; tooltipLabel?: string };
+                const p = payload[0].payload as {
+                  label: string;
+                  value: number;
+                  tooltipLabel?: string;
+                };
                 return (
                   <div className="rounded-lg border bg-popover px-3 py-2 text-xs shadow-md">
                     <p className="font-medium">{p.tooltipLabel ?? p.label}</p>
                     <p className="text-muted-foreground">
-                      {valueLabel} : <span className="font-semibold text-foreground tabular-nums">{format(p.value)}</span>
+                      {valueLabel} :{" "}
+                      <span className="font-semibold text-foreground tabular-nums">
+                        {format(p.value)}
+                      </span>
                     </p>
                   </div>
                 );
@@ -65,7 +90,13 @@ export function SimpleBarChart({
 }
 
 /** Classement horizontal (barres + libellés directs), sans graphique lourd. */
-export function RankBars({ rows, format = (v) => String(v) }: { rows: { label: string; value: number; sub?: string }[]; format?: (v: number) => string }) {
+export function RankBars({
+  rows,
+  format = (v) => String(v),
+}: {
+  rows: { label: string; value: number; sub?: string }[];
+  format?: (v: number) => string;
+}) {
   const max = Math.max(1, ...rows.map((r) => r.value));
   return (
     <ul className="grid gap-3">
@@ -75,11 +106,18 @@ export function RankBars({ rows, format = (v) => String(v) }: { rows: { label: s
             <span className="truncate">{r.label}</span>
             <span className="shrink-0 font-medium tabular-nums">
               {format(r.value)}
-              {r.sub ? <span className="ml-1.5 text-[12px] font-normal text-muted-foreground">{r.sub}</span> : null}
+              {r.sub ? (
+                <span className="ml-1.5 text-[12px] font-normal text-muted-foreground">
+                  {r.sub}
+                </span>
+              ) : null}
             </span>
           </div>
           <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-            <div className="h-full rounded-full bg-primary" style={{ width: `${(r.value / max) * 100}%` }} />
+            <div
+              className="h-full rounded-full bg-primary"
+              style={{ width: `${(r.value / max) * 100}%` }}
+            />
           </div>
         </li>
       ))}

@@ -134,7 +134,9 @@ export const organization = pgTable(
     reminder24h: boolean().notNull().default(true),
     reminder2h: boolean().notNull().default(true),
     /** Abonnement (synchronisé depuis Stripe par webhook) */
-    plan: text({ enum: ["free", "starter", "pro"] }).notNull().default("free"),
+    plan: text({ enum: ["free", "starter", "pro"] })
+      .notNull()
+      .default("free"),
     stripeCustomerId: text().unique(),
     stripeSubscriptionId: text().unique(),
     subscriptionStatus: text(),

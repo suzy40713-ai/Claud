@@ -38,7 +38,11 @@ export const createOrganizationSchema = z.object({
 });
 
 export async function isSlugTaken(slug: string, exceptOrgId?: string) {
-  const [row] = await db.select({ id: organization.id }).from(organization).where(eq(organization.slug, slug)).limit(1);
+  const [row] = await db
+    .select({ id: organization.id })
+    .from(organization)
+    .where(eq(organization.slug, slug))
+    .limit(1);
   return Boolean(row && row.id !== exceptOrgId);
 }
 
@@ -51,12 +55,18 @@ export async function createOrganization(
   input: z.input<typeof createOrganizationSchema>,
 ) {
   const data = createOrganizationSchema.parse(input);
-  if (await isSlugTaken(data.slug)) throw new UserError(SLUG_ERROR_MESSAGES.taken, { slug: SLUG_ERROR_MESSAGES.taken });
+  if (await isSlugTaken(data.slug))
+    throw new UserError(SLUG_ERROR_MESSAGES.taken, { slug: SLUG_ERROR_MESSAGES.taken });
   try {
     return await db.transaction(async (tx) => {
       const [org] = await tx
         .insert(organization)
-        .values({ name: data.name, slug: data.slug, activity: data.activity, timezone: data.timezone })
+        .values({
+          name: data.name,
+          slug: data.slug,
+          activity: data.activity,
+          timezone: data.timezone,
+        })
         .returning();
       const [owner] = await tx
         .insert(member)
@@ -66,10 +76,12 @@ export async function createOrganization(
         .insert(staff)
         .values({ organizationId: org.id, memberId: owner.id, displayName: user.name })
         .returning();
-      await tx.insert(workingHours).values([
-        ...DEFAULT_WEEK.map((h) => ({ ...h, organizationId: org.id, staffId: null })),
-        ...DEFAULT_WEEK.map((h) => ({ ...h, organizationId: org.id, staffId: profile.id })),
-      ]);
+      await tx
+        .insert(workingHours)
+        .values([
+          ...DEFAULT_WEEK.map((h) => ({ ...h, organizationId: org.id, staffId: null })),
+          ...DEFAULT_WEEK.map((h) => ({ ...h, organizationId: org.id, staffId: profile.id })),
+        ]);
       return org;
     });
   } catch (error) {

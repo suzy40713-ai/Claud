@@ -44,7 +44,9 @@ export function ManageActions({
   const [mode, setMode] = useState<null | "cancel" | "move">(null);
   const [error, setError] = useState<string | null>(null);
   const [days, setDays] = useState<Day[] | null>(null);
-  const [from, setFrom] = useState(() => new Intl.DateTimeFormat("en-CA", { timeZone }).format(new Date()));
+  const [from, setFrom] = useState(() =>
+    new Intl.DateTimeFormat("en-CA", { timeZone }).format(new Date()),
+  );
   const [date, setDate] = useState<string | null>(null);
   const time = new Intl.DateTimeFormat("fr-FR", { timeZone, hour: "2-digit", minute: "2-digit" });
 
@@ -86,19 +88,32 @@ export function ManageActions({
           >
             <RefreshCw /> Déplacer
           </Button>
-          <Button variant="secondary" size="lg" className="text-destructive" onClick={() => (setError(null), setMode("cancel"))}>
+          <Button
+            variant="secondary"
+            size="lg"
+            className="text-destructive"
+            onClick={() => (setError(null), setMode("cancel"))}
+          >
             <X /> Annuler
           </Button>
         </div>
       ) : (
         <p className="text-center text-[13px] text-muted-foreground">
-          La modification en ligne n&apos;est plus possible. Contactez directement l&apos;établissement.
+          La modification en ligne n&apos;est plus possible. Contactez directement
+          l&apos;établissement.
         </p>
       )}
-      {canChange ? <p className="text-center text-xs text-muted-foreground">Modification ou annulation possible jusqu&apos;au {deadlineLabel}.</p> : null}
+      {canChange ? (
+        <p className="text-center text-xs text-muted-foreground">
+          Modification ou annulation possible jusqu&apos;au {deadlineLabel}.
+        </p>
+      ) : null}
 
       <Dialog open={mode === "cancel"} onOpenChange={(o) => !o && setMode(null)}>
-        <DialogContent title="Annuler ce rendez-vous ?" description="L'établissement sera prévenu et le créneau libéré.">
+        <DialogContent
+          title="Annuler ce rendez-vous ?"
+          description="L'établissement sera prévenu et le créneau libéré."
+        >
           <form
             className="grid gap-4"
             onSubmit={(e) => {
@@ -117,7 +132,13 @@ export function ManageActions({
             <Field id="reason" label="Motif (facultatif)">
               <Textarea id="reason" name="reason" maxLength={300} className="min-h-20" />
             </Field>
-            <Button type="submit" variant="destructive" size="lg" disabled={pending} className="w-full">
+            <Button
+              type="submit"
+              variant="destructive"
+              size="lg"
+              disabled={pending}
+              className="w-full"
+            >
               {pending ? <Spinner /> : null}
               Confirmer l&apos;annulation
             </Button>
@@ -126,17 +147,32 @@ export function ManageActions({
       </Dialog>
 
       <Dialog open={mode === "move"} onOpenChange={(o) => !o && setMode(null)}>
-        <DialogContent title="Choisir un nouvel horaire" description="Même prestation, même professionnel.">
+        <DialogContent
+          title="Choisir un nouvel horaire"
+          description="Même prestation, même professionnel."
+        >
           <div className="grid gap-4">
             {error ? <Alert variant="error">{error}</Alert> : null}
             <div className="flex items-center gap-2">
-              <Button variant="secondary" size="icon" aria-label="Semaine précédente" onClick={() => { const f = addDays(from, -7); setFrom(f); load(f); }}>
+              <Button
+                variant="secondary"
+                size="icon"
+                aria-label="Semaine précédente"
+                onClick={() => {
+                  const f = addDays(from, -7);
+                  setFrom(f);
+                  load(f);
+                }}
+              >
                 <ChevronLeft />
               </Button>
               <div className="grid flex-1 grid-cols-7 gap-1">
                 {(days ?? []).map((d) => {
                   const [y, m, dd] = d.date.split("-").map(Number);
-                  const label = new Intl.DateTimeFormat("fr-FR", { weekday: "short", timeZone: "UTC" }).format(new Date(Date.UTC(y, m - 1, dd, 12)));
+                  const label = new Intl.DateTimeFormat("fr-FR", {
+                    weekday: "short",
+                    timeZone: "UTC",
+                  }).format(new Date(Date.UTC(y, m - 1, dd, 12)));
                   return (
                     <button
                       key={d.date}
@@ -144,7 +180,14 @@ export function ManageActions({
                       disabled={!d.slots.length}
                       aria-pressed={date === d.date}
                       onClick={() => setDate(d.date)}
-                      className={cn("flex flex-col items-center rounded-lg py-1.5 text-xs", date === d.date ? "bg-primary text-primary-foreground" : d.slots.length ? "hover:bg-accent" : "opacity-40")}
+                      className={cn(
+                        "flex flex-col items-center rounded-lg py-1.5 text-xs",
+                        date === d.date
+                          ? "bg-primary text-primary-foreground"
+                          : d.slots.length
+                            ? "hover:bg-accent"
+                            : "opacity-40",
+                      )}
                     >
                       <span className="capitalize">{label.replace(".", "")}</span>
                       <span className="text-sm font-semibold">{dd}</span>
@@ -152,7 +195,16 @@ export function ManageActions({
                   );
                 })}
               </div>
-              <Button variant="secondary" size="icon" aria-label="Semaine suivante" onClick={() => { const f = addDays(from, 7); setFrom(f); load(f); }}>
+              <Button
+                variant="secondary"
+                size="icon"
+                aria-label="Semaine suivante"
+                onClick={() => {
+                  const f = addDays(from, 7);
+                  setFrom(f);
+                  load(f);
+                }}
+              >
                 <ChevronRight />
               </Button>
             </div>
@@ -183,7 +235,11 @@ export function ManageActions({
                     {time.format(new Date(s.start))}
                   </button>
                 ))}
-                {days.every((d) => !d.slots.length) ? <p className="col-span-full py-6 text-center text-sm text-muted-foreground">Aucun créneau cette semaine.</p> : null}
+                {days.every((d) => !d.slots.length) ? (
+                  <p className="col-span-full py-6 text-center text-sm text-muted-foreground">
+                    Aucun créneau cette semaine.
+                  </p>
+                ) : null}
               </div>
             )}
           </div>

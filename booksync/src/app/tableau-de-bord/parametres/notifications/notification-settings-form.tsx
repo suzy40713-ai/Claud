@@ -58,7 +58,10 @@ export function NotificationSettingsForm({
         save(() => updateNotificationSettingsAction(v));
       }}
     >
-      <SettingsSection title="Emails à vos clients" description="Envoyés automatiquement à chaque réservation, modification ou annulation.">
+      <SettingsSection
+        title="Emails à vos clients"
+        description="Envoyés automatiquement à chaque réservation, modification ou annulation."
+      >
         <div className="grid gap-4">
           <div className="divide-y">
             <Row
@@ -93,7 +96,10 @@ export function NotificationSettingsForm({
           <p className="text-[13px] text-muted-foreground">Forfait actuel : {planName}.</p>
         </div>
       </SettingsSection>
-      <SettingsSection title="Votre équipe" description="Alertes envoyées à l'employé concerné, au propriétaire et aux administrateurs.">
+      <SettingsSection
+        title="Votre équipe"
+        description="Alertes envoyées à l'employé concerné, au propriétaire et aux administrateurs."
+      >
         <Row
           title="Nouvelle réservation et annulation"
           description="Notification dans BookSync et, avec un forfait payant, par email."

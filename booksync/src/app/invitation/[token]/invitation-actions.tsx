@@ -8,7 +8,13 @@ import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 import { acceptInvitationAction, declineInvitationAction } from "./actions";
 
-export function InvitationActions({ token, signOutOnly = false }: { token: string; signOutOnly?: boolean }) {
+export function InvitationActions({
+  token,
+  signOutOnly = false,
+}: {
+  token: string;
+  signOutOnly?: boolean;
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +40,8 @@ export function InvitationActions({ token, signOutOnly = false }: { token: strin
     );
   }
 
-  if (declined) return <Alert className="mt-6">Invitation refusée. Vous pouvez fermer cette page.</Alert>;
+  if (declined)
+    return <Alert className="mt-6">Invitation refusée. Vous pouvez fermer cette page.</Alert>;
 
   return (
     <div className="mt-7 grid gap-3">

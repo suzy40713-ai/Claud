@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { Route } from "next";
 import { ArrowLeft, Check, ChevronLeft, ChevronRight, Clock, UserRound } from "lucide-react";
@@ -24,7 +24,12 @@ type Day = { date: string; slots: { start: string; staffIds: string[] }[] };
 const DAYS_PER_PAGE = 7;
 
 function todayIn(tz: string) {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
 }
 function addDays(date: string, n: number) {
   const [y, m, d] = date.split("-").map(Number);
@@ -34,10 +39,19 @@ function dayLabel(date: string) {
   const [y, m, d] = date.split("-").map(Number);
   const dt = new Date(Date.UTC(y, m - 1, d, 12));
   return {
-    weekday: new Intl.DateTimeFormat("fr-FR", { weekday: "short", timeZone: "UTC" }).format(dt).replace(".", ""),
+    weekday: new Intl.DateTimeFormat("fr-FR", { weekday: "short", timeZone: "UTC" })
+      .format(dt)
+      .replace(".", ""),
     day: d,
-    month: new Intl.DateTimeFormat("fr-FR", { month: "short", timeZone: "UTC" }).format(dt).replace(".", ""),
-    long: new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(dt),
+    month: new Intl.DateTimeFormat("fr-FR", { month: "short", timeZone: "UTC" })
+      .format(dt)
+      .replace(".", ""),
+    long: new Intl.DateTimeFormat("fr-FR", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      timeZone: "UTC",
+    }).format(dt),
   };
 }
 
@@ -62,41 +76,63 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
   const [pending, startTransition] = useTransition();
 
   const svc = services.find((s) => s.id === serviceId) ?? null;
-  const svcStaff = useMemo(() => (svc ? staff.filter((s) => svc.staffIds.includes(s.id)) : []), [svc, staff]);
+  const svcStaff = useMemo(
+    () => (svc ? staff.filter((s) => svc.staffIds.includes(s.id)) : []),
+    [svc, staff],
+  );
   const chosenStaff = staff.find((s) => s.id === staffId) ?? null;
-  const timeFmt = useMemo(() => new Intl.DateTimeFormat("fr-FR", { timeZone: tz, hour: "2-digit", minute: "2-digit" }), [tz]);
-
-  const loadSlots = useCallback(
-    async (from: string, keepSelection = false) => {
-      if (!serviceId) return;
-      setLoadingSlots(true);
-      setError(null);
-      const res = await getSlotsAction(org.slug, { serviceId, staffId, fromDate: from, days: DAYS_PER_PAGE });
-      setLoadingSlots(false);
-      if (!res.ok) {
-        setError(res.error);
-        return;
-      }
-      setDays(res.data);
-      if (!keepSelection) {
-        const first = res.data.find((d) => d.slots.length);
-        setSelectedDate(first?.date ?? res.data[0]?.date ?? null);
-        setSlot(null);
-      }
-    },
-    [org.slug, serviceId, staffId],
+  const timeFmt = useMemo(
+    () => new Intl.DateTimeFormat("fr-FR", { timeZone: tz, hour: "2-digit", minute: "2-digit" }),
+    [tz],
   );
 
-  useEffect(() => {
-    if (step === "time") void loadSlots(weekStart);
-  }, [step, weekStart, loadSlots]);
+  /** Chargement des créneaux, déclenché par les actions de l'utilisateur (pas par un effet). */
+  async function loadSlots(opts: {
+    serviceId: string;
+    staffId: string | null;
+    from: string;
+    keepSelection?: boolean;
+  }) {
+    setLoadingSlots(true);
+    setError(null);
+    setDays(null);
+    const res = await getSlotsAction(org.slug, {
+      serviceId: opts.serviceId,
+      staffId: opts.staffId,
+      fromDate: opts.from,
+      days: DAYS_PER_PAGE,
+    });
+    setLoadingSlots(false);
+    if (!res.ok) {
+      setError(res.error);
+      return;
+    }
+    setDays(res.data);
+    if (!opts.keepSelection) {
+      const first = res.data.find((d) => d.slots.length);
+      setSelectedDate(first?.date ?? res.data[0]?.date ?? null);
+      setSlot(null);
+    }
+  }
+
+  function openTime(svcId: string, stId: string | null, from = today) {
+    setWeekStart(from);
+    setStep("time");
+    void loadSlots({ serviceId: svcId, staffId: stId, from });
+  }
+
+  function changeWeek(from: string) {
+    if (!serviceId) return;
+    setWeekStart(from);
+    void loadSlots({ serviceId, staffId, from });
+  }
 
   function chooseService(id: string) {
     setServiceId(id);
     const s = services.find((x) => x.id === id)!;
     setStaffId(null);
-    setWeekStart(today);
-    setStep(s.staffIds.length > 1 ? "staff" : "time");
+    if (s.staffIds.length > 1) setStep("staff");
+    else openTime(id, null);
   }
 
   function back() {
@@ -132,7 +168,7 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
         setError(res.error);
         if (/vient d'être réservé/.test(res.error)) {
           setStep("time");
-          void loadSlots(weekStart, false);
+          void loadSlots({ serviceId: svc.id, staffId, from: weekStart });
         }
         return;
       }
@@ -151,8 +187,17 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
         <ol className="flex flex-1 items-center gap-1.5" aria-label="Étapes de la réservation">
           {["Prestation", "Avec qui", "Date et heure", "Coordonnées"].map((label, i) => (
             <li key={label} className="flex flex-1 flex-col gap-1">
-              <span className={cn("h-1 rounded-full", i <= stepIndex ? "bg-primary" : "bg-muted")} />
-              <span className={cn("hidden text-[11px] font-medium sm:block", i === stepIndex ? "text-foreground" : "text-muted-foreground")}>{label}</span>
+              <span
+                className={cn("h-1 rounded-full", i <= stepIndex ? "bg-primary" : "bg-muted")}
+              />
+              <span
+                className={cn(
+                  "hidden text-[11px] font-medium sm:block",
+                  i === stepIndex ? "text-foreground" : "text-muted-foreground",
+                )}
+              >
+                {label}
+              </span>
             </li>
           ))}
         </ol>
@@ -167,7 +212,9 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
 
         {step === "service" ? (
           <section aria-labelledby="step-service" className="animate-fade-up">
-            <h2 id="step-service" className="mb-4 text-lg font-semibold">Choisissez une prestation</h2>
+            <h2 id="step-service" className="mb-4 text-lg font-semibold">
+              Choisissez une prestation
+            </h2>
             <ul className="grid gap-2.5">
               {services.map((s) => (
                 <li key={s.id}>
@@ -179,19 +226,33 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
                   >
                     {s.imageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={s.imageUrl} alt="" className="size-14 shrink-0 rounded-lg object-cover" loading="lazy" />
+                      <img
+                        src={s.imageUrl}
+                        alt=""
+                        className="size-14 shrink-0 rounded-lg object-cover"
+                        loading="lazy"
+                      />
                     ) : (
-                      <span className="h-12 w-1 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
+                      <span
+                        className="h-12 w-1 shrink-0 rounded-full"
+                        style={{ backgroundColor: s.color }}
+                      />
                     )}
                     <span className="min-w-0 flex-1">
                       <span className="block font-medium">{s.name}</span>
-                      {s.description ? <span className="mt-0.5 line-clamp-2 block text-[13px] text-muted-foreground">{s.description}</span> : null}
+                      {s.description ? (
+                        <span className="mt-0.5 line-clamp-2 block text-[13px] text-muted-foreground">
+                          {s.description}
+                        </span>
+                      ) : null}
                       <span className="mt-1 inline-flex items-center gap-1 text-[13px] text-muted-foreground">
                         <Clock className="size-3.5" /> {formatDuration(s.durationMinutes)}
                       </span>
                     </span>
                     <span className="shrink-0 text-right">
-                      <span className="block font-semibold tabular-nums">{s.priceCents ? formatCents(s.priceCents) : "Gratuit"}</span>
+                      <span className="block font-semibold tabular-nums">
+                        {s.priceCents ? formatCents(s.priceCents) : "Gratuit"}
+                      </span>
                       <ChevronRight className="ml-auto size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
                     </span>
                   </button>
@@ -203,7 +264,9 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
 
         {step === "staff" && svc ? (
           <section aria-labelledby="step-staff" className="animate-fade-up">
-            <h2 id="step-staff" className="mb-1 text-lg font-semibold">Avec qui ?</h2>
+            <h2 id="step-staff" className="mb-1 text-lg font-semibold">
+              Avec qui ?
+            </h2>
             <p className="mb-4 text-sm text-muted-foreground">{svc.name}</p>
             <ul className="grid gap-2.5 sm:grid-cols-2">
               <li>
@@ -213,7 +276,7 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
                   icon={<UserRound className="size-5" />}
                   onClick={() => {
                     setStaffId(null);
-                    setStep("time");
+                    openTime(svc.id, null);
                   }}
                 />
               </li>
@@ -222,10 +285,12 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
                   <StaffChoice
                     label={s.name}
                     sub={s.bio ?? undefined}
-                    icon={<Avatar name={s.name} src={s.photoUrl} color={s.color} className="size-10" />}
+                    icon={
+                      <Avatar name={s.name} src={s.photoUrl} color={s.color} className="size-10" />
+                    }
                     onClick={() => {
                       setStaffId(s.id);
-                      setStep("time");
+                      openTime(svc.id, s.id);
                     }}
                   />
                 </li>
@@ -236,7 +301,9 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
 
         {step === "time" && svc ? (
           <section aria-labelledby="step-time" className="animate-fade-up">
-            <h2 id="step-time" className="mb-1 text-lg font-semibold">Choisissez un horaire</h2>
+            <h2 id="step-time" className="mb-1 text-lg font-semibold">
+              Choisissez un horaire
+            </h2>
             <p className="mb-4 text-sm text-muted-foreground">
               {svc.name} · {formatDuration(svc.durationMinutes)}
               {chosenStaff ? ` · avec ${chosenStaff.name}` : ""}
@@ -247,12 +314,24 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
                 size="icon"
                 aria-label="Semaine précédente"
                 disabled={weekStart <= today || loadingSlots}
-                onClick={() => setWeekStart((w) => (addDays(w, -DAYS_PER_PAGE) < today ? today : addDays(w, -DAYS_PER_PAGE)))}
+                onClick={() =>
+                  changeWeek(
+                    addDays(weekStart, -DAYS_PER_PAGE) < today
+                      ? today
+                      : addDays(weekStart, -DAYS_PER_PAGE),
+                  )
+                }
               >
                 <ChevronLeft />
               </Button>
               <div className="grid flex-1 grid-cols-7 gap-1">
-                {(days ?? Array.from({ length: DAYS_PER_PAGE }, (_, i) => ({ date: addDays(weekStart, i), slots: [] }))).map((d) => {
+                {(
+                  days ??
+                  Array.from({ length: DAYS_PER_PAGE }, (_, i) => ({
+                    date: addDays(weekStart, i),
+                    slots: [],
+                  }))
+                ).map((d) => {
                   const l = dayLabel(d.date);
                   const has = d.slots.length > 0;
                   const active = d.date === selectedDate;
@@ -269,12 +348,25 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
                       aria-label={`${l.long}${has ? "" : " — complet"}`}
                       className={cn(
                         "flex flex-col items-center rounded-lg py-2 text-center transition-colors",
-                        active ? "bg-primary text-primary-foreground" : has ? "hover:bg-accent" : "text-muted-foreground/50",
+                        active
+                          ? "bg-primary text-primary-foreground"
+                          : has
+                            ? "hover:bg-accent"
+                            : "text-muted-foreground/50",
                       )}
                     >
                       <span className="text-[11px] capitalize">{l.weekday}</span>
                       <span className="text-base font-semibold tabular-nums">{l.day}</span>
-                      <span className={cn("mt-0.5 size-1 rounded-full", has ? (active ? "bg-primary-foreground" : "bg-primary") : "bg-transparent")} />
+                      <span
+                        className={cn(
+                          "mt-0.5 size-1 rounded-full",
+                          has
+                            ? active
+                              ? "bg-primary-foreground"
+                              : "bg-primary"
+                            : "bg-transparent",
+                        )}
+                      />
                     </button>
                   );
                 })}
@@ -284,7 +376,7 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
                 size="icon"
                 aria-label="Semaine suivante"
                 disabled={addDays(weekStart, DAYS_PER_PAGE) > lastDate || loadingSlots}
-                onClick={() => setWeekStart((w) => addDays(w, DAYS_PER_PAGE))}
+                onClick={() => changeWeek(addDays(weekStart, DAYS_PER_PAGE))}
               >
                 <ChevronRight />
               </Button>
@@ -298,8 +390,14 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
               </div>
             ) : currentDay && currentDay.slots.length ? (
               <>
-                <p className="mb-3 text-sm font-medium first-letter:uppercase">{dayLabel(currentDay.date).long}</p>
-                <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5" role="listbox" aria-label="Horaires disponibles">
+                <p className="mb-3 text-sm font-medium first-letter:uppercase">
+                  {dayLabel(currentDay.date).long}
+                </p>
+                <div
+                  className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5"
+                  role="listbox"
+                  aria-label="Horaires disponibles"
+                >
                   {currentDay.slots.map((s) => (
                     <button
                       key={s.start}
@@ -321,9 +419,16 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
             ) : (
               <div className="rounded-xl border border-dashed px-4 py-10 text-center">
                 <p className="font-medium">Aucun créneau disponible cette semaine</p>
-                <p className="mt-1 text-sm text-muted-foreground">Essayez la semaine suivante{svcStaff.length > 1 && staffId ? " ou un autre membre de l'équipe" : ""}.</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Essayez la semaine suivante
+                  {svcStaff.length > 1 && staffId ? " ou un autre membre de l'équipe" : ""}.
+                </p>
                 {addDays(weekStart, DAYS_PER_PAGE) <= lastDate ? (
-                  <Button variant="secondary" className="mt-4" onClick={() => setWeekStart((w) => addDays(w, DAYS_PER_PAGE))}>
+                  <Button
+                    variant="secondary"
+                    className="mt-4"
+                    onClick={() => changeWeek(addDays(weekStart, DAYS_PER_PAGE))}
+                  >
                     Semaine suivante <ChevronRight />
                   </Button>
                 ) : null}
@@ -334,11 +439,20 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
 
         {step === "details" && svc && slot ? (
           <section aria-labelledby="step-details" className="animate-fade-up">
-            <h2 id="step-details" className="mb-4 text-lg font-semibold">Vos coordonnées</h2>
+            <h2 id="step-details" className="mb-4 text-lg font-semibold">
+              Vos coordonnées
+            </h2>
             <div className="mb-5 rounded-xl border bg-subtle p-4 text-sm">
               <p className="font-semibold">{svc.name}</p>
               <p className="mt-1 text-muted-foreground first-letter:uppercase">
-                {new Intl.DateTimeFormat("fr-FR", { timeZone: tz, weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }).format(new Date(slot))}
+                {new Intl.DateTimeFormat("fr-FR", {
+                  timeZone: tz,
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }).format(new Date(slot))}
                 {" · "}
                 {formatDuration(svc.durationMinutes)}
               </p>
@@ -356,13 +470,31 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
                   <Input id="lastName" name="lastName" autoComplete="family-name" required />
                 </Field>
               </div>
-              <Field id="email" label="Email" hint="Pour recevoir la confirmation et gérer votre rendez-vous." error={fieldErrors.email}>
-                <Input id="email" name="email" type="email" inputMode="email" autoComplete="email" autoCapitalize="none" required />
+              <Field
+                id="email"
+                label="Email"
+                hint="Pour recevoir la confirmation et gérer votre rendez-vous."
+                error={fieldErrors.email}
+              >
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  autoCapitalize="none"
+                  required
+                />
               </Field>
               <Field id="phone" label="Téléphone (facultatif)" error={fieldErrors.phone}>
                 <Input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" />
               </Field>
-              <Field id="note" label="Message (facultatif)" error={fieldErrors.note} hint="N'indiquez pas d'information médicale.">
+              <Field
+                id="note"
+                label="Message (facultatif)"
+                error={fieldErrors.note}
+                hint="N'indiquez pas d'information médicale."
+              >
                 <Textarea id="note" name="note" maxLength={500} className="min-h-20" />
               </Field>
               {/* Champ piège pour les robots : invisible pour les humains. */}
@@ -372,8 +504,13 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
                 </label>
               </div>
               <label className="flex items-start gap-2.5 text-[13px] text-muted-foreground">
-                <Checkbox checked={optIn} onCheckedChange={(v) => setOptIn(v === true)} className="mt-0.5" />
-                J&apos;accepte de recevoir par email la confirmation et les rappels de ce rendez-vous.
+                <Checkbox
+                  checked={optIn}
+                  onCheckedChange={(v) => setOptIn(v === true)}
+                  className="mt-0.5"
+                />
+                J&apos;accepte de recevoir par email la confirmation et les rappels de ce
+                rendez-vous.
               </label>
               <p className="text-xs text-muted-foreground">
                 Vos données sont transmises à {org.name} pour la gestion de votre rendez-vous.{" "}
@@ -393,7 +530,17 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
   );
 }
 
-function StaffChoice({ label, sub, icon, onClick }: { label: string; sub?: string; icon: React.ReactNode; onClick: () => void }) {
+function StaffChoice({
+  label,
+  sub,
+  icon,
+  onClick,
+}: {
+  label: string;
+  sub?: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+}) {
   return (
     <button
       type="button"
@@ -401,10 +548,14 @@ function StaffChoice({ label, sub, icon, onClick }: { label: string; sub?: strin
       className="flex w-full items-center gap-3 rounded-xl border p-3.5 text-left transition-colors hover:border-primary/40 hover:bg-primary-soft/40 focus-visible:ring-[3px] focus-visible:ring-ring/30 focus-visible:outline-none"
       data-testid="public-staff"
     >
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">{icon}</span>
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+        {icon}
+      </span>
       <span className="min-w-0 flex-1">
         <span className="block font-medium">{label}</span>
-        {sub ? <span className="line-clamp-1 block text-[13px] text-muted-foreground">{sub}</span> : null}
+        {sub ? (
+          <span className="line-clamp-1 block text-[13px] text-muted-foreground">{sub}</span>
+        ) : null}
       </span>
       <ChevronRight className="size-4 text-muted-foreground" />
     </button>

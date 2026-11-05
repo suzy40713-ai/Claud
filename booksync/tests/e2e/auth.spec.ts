@@ -11,8 +11,6 @@ import {
   uniqueEmail,
 } from "./helpers";
 
-test.afterAll(() => sql.end());
-
 test.describe("inscription et entreprise", () => {
   test("parcours complet : inscription → confirmation → entreprise → tableau de bord → déconnexion → connexion", async ({
     page,
@@ -29,15 +27,18 @@ test.describe("inscription et entreprise", () => {
     // L'adresse publique est suggérée à partir du nom (accents supprimés).
     const suffix = Date.now().toString(36);
     await page.getByLabel("Nom de l'entreprise").fill(`Clinique Vétérinaire Éloïse ${suffix}`);
+    await page.getByLabel("Votre activité").selectOption("autre");
     await expect(page.getByLabel("Adresse de votre page de réservation")).toHaveValue(
       `clinique-veterinaire-eloise-${suffix}`,
     );
     await page.getByRole("button", { name: "Créer mon entreprise" }).click();
 
-    await expect(page).toHaveURL(/\/tableau-de-bord$/);
+    // Direction l'assistant d'installation, puis la vue générale.
+    await expect(page).toHaveURL(/\/tableau-de-bord\/demarrage$/);
+    await expect(page.getByRole("heading", { name: /Bienvenue sur BookSync/ })).toBeVisible();
+    await page.goto("/tableau-de-bord");
     await expect(page.getByRole("heading", { name: "Bonjour Camille" })).toBeVisible();
     await expect(page.getByTestId("org-name")).toHaveText(`Clinique Vétérinaire Éloïse ${suffix}`);
-    await expect(page.getByText("Propriétaire")).toBeVisible();
     await expect(page.getByText(`/clinique-veterinaire-eloise-${suffix}`)).toBeVisible();
 
     // L'entreprise et l'appartenance sont bien en base.
@@ -73,6 +74,9 @@ test.describe("inscription et entreprise", () => {
       page.getByText("Le mot de passe doit contenir au moins 10 caractères."),
     ).toBeVisible();
     await expect(page.getByLabel("Email professionnel")).toHaveAttribute("aria-invalid", "true");
+    await expect(
+      page.getByText("Vous devez accepter les conditions générales pour créer un compte."),
+    ).toBeVisible();
   });
 
   test("une adresse email déjà utilisée : même réponse, titulaire prévenu, pas de second compte", async ({

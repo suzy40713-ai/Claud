@@ -41,7 +41,10 @@ async function TopBarRight() {
       <UserMenu
         name={ctx.user.name}
         email={ctx.user.email}
-        memberships={ctx.memberships.map((m) => ({ id: m.organizationId, name: m.organizationName }))}
+        memberships={ctx.memberships.map((m) => ({
+          id: m.organizationId,
+          name: m.organizationName,
+        }))}
         activeOrganizationId={ctx.organization.id}
       />
     </div>
@@ -63,7 +66,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-dvh bg-subtle lg:grid lg:grid-cols-[248px_1fr]">
       <aside className="sticky top-0 hidden h-dvh flex-col border-r bg-background px-3 py-4 lg:flex">
-        <Link href="/tableau-de-bord" className="mb-6 inline-flex rounded-md px-2.5" aria-label="BookSync — vue générale">
+        <Link
+          href="/tableau-de-bord"
+          className="mb-6 inline-flex rounded-md px-2.5"
+          aria-label="BookSync — vue générale"
+        >
           <Logo />
         </Link>
         <Suspense fallback={<div className="mx-2.5 h-64 animate-pulse rounded-lg bg-muted" />}>
@@ -73,7 +80,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="flex min-w-0 flex-col">
         <header className="sticky top-0 z-30 border-b bg-background/90 pt-[env(safe-area-inset-top)] backdrop-blur-md">
           <div className="flex h-14 items-center justify-between gap-3 px-4 sm:px-6">
-            <Link href="/tableau-de-bord" className="flex min-w-0 items-center gap-2 lg:hidden" aria-label="Vue générale">
+            <Link
+              href="/tableau-de-bord"
+              className="flex min-w-0 items-center gap-2 lg:hidden"
+              aria-label="Vue générale"
+            >
               <Logo className="[&>span:last-child]:hidden" />
               <Suspense>
                 <MobileOrgName />
@@ -85,7 +96,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </Suspense>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-5 pb-28 sm:px-6 sm:pt-8 lg:pb-12">{children}</main>
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-5 pb-28 sm:px-6 sm:pt-8 lg:pb-12">
+          {children}
+        </main>
       </div>
       <Suspense>
         <MobileTabs />

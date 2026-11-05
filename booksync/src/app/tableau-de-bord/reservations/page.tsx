@@ -10,7 +10,11 @@ import { ReservationsView } from "./reservations-view";
 
 export const metadata: Metadata = { title: "Réservations" };
 
-async function Content({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+async function Content({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>;
+}) {
   const sp = await searchParams;
   const ctx = await requireOrg();
   const manageAll = can(ctx.role, "appointments.manage_all");
@@ -27,10 +31,22 @@ async function Content({ searchParams }: { searchParams: Promise<Record<string, 
   return (
     <ReservationsView
       timeZone={ctx.organization.timezone}
-      rows={rows.map((r) => ({ ...r, startsAt: r.startsAt.toISOString(), endsAt: r.endsAt.toISOString() }))}
+      rows={rows.map((r) => ({
+        ...r,
+        startsAt: r.startsAt.toISOString(),
+        endsAt: r.endsAt.toISOString(),
+      }))}
       hasMore={hasMore}
-      filters={{ when: filters.when, status: filters.status, staffId: filters.staffId ?? "", q: filters.q ?? "", page: filters.page }}
-      staff={staff.filter((s) => manageAll || s.id === ctx.staffId).map((s) => ({ id: s.id, name: s.displayName, color: s.color }))}
+      filters={{
+        when: filters.when,
+        status: filters.status,
+        staffId: filters.staffId ?? "",
+        q: filters.q ?? "",
+        page: filters.page,
+      }}
+      staff={staff
+        .filter((s) => manageAll || s.id === ctx.staffId)
+        .map((s) => ({ id: s.id, name: s.displayName, color: s.color }))}
       showStaffFilter={manageAll && staff.length > 1}
       canSeeCustomers={can(ctx.role, "customers.view_all")}
     />

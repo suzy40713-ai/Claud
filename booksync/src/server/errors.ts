@@ -34,21 +34,31 @@ export function zodFieldErrors(error: ZodError) {
 }
 
 /** Exécute une action serveur et convertit les erreurs connues en résultat affichable. */
-export async function runAction<T>(fn: () => Promise<T>, message?: string): Promise<ActionResult<T>> {
+export async function runAction<T>(
+  fn: () => Promise<T>,
+  message?: string,
+): Promise<ActionResult<T>> {
   try {
     return { ok: true, data: await fn(), message };
   } catch (error) {
     // Les redirections / notFound de Next doivent être relancées.
-    if (error && typeof error === "object" && "digest" in error && String((error as { digest: unknown }).digest).startsWith("NEXT_")) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "digest" in error &&
+      String((error as { digest: unknown }).digest).startsWith("NEXT_")
+    ) {
       throw error;
     }
     if (error instanceof ZodError) {
       const fieldErrors = zodFieldErrors(error);
       return { ok: false, error: "Certains champs sont invalides.", fieldErrors };
     }
-    if (error instanceof UserError) return { ok: false, error: error.message, fieldErrors: error.fieldErrors };
+    if (error instanceof UserError)
+      return { ok: false, error: error.message, fieldErrors: error.fieldErrors };
     if (error instanceof ForbiddenError) return { ok: false, error: error.message };
-    if (error instanceof PlanLimitError) return { ok: false, error: error.message, limit: error.kind };
+    if (error instanceof PlanLimitError)
+      return { ok: false, error: error.message, limit: error.kind };
     console.error("[action] erreur inattendue", error);
     return { ok: false, error: "Une erreur inattendue est survenue. Réessayez dans un instant." };
   }

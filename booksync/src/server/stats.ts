@@ -3,13 +3,19 @@ import { and, count, desc, eq, gte, inArray, lt, sql, type SQL } from "drizzle-o
 import { db } from "@/db/client";
 import { appointment, customer, staff } from "@/db/schema";
 import { can } from "@/domain/permissions";
-import { localMinuteToInstant, addDays, localDateOf, isoWeekday } from "@/domain/availability/engine";
+import {
+  localMinuteToInstant,
+  addDays,
+  localDateOf,
+  isoWeekday,
+} from "@/domain/availability/engine";
 import type { OrgContext } from "@/server/auth/session";
 
 /** Un employé ne voit que ses propres chiffres. */
 function scope(ctx: OrgContext): SQL[] {
   const c: SQL[] = [eq(appointment.organizationId, ctx.organization.id)];
-  if (!can(ctx.role, "stats.view") || !can(ctx.role, "appointments.manage_all")) c.push(ctx.staffId ? eq(appointment.staffId, ctx.staffId) : sql`false`);
+  if (!can(ctx.role, "stats.view") || !can(ctx.role, "appointments.manage_all"))
+    c.push(ctx.staffId ? eq(appointment.staffId, ctx.staffId) : sql`false`);
   return c;
 }
 
@@ -41,64 +47,90 @@ export async function getOverview(ctx: OrgContext) {
     const [r] = await db
       .select({ n: count() })
       .from(appointment)
-      .where(and(...base, active, gte(appointment.startsAt, midnight(from, tz)), lt(appointment.startsAt, midnight(to, tz))));
+      .where(
+        and(
+          ...base,
+          active,
+          gte(appointment.startsAt, midnight(from, tz)),
+          lt(appointment.startsAt, midnight(to, tz)),
+        ),
+      );
     return r.n;
   };
 
-  const [todayCount, weekCount, [{ revenue }], [{ customers }], upcoming, recent, daily] = await Promise.all([
-    countBetween(today, addDays(today, 1)),
-    countBetween(weekStart, addDays(weekStart, 7)),
-    db
-      .select({ revenue: revenueExpr })
-      .from(appointment)
-      .where(and(...base, gte(appointment.startsAt, midnight(monthStart, tz)), lt(appointment.startsAt, midnight(nextMonth, tz)))),
-    can(ctx.role, "customers.view_all")
-      ? db.select({ customers: count() }).from(customer).where(eq(customer.organizationId, ctx.organization.id))
-      : db
-          .select({ customers: sql<number>`count(distinct ${appointment.customerId})::int` })
-          .from(appointment)
-          .where(and(...base)),
-    db
-      .select({
-        id: appointment.id,
-        startsAt: appointment.startsAt,
-        serviceName: appointment.serviceName,
-        staffName: staff.displayName,
-        staffColor: staff.color,
-        firstName: customer.firstName,
-        lastName: customer.lastName,
-      })
-      .from(appointment)
-      .innerJoin(staff, eq(staff.id, appointment.staffId))
-      .innerJoin(customer, eq(customer.id, appointment.customerId))
-      .where(and(...base, eq(appointment.status, "confirmed"), gte(appointment.startsAt, new Date())))
-      .orderBy(appointment.startsAt)
-      .limit(6),
-    db
-      .select({
-        id: appointment.id,
-        createdAt: appointment.createdAt,
-        startsAt: appointment.startsAt,
-        source: appointment.source,
-        status: appointment.status,
-        serviceName: appointment.serviceName,
-        firstName: customer.firstName,
-        lastName: customer.lastName,
-      })
-      .from(appointment)
-      .innerJoin(customer, eq(customer.id, appointment.customerId))
-      .where(and(...base))
-      .orderBy(desc(appointment.createdAt))
-      .limit(6),
-    db
-      .select({
-        day: sql<string>`to_char(${appointment.startsAt} at time zone ${tz}, 'YYYY-MM-DD')`,
-        n: sql<number>`count(*)::int`,
-      })
-      .from(appointment)
-      .where(and(...base, active, gte(appointment.startsAt, midnight(addDays(today, -29), tz)), lt(appointment.startsAt, midnight(addDays(today, 1), tz))))
-      .groupBy(sql`1`),
-  ]);
+  const [todayCount, weekCount, [{ revenue }], [{ customers }], upcoming, recent, daily] =
+    await Promise.all([
+      countBetween(today, addDays(today, 1)),
+      countBetween(weekStart, addDays(weekStart, 7)),
+      db
+        .select({ revenue: revenueExpr })
+        .from(appointment)
+        .where(
+          and(
+            ...base,
+            gte(appointment.startsAt, midnight(monthStart, tz)),
+            lt(appointment.startsAt, midnight(nextMonth, tz)),
+          ),
+        ),
+      can(ctx.role, "customers.view_all")
+        ? db
+            .select({ customers: count() })
+            .from(customer)
+            .where(eq(customer.organizationId, ctx.organization.id))
+        : db
+            .select({ customers: sql<number>`count(distinct ${appointment.customerId})::int` })
+            .from(appointment)
+            .where(and(...base)),
+      db
+        .select({
+          id: appointment.id,
+          startsAt: appointment.startsAt,
+          serviceName: appointment.serviceName,
+          staffName: staff.displayName,
+          staffColor: staff.color,
+          firstName: customer.firstName,
+          lastName: customer.lastName,
+        })
+        .from(appointment)
+        .innerJoin(staff, eq(staff.id, appointment.staffId))
+        .innerJoin(customer, eq(customer.id, appointment.customerId))
+        .where(
+          and(...base, eq(appointment.status, "confirmed"), gte(appointment.startsAt, new Date())),
+        )
+        .orderBy(appointment.startsAt)
+        .limit(6),
+      db
+        .select({
+          id: appointment.id,
+          createdAt: appointment.createdAt,
+          startsAt: appointment.startsAt,
+          source: appointment.source,
+          status: appointment.status,
+          serviceName: appointment.serviceName,
+          firstName: customer.firstName,
+          lastName: customer.lastName,
+        })
+        .from(appointment)
+        .innerJoin(customer, eq(customer.id, appointment.customerId))
+        .where(and(...base))
+        .orderBy(desc(appointment.createdAt))
+        .limit(6),
+      db
+        .select({
+          day: sql<string>`to_char(${appointment.startsAt} at time zone ${tz}, 'YYYY-MM-DD')`,
+          n: sql<number>`count(*)::int`,
+        })
+        .from(appointment)
+        .where(
+          and(
+            ...base,
+            active,
+            gte(appointment.startsAt, midnight(addDays(today, -29), tz)),
+            lt(appointment.startsAt, midnight(addDays(today, 1), tz)),
+          ),
+        )
+        .groupBy(sql`1`),
+    ]);
 
   const series = Array.from({ length: 30 }, (_, i) => {
     const d = addDays(today, i - 29);
@@ -111,7 +143,11 @@ export type AnalyticsRange = { from: string; to: string };
 
 export async function getAnalytics(ctx: OrgContext, range: AnalyticsRange) {
   const tz = ctx.organization.timezone;
-  const base = [...scope(ctx), gte(appointment.startsAt, midnight(range.from, tz)), lt(appointment.startsAt, midnight(addDays(range.to, 1), tz))];
+  const base = [
+    ...scope(ctx),
+    gte(appointment.startsAt, midnight(range.from, tz)),
+    lt(appointment.startsAt, midnight(addDays(range.to, 1), tz)),
+  ];
   const advanced = ctx.plan.features.advancedStats;
 
   const [[totals], services, staffRows, monthly, weekdays, sources] = await Promise.all([
@@ -126,7 +162,11 @@ export async function getAnalytics(ctx: OrgContext, range: AnalyticsRange) {
       .from(appointment)
       .where(and(...base)),
     db
-      .select({ name: appointment.serviceName, n: sql<number>`count(*)::int`, revenue: revenueExpr })
+      .select({
+        name: appointment.serviceName,
+        n: sql<number>`count(*)::int`,
+        revenue: revenueExpr,
+      })
       .from(appointment)
       .where(and(...base, sql`${appointment.status} <> 'cancelled'`))
       .groupBy(appointment.serviceName)
@@ -156,13 +196,24 @@ export async function getAnalytics(ctx: OrgContext, range: AnalyticsRange) {
             revenue: revenueExpr,
           })
           .from(appointment)
-          .where(and(...scope(ctx), gte(appointment.startsAt, midnight(firstOfMonthMonthsAgo(localDateOf(new Date(), tz), 11), tz))))
+          .where(
+            and(
+              ...scope(ctx),
+              gte(
+                appointment.startsAt,
+                midnight(firstOfMonthMonthsAgo(localDateOf(new Date(), tz), 11), tz),
+              ),
+            ),
+          )
           .groupBy(sql`1`)
           .orderBy(sql`1`)
       : Promise.resolve([]),
     advanced
       ? db
-          .select({ dow: sql<number>`extract(isodow from ${appointment.startsAt} at time zone ${tz})::int`, n: sql<number>`count(*)::int` })
+          .select({
+            dow: sql<number>`extract(isodow from ${appointment.startsAt} at time zone ${tz})::int`,
+            n: sql<number>`count(*)::int`,
+          })
           .from(appointment)
           .where(and(...base, sql`${appointment.status} <> 'cancelled'`))
           .groupBy(sql`1`)
@@ -189,7 +240,10 @@ export async function getAnalytics(ctx: OrgContext, range: AnalyticsRange) {
     services,
     staff: staffRows,
     monthly,
-    weekdays: Array.from({ length: 7 }, (_, i) => ({ dow: i + 1, n: weekdays.find((w) => w.dow === i + 1)?.n ?? 0 })),
+    weekdays: Array.from({ length: 7 }, (_, i) => ({
+      dow: i + 1,
+      n: weekdays.find((w) => w.dow === i + 1)?.n ?? 0,
+    })),
     sources,
   };
 }

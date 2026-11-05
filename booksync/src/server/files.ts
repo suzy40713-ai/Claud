@@ -8,7 +8,14 @@ import { UserError } from "@/server/errors";
 export type FileKind = "logo" | "cover" | "staff_photo" | "service_image";
 
 const MAX_INPUT_BYTES = 5 * 1024 * 1024;
-const ACCEPTED = new Set(["image/png", "image/jpeg", "image/webp", "image/svg+xml", "image/gif", "image/avif"]);
+const ACCEPTED = new Set([
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "image/svg+xml",
+  "image/gif",
+  "image/avif",
+]);
 const SIZES: Record<FileKind, { width: number; height: number; fit: "inside" | "cover" }> = {
   logo: { width: 512, height: 512, fit: "inside" },
   staff_photo: { width: 400, height: 400, fit: "cover" },
@@ -23,7 +30,8 @@ const SIZES: Record<FileKind, { width: number; height: number; fit: "inside" | "
 export async function storeImage(organizationId: string, kind: FileKind, upload: File) {
   if (!(upload instanceof File) || upload.size === 0) throw new UserError("Aucun fichier reçu.");
   if (upload.size > MAX_INPUT_BYTES) throw new UserError("L'image ne doit pas dépasser 5 Mo.");
-  if (!ACCEPTED.has(upload.type)) throw new UserError("Format non pris en charge. Utilisez PNG, JPG, WEBP ou SVG.");
+  if (!ACCEPTED.has(upload.type))
+    throw new UserError("Format non pris en charge. Utilisez PNG, JPG, WEBP ou SVG.");
 
   const input = Buffer.from(await upload.arrayBuffer());
   let output: { data: Buffer; info: { size: number; width: number; height: number } };

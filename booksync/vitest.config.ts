@@ -28,6 +28,10 @@ export default defineConfig({
             NEXT_PUBLIC_APP_URL: "http://localhost:3000",
             AUTH_RATE_LIMIT: "on",
             RESEND_API_KEY: "",
+            STRIPE_SECRET_KEY: "sk_test_booksync_tests_hors_ligne",
+            STRIPE_WEBHOOK_SECRET: "whsec_test_booksync",
+            STRIPE_PRICE_STARTER: "price_test_starter",
+            STRIPE_PRICE_PRO: "price_test_pro",
           },
           // Une seule base de test partagée : on exécute les fichiers séquentiellement.
           fileParallelism: false,
