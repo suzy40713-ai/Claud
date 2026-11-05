@@ -2,6 +2,17 @@
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
+type ValueFormat = "count" | "currency";
+const FORMATS: Record<ValueFormat, (v: number) => string> = {
+  count: (v) => v.toLocaleString("fr-FR"),
+  currency: (cents) =>
+    new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
+      maximumFractionDigits: 0,
+    }).format(cents / 100),
+};
+
 /**
  * Histogramme à une série (couleur principale), barres fines à extrémité arrondie,
  * grille discrète, infobulle au survol et tableau de données accessible.
@@ -9,23 +20,25 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 export function SimpleBarChart({
   data,
   valueLabel,
-  format = (v) => String(v),
+  valueFormat = "count",
   height = 220,
   caption,
 }: {
   data: { label: string; value: number; tooltipLabel?: string }[];
   valueLabel: string;
-  format?: (v: number) => string;
+  /** Format des valeurs (une fonction ne peut pas être transmise depuis un composant serveur). */
+  valueFormat?: ValueFormat;
   height?: number;
   caption: string;
 }) {
+  const format = FORMATS[valueFormat];
   return (
     <figure>
       <div style={{ height }} aria-hidden>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
-            margin={{ top: 8, right: 4, bottom: 0, left: -18 }}
+            margin={{ top: 8, right: 4, bottom: 0, left: valueFormat === "currency" ? -4 : -14 }}
             barCategoryGap={2}
           >
             <CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="0" />
@@ -42,7 +55,7 @@ export function SimpleBarChart({
               tickLine={false}
               axisLine={false}
               tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
-              width={48}
+              width={valueFormat === "currency" ? 64 : 40}
               tickFormatter={(v: number) => format(v)}
             />
             <Tooltip

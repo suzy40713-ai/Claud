@@ -302,3 +302,27 @@ test.describe("parcours métier", () => {
     await expect(page).toHaveURL(/\/tableau-de-bord$/);
   });
 });
+
+test("statistiques avancées (forfait Pro) : graphiques affichés sans erreur", async ({ page }) => {
+  const owner = await signUpAndVerify(page);
+  const slug = `pro-${Date.now().toString(36)}`;
+  await createOrganization(page, "Studio Pro", slug);
+  void owner;
+  await setPlan(slug, "pro");
+  await page.goto("/tableau-de-bord/statistiques");
+  await expect(page.getByRole("heading", { name: "Évolution mensuelle" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Activité des employés" })).toBeVisible();
+  await expect(page.getByText("Une erreur est survenue")).toHaveCount(0);
+});
+
+test("calendrier mobile : aucun débordement horizontal", async ({ page, isMobile }) => {
+  test.skip(!isMobile, "Spécifique au mobile");
+  await signUpAndVerify(page);
+  await createOrganization(page, "Studio Mobile", `mob-${Date.now().toString(36)}`);
+  await page.goto("/tableau-de-bord/calendrier");
+  await expect(page.getByTestId("calendar-title")).toBeVisible();
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(0);
+});

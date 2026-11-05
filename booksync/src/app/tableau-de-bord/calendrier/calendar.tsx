@@ -146,7 +146,12 @@ export function Calendar({
 
   const title =
     view === "day"
-      ? fmtDay(anchor, { weekday: "long", day: "numeric", month: "long", year: "numeric" })
+      ? fmtDay(
+          anchor,
+          isMobile
+            ? { weekday: "short", day: "numeric", month: "short" }
+            : { weekday: "long", day: "numeric", month: "long", year: "numeric" },
+        )
       : view === "week"
         ? `${fmtDay(range.from, { day: "numeric", month: "short" })} – ${fmtDay(shiftDate(range.from, 6), { day: "numeric", month: "short", year: "numeric" })}`
         : fmtDay(anchor, { month: "long", year: "numeric" });
@@ -156,9 +161,9 @@ export function Calendar({
   );
 
   return (
-    <div className="grid gap-4">
+    <div className="grid min-w-0 gap-4 [&>*]:min-w-0">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2">
           <Button
             variant="secondary"
             size="icon"
@@ -179,7 +184,7 @@ export function Calendar({
             Aujourd&apos;hui
           </Button>
           <h2
-            className="ml-1 truncate text-base font-semibold first-letter:uppercase sm:text-lg"
+            className="ml-1 min-w-0 truncate text-[15px] font-semibold first-letter:uppercase sm:text-lg"
             data-testid="calendar-title"
           >
             {title}

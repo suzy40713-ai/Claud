@@ -63,8 +63,40 @@ services:
         generateValue: true
       - key: AUTH_RATE_LIMIT
         value: "on"
-      # Facultatif : sans clé, les emails sont journalisés mais pas envoyés.
+      # Emails transactionnels (Resend). Sans clé : journalisés, non envoyés.
       - key: RESEND_API_KEY
         sync: false
       - key: EMAIL_FROM
+        sync: false
+      # Planificateur (Supabase pg_cron → /api/cron/notifications)
+      - key: CRON_SECRET
+        generateValue: true
+      # Stripe Billing (clés de test pendant le développement)
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_STARTER
+        sync: false
+      - key: STRIPE_PRICE_PRO
+        sync: false
+      # Connexion avec Google (facultatif)
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      # Mentions légales (informations de l'éditeur)
+      - key: NEXT_PUBLIC_LEGAL_COMPANY
+        sync: false
+      - key: NEXT_PUBLIC_LEGAL_FORM
+        sync: false
+      - key: NEXT_PUBLIC_LEGAL_ADDRESS
+        sync: false
+      - key: NEXT_PUBLIC_LEGAL_SIREN
+        sync: false
+      - key: NEXT_PUBLIC_LEGAL_VAT
+        sync: false
+      - key: NEXT_PUBLIC_LEGAL_DIRECTOR
+        sync: false
+      - key: NEXT_PUBLIC_LEGAL_EMAIL
         sync: false

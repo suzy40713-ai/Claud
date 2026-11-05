@@ -100,7 +100,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ du?: string; 
               <SimpleBarChart
                 caption="Chiffre d'affaires par mois"
                 valueLabel="CA"
-                format={(v) => formatCents(v).replace(/,00\s/, " ")}
+                valueFormat="currency"
                 data={a.monthly.map((m) => ({
                   label: formatInTz(`${m.month}-15T12:00:00Z`, tz, "MMM"),
                   value: m.revenue,

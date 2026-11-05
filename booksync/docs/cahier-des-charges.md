@@ -1,7 +1,7 @@
 # BookSync — Cahier des charges
 
 > Document de référence, mis à jour à chaque décision produit.
-> Dernière mise à jour : 5 novembre 2026.
+> Dernière mise à jour : 6 novembre 2026.
 > Les points marqués **[défaut proposé]** sont des choix par défaut en attente de validation.
 
 ## 1. Vision
@@ -96,18 +96,18 @@ Règles de calcul **[défaut proposé]** :
 
 ## 7. Feuille de route
 
-| Étape | Contenu                                                                                | État        |
-| ----- | -------------------------------------------------------------------------------------- | ----------- |
-| 0     | Socle technique, design system, base de données, CI, Render                            | ✅          |
-| 1     | Comptes, Google, CGU, entreprise, paramètres, rôles, invitations, fondations des plans | 🟡 en cours |
-| 2     | Services (durée, prix, temps tampon) et employés réservables                           |             |
-| 3     | Disponibilités : horaires, pauses, congés, moteur de créneaux                          |             |
-| 4     | Page de réservation publique (mobile d'abord), anti double réservation                 |             |
-| 5     | Agenda professionnel : jour / semaine / mois, création, déplacement, annulation        |             |
-| 6     | Notifications email clients (STARTER+) et rappels automatiques (PRO)                   |             |
-| 7     | Clients (fiches, historique, notes)                                                    |             |
-| 8     | Facturation Stripe Billing (STARTER, PRO), limites appliquées partout                  |             |
-| 9     | Statistiques (basiques / avancées), personnalisation de la page (PRO)                  |             |
+| Étape | Contenu                                                                                | État                                   |
+| ----- | -------------------------------------------------------------------------------------- | -------------------------------------- |
+| 0     | Socle technique, design system, base de données, CI, Render                            | ✅                                     |
+| 1     | Comptes, Google, CGU, entreprise, paramètres, rôles, invitations, fondations des plans | ✅ (Google : identifiants à créer)     |
+| 2     | Services (durée, prix, temps tampon) et employés réservables                           | ✅                                     |
+| 3     | Disponibilités : horaires, pauses, congés, moteur de créneaux                          | ✅                                     |
+| 4     | Page de réservation publique (mobile d'abord), anti double réservation                 | ✅                                     |
+| 5     | Agenda professionnel : jour / semaine / mois, création, déplacement, annulation        | ✅                                     |
+| 6     | Notifications email clients (STARTER+) et rappels automatiques (PRO)                   | ✅ (envoi réel : clé Resend à fournir) |
+| 7     | Clients (fiches, historique, notes)                                                    | ✅                                     |
+| 8     | Facturation Stripe Billing (STARTER, PRO), limites appliquées partout                  | ✅ (mode test : clé Stripe à fournir)  |
+| 9     | Statistiques (basiques / avancées), personnalisation de la page (PRO)                  | ✅                                     |
 
 ## 8. Services externes
 

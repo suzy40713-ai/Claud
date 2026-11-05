@@ -43,24 +43,23 @@ pnpm dev                       # http://localhost:3000
 Les tests d'intégration **réinitialisent** la base `TEST_DATABASE_URL`
 (par défaut `postgres://postgres@localhost:5432/booksync_test`).
 
-## Authentification (étape 1)
+## Fonctionnalités
 
-- Better Auth : email + mot de passe, confirmation obligatoire de l'email, mot de passe oublié,
-  sessions de 30 jours, limitation des tentatives (5/min sur la connexion et l'inscription).
-- Protection contre l'énumération des comptes : une inscription avec un email déjà utilisé
-  répond comme un succès et prévient le titulaire par email.
-- Entreprise (organisation) créée à l'onboarding : nom, adresse publique unique, fuseau horaire.
-  Le créateur est `owner`. L'appartenance est toujours revérifiée en base (`requireOrganization`).
-- Emails : chaque envoi est journalisé dans `email_message`. Sans `RESEND_API_KEY`, rien n'est
-  envoyé ; en développement, les emails sont consultables sur `/dev/emails`.
+| Domaine              | Contenu                                                                                                                                                                                   |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Comptes              | Inscription / connexion email, Google (si configuré), vérification de l'email, mot de passe oublié, CGU obligatoires, sessions de 30 jours, limitation des tentatives                     |
+| Entreprise           | Création guidée (activité, adresse publique, fuseau), assistant d'installation, paramètres (coordonnées, logo, règles de réservation, personnalisation Pro)                               |
+| Équipe               | Rôles propriétaire / administrateur / employé, invitations par email (lien signé, 7 jours, usage unique), profils, services autorisés, horaires, pauses, absences                         |
+| Agenda               | Calendrier jour / semaine / mois, filtre par employé, création, déplacement, annulation, présence / absence, notes internes                                                               |
+| Réservation publique | `/{adresse}` : prestation → employé → créneau → coordonnées, sans compte ; lien signé `/rdv/…` pour modifier, annuler, ajouter à l'agenda (.ics)                                          |
+| Disponibilités       | Moteur pur (`src/domain/availability`) : horaires, pauses, fermetures, battement, délais, fuseaux et changements d'heure ; contrainte d'exclusion PostgreSQL contre la double réservation |
+| Clients              | Liste, recherche, fiche, historique, notes, suppression (RGPD)                                                                                                                            |
+| Notifications        | File dédupliquée (`notification`), confirmation / modification / annulation, rappels 24 h et 2 h (Pro), alertes équipe, nouvelles tentatives, prêt pour les SMS                           |
+| Statistiques         | Vue générale et page analytique calculées depuis les rendez-vous réels ; avancées en Pro                                                                                                  |
+| Abonnements          | Stripe Checkout, changement d'offre au prorata, résiliation, portail, factures, webhooks idempotents, limites appliquées côté serveur                                                     |
+| RGPD                 | Export JSON des données, suppression du compte, hébergement UE                                                                                                                            |
 
-| Page                                                  | Rôle                                     |
-| ----------------------------------------------------- | ---------------------------------------- |
-| `/inscription`, `/connexion`                          | Création de compte, connexion            |
-| `/verifier-email`                                     | Attente / renvoi du lien de confirmation |
-| `/mot-de-passe-oublie`, `/reinitialiser-mot-de-passe` | Réinitialisation                         |
-| `/onboarding`                                         | Création de l'entreprise                 |
-| `/tableau-de-bord`                                    | Espace professionnel (protégé)           |
+Mise en ligne : voir [`docs/deploiement.md`](docs/deploiement.md). Cahier des charges : [`docs/cahier-des-charges.md`](docs/cahier-des-charges.md).
 
 ## Structure
 
