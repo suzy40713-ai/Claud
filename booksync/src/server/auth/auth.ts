@@ -2,19 +2,20 @@ import "server-only";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { organization } from "better-auth/plugins";
-import { asc, eq } from "drizzle-orm";
+import { APIError } from "better-auth/api";
 import { db } from "@/db/client";
 import * as schema from "@/db/schema";
 import { env } from "@/lib/env";
 import { sendEmail } from "@/server/email/send";
 import { PASSWORD_MIN } from "@/lib/validation/auth";
+import { TERMS_VERSION } from "@/lib/legal";
 import {
   existingAccountTemplate,
   resetPasswordTemplate,
   verifyEmailTemplate,
 } from "@/server/email/templates";
 
+export { TERMS_VERSION };
 export const PASSWORD_MIN_LENGTH = PASSWORD_MIN;
 
 export const auth = betterAuth({
@@ -62,7 +63,8 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 30,
     updateAge: 60 * 60 * 24,
-    cookieCache: { enabled: true, maxAge: 5 * 60 },
+    // Pas de cache cookie : chaque requête relit la session en base (révocation immédiate, données à jour).
+    cookieCache: { enabled: false },
   },
   rateLimit: {
     enabled: env.AUTH_RATE_LIMIT,
@@ -76,36 +78,47 @@ export const auth = betterAuth({
       "/send-verification-email": { window: 60, max: 3 },
     },
   },
+  user: {
+    additionalFields: {
+      termsAcceptedAt: { type: "date", required: false, input: false },
+      termsVersion: { type: "string", required: false, input: false },
+    },
+  },
+  socialProviders:
+    env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+      ? {
+          google: {
+            clientId: env.GOOGLE_CLIENT_ID,
+            clientSecret: env.GOOGLE_CLIENT_SECRET,
+            prompt: "select_account",
+          },
+        }
+      : {},
+  account: {
+    // Un compte créé par email et une connexion Google avec la même adresse vérifiée = un seul compte.
+    accountLinking: { enabled: true, trustedProviders: ["google"] },
+  },
   databaseHooks: {
-    session: {
+    user: {
       create: {
-        // À la connexion, on réactive automatiquement la première entreprise de l'utilisateur.
-        async before(session) {
-          const [membership] = await db
-            .select({ organizationId: schema.member.organizationId })
-            .from(schema.member)
-            .where(eq(schema.member.userId, session.userId))
-            .orderBy(asc(schema.member.createdAt))
-            .limit(1);
-          return { data: { ...session, activeOrganizationId: membership?.organizationId ?? null } };
+        // Les conditions générales sont obligatoires à l'inscription par email.
+        // (Inscription Google : l'acceptation est demandée avant l'accès à l'application.)
+        async before(user, ctx) {
+          if (ctx?.path === "/sign-up/email") {
+            const accepted = (ctx.body as { acceptTerms?: unknown } | undefined)?.acceptTerms === true;
+            if (!accepted) {
+              throw new APIError("BAD_REQUEST", {
+                code: "TERMS_NOT_ACCEPTED",
+                message: "Vous devez accepter les conditions générales.",
+              });
+            }
+            return { data: { ...user, termsAcceptedAt: new Date(), termsVersion: TERMS_VERSION } };
+          }
         },
       },
     },
   },
-  plugins: [
-    organization({
-      creatorRole: "owner",
-      organizationLimit: 10,
-      schema: {
-        organization: {
-          additionalFields: {
-            timezone: { type: "string", required: true, defaultValue: "Europe/Paris", input: true },
-          },
-        },
-      },
-    }),
-    nextCookies(), // doit rester en dernier
-  ],
+  plugins: [nextCookies()],
 });
 
 export type Session = typeof auth.$Infer.Session;

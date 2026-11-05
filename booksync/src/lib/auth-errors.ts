@@ -14,6 +14,7 @@ const MESSAGES: Record<string, string> = {
   EMAIL_ALREADY_VERIFIED: "Votre adresse email est déjà confirmée. Vous pouvez vous connecter.",
   SESSION_EXPIRED: "Votre session a expiré. Reconnectez-vous.",
   TOO_MANY_REQUESTS: "Trop de tentatives. Patientez une minute avant de réessayer.",
+  TERMS_NOT_ACCEPTED: "Vous devez accepter les conditions générales pour créer un compte.",
   ORGANIZATION_ALREADY_EXISTS: "Cette adresse est déjà utilisée par une autre entreprise.",
   SLUG_IS_TAKEN: "Cette adresse est déjà utilisée par une autre entreprise.",
   YOU_HAVE_REACHED_THE_MAXIMUM_NUMBER_OF_ORGANIZATIONS:

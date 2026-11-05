@@ -25,6 +25,16 @@ export const env = createEnv({
     /** Clé Resend. Absente : les emails sont journalisés en base sans être envoyés (développement). */
     RESEND_API_KEY: z.string().startsWith("re_").optional(),
     EMAIL_FROM: z.string().min(3).default("BookSync <onboarding@resend.dev>"),
+    /** Connexion avec Google (Google Cloud Console → Identifiants → ID client OAuth). */
+    GOOGLE_CLIENT_ID: z.string().min(10).optional(),
+    GOOGLE_CLIENT_SECRET: z.string().min(10).optional(),
+    /** Stripe Billing (mode test : sk_test_…). */
+    STRIPE_SECRET_KEY: z.string().startsWith("sk_").optional(),
+    STRIPE_WEBHOOK_SECRET: z.string().startsWith("whsec_").optional(),
+    STRIPE_PRICE_STARTER: z.string().startsWith("price_").optional(),
+    STRIPE_PRICE_PRO: z.string().startsWith("price_").optional(),
+    /** Secret partagé avec le planificateur (Supabase pg_cron) pour /api/cron/*. */
+    CRON_SECRET: z.string().min(24).optional(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
@@ -37,6 +47,13 @@ export const env = createEnv({
     AUTH_RATE_LIMIT: process.env.AUTH_RATE_LIMIT,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     EMAIL_FROM: process.env.EMAIL_FROM,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+    STRIPE_PRICE_STARTER: process.env.STRIPE_PRICE_STARTER,
+    STRIPE_PRICE_PRO: process.env.STRIPE_PRICE_PRO,
+    CRON_SECRET: process.env.CRON_SECRET,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   },
   // Permet le build Docker sans secrets (ils sont injectés à l'exécution par Render).

@@ -133,3 +133,43 @@ Mot de passe oublié : ${resetUrl}
 Si vous n'êtes pas à l'origine de cette demande, ignorez ce message : votre compte reste protégé.`;
   return { template: "existing-account", subject, html, text };
 }
+
+const ROLE_FR: Record<string, string> = {
+  admin: "administrateur",
+  employee: "employé",
+  owner: "propriétaire",
+};
+
+export function invitationTemplate({
+  organizationName,
+  inviterName,
+  role,
+  url,
+  expiresInDays,
+}: {
+  organizationName: string;
+  inviterName: string;
+  role: string;
+  url: string;
+  expiresInDays: number;
+}): RenderedEmail {
+  const subject = `${inviterName} vous invite à rejoindre ${organizationName} sur BookSync`;
+  const html = layout({
+    preheader: `Rejoignez l'équipe ${organizationName} sur BookSync.`,
+    body: [
+      `<h1 style="margin:0 0 16px;font-size:20px;line-height:28px;">Rejoignez ${escapeHtml(organizationName)}</h1>`,
+      paragraph(
+        `${escapeHtml(inviterName)} vous invite à rejoindre l'équipe <strong>${escapeHtml(organizationName)}</strong> sur BookSync en tant qu'<strong>${escapeHtml(ROLE_FR[role] ?? role)}</strong>.`,
+      ),
+      `<p style="margin:24px 0;">${button(url, "Accepter l'invitation")}</p>`,
+      paragraph(`Ce lien est personnel et valable ${expiresInDays} jours.`),
+      fallbackLink(url),
+    ].join(""),
+  });
+  const text = `${inviterName} vous invite à rejoindre l'équipe ${organizationName} sur BookSync en tant qu'${ROLE_FR[role] ?? role}.
+
+Accepter l'invitation : ${url}
+
+Ce lien est personnel et valable ${expiresInDays} jours.`;
+  return { template: "invitation", subject, html, text };
+}

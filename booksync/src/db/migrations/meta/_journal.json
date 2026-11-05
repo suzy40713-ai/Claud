@@ -12,15 +12,22 @@
     {
       "idx": 1,
       "version": "7",
-      "when": 1793913921912,
-      "tag": "0001_auth_and_email",
+      "when": 1793916131976,
+      "tag": "0001_schema",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
-      "when": 1793913922708,
-      "tag": "0002_enable_rls",
+      "when": 1793916132761,
+      "tag": "0002_constraints_and_rls",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793916801200,
+      "tag": "0003_staff_keep_history",
       "breakpoints": true
     }
   ]

@@ -7,21 +7,24 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Spinner } from "@/components/ui/spinner";
+import { ACTIVITIES } from "@/domain/activities";
 import { slugify } from "@/domain/organization/slug";
 import { PREFERRED_TIMEZONES } from "@/domain/organization/timezones";
 import { checkSlugAvailability, createOrganizationAction, type OnboardingState } from "./actions";
 
 export function OnboardingForm({ publicBaseUrl }: { publicBaseUrl: string }) {
-  const [state, formAction, pending] = useActionState<OnboardingState, FormData>(
+  const [state, formAction, pending] = useActionState<OnboardingState | null, FormData>(
     createOrganizationAction,
-    {},
+    null,
   );
-  const [name, setName] = useState(state.values?.name ?? "");
-  const [slug, setSlug] = useState(state.values?.slug ?? "");
-  const [slugTouched, setSlugTouched] = useState(Boolean(state.values?.slug));
+  const fieldErrors: Record<string, string> = state && !state.ok ? (state.fieldErrors ?? {}) : {};
+  const formError = state && !state.ok && Object.keys(fieldErrors).length === 0 ? state.error : null;
+  const [name, setName] = useState(state?.values?.name ?? "");
+  const [slug, setSlug] = useState(state?.values?.slug ?? "");
+  const [slugTouched, setSlugTouched] = useState(Boolean(state?.values?.slug));
   const [slugCheck, setSlugCheck] = useState<{ slug: string; error: string | null } | null>(null);
-  const [timezone, setTimezone] = useState(state.values?.timezone ?? "Europe/Paris");
-  const [timezoneTouched, setTimezoneTouched] = useState(Boolean(state.values?.timezone));
+  const [timezone, setTimezone] = useState(state?.values?.timezone ?? "Europe/Paris");
+  const [timezoneTouched, setTimezoneTouched] = useState(Boolean(state?.values?.timezone));
 
   // Vérification de disponibilité de l'adresse, avec un léger délai pendant la frappe.
   useEffect(() => {
@@ -38,7 +41,7 @@ export function OnboardingForm({ publicBaseUrl }: { publicBaseUrl: string }) {
   }, [slug]);
 
   const liveSlugError = slug && slugCheck?.slug === slug ? slugCheck.error : null;
-  const shownSlugError = liveSlugError ?? (slug === state.values?.slug ? state.errors?.slug : null);
+  const shownSlugError = liveSlugError ?? (slug === state?.values?.slug ? fieldErrors.slug : null);
 
   function onNameChange(value: string) {
     setName(value);
@@ -52,8 +55,8 @@ export function OnboardingForm({ publicBaseUrl }: { publicBaseUrl: string }) {
 
   return (
     <form action={formAction} noValidate className="grid gap-5">
-      {state.formError ? <Alert variant="error">{state.formError}</Alert> : null}
-      <Field id="name" label="Nom de l'entreprise" error={state.errors?.name}>
+      {formError ? <Alert variant="error">{formError}</Alert> : null}
+      <Field id="name" label="Nom de l'entreprise" error={fieldErrors.name}>
         <Input
           id="name"
           name="name"
@@ -91,7 +94,7 @@ export function OnboardingForm({ publicBaseUrl }: { publicBaseUrl: string }) {
           />
         </div>
       </Field>
-      <Field id="timezone" label="Fuseau horaire" error={state.errors?.timezone}>
+      <Field id="timezone" label="Fuseau horaire" error={fieldErrors.timezone}>
         <NativeSelect
           id="timezone"
           name="timezone"

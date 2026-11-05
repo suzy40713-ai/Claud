@@ -2,10 +2,13 @@
  * Tables d'authentification et d'organisation (format attendu par Better Auth).
  * Les noms de colonnes sont convertis en snake_case par Drizzle (`casing: "snake_case"`).
  */
+import { sql } from "drizzle-orm";
 import {
   bigint,
   boolean,
+  check,
   index,
+  integer,
   pgTable,
   text,
   timestamp,
@@ -27,6 +30,9 @@ export const user = pgTable("user", {
   email: text().notNull().unique(),
   emailVerified: boolean().notNull().default(false),
   image: text(),
+  /** Acceptation des conditions générales (obligatoire). */
+  termsAcceptedAt: timestamp({ withTimezone: true }),
+  termsVersion: text(),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 });
@@ -44,7 +50,6 @@ export const session = pgTable(
     userId: uuid()
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    activeOrganizationId: uuid().references(() => organization.id, { onDelete: "set null" }),
   },
   (t) => [index("session_user_id_idx").on(t.userId)],
 );
@@ -94,17 +99,57 @@ export const rateLimit = pgTable("rate_limit", {
   lastRequest: bigint({ mode: "number" }).notNull(),
 });
 
-/** Une organisation = un compte client BookSync (cabinet, salon, studio…). */
-export const organization = pgTable("organization", {
-  id: id(),
-  name: text().notNull(),
-  /** Identifiant public utilisé dans l'URL de la page de réservation : booksync.fr/{slug} */
-  slug: text().notNull().unique(),
-  logo: text(),
-  metadata: text(),
-  timezone: text().notNull().default("Europe/Paris"),
-  createdAt: createdAt(),
-});
+/** Une organisation = un compte client BookSync (salon, cabinet, studio, garage…). */
+export const organization = pgTable(
+  "organization",
+  {
+    id: id(),
+    name: text().notNull(),
+    /** Identifiant public utilisé dans l'URL de la page de réservation : booksync.fr/{slug} */
+    slug: text().notNull().unique(),
+    activity: text(),
+    description: text(),
+    logoFileId: uuid(),
+    email: text(),
+    phone: text(),
+    addressLine1: text(),
+    addressLine2: text(),
+    postalCode: text(),
+    city: text(),
+    country: text().notNull().default("FR"),
+    timezone: text().notNull().default("Europe/Paris"),
+    currency: text().notNull().default("EUR"),
+    /** Réglages de réservation en ligne */
+    bookingEnabled: boolean().notNull().default(true),
+    minNoticeMinutes: integer().notNull().default(120),
+    maxAdvanceDays: integer().notNull().default(60),
+    slotIntervalMinutes: integer().notNull().default(15),
+    cancellationNoticeHours: integer().notNull().default(24),
+    /** Personnalisation de la page de réservation (plan Pro) */
+    brandColor: text(),
+    coverFileId: uuid(),
+    welcomeMessage: text(),
+    /** Notifications */
+    notifyStaffOnBooking: boolean().notNull().default(true),
+    reminder24h: boolean().notNull().default(true),
+    reminder2h: boolean().notNull().default(true),
+    /** Abonnement (synchronisé depuis Stripe par webhook) */
+    plan: text({ enum: ["free", "starter", "pro"] }).notNull().default("free"),
+    stripeCustomerId: text().unique(),
+    stripeSubscriptionId: text().unique(),
+    subscriptionStatus: text(),
+    currentPeriodEnd: timestamp({ withTimezone: true }),
+    cancelAtPeriodEnd: boolean().notNull().default(false),
+    onboardingCompletedAt: timestamp({ withTimezone: true }),
+    metadata: text(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    check("organization_slot_interval_ck", sql`${t.slotIntervalMinutes} between 5 and 120`),
+    check("organization_min_notice_ck", sql`${t.minNoticeMinutes} between 0 and 43200`),
+    check("organization_max_advance_ck", sql`${t.maxAdvanceDays} between 1 and 730`),
+  ],
+);
 
 export const member = pgTable(
   "member",
@@ -116,8 +161,9 @@ export const member = pgTable(
     userId: uuid()
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    /** owner | admin | member — affinés selon le cahier des charges. */
-    role: text().notNull().default("member"),
+    role: text({ enum: ["owner", "admin", "employee"] })
+      .notNull()
+      .default("employee"),
     createdAt: createdAt(),
   },
   (t) => [
@@ -134,8 +180,14 @@ export const invitation = pgTable(
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
     email: text().notNull(),
-    role: text(),
-    status: text().notNull().default("pending"),
+    role: text({ enum: ["admin", "employee"] })
+      .notNull()
+      .default("employee"),
+    /** Empreinte SHA-256 du jeton envoyé par email (le jeton lui-même n'est jamais stocké). */
+    tokenHash: text().notNull().unique(),
+    status: text({ enum: ["pending", "accepted", "declined", "cancelled"] })
+      .notNull()
+      .default("pending"),
     expiresAt: timestamp({ withTimezone: true }).notNull(),
     createdAt: createdAt(),
     inviterId: uuid()
@@ -145,5 +197,8 @@ export const invitation = pgTable(
   (t) => [
     index("invitation_org_id_idx").on(t.organizationId),
     index("invitation_email_idx").on(t.email),
+    uniqueIndex("invitation_pending_uq")
+      .on(t.organizationId, t.email)
+      .where(sql`${t.status} = 'pending'`),
   ],
 );

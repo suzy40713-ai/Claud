@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Checkbox } from "@/components/ui/checkbox";
+import { safeRedirect } from "@/lib/auth-errors";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
@@ -14,6 +17,11 @@ import { PASSWORD_RULE, validateSignUp, type SignUpErrors } from "@/lib/validati
 
 export function SignUpForm() {
   const router = useRouter();
+  const params = useSearchParams();
+  const presetEmail = params.get("email") ?? "";
+  const redirection = safeRedirect(params.get("redirection"), "/verifier-email/confirme");
+  const [terms, setTerms] = useState(false);
+  const [termsError, setTermsError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const [errors, setErrors] = useState<SignUpErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -24,15 +32,17 @@ export function SignUpForm() {
     const result = validateSignUp(data);
     setErrors(result.errors);
     setFormError(null);
-    if (!result.ok) return;
+    setTermsError(terms ? null : "Vous devez accepter les conditions générales pour créer un compte.");
+    if (!result.ok || !terms) return;
 
     startTransition(async () => {
       const { error } = await authClient.signUp.email({
         name: result.data.name,
         email: result.data.email,
         password: result.data.password,
-        callbackURL: "/verifier-email/confirme",
-      });
+        callbackURL: redirection,
+        acceptTerms: true,
+      } as Parameters<typeof authClient.signUp.email>[0]);
       if (error) {
         setFormError(authErrorMessage(error));
         return;
@@ -51,6 +61,7 @@ export function SignUpForm() {
         <Input
           id="email"
           name="email"
+          defaultValue={presetEmail}
           type="email"
           inputMode="email"
           autoComplete="email"
@@ -63,6 +74,34 @@ export function SignUpForm() {
       <Field id="password" label="Mot de passe" hint={PASSWORD_RULE} error={errors.password}>
         <PasswordInput id="password" name="password" autoComplete="new-password" required />
       </Field>
+      <div className="grid gap-1.5">
+        <div className="flex items-start gap-2.5">
+          <Checkbox
+            id="terms"
+            checked={terms}
+            onCheckedChange={(v) => setTerms(v === true)}
+            aria-invalid={termsError ? true : undefined}
+            aria-describedby={termsError ? "terms-error" : undefined}
+            className="mt-0.5"
+          />
+          <label htmlFor="terms" className="text-sm leading-snug text-muted-foreground">
+            J&apos;accepte les{" "}
+            <Link href="/conditions-generales" target="_blank" className="font-medium text-foreground underline underline-offset-2">
+              conditions générales
+            </Link>{" "}
+            et la{" "}
+            <Link href="/confidentialite" target="_blank" className="font-medium text-foreground underline underline-offset-2">
+              politique de confidentialité
+            </Link>
+            .
+          </label>
+        </div>
+        {termsError ? (
+          <p id="terms-error" className="text-[13px] font-medium text-destructive">
+            {termsError}
+          </p>
+        ) : null}
+      </div>
       <Button type="submit" size="lg" disabled={pending} className="mt-1 w-full">
         {pending ? <Spinner /> : null}
         Créer mon compte
