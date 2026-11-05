@@ -277,6 +277,7 @@ export const notification = pgTable(
         "reminder_2h",
         "staff_new_booking",
         "staff_booking_cancelled",
+        "staff_booking_rescheduled",
       ],
     }).notNull(),
     audience: text({ enum: ["customer", "staff"] }).notNull(),

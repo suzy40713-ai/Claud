@@ -13,7 +13,7 @@ export async function countUnread(ctx: OrgContext) {
       and(
         eq(notification.organizationId, ctx.organization.id),
         eq(notification.audience, "staff"),
-        eq(notification.recipient, ctx.user.email),
+        eq(notification.recipient, ctx.user.email.toLowerCase()),
         isNull(notification.readAt),
       ),
     );

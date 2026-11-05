@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireOrg } from "@/server/auth/session";
 import { runAction } from "@/server/errors";
+import { markOnboardingStep } from "@/server/onboarding";
 import {
   addTimeOff,
   removeTimeOff,
@@ -19,7 +20,12 @@ function refresh<T>(res: T): T {
 
 export async function saveHoursAction(staffId: string | null, week: unknown) {
   const ctx = await requireOrg();
-  return refresh(await runAction(() => setWeeklyHours(ctx, staffId, week), "Horaires enregistrés."));
+  return refresh(
+    await runAction(async () => {
+      await setWeeklyHours(ctx, staffId, week);
+      if (!staffId) await markOnboardingStep(ctx.organization.id, "hours");
+    }, "Horaires enregistrés."),
+  );
 }
 
 export async function addTimeOffAction(staffId: string | null, input: Parameters<typeof addTimeOff>[2]) {
