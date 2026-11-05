@@ -35,3 +35,27 @@ services:
         sync: false
       - key: LEAD_NOTIFY_EMAIL
         sync: false
+  # ── BookSync ───────────────────────────────────────────────
+  # Région UE (RGPD). Le plan « free » se met en veille après inactivité :
+  # passer en « starter » avant l'ouverture aux clients.
+  - type: web
+    name: booksync
+    runtime: docker
+    rootDir: booksync
+    dockerfilePath: ./Dockerfile
+    region: frankfurt
+    plan: free
+    healthCheckPath: /api/health
+    autoDeploy: true
+    buildFilter:
+      paths:
+        - booksync/**
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false
+      - key: DATABASE_POOL_MAX
+        value: "10"
