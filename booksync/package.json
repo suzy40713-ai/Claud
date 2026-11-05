@@ -17,10 +17,12 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/db/migrate.ts",
     "db:studio": "drizzle-kit studio",
-    "check": "pnpm typecheck && pnpm lint && pnpm test"
+    "check": "pnpm typecheck && pnpm lint && pnpm test",
+    "build:e2e": "NEXT_PUBLIC_APP_URL=http://localhost:3100 next build"
   },
   "dependencies": {
     "@t3-oss/env-nextjs": "0.13.11",
+    "better-auth": "1.7.12",
     "class-variance-authority": "0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "0.45.4",

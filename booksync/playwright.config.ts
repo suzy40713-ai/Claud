@@ -19,6 +19,9 @@ export default defineConfig({
     command: `pnpm exec next start -p ${PORT}`,
     url: `${baseURL}/api/health`,
     reuseExistingServer: !process.env.CI,
+    // Les tests créent de nombreux comptes : la limitation de tentatives est désactivée ici
+    // (elle est couverte par les tests d'intégration).
+    env: { AUTH_RATE_LIMIT: "off", NEXT_PUBLIC_APP_URL: baseURL },
     timeout: 60_000,
   },
 });

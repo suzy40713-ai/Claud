@@ -20,7 +20,8 @@ Interface entièrement en français.
 Prérequis : Node 22+, pnpm 10+, PostgreSQL 16+.
 
 ```bash
-cp .env.example .env.local     # puis ajuster DATABASE_URL
+scripts/dev-db.sh              # PostgreSQL local sans Docker (facultatif)
+cp .env.example .env.local     # puis ajuster DATABASE_URL et BETTER_AUTH_SECRET
 cp .env.local .env             # lu par drizzle-kit
 createdb booksync_dev && createdb booksync_test
 pnpm install
@@ -41,6 +42,25 @@ pnpm dev                       # http://localhost:3000
 
 Les tests d'intégration **réinitialisent** la base `TEST_DATABASE_URL`
 (par défaut `postgres://postgres@localhost:5432/booksync_test`).
+
+## Authentification (étape 1)
+
+- Better Auth : email + mot de passe, confirmation obligatoire de l'email, mot de passe oublié,
+  sessions de 30 jours, limitation des tentatives (5/min sur la connexion et l'inscription).
+- Protection contre l'énumération des comptes : une inscription avec un email déjà utilisé
+  répond comme un succès et prévient le titulaire par email.
+- Entreprise (organisation) créée à l'onboarding : nom, adresse publique unique, fuseau horaire.
+  Le créateur est `owner`. L'appartenance est toujours revérifiée en base (`requireOrganization`).
+- Emails : chaque envoi est journalisé dans `email_message`. Sans `RESEND_API_KEY`, rien n'est
+  envoyé ; en développement, les emails sont consultables sur `/dev/emails`.
+
+| Page                                                  | Rôle                                     |
+| ----------------------------------------------------- | ---------------------------------------- |
+| `/inscription`, `/connexion`                          | Création de compte, connexion            |
+| `/verifier-email`                                     | Attente / renvoi du lien de confirmation |
+| `/mot-de-passe-oublie`, `/reinitialiser-mot-de-passe` | Réinitialisation                         |
+| `/onboarding`                                         | Création de l'entreprise                 |
+| `/tableau-de-bord`                                    | Espace professionnel (protégé)           |
 
 ## Structure
 

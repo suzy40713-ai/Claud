@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import { cacheLife } from "next/cache";
 import { CalendarCheck, BellRing, Globe2 } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +35,15 @@ export default function HomePage() {
       />
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
         <Logo />
-        <ThemeToggle />
+        <nav className="flex items-center gap-1 sm:gap-2">
+          <ThemeToggle />
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/connexion">Connexion</Link>
+          </Button>
+          <Button asChild size="sm">
+            <Link href="/inscription">Essayer</Link>
+          </Button>
+        </nav>
       </header>
 
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-4 pt-14 pb-16 text-center sm:px-6 sm:pt-24">

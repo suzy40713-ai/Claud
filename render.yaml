@@ -59,3 +59,12 @@ services:
         sync: false
       - key: DATABASE_POOL_MAX
         value: "10"
+      - key: BETTER_AUTH_SECRET
+        generateValue: true
+      - key: AUTH_RATE_LIMIT
+        value: "on"
+      # Facultatif : sans clé, les emails sont journalisés mais pas envoyés.
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
