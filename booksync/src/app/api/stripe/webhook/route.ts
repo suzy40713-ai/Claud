@@ -1,24 +1,20 @@
 import { connection } from "next/server";
-import { env } from "@/lib/env";
 import { handleStripeEvent } from "@/server/billing/service";
-import { getStripe } from "@/server/billing/stripe";
+import { getStripe, getWebhookSecret } from "@/server/billing/stripe";
 
 /** Webhooks Stripe : signature vérifiée sur le corps brut, traitement idempotent. */
 export async function POST(req: Request) {
   await connection();
   const stripe = getStripe();
-  if (!stripe || !env.STRIPE_WEBHOOK_SECRET)
+  const secret = stripe ? await getWebhookSecret() : null;
+  if (!stripe || !secret)
     return Response.json({ error: "Facturation non configurée" }, { status: 503 });
   const signature = req.headers.get("stripe-signature");
   if (!signature) return Response.json({ error: "Signature manquante" }, { status: 400 });
   const payload = await req.text();
   let event;
   try {
-    event = await stripe.webhooks.constructEventAsync(
-      payload,
-      signature,
-      env.STRIPE_WEBHOOK_SECRET,
-    );
+    event = await stripe.webhooks.constructEventAsync(payload, signature, secret);
   } catch {
     return Response.json({ error: "Signature invalide" }, { status: 400 });
   }

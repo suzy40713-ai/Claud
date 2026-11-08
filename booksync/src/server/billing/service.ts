@@ -8,20 +8,24 @@ import { assertCan } from "@/domain/permissions";
 import { env } from "@/lib/env";
 import type { OrgContext } from "@/server/auth/session";
 import { UserError } from "@/server/errors";
-import { getStripe, isBillingConfigured } from "./stripe";
+import { ensureStripeSetup, getPriceIds, getStripe, isBillingConfigured } from "./stripe";
 
 type PaidPlan = Exclude<PlanId, "free">;
 
-export function priceIdFor(plan: PaidPlan) {
-  const id = plan === "starter" ? env.STRIPE_PRICE_STARTER : env.STRIPE_PRICE_PRO;
-  if (!id) throw new UserError("La facturation n'est pas encore configurée.");
-  return id;
+export async function priceIdFor(plan: PaidPlan) {
+  try {
+    return (await getPriceIds())[plan];
+  } catch (error) {
+    console.error("[stripe] prix introuvables", error);
+    throw new UserError("La facturation n'est pas encore configurée.");
+  }
 }
 
-export function planForPrice(priceId: string | null | undefined): PaidPlan | null {
+export async function planForPrice(priceId: string | null | undefined): Promise<PaidPlan | null> {
   if (!priceId) return null;
-  if (priceId === env.STRIPE_PRICE_STARTER) return "starter";
-  if (priceId === env.STRIPE_PRICE_PRO) return "pro";
+  const ids = await getPriceIds();
+  if (priceId === ids.starter) return "starter";
+  if (priceId === ids.pro) return "pro";
   return null;
 }
 
@@ -71,7 +75,8 @@ export async function startSubscription(
 ): Promise<{ url: string } | { changed: true }> {
   assertCan(ctx.role, "billing.manage");
   const stripe = requireStripe();
-  const price = priceIdFor(plan);
+  await ensureStripeSetup();
+  const price = await priceIdFor(plan);
 
   if (hasLiveSubscription(ctx)) {
     const sub = await stripe.subscriptions.retrieve(ctx.organization.stripeSubscriptionId!);
@@ -167,7 +172,7 @@ export async function syncSubscription(sub: Stripe.Subscription) {
   if (org.stripeSubscriptionId && org.stripeSubscriptionId !== sub.id && sub.status === "canceled")
     return org.id;
   const item = sub.items.data[0];
-  const plan = planForPrice(item?.price.id);
+  const plan = await planForPrice(item?.price.id);
   const ended = ["canceled", "incomplete_expired", "unpaid"].includes(sub.status);
   await db
     .update(organization)

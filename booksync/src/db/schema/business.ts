@@ -340,3 +340,16 @@ export const stripeEvent = pgTable("stripe_event", {
   type: text().notNull(),
   processedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
+
+/**
+ * Réglages techniques de l'application (ex. secret du webhook Stripe créé automatiquement).
+ * Lisibles uniquement côté serveur (RLS activée, aucun accès public).
+ */
+export const appSetting = pgTable("app_setting", {
+  key: text().primaryKey(),
+  value: text().notNull(),
+  updatedAt: timestamp({ withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});

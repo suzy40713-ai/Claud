@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import { env } from "@/lib/env";
 import { safeEqual } from "@/lib/tokens";
+import { ensureStripeSetup } from "@/server/billing/stripe";
 import { processDueNotifications } from "@/server/notifications/dispatch";
 
 /**
@@ -15,7 +16,19 @@ async function handle(req: Request) {
   if (!expected || !safeEqual(given, expected))
     return Response.json({ error: "Non autorisé" }, { status: 401 });
   const stats = await processDueNotifications();
-  return Response.json({ ok: true, ...stats }, { headers: { "Cache-Control": "no-store" } });
+  // Configuration Stripe automatique (offres + webhook), sans bloquer les notifications.
+  let billing: "ok" | "absent" | "erreur" = "absent";
+  try {
+    await ensureStripeSetup();
+    if (process.env.STRIPE_SECRET_KEY) billing = "ok";
+  } catch (error) {
+    console.error("[stripe] configuration automatique impossible", error);
+    billing = "erreur";
+  }
+  return Response.json(
+    { ok: true, ...stats, billing },
+    { headers: { "Cache-Control": "no-store" } },
+  );
 }
 
 export const GET = handle;
