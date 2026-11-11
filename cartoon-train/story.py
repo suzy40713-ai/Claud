@@ -715,6 +715,9 @@ def main():
     a = ap.parse_args()
     if a.story == "h1":
         stories = [dict(title=TITLE, slug=SLUG, beats=BEATS, hero=TOI)]
+    elif a.story.startswith("pc") or a.story.startswith("pg") or a.story == "percer":
+        from percer import STORIES as PR
+        stories = [s_ for s_ in PR if a.story == "percer" or s_["slug"].startswith(a.story)]
     elif a.story.startswith("ab"):
         from absurde import STORIES as AB
         stories = [s_ for s_ in AB if a.story == "aball" or s_["slug"].startswith(a.story)]
