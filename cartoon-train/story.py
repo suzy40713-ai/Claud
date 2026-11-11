@@ -715,6 +715,9 @@ def main():
     a = ap.parse_args()
     if a.story == "h1":
         stories = [dict(title=TITLE, slug=SLUG, beats=BEATS, hero=TOI)]
+    elif a.story.startswith("ab"):
+        from absurde import STORIES as AB
+        stories = [s_ for s_ in AB if a.story == "aball" or s_["slug"].startswith(a.story)]
     elif a.story.startswith("t5"):
         from types5 import STORIES as T5
         stories = [s_ for s_ in T5 if a.story == "t5all" or s_["slug"].startswith(a.story)]
