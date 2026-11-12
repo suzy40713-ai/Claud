@@ -36,6 +36,13 @@
       "when": 1794145295116,
       "tag": "0004_app_setting",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794506227835,
+      "tag": "0005_autopilot",
+      "breakpoints": true
     }
   ]
 }

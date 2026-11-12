@@ -1,31 +1,6 @@
-import type { Metadata } from "next";
-import { Suspense } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { requirePermission } from "@/server/auth/session";
-import { NotificationSettingsForm } from "./notification-settings-form";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Notifications — Paramètres" };
-
-async function Content() {
-  const ctx = await requirePermission("notifications.settings");
-  const o = ctx.organization;
-  return (
-    <NotificationSettingsForm
-      features={ctx.plan.features}
-      planName={ctx.plan.name}
-      initial={{
-        notifyStaffOnBooking: o.notifyStaffOnBooking,
-        reminder24h: o.reminder24h,
-        reminder2h: o.reminder2h,
-      }}
-    />
-  );
-}
-
+/** Les réglages de notifications sont désormais gérés dans Autopilot (anciens liens conservés). */
 export default function NotificationSettingsPage() {
-  return (
-    <Suspense fallback={<Skeleton className="h-96" />}>
-      <Content />
-    </Suspense>
-  );
+  redirect("/tableau-de-bord/autopilot");
 }

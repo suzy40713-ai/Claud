@@ -7,6 +7,7 @@ import {
   ListChecks,
   Scissors,
   Settings,
+  Sparkles,
   UserRound,
   Users,
 } from "lucide-react";
@@ -23,6 +24,7 @@ const ICONS = {
   chart: BarChart3,
   settings: Settings,
   card: CreditCard,
+  autopilot: Sparkles,
 } as const;
 
 export function NavIcon({ name, className }: { name: NavItem["icon"]; className?: string }) {

@@ -13,7 +13,8 @@ export type NavItem = {
     | "bell"
     | "chart"
     | "settings"
-    | "card";
+    | "card"
+    | "autopilot";
   permission?: Permission;
   /** Affiché dans la barre d'onglets mobile */
   mobile?: boolean;
@@ -37,6 +38,12 @@ export const NAV_ITEMS: NavItem[] = [
     permission: "services.manage",
   },
   { href: "/tableau-de-bord/equipe", label: "Employés", icon: "team", permission: "team.view" },
+  {
+    href: "/tableau-de-bord/autopilot",
+    label: "Autopilot",
+    icon: "autopilot",
+    permission: "autopilot.view",
+  },
   { href: "/tableau-de-bord/notifications", label: "Notifications", icon: "bell" },
   {
     href: "/tableau-de-bord/statistiques",

@@ -3,16 +3,30 @@ import { after } from "next/server";
 import { and, eq, inArray, lt, lte, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { appointment, customer, notification, organization, staff } from "@/db/schema";
+import type { AutomationKey } from "@/domain/autopilot/automations";
 import { effectivePlan } from "@/domain/billing/plans";
 import { env } from "@/lib/env";
 import { capitalize, formatCents, formatDateLong, formatDuration, formatTime } from "@/lib/format";
 import { manageUrl } from "@/lib/manage-token";
 import { customerEmail, staffEmail, type BookingEmailData } from "@/server/email/booking-templates";
 import { sendEmail } from "@/server/email/send";
+import { loadActiveChecker } from "@/server/autopilot/rules";
 
 const MAX_ATTEMPTS = 5;
 
 type Row = typeof notification.$inferSelect;
+
+/** Automatisation Autopilot dont dépend chaque type de notification. */
+const RULE_FOR_TYPE: Record<Row["type"], AutomationKey> = {
+  booking_confirmation: "booking_confirmation",
+  booking_rescheduled: "booking_confirmation",
+  booking_cancelled: "cancellation_notice",
+  reminder_24h: "reminder_24h",
+  reminder_2h: "reminder_2h",
+  staff_new_booking: "staff_alerts",
+  staff_booking_rescheduled: "staff_alerts",
+  staff_booking_cancelled: "staff_alerts",
+};
 
 /** Réserve un lot de notifications dues (SKIP LOCKED : plusieurs exécutions parallèles ne traitent jamais la même). */
 async function claimDue(limit: number): Promise<Row[]> {
@@ -114,6 +128,12 @@ async function processOne(n: Row): Promise<"sent" | "failed" | "skipped"> {
       !plan.features.automaticReminders)
   ) {
     await finish("skipped", { lastError: "Rappel devenu sans objet" });
+    return "skipped";
+  }
+  // Automatisation désactivée depuis la programmation : on n'envoie pas.
+  const active = await loadActiveChecker(db, appt.organizationId, plan.id);
+  if (!active(RULE_FOR_TYPE[n.type])) {
+    await finish("skipped", { lastError: "Automatisation désactivée dans Autopilot" });
     return "skipped";
   }
   if (n.audience === "customer" && (!plan.features.emailNotifications || !cust.emailOptIn)) {

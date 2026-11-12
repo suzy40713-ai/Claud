@@ -11,6 +11,7 @@ import {
   foreignKey,
   index,
   integer,
+  jsonb,
   pgTable,
   primaryKey,
   smallint,
@@ -353,3 +354,45 @@ export const appSetting = pgTable("app_setting", {
     .defaultNow()
     .$onUpdate(() => new Date()),
 });
+
+/**
+ * Choix du professionnel pour chaque automatisation Autopilot (absence de ligne = valeur par défaut).
+ * Le catalogue et les forfaits sont définis dans `src/domain/autopilot/automations.ts`.
+ */
+export const automationRule = pgTable(
+  "automation_rule",
+  {
+    organizationId: orgId(),
+    key: text().notNull(),
+    enabled: boolean().notNull(),
+    updatedByUserId: uuid().references(() => user.id, { onDelete: "set null" }),
+    updatedAt: updatedAt(),
+  },
+  (t) => [primaryKey({ columns: [t.organizationId, t.key] })],
+);
+
+/**
+ * Journal Autopilot : chaque action automatique ou demandée (assistant, liste d'attente, réglages),
+ * avec son statut. Les actions sensibles restent « pending » tant qu'un humain ne les a pas confirmées.
+ */
+export const autopilotAction = pgTable(
+  "autopilot_action",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    organizationId: orgId(),
+    source: text({ enum: ["automation", "assistant", "waitlist", "user"] }).notNull(),
+    kind: text().notNull(),
+    status: text({ enum: ["pending", "done", "failed", "expired", "cancelled"] }).notNull(),
+    summary: text().notNull(),
+    payload: jsonb().$type<Record<string, unknown>>().notNull().default({}),
+    error: text(),
+    actorUserId: uuid().references(() => user.id, { onDelete: "set null" }),
+    expiresAt: timestamp({ withTimezone: true }),
+    decidedAt: timestamp({ withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index("autopilot_action_org_created_idx").on(t.organizationId, t.createdAt),
+    index("autopilot_action_org_status_idx").on(t.organizationId, t.status),
+  ],
+);

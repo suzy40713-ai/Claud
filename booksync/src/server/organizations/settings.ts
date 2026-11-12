@@ -106,21 +106,6 @@ export async function updateBranding(ctx: OrgContext, input: z.input<typeof bran
   await db.update(organization).set(data).where(eq(organization.id, ctx.organization.id));
 }
 
-export const notificationSettingsSchema = z.object({
-  notifyStaffOnBooking: z.boolean(),
-  reminder24h: z.boolean(),
-  reminder2h: z.boolean(),
-});
-
-export async function updateNotificationSettings(
-  ctx: OrgContext,
-  input: z.input<typeof notificationSettingsSchema>,
-) {
-  assertCan(ctx.role, "notifications.settings");
-  const data = notificationSettingsSchema.parse(input);
-  await db.update(organization).set(data).where(eq(organization.id, ctx.organization.id));
-}
-
 const IMAGE_COLUMNS = { logo: "logoFileId", cover: "coverFileId" } as const;
 
 export async function replaceOrganizationImage(

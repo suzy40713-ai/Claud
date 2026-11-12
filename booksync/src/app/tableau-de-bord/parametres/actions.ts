@@ -7,7 +7,6 @@ import {
   replaceOrganizationImage,
   updateBookingSettings,
   updateBranding,
-  updateNotificationSettings,
   updateOrganizationInfo,
 } from "@/server/organizations/settings";
 
@@ -40,18 +39,6 @@ export async function updateBookingSettingsAction(
 export async function updateBrandingAction(input: Parameters<typeof updateBranding>[1]) {
   const ctx = await requireOrg();
   return done(await runAction(() => updateBranding(ctx, input), "Personnalisation enregistrée."));
-}
-
-export async function updateNotificationSettingsAction(
-  input: Parameters<typeof updateNotificationSettings>[1],
-) {
-  const ctx = await requireOrg();
-  return done(
-    await runAction(
-      () => updateNotificationSettings(ctx, input),
-      "Préférences de notification enregistrées.",
-    ),
-  );
 }
 
 export async function uploadOrganizationImageAction(formData: FormData) {

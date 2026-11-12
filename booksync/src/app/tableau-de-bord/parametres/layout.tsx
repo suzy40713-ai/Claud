@@ -20,11 +20,6 @@ export const SETTINGS_TABS = [
     label: "Horaires et fermetures",
     permission: "closures.manage",
   },
-  {
-    href: "/tableau-de-bord/parametres/notifications",
-    label: "Notifications",
-    permission: "notifications.settings",
-  },
   { href: "/tableau-de-bord/parametres/compte", label: "Mon compte", permission: null },
 ] as const;
 

@@ -129,10 +129,6 @@ export const organization = pgTable(
     brandColor: text(),
     coverFileId: uuid(),
     welcomeMessage: text(),
-    /** Notifications */
-    notifyStaffOnBooking: boolean().notNull().default(true),
-    reminder24h: boolean().notNull().default(true),
-    reminder2h: boolean().notNull().default(true),
     /** Abonnement (synchronisé depuis Stripe par webhook) */
     plan: text({ enum: ["free", "starter", "pro"] })
       .notNull()

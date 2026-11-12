@@ -2,19 +2,16 @@ import "server-only";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { member, notification, staff, user } from "@/db/schema";
+import type { AutomationKey } from "@/domain/autopilot/automations";
 import type { Plan } from "@/domain/billing/plans";
+import { loadActiveChecker } from "@/server/autopilot/rules";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 export type BookingEvent = "created" | "rescheduled" | "cancelled";
 
 export type NotifyContext = {
-  organization: {
-    id: string;
-    notifyStaffOnBooking: boolean;
-    reminder24h: boolean;
-    reminder2h: boolean;
-  };
+  organization: { id: string };
   plan: Plan;
   appointment: { id: string; staffId: string; startsAt: Date; status: string };
   customer: { email: string | null; emailOptIn: boolean };
@@ -23,17 +20,9 @@ export type NotifyContext = {
 };
 
 const REMINDERS = [
-  {
-    type: "reminder_24h" as const,
-    hours: 24,
-    enabled: (o: NotifyContext["organization"]) => o.reminder24h,
-  },
-  {
-    type: "reminder_2h" as const,
-    hours: 2,
-    enabled: (o: NotifyContext["organization"]) => o.reminder2h,
-  },
-];
+  { type: "reminder_24h" as const, hours: 24 },
+  { type: "reminder_2h" as const, hours: 2 },
+] satisfies Array<{ type: AutomationKey; hours: number }>;
 
 /** Destinataires internes : l'employé concerné + propriétaires et administrateurs (adresses uniques). */
 async function staffRecipients(tx: Tx, organizationId: string, staffId: string) {
@@ -62,6 +51,8 @@ export async function enqueueBookingNotifications(tx: Tx, event: BookingEvent, c
   const { organization: org, plan, appointment: appt, customer } = ctx;
   const startsIso = appt.startsAt.toISOString();
   const rows: Array<typeof notification.$inferInsert> = [];
+  // Règles Autopilot de l'entreprise (lues dans la transaction de la réservation).
+  const active = await loadActiveChecker(tx, org.id, plan.id);
 
   // Un changement d'horaire ou une annulation rend caducs les rappels déjà programmés.
   if (event !== "created") {
@@ -79,7 +70,9 @@ export async function enqueueBookingNotifications(tx: Tx, event: BookingEvent, c
 
   const canEmailCustomer =
     plan.features.emailNotifications && customer.email && customer.emailOptIn;
-  if (canEmailCustomer) {
+  const customerRule: AutomationKey =
+    event === "cancelled" ? "cancellation_notice" : "booking_confirmation";
+  if (canEmailCustomer && active(customerRule)) {
     const type =
       event === "created"
         ? "booking_confirmation"
@@ -95,28 +88,28 @@ export async function enqueueBookingNotifications(tx: Tx, event: BookingEvent, c
       recipient: customer.email!,
       dedupeKey: `${appt.id}:${type}:${event === "rescheduled" ? startsIso : "1"}`,
     });
+  }
 
-    if (event !== "cancelled" && plan.features.automaticReminders) {
-      for (const r of REMINDERS) {
-        if (!r.enabled(org)) continue;
-        const when = new Date(appt.startsAt.getTime() - r.hours * 3_600_000);
-        // Rappel inutile si le rendez-vous est déjà plus proche que l'échéance du rappel.
-        if (when.getTime() <= Date.now() + 5 * 60_000) continue;
-        rows.push({
-          organizationId: org.id,
-          appointmentId: appt.id,
-          type: r.type,
-          audience: "customer",
-          channel: "email",
-          recipient: customer.email!,
-          scheduledFor: when,
-          dedupeKey: `${appt.id}:${r.type}:${startsIso}`,
-        });
-      }
+  if (canEmailCustomer && event !== "cancelled" && plan.features.automaticReminders) {
+    for (const r of REMINDERS) {
+      if (!active(r.type)) continue;
+      const when = new Date(appt.startsAt.getTime() - r.hours * 3_600_000);
+      // Rappel inutile si le rendez-vous est déjà plus proche que l'échéance du rappel.
+      if (when.getTime() <= Date.now() + 5 * 60_000) continue;
+      rows.push({
+        organizationId: org.id,
+        appointmentId: appt.id,
+        type: r.type,
+        audience: "customer",
+        channel: "email",
+        recipient: customer.email!,
+        scheduledFor: when,
+        dedupeKey: `${appt.id}:${r.type}:${startsIso}`,
+      });
     }
   }
 
-  if (org.notifyStaffOnBooking) {
+  if (active("staff_alerts")) {
     const type =
       event === "created"
         ? "staff_new_booking"
