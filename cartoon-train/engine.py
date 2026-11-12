@@ -1769,6 +1769,9 @@ def main():
     elif a.serie == 4:
         from sketches4 import SKETCHES as sketches
         OUT = os.path.join(HERE, "videos-serie4")
+    if a.serie == 11:
+        from sketches11 import SKETCHES as sketches
+        OUT = os.path.join(HERE, "videos-refus-s2")
     if a.serie == 10:
         from sketches10 import SKETCHES as sketches
         OUT = os.path.join(HERE, "videos-gerard-s2")
