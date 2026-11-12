@@ -15,7 +15,8 @@ export type NavItem = {
     | "settings"
     | "card"
     | "autopilot"
-    | "waitlist";
+    | "waitlist"
+    | "insights";
   permission?: Permission;
   /** Affiché dans la barre d'onglets mobile */
   mobile?: boolean;
@@ -56,6 +57,12 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/tableau-de-bord/statistiques",
     label: "Statistiques",
     icon: "chart",
+    permission: "stats.view",
+  },
+  {
+    href: "/tableau-de-bord/analyses",
+    label: "Analyses",
+    icon: "insights",
     permission: "stats.view",
   },
   { href: "/tableau-de-bord/parametres", label: "Paramètres", icon: "settings" },

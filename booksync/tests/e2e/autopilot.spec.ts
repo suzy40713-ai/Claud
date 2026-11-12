@@ -124,3 +124,22 @@ test("liste d'attente : inscription publique, annulation, proposition par email,
   await a.close();
   await b.close();
 });
+
+test("analyses : réservées au forfait Pro, affichées sans erreur", async ({ page }) => {
+  await signUpAndVerify(page, { name: "Nora Lambert" });
+  const slug = `analyse-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
+  await createOrganization(page, "Studio Nora", slug);
+  await page.goto("/tableau-de-bord/analyses");
+  await expect(page.getByText(/est inclus dans le forfait/)).toBeVisible();
+  await setPlan(slug, "pro");
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Recommandations" })).toBeVisible();
+  await expect(page.getByTestId("recommendation").first()).toContainText(
+    "Pas encore assez de données",
+  );
+  await expect(page.getByText("Une erreur est survenue")).toHaveCount(0);
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(0);
+});
