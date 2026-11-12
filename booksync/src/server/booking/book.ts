@@ -16,6 +16,7 @@ import { optionalPhone, optionalText } from "@/domain/validation";
 import { findOrCreateCustomer } from "@/server/customers/core";
 import { pgErrorCode, UserError } from "@/server/errors";
 import { enqueueBookingNotifications, type NotifyContext } from "@/server/notifications/queue";
+import { offerFreedSlot } from "@/server/waitlist/offers";
 import { loadAvailabilityInput, staffForService } from "./availability";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
@@ -102,6 +103,10 @@ type CreateArgs = {
   actor: NotifyContext["actor"];
   /** Réservation manuelle : autorisée hors horaires/délai, mais jamais en chevauchement. */
   enforceSchedule: boolean;
+  /** Créneau proposé par la liste d'attente : la prestation peut ne pas être réservable en ligne. */
+  allowOffline?: boolean;
+  /** Exécuté dans la même transaction, après la création (annule tout en cas d'erreur). */
+  onCreated?: (tx: Tx, appt: typeof appointment.$inferSelect) => Promise<void>;
 };
 
 /**
@@ -127,7 +132,11 @@ export async function createAppointment(args: CreateArgs) {
           ),
         )
         .limit(1);
-      if (!svc || !svc.isActive || (args.source === "online" && !svc.isOnlineBookable)) {
+      if (
+        !svc ||
+        !svc.isActive ||
+        (args.source === "online" && !svc.isOnlineBookable && !args.allowOffline)
+      ) {
         throw new UserError("Ce service n'est pas disponible à la réservation.");
       }
       const eligible = await staffForService(tx, org.id, svc.id);
@@ -212,6 +221,7 @@ export async function createAppointment(args: CreateArgs) {
         customer: cust,
         actor: args.actor,
       });
+      await args.onCreated?.(tx, appt);
       return appt;
     });
   } catch (error) {
@@ -272,6 +282,8 @@ export async function rescheduleAppointment(args: {
         customer: cust,
         actor: args.actor,
       });
+      // L'ancien horaire est libre : proposé à la liste d'attente.
+      await offerFreedSlot(tx, org, { staffId: current.staffId, startsAt: current.startsAt });
       return updated;
     });
   } catch (error) {
@@ -315,6 +327,7 @@ export async function cancelAppointment(args: {
       customer: cust,
       actor: args.actor,
     });
+    await offerFreedSlot(tx, org, { staffId: updated.staffId, startsAt: updated.startsAt });
     return updated;
   });
 }

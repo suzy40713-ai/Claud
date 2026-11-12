@@ -11,6 +11,7 @@ export type AutomationKey =
   | "reminder_24h"
   | "reminder_2h"
   | "staff_alerts"
+  | "waitlist"
   | "calendar_sync"
   | "conflict_protection";
 
@@ -56,6 +57,15 @@ export const AUTOMATIONS: readonly AutomationDefinition[] = [
     title: "Rappel 2 heures avant",
     description: "Un dernier rappel le jour même.",
     minPlan: "starter",
+    defaultEnabled: true,
+    category: "clients",
+  },
+  {
+    key: "waitlist",
+    title: "Liste d'attente intelligente",
+    description:
+      "Quand un rendez-vous est annulé, le créneau est proposé par email aux clients en attente compatibles. Le premier qui confirme l'obtient ; les propositions expirent au bout de 2 heures.",
+    minPlan: "pro",
     defaultEnabled: true,
     category: "clients",
   },

@@ -12,9 +12,9 @@ function secret() {
   return s;
 }
 
-function sign(appointmentId: string) {
+function sign(id: string, purpose: "rdv" | "attente" = "rdv") {
   return createHmac("sha256", secret())
-    .update(`booksync:rdv:${appointmentId}`)
+    .update(`booksync:${purpose}:${id}`)
     .digest("base64url")
     .slice(0, 32);
 }
@@ -31,4 +31,15 @@ export function verifyManageToken(token: string): string | null {
 
 export function manageUrl(baseUrl: string, appointmentId: string) {
   return `${baseUrl}/rdv/${createManageToken(appointmentId)}`;
+}
+
+/** Lien d'une proposition de liste d'attente : même principe, avec une clé de signature distincte. */
+export function createOfferToken(offerId: string) {
+  return `${offerId}.${sign(offerId, "attente")}`;
+}
+
+export function verifyOfferToken(token: string): string | null {
+  const m = /^([0-9a-f-]{36})\.([A-Za-z0-9_-]{32})$/.exec(token);
+  if (!m) return null;
+  return safeEqual(m[2], sign(m[1], "attente")) ? m[1] : null;
 }

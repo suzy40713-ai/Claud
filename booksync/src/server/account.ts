@@ -2,6 +2,10 @@ import "server-only";
 import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/db/client";
 import {
+  automationRule,
+  autopilotAction,
+  waitlistEntry,
+  waitlistOffer,
   account,
   appointment,
   customer,
@@ -66,6 +70,22 @@ export async function exportUserData(userId: string) {
         ...a,
         manageTokenHash: undefined,
       })),
+      waitlist: await db
+        .select()
+        .from(waitlistEntry)
+        .where(eq(waitlistEntry.organizationId, orgId)),
+      waitlistOffers: await db
+        .select()
+        .from(waitlistOffer)
+        .where(eq(waitlistOffer.organizationId, orgId)),
+      automationRules: await db
+        .select()
+        .from(automationRule)
+        .where(eq(automationRule.organizationId, orgId)),
+      autopilotHistory: await db
+        .select()
+        .from(autopilotAction)
+        .where(eq(autopilotAction.organizationId, orgId)),
     });
   }
 

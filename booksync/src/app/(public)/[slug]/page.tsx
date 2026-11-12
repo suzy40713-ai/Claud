@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { CalendarX2, Clock, MapPin, Phone } from "lucide-react";
+import Link from "next/link";
+import { BellRing, CalendarX2, Clock, MapPin, Phone } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { Skeleton } from "@/components/ui/skeleton";
 import { describeDay, WEEKDAYS } from "@/domain/schedule/hours";
@@ -130,6 +131,26 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
           ) : (
             <BookingFlow page={page} />
           )}
+          {page.waitlistEnabled && page.services.length ? (
+            <div className="mt-6 flex flex-col gap-3 rounded-2xl border bg-card p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="flex items-center gap-2 font-semibold">
+                  <BellRing className="size-4 text-primary" aria-hidden /> Aucun créneau ne vous
+                  convient ?
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Inscrivez-vous sur la liste d&apos;attente : nous vous prévenons par email dès
+                  qu&apos;un créneau se libère.
+                </p>
+              </div>
+              <Link
+                href={`/${o.slug}/liste-attente`}
+                className="inline-flex h-10 shrink-0 items-center justify-center rounded-md border bg-card px-4 text-sm font-semibold hover:bg-subtle"
+              >
+                Rejoindre la liste d&apos;attente
+              </Link>
+            </div>
+          ) : null}
           <p className="mt-8 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
             Propulsé par <Logo className="scale-75 [&>span:last-child]:text-sm" />
           </p>

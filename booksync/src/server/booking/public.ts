@@ -1,4 +1,6 @@
 import "server-only";
+import { isAutomationActive } from "@/domain/autopilot/automations";
+import { loadStoredRules } from "@/server/autopilot/rules";
 import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import { db } from "@/db/client";
 import { organization, service, staff, staffService } from "@/db/schema";
@@ -72,7 +74,9 @@ export async function getPublicBookingPage(slug: string) {
         .orderBy(asc(staff.position), asc(staff.createdAt))
     : [];
 
+  const rules = await loadStoredRules(db, org.id);
   return {
+    waitlistEnabled: org.bookingEnabled && isAutomationActive("waitlist", plan.id, rules),
     organization: {
       id: org.id,
       slug: org.slug,

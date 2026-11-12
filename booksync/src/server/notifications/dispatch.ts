@@ -203,7 +203,12 @@ export async function processDueNotifications(limit = 50) {
 /** Envoi immédiat après la réponse HTTP (confirmation instantanée), sans ralentir l'utilisateur. */
 export function dispatchSoon() {
   try {
-    after(() => processDueNotifications(20).catch((e) => console.error("[notifications]", e)));
+    after(async () => {
+      await processDueNotifications(20).catch((e) => console.error("[notifications]", e));
+      // Propositions de la liste d'attente créées par une annulation ou un déplacement.
+      const { processWaitlist } = await import("@/server/waitlist/service");
+      await processWaitlist().catch((e) => console.error("[liste d'attente]", e));
+    });
   } catch {
     // Hors requête (tests, scripts) : le planificateur prendra le relais.
   }

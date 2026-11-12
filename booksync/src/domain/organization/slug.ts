@@ -37,6 +37,7 @@ export const RESERVED_SLUGS = new Set([
   "reinitialiser-mot-de-passe",
   "reservation",
   "rdv",
+  "liste-attente",
   "signup",
   "statut",
   "support",

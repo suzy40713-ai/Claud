@@ -14,7 +14,8 @@ export type NavItem = {
     | "chart"
     | "settings"
     | "card"
-    | "autopilot";
+    | "autopilot"
+    | "waitlist";
   permission?: Permission;
   /** Affiché dans la barre d'onglets mobile */
   mobile?: boolean;
@@ -43,6 +44,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Autopilot",
     icon: "autopilot",
     permission: "autopilot.view",
+  },
+  {
+    href: "/tableau-de-bord/liste-attente",
+    label: "Liste d'attente",
+    icon: "waitlist",
+    permission: "customers.view_all",
   },
   { href: "/tableau-de-bord/notifications", label: "Notifications", icon: "bell" },
   {

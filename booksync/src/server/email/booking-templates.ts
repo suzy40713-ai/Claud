@@ -178,3 +178,63 @@ export function staffEmail(
     text,
   };
 }
+
+export type WaitlistOfferEmailData = {
+  organizationName: string;
+  organizationAddress: string | null;
+  customerFirstName: string;
+  serviceName: string;
+  staffName: string;
+  dateLabel: string;
+  timeLabel: string;
+  durationLabel: string;
+  priceLabel: string | null;
+  acceptUrl: string;
+  /** Échéance déjà formatée, ex. « aujourd'hui à 16:30 » */
+  expiresLabel: string;
+  brandColor?: string | null;
+};
+
+/** Proposition d'un créneau libéré à un client inscrit sur la liste d'attente. */
+export function waitlistOfferEmail(d: WaitlistOfferEmailData): RenderedEmail {
+  const color = d.brandColor ?? "#3563E9";
+  const org = escapeHtml(d.organizationName);
+  const title = "Un créneau s'est libéré pour vous";
+  const intro = `Bonjour ${escapeHtml(d.customerFirstName)}, vous êtes sur la liste d'attente de <strong>${org}</strong> et un créneau correspondant à vos préférences vient de se libérer.`;
+  const rows: Array<[string, string]> = [
+    ["Prestation", d.serviceName],
+    ["Date", d.dateLabel],
+    ["Heure", `${d.timeLabel} (${d.durationLabel})`],
+    ["Avec", d.staffName],
+  ];
+  if (d.priceLabel) rows.push(["Prix", `${d.priceLabel} — à régler sur place`]);
+  if (d.organizationAddress) rows.push(["Adresse", d.organizationAddress]);
+  const table = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border:1px solid #e4e7ec;border-radius:10px;">${rows
+    .map(
+      ([k, v], i) =>
+        `<tr><td style="padding:10px 14px;font-size:13px;color:#667085;width:110px;${i ? "border-top:1px solid #f2f4f7;" : ""}">${k}</td><td style="padding:10px 14px;font-size:14px;font-weight:600;${i ? "border-top:1px solid #f2f4f7;" : ""}">${escapeHtml(v)}</td></tr>`,
+    )
+    .join("")}</table>`;
+  const notice = `Ce créneau est aussi proposé à d'autres personnes : la première qui confirme l'obtient. Proposition valable jusqu'à ${d.expiresLabel}.`;
+  const body = [
+    h1(title),
+    p(intro),
+    table,
+    `<p style="margin:20px 0 10px;">${btn(d.acceptUrl, "Réserver ce créneau", color)}</p>`,
+    `<p style="margin:0;font-size:13px;color:#667085;">${escapeHtml(notice)}</p>`,
+  ].join("");
+  const text = `${title}
+
+${intro.replace(/<[^>]+>/g, "")}
+
+${rows.map(([k, v]) => `${k} : ${v}`).join("\n")}
+
+Réserver ce créneau : ${d.acceptUrl}
+${notice}`;
+  return {
+    template: "waitlist_offer",
+    subject: `Créneau disponible : ${d.dateLabel} à ${d.timeLabel} — ${d.organizationName}`,
+    html: shell(title, `${d.dateLabel} à ${d.timeLabel}`, body, color),
+    text,
+  };
+}

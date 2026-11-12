@@ -8,6 +8,7 @@ import {
   boolean,
   check,
   customType,
+  date,
   foreignKey,
   index,
   integer,
@@ -394,5 +395,91 @@ export const autopilotAction = pgTable(
   (t) => [
     index("autopilot_action_org_created_idx").on(t.organizationId, t.createdAt),
     index("autopilot_action_org_status_idx").on(t.organizationId, t.status),
+  ],
+);
+
+/**
+ * Liste d'attente : un client souhaite un créneau pour une prestation, avec ses préférences.
+ * Quand un rendez-vous est annulé, BookSync propose le créneau libéré aux inscrits compatibles.
+ */
+export const waitlistEntry = pgTable(
+  "waitlist_entry",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    organizationId: orgId(),
+    customerId: uuid().notNull(),
+    serviceId: uuid().notNull(),
+    /** null = n'importe quel employé */
+    staffId: uuid().references(() => staff.id, { onDelete: "set null" }),
+    dateFrom: date({ mode: "string" }).notNull(),
+    dateTo: date({ mode: "string" }).notNull(),
+    /** 1 = lundi … 7 = dimanche ; vide = tous les jours */
+    weekdays: smallint()
+      .array()
+      .notNull()
+      .default(sql`'{}'::smallint[]`),
+    fromMinute: integer().notNull().default(0),
+    toMinute: integer().notNull().default(1440),
+    note: text(),
+    status: text({ enum: ["active", "booked", "cancelled", "expired"] })
+      .notNull()
+      .default("active"),
+    source: text({ enum: ["staff", "online"] }).notNull(),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    unique("waitlist_entry_org_id_uq").on(t.organizationId, t.id),
+    foreignKey({
+      columns: [t.organizationId, t.customerId],
+      foreignColumns: [customer.organizationId, customer.id],
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [t.organizationId, t.serviceId],
+      foreignColumns: [service.organizationId, service.id],
+    }).onDelete("cascade"),
+    index("waitlist_entry_org_status_idx").on(t.organizationId, t.status),
+    check("waitlist_entry_dates_ck", sql`${t.dateFrom} <= ${t.dateTo}`),
+    check(
+      "waitlist_entry_minutes_ck",
+      sql`${t.fromMinute} >= 0 and ${t.fromMinute} < ${t.toMinute} and ${t.toMinute} <= 1440`,
+    ),
+  ],
+);
+
+/**
+ * Proposition d'un créneau libéré à un inscrit. Plusieurs clients peuvent recevoir la même
+ * proposition : le premier qui confirme obtient le rendez-vous (la contrainte anti-chevauchement
+ * des rendez-vous garantit qu'il n'y a jamais deux gagnants).
+ */
+export const waitlistOffer = pgTable(
+  "waitlist_offer",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    organizationId: orgId(),
+    entryId: uuid().notNull(),
+    staffId: uuid()
+      .notNull()
+      .references(() => staff.id, { onDelete: "cascade" }),
+    startsAt: timestamp({ withTimezone: true }).notNull(),
+    expiresAt: timestamp({ withTimezone: true }).notNull(),
+    status: text({ enum: ["pending", "accepted", "expired", "superseded"] })
+      .notNull()
+      .default("pending"),
+    appointmentId: uuid().references(() => appointment.id, { onDelete: "set null" }),
+    notifiedAt: timestamp({ withTimezone: true }),
+    attempts: integer().notNull().default(0),
+    lastError: text(),
+    decidedAt: timestamp({ withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    foreignKey({
+      columns: [t.organizationId, t.entryId],
+      foreignColumns: [waitlistEntry.organizationId, waitlistEntry.id],
+    }).onDelete("cascade"),
+    uniqueIndex("waitlist_offer_slot_uq").on(t.entryId, t.staffId, t.startsAt),
+    index("waitlist_offer_status_idx").on(t.status, t.expiresAt),
+    index("waitlist_offer_slot_idx").on(t.organizationId, t.staffId, t.startsAt),
   ],
 );

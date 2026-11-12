@@ -3,6 +3,7 @@ import {
   Bell,
   CalendarDays,
   CreditCard,
+  Hourglass,
   LayoutDashboard,
   ListChecks,
   Scissors,
@@ -25,6 +26,7 @@ const ICONS = {
   settings: Settings,
   card: CreditCard,
   autopilot: Sparkles,
+  waitlist: Hourglass,
 } as const;
 
 export function NavIcon({ name, className }: { name: NavItem["icon"]; className?: string }) {
