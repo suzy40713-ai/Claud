@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@anthropic-ai/sdk':
-        specifier: ^1.8.0
+        specifier: 1.8.0
         version: 1.8.0(zod@4.6.7)
       '@date-fns/tz':
         specifier: 1.5.0
