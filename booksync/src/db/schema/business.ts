@@ -5,6 +5,7 @@
  */
 import { sql } from "drizzle-orm";
 import {
+  bigint,
   boolean,
   check,
   customType,
@@ -495,4 +496,43 @@ export const dailySummary = pgTable(
     sentAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.organizationId, t.forDate] })],
+);
+
+/** Conversation avec l'assistant BookSync (par utilisateur et par entreprise). */
+export const assistantMessage = pgTable(
+  "assistant_message",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    organizationId: orgId(),
+    userId: uuid()
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    role: text({ enum: ["user", "assistant"] }).notNull(),
+    content: text().notNull(),
+    /** Actions proposées (identifiants d'actions Autopilot en attente de confirmation) */
+    actionIds: uuid()
+      .array()
+      .notNull()
+      .default(sql`'{}'::uuid[]`),
+    createdAt: createdAt(),
+  },
+  (t) => [index("assistant_message_org_user_idx").on(t.organizationId, t.userId, t.createdAt)],
+);
+
+/**
+ * Consommation de l'assistant par entreprise et par mois : nombre de questions, jetons et coût
+ * réel (calculé à partir de l'usage renvoyé par l'API), en millionièmes de dollar.
+ */
+export const assistantUsage = pgTable(
+  "assistant_usage",
+  {
+    organizationId: orgId(),
+    month: text().notNull(),
+    questions: integer().notNull().default(0),
+    inputTokens: bigint({ mode: "number" }).notNull().default(0),
+    outputTokens: bigint({ mode: "number" }).notNull().default(0),
+    costMicroUsd: bigint({ mode: "number" }).notNull().default(0),
+    updatedAt: updatedAt(),
+  },
+  (t) => [primaryKey({ columns: [t.organizationId, t.month] })],
 );

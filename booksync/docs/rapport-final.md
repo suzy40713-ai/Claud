@@ -27,10 +27,24 @@
 | Paramètres              | Entreprise (coordonnées, logo), réservation en ligne, personnalisation (Pro), horaires, notifications, compte (profil, mot de passe), export RGPD, suppression du compte                                                   | E2E                                                                              |
 | Sécurité                | RLS sur toutes les tables, révocation des rôles de l'API Supabase, clés étrangères composites par entreprise, en-têtes de sécurité, images ré-encodées, secrets uniquement côté serveur                                    | Intégration + E2E                                                                |
 
+## BookSync Autopilot (novembre 2026)
+
+| Fonction                          | Forfait          | Contenu                                                                                                                                      | Vérifié par                                                          |
+| --------------------------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Automatisations activables        | Gratuit/Starter+ | Confirmation, annulation, rappels 24 h / 2 h, alertes équipe ; protections permanentes (calendrier, conflits) ; re-vérifiées à l'envoi       | Unitaires + intégration + E2E                                        |
+| Page Autopilot                    | Tous (lecture)   | Indicateurs, automatisations actives/désactivées, à confirmer, historique, prochaines actions, erreurs, aperçu de demain                     | E2E desktop + mobile                                                 |
+| Liste d'attente intelligente      | Pro              | Inscription publique ou par l'équipe ; créneau libéré proposé aux 3 premiers compatibles ; premier qui confirme gagne ; expiration 2 h       | Intégration (dont confirmations simultanées) + E2E complet           |
+| Analyses et recommandations       | Pro              | Heures de pointe/creuses, prestations, annulations, tendance, clients réguliers/à relancer ; recommandations chiffrées avec seuil de données | Unitaires + intégration + E2E                                        |
+| Résumé quotidien                  | Pro              | Email à 19 h (heure locale) au propriétaire et aux administrateurs ; envoi unique garanti                                                    | Unitaires + intégration                                              |
+| Assistant conversationnel (Haiku) | Pro              | 7 outils serveur fermés, isolation par entreprise et rôle, modifications seulement après clic « Confirmer », quotas et plafond de dépense    | Intégration avec client de test ; **aucun appel réel** (clé absente) |
+
+L'assistant est **désactivé en production** tant qu'aucune clé `ANTHROPIC_API_KEY` n'est fournie :
+son fonctionnement avec le vrai modèle n'a donc pas encore été testé.
+
 ## Tests
 
-- **105** tests unitaires et d'intégration (PostgreSQL réel).
-- **54** tests de bout en bout (Chromium, desktop + Pixel 7).
+- **147** tests unitaires et d'intégration (PostgreSQL réel).
+- **62** tests de bout en bout (Chromium, desktop + Pixel 7).
 - Build de production et image de production simulée sur une base vierge : OK.
 
 ## Bugs et limites connus
@@ -47,11 +61,12 @@ Voir [`deploiement.md`](deploiement.md) : Supabase, Render, pg_cron, Resend, Str
 
 ## Coûts à prévoir
 
-| Service        | Gratuit                                                           | Payant (à valider)                               |
-| -------------- | ----------------------------------------------------------------- | ------------------------------------------------ |
-| Supabase       | Offre gratuite (500 Mo, mise en pause après 7 jours d'inactivité) | Pro 25 $/mois pour la production                 |
-| Render         | Plan gratuit (mise en veille)                                     | Starter 7 $/mois recommandé à l'ouverture        |
-| Resend         | 3 000 emails/mois                                                 | 20 $/mois au-delà                                |
-| Stripe         | Aucun abonnement                                                  | ~1,5 % + 0,25 € par paiement de carte européenne |
-| Google OAuth   | Gratuit                                                           | —                                                |
-| Nom de domaine | —                                                                 | ~10–15 €/an                                      |
+| Service               | Gratuit                                                           | Payant (à valider)                                             |
+| --------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------- |
+| Supabase              | Offre gratuite (500 Mo, mise en pause après 7 jours d'inactivité) | Pro 25 $/mois pour la production                               |
+| Render                | Plan gratuit (mise en veille)                                     | Starter 7 $/mois recommandé à l'ouverture                      |
+| Resend                | 3 000 emails/mois                                                 | 20 $/mois au-delà                                              |
+| Stripe                | Aucun abonnement                                                  | ~1,5 % + 0,25 € par paiement de carte européenne               |
+| Anthropic (assistant) | —                                                                 | ≈ 0,1–0,3 centime par question, plafonné (5 $/mois par défaut) |
+| Google OAuth          | Gratuit                                                           | —                                                              |
+| Nom de domaine        | —                                                                 | ~10–15 €/an                                                    |

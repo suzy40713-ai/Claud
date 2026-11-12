@@ -71,6 +71,11 @@ services:
       # Planificateur (Supabase pg_cron → /api/cron/notifications)
       - key: CRON_SECRET
         generateValue: true
+      # Assistant BookSync (Claude Haiku, payant à l'usage) : à ajouter uniquement après accord.
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ASSISTANT_MONTHLY_BUDGET_USD
+        value: "5"
       # Stripe Billing (clés de test pendant le développement)
       - key: STRIPE_SECRET_KEY
         sync: false

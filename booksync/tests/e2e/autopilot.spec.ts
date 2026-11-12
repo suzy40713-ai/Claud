@@ -143,3 +143,22 @@ test("analyses : réservées au forfait Pro, affichées sans erreur", async ({ p
   );
   expect(overflow).toBeLessThanOrEqual(0);
 });
+
+test("assistant : réservé au Pro, désactivé sans clé d'API (aucun appel payant)", async ({
+  page,
+}) => {
+  await signUpAndVerify(page, { name: "Yanis Bel" });
+  const slug = `assist-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
+  await createOrganization(page, "Atelier Yanis", slug);
+  await page.goto("/tableau-de-bord/assistant");
+  await expect(page.getByText(/est inclus dans le forfait/)).toBeVisible();
+  await setPlan(slug, "pro");
+  await page.reload();
+  await expect(page.getByText("L'assistant n'est pas encore activé.")).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Votre question" })).toBeDisabled();
+  await expect(page.getByTestId("assistant-usage")).toContainText("0 / 300 questions");
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(0);
+});

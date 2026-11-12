@@ -35,6 +35,13 @@ export const env = createEnv({
     STRIPE_PRICE_PRO: z.string().startsWith("price_").optional(),
     /** Secret partagé avec le planificateur (Supabase pg_cron) pour /api/cron/*. */
     CRON_SECRET: z.string().min(24).optional(),
+    /**
+     * Assistant BookSync (Claude Haiku, service payant à l'usage). Absente : assistant désactivé.
+     * Ne l'ajouter qu'avec l'accord du propriétaire du compte Anthropic.
+     */
+    ANTHROPIC_API_KEY: z.string().startsWith("sk-ant-").optional(),
+    /** Plafond de dépense mensuel de l'assistant, toutes entreprises confondues, en dollars. */
+    ASSISTANT_MONTHLY_BUDGET_USD: z.coerce.number().min(0).max(1000).default(5),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
@@ -54,6 +61,8 @@ export const env = createEnv({
     STRIPE_PRICE_STARTER: process.env.STRIPE_PRICE_STARTER,
     STRIPE_PRICE_PRO: process.env.STRIPE_PRICE_PRO,
     CRON_SECRET: process.env.CRON_SECRET,
+    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+    ASSISTANT_MONTHLY_BUDGET_USD: process.env.ASSISTANT_MONTHLY_BUDGET_USD,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   },
   // Permet le build Docker sans secrets (ils sont injectés à l'exécution par Render).

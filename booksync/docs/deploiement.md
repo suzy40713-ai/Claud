@@ -77,7 +77,23 @@ Sans clé, les emails sont enregistrés dans la table `email_message` mais **ne 
 3. Reportez `GOOGLE_CLIENT_ID` et `GOOGLE_CLIENT_SECRET` dans Render. Le bouton « Continuer avec
    Google » apparaît automatiquement.
 
-## 7. Mentions légales
+## 7. Assistant BookSync — Claude Haiku (payant à l'usage, facultatif)
+
+L'assistant du forfait Pro reste **désactivé** tant que `ANTHROPIC_API_KEY` est absente : aucune
+dépense possible. Pour l'activer (décision du propriétaire du compte) :
+
+1. Sur [console.anthropic.com](https://console.anthropic.com), ajoutez un crédit prépayé (5 $ minimum)
+   et, dans _Limits_, fixez une **limite de dépense mensuelle** côté Anthropic.
+2. Créez une clé API → `ANTHROPIC_API_KEY` dans Render.
+3. Ajustez `ASSISTANT_MONTHLY_BUDGET_USD` (5 $ par défaut) : au-delà, l'assistant se coupe jusqu'au
+   mois suivant, toutes entreprises confondues.
+
+Garde-fous intégrés : modèle `claude-haiku-5-5` (0,10 $ / 0,50 $ par million de jetons), effort de
+réflexion bas, 1 500 jetons de sortie et 5 appels au plus par question, 300 questions par mois et par
+entreprise, 40 par jour et par utilisateur, 6 par minute. Le coût réel de chaque appel est enregistré
+(table `assistant_usage`). Ordre de grandeur : 0,1 à 0,3 centime par question.
+
+## 8. Mentions légales
 
 Renseignez les variables `NEXT_PUBLIC_LEGAL_*` (raison sociale, adresse, SIREN, TVA, directeur de
 la publication) puis redéployez. Faites relire les conditions générales et la politique de
@@ -95,6 +111,8 @@ confidentialité par un juriste avant l'ouverture commerciale.
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_PRO` | pour les abonnements | Stripe + `scripts/stripe-setup.ts`                                 |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`                                               |      facultatif      | Google Cloud Console                                               |
 | `NEXT_PUBLIC_LEGAL_*`                                                                    |  ✅ avant ouverture  | Vos informations de société                                        |
+| `ANTHROPIC_API_KEY`                                                                      | facultatif (payant)  | Console Anthropic, après accord                                    |
+| `ASSISTANT_MONTHLY_BUDGET_USD`                                                           |          —           | Plafond mensuel de l'assistant (5 par défaut)                      |
 | `AUTH_RATE_LIMIT`                                                                        |          —           | Laisser `on`                                                       |
 
 ## Domaine personnalisé
