@@ -483,3 +483,16 @@ export const waitlistOffer = pgTable(
     index("waitlist_offer_slot_idx").on(t.organizationId, t.staffId, t.startsAt),
   ],
 );
+
+/** Résumés quotidiens envoyés (une ligne par entreprise et par jour : jamais de doublon). */
+export const dailySummary = pgTable(
+  "daily_summary",
+  {
+    organizationId: orgId(),
+    /** Jour concerné par le résumé (le lendemain de l'envoi), date locale */
+    forDate: date({ mode: "string" }).notNull(),
+    recipients: integer().notNull().default(0),
+    sentAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.organizationId, t.forDate] })],
+);

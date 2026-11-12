@@ -16,6 +16,7 @@ import {
   NOTIFICATION_TITLES,
   type ActivityEntry,
 } from "@/server/autopilot/activity";
+import { buildDailySummary } from "@/server/autopilot/daily-summary";
 import { listAutomations } from "@/server/autopilot/rules";
 import { AutomationList, type AutomationItem } from "./automation-list";
 
@@ -107,6 +108,7 @@ async function Content() {
   }));
   const canManage = can(ctx.role, "autopilot.manage");
   const pending = activity.filter((a) => a.status === "pending");
+  const tomorrow = ctx.plan.id === "pro" ? await buildDailySummary(ctx.organization) : null;
 
   return (
     <div className="grid gap-8">
@@ -171,6 +173,34 @@ async function Content() {
           <ActivityList entries={activity} tz={tz} />
         </section>
         <div className="grid content-start gap-8">
+          {tomorrow ? (
+            <section className="grid gap-3" data-testid="tomorrow-summary">
+              <h2 className="text-[15px] font-semibold">Demain · {tomorrow.dateLabel}</h2>
+              <div className="grid gap-3 rounded-xl border bg-card p-4 text-sm shadow-xs">
+                <p>
+                  <strong>{tomorrow.appointments.length}</strong> rendez-vous
+                  {tomorrow.appointments.length
+                    ? ` · premier à ${tomorrow.appointments[0].time}, dernier à ${tomorrow.appointments.at(-1)!.time}`
+                    : ""}
+                </p>
+                {tomorrow.freeSlots ? (
+                  <p className="text-muted-foreground">
+                    {tomorrow.freeSlots.count} créneau{tomorrow.freeSlots.count > 1 ? "x" : ""}{" "}
+                    libre{tomorrow.freeSlots.count > 1 ? "s" : ""} pour «{" "}
+                    {tomorrow.freeSlots.serviceName} »
+                  </p>
+                ) : null}
+                <p className="text-muted-foreground">
+                  {tomorrow.cancellations.length} annulation
+                  {tomorrow.cancellations.length > 1 ? "s" : ""} ces dernières 24 h ·{" "}
+                  {tomorrow.waitlist.active} en liste d&apos;attente
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Envoyé chaque soir à 19 h si le « Résumé quotidien » est actif.
+                </p>
+              </div>
+            </section>
+          ) : null}
           <section className="grid gap-3">
             <h2 className="text-[15px] font-semibold">Prochaines actions</h2>
             {scheduled.length ? (

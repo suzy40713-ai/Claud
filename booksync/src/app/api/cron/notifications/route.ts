@@ -4,6 +4,7 @@ import { safeEqual } from "@/lib/tokens";
 import { ensureStripeSetup } from "@/server/billing/stripe";
 import { processDueNotifications } from "@/server/notifications/dispatch";
 import { processWaitlist } from "@/server/waitlist/service";
+import { sendDueDailySummaries } from "@/server/autopilot/daily-summary";
 
 /**
  * Traitement planifié des notifications (rappels 24 h / 2 h, nouvelles tentatives).
@@ -24,6 +25,13 @@ async function handle(req: Request) {
     console.error("[liste d'attente] traitement planifié impossible", error);
     waitlist = "erreur";
   }
+  let summaries: Awaited<ReturnType<typeof sendDueDailySummaries>> | "erreur";
+  try {
+    summaries = await sendDueDailySummaries();
+  } catch (error) {
+    console.error("[résumé quotidien] traitement planifié impossible", error);
+    summaries = "erreur";
+  }
   // Configuration Stripe automatique (offres + webhook), sans bloquer les notifications.
   let billing: "ok" | "absent" | "erreur" = "absent";
   try {
@@ -34,7 +42,7 @@ async function handle(req: Request) {
     billing = "erreur";
   }
   return Response.json(
-    { ok: true, ...stats, waitlist, billing },
+    { ok: true, ...stats, waitlist, summaries, billing },
     { headers: { "Cache-Control": "no-store" } },
   );
 }

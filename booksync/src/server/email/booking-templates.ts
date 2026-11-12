@@ -23,7 +23,13 @@ export type BookingEmailData = {
   brandColor?: string | null;
 };
 
-function shell(title: string, preheader: string, body: string, color = "#3563E9") {
+export function shell(
+  title: string,
+  preheader: string,
+  body: string,
+  color = "#3563E9",
+  footer = "Email envoyé via BookSync pour le compte de l'établissement indiqué ci-dessus. Le paiement s'effectue directement sur place.",
+) {
   return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title></head>
 <body style="margin:0;background:#f5f7fa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#101828;">
 <span style="display:none;max-height:0;overflow:hidden;">${escapeHtml(preheader)}</span>
@@ -32,7 +38,7 @@ function shell(title: string, preheader: string, body: string, color = "#3563E9"
 <tr><td style="background:#ffffff;border:1px solid #e4e7ec;border-radius:14px;overflow:hidden;">
 <div style="height:4px;background:${escapeHtml(color)};"></div>
 <div style="padding:28px 26px;">${body}</div></td></tr>
-<tr><td style="padding:18px 6px;font-size:12px;line-height:18px;color:#667085;">Email envoyé via BookSync pour le compte de l'établissement indiqué ci-dessus. Le paiement s'effectue directement sur place.</td></tr>
+<tr><td style="padding:18px 6px;font-size:12px;line-height:18px;color:#667085;">${escapeHtml(footer)}</td></tr>
 </table></td></tr></table></body></html>`;
 }
 
@@ -54,7 +60,7 @@ function detailsTable(d: BookingEmailData) {
     .join("")}</table>`;
 }
 
-function btn(url: string, label: string, color = "#3563E9") {
+export function btn(url: string, label: string, color = "#3563E9") {
   return `<a href="${escapeHtml(url)}" style="display:inline-block;background:${escapeHtml(color)};color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;padding:12px 20px;border-radius:9px;">${escapeHtml(label)}</a>`;
 }
 
@@ -78,8 +84,9 @@ function manageNote(d: BookingEmailData) {
     : "Vous pouvez modifier ou annuler votre rendez-vous jusqu'à son début.";
 }
 
-const h1 = (t: string) => `<h1 style="margin:0 0 6px;font-size:21px;line-height:28px;">${t}</h1>`;
-const p = (t: string) =>
+export const h1 = (t: string) =>
+  `<h1 style="margin:0 0 6px;font-size:21px;line-height:28px;">${t}</h1>`;
+export const p = (t: string) =>
   `<p style="margin:0 0 12px;font-size:15px;line-height:23px;color:#475467;">${t}</p>`;
 
 export function customerEmail(

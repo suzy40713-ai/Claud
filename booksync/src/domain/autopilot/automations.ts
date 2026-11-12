@@ -12,6 +12,7 @@ export type AutomationKey =
   | "reminder_2h"
   | "staff_alerts"
   | "waitlist"
+  | "daily_summary"
   | "calendar_sync"
   | "conflict_protection";
 
@@ -75,6 +76,15 @@ export const AUTOMATIONS: readonly AutomationDefinition[] = [
     description:
       "Prévient l'employé concerné, le propriétaire et les administrateurs à chaque réservation, modification ou annulation (par email à partir du forfait Starter).",
     minPlan: "free",
+    defaultEnabled: true,
+    category: "equipe",
+  },
+  {
+    key: "daily_summary",
+    title: "Résumé quotidien",
+    description:
+      "Chaque soir à 19 h, un email au propriétaire et aux administrateurs : rendez-vous du lendemain, créneaux encore libres, annulations récentes, liste d'attente et actions d'Autopilot.",
+    minPlan: "pro",
     defaultEnabled: true,
     category: "equipe",
   },

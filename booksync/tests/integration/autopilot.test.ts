@@ -129,7 +129,7 @@ describe("Autopilot : automatisations", () => {
     const adminCtx = await ctxFor(admin, ctx.organization.id);
     const employeeCtx = await ctxFor(employee, ctx.organization.id);
     expect(adminCtx.role).toBe("admin");
-    await expect(listAutomations(adminCtx)).resolves.toHaveLength(8);
+    await expect(listAutomations(adminCtx)).resolves.toHaveLength(9);
     await expect(setAutomation(adminCtx, "reminder_2h", false)).rejects.toThrow(/droits/);
     await expect(listActivity(employeeCtx)).rejects.toThrow(/droits/);
   });
