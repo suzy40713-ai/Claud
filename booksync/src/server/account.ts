@@ -2,7 +2,6 @@ import "server-only";
 import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/db/client";
 import {
-  assistantMessage,
   automationRule,
   autopilotAction,
   waitlistEntry,
@@ -97,15 +96,6 @@ export async function exportUserData(userId: string) {
     loginMethods: providers.map((p) => (p.providerId === "credential" ? "email" : p.providerId)),
     memberships,
     organizations,
-    assistantConversations: await db
-      .select({
-        organizationId: assistantMessage.organizationId,
-        role: assistantMessage.role,
-        content: assistantMessage.content,
-        createdAt: assistantMessage.createdAt,
-      })
-      .from(assistantMessage)
-      .where(eq(assistantMessage.userId, userId)),
   };
 }
 

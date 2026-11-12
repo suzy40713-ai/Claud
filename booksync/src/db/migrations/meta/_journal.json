@@ -64,6 +64,13 @@
       "when": 1794508670746,
       "tag": "0008_assistant",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794515494979,
+      "tag": "0009_remove_assistant",
+      "breakpoints": true
     }
   ]
 }
