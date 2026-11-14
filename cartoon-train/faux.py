@@ -159,3 +159,101 @@ STORIES.append(histoire(
         faux_toi("Alors, tu y croyais à combien ? Écris-le en commentaire, espèce de fils de pute. "
                  "Et abonne-toi.", "burst", "ABONNE-TOI"),
     ]))
+
+
+# --- Lot 2 histoire (titres courts dans la bulle jaune) ---
+def lot(slug, sujet, tag, items, hook=None):
+    beats = []
+    scenes = ["burstblue", "burst", "burstyellow", "burstblue", "burst"]
+    for k, (q, label, rep) in enumerate(items):
+        beats.append(croit(q, scenes[k % 5], label))
+        beats.append(faux_toi(rep, scenes[(k + 2) % 5], "ENCORE FAUX" if k == 2 else "FAUX !"))
+    beats.append(faux_toi("Alors, tu y croyais à combien ? Écris-le en commentaire, espèce de fils de pute. "
+                          "Et abonne-toi.", "burst", "ABONNE-TOI"))
+    return histoire(slug, "%s : tout ce que tu crois est faux" % sujet, hook or "%s ? TOUT est FAUX" % sujet,
+                    "%s : tout ce que tu crois est FAUX 😤 Tu y croyais à combien ?" % sujet, tag, beats)
+
+
+STORIES += [
+    lot("fx05-egypte-2", "L'Égypte, partie 2", "#egypte", [
+        ("Tu crois que les Égyptiens écrivaient tout en hiéroglyphes ?", "HIÉROGLYPHES",
+         "FAUX, espèce de fils de pute ! Au quotidien, ils utilisaient une écriture beaucoup plus rapide. "
+         "Les hiéroglyphes, c'était pour les monuments."),
+        ("Tu crois que le Sphinx a perdu son nez à cause des canons de Napoléon ?", "NAPOLÉON",
+         "FAUX, fils de pute ! Des dessins faits avant la naissance de Napoléon le montrent déjà sans nez."),
+        ("Tu crois que la malédiction de Toutânkhamon a tué ceux qui ont ouvert sa tombe ?", "MALÉDICTION",
+         "Encore FAUX, espèce de gros fils de pute ! Howard Carter, celui qui l'a ouverte, a vécu encore "
+         "dix-sept ans."),
+        ("Tu crois que les pharaons étaient tous des hommes ?", "PHARAONS",
+         "FAUX, fils de pute ! Hatchepsout a régné comme pharaon pendant une vingtaine d'années."),
+        ("Et tu crois qu'on gardait le cerveau des momies dans un vase ?", "CERVEAU",
+         "FAUX, fils de pute ! Le cerveau était souvent retiré et jeté. Les vases, c'était pour les autres "
+         "organes."),
+    ], hook="L'Égypte, partie 2 : TOUT est FAUX"),
+    lot("fx06-romains", "Les Romains", "#rome", [
+        ("Tu crois que les gladiateurs se battaient toujours jusqu'à la mort ?", "GLADIATEURS",
+         "FAUX, espèce de fils de pute ! La plupart des combats ne finissaient pas par une mort. Un gladiateur, "
+         "ça coûtait trop cher à former."),
+        ("Tu crois que le pouce vers le bas voulait dire « tue-le » ?", "POUCE",
+         "FAUX, fils de pute ! On ne sait pas vraiment quel geste voulait dire quoi. Cette image vient "
+         "surtout d'un tableau peint au dix-neuvième siècle."),
+        ("Tu crois que les Romains vomissaient dans un vomitorium pendant les banquets ?", "VOMITORIUM",
+         "Encore FAUX, espèce de gros fils de pute ! Le vomitorium, c'était les couloirs de sortie "
+         "des amphithéâtres."),
+        ("Tu crois que Jules César était empereur ?", "CÉSAR",
+         "FAUX, fils de pute ! Il n'a jamais été empereur. Le premier empereur, c'est Auguste."),
+        ("Et tu crois que Néron jouait de la lyre pendant que Rome brûlait ?", "NÉRON",
+         "FAUX, fils de pute ! D'après l'historien Tacite, il n'était même pas à Rome quand l'incendie "
+         "a commencé."),
+    ]),
+    lot("fx07-pirates", "Les pirates", "#pirates", [
+        ("Tu crois que les pirates faisaient marcher leurs prisonniers sur la planche ?", "LA PLANCHE",
+         "FAUX, espèce de fils de pute ! Il n'y en a presque aucune trace. C'est surtout une invention "
+         "des romans et des films."),
+        ("Tu crois que les pirates enterraient leurs trésors ?", "TRÉSOR",
+         "FAUX, fils de pute ! Ils dépensaient leur butin très vite. Les trésors enterrés, c'est presque "
+         "toujours une légende."),
+        ("Tu crois que les pirates parlaient en disant « Arrr » ?", "ARRR",
+         "Encore FAUX, espèce de gros fils de pute ! Ce « Arrr » vient surtout d'un acteur, dans un film "
+         "des années cinquante."),
+        ("Tu crois que les pirates n'avaient aucune règle ?", "AUCUNE RÈGLE",
+         "FAUX, fils de pute ! Beaucoup avaient des codes écrits : partage du butin, argent pour les blessés, "
+         "et ils votaient pour choisir leur capitaine."),
+        ("Et tu crois que les pirates, c'était seulement des hommes ?", "QUE DES HOMMES",
+         "FAUX, fils de pute ! Anne Bonny et Mary Read étaient de vraies pirates, et elles faisaient peur "
+         "à tout le monde."),
+    ]),
+    lot("fx08-grece", "La Grèce antique", "#grece", [
+        ("Tu crois que les statues grecques étaient toutes blanches ?", "BLANCHES",
+         "FAUX, espèce de fils de pute ! Elles étaient peintes de couleurs vives. La peinture s'est "
+         "effacée avec le temps."),
+        ("Tu crois que les athlètes des Jeux olympiques portaient une tenue ?", "JEUX OLYMPIQUES",
+         "FAUX, fils de pute ! Ils concouraient complètement nus."),
+        ("Tu crois que les Spartiates n'étaient que trois cents aux Thermopyles ?", "300",
+         "Encore FAUX, espèce de gros fils de pute ! Ils étaient accompagnés de plusieurs milliers "
+         "d'autres Grecs."),
+        ("Tu crois que les Grecs pensaient que la Terre était plate ?", "TERRE PLATE",
+         "FAUX, fils de pute ! Un Grec, Ératosthène, a même calculé la taille de la Terre, "
+         "et il ne s'est pas beaucoup trompé."),
+        ("Et tu crois que tout le monde votait dans la démocratie athénienne ?", "DÉMOCRATIE",
+         "FAUX, fils de pute ! Seulement les hommes citoyens. Ni les femmes, ni les esclaves, "
+         "ni les étrangers."),
+    ]),
+    lot("fx09-revolution", "La Révolution française", "#revolution", [
+        ("Tu crois que Marie-Antoinette a dit « Qu'ils mangent de la brioche » ?", "BRIOCHE",
+         "FAUX, espèce de fils de pute ! Aucune preuve. Cette phrase circulait déjà avant qu'elle "
+         "arrive en France."),
+        ("Tu crois que la Bastille était pleine de prisonniers ?", "BASTILLE",
+         "FAUX, fils de pute ! Le quatorze juillet mille sept cent quatre-vingt-neuf, il n'y en avait "
+         "que sept."),
+        ("Tu crois que le docteur Guillotin a inventé la guillotine ?", "GUILLOTIN",
+         "Encore FAUX, espèce de gros fils de pute ! Il a seulement proposé de l'utiliser. C'est un "
+         "autre médecin qui l'a mise au point. Au début, on l'appelait même la louisette."),
+        ("Tu crois que le quatorze juillet fête seulement la prise de la Bastille ?", "14 JUILLET",
+         "FAUX, fils de pute ! Il fête aussi la fête de la Fédération, un an plus tard, en "
+         "mille sept cent quatre-vingt-dix."),
+        ("Et tu crois que Louis XVI était un roi idiot qui ne faisait rien ?", "LOUIS XVI",
+         "FAUX, fils de pute ! Il adorait la géographie, et il a préparé lui-même une grande "
+         "expédition autour du monde."),
+    ]),
+]
