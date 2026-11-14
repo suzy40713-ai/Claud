@@ -107,3 +107,55 @@ STORIES.append(corps(
                  "Et abonne-toi.", "burst", "ABONNE-TOI"),
     ]))
 STORIES[-1]["beats"][-1]["fx"]["cta"] = True
+
+
+# --- Histoire : un thème par vidéo ---
+def histoire(slug, theme, hook, caption, tag, beats):
+    d = corps(slug, theme, hook, caption, beats)
+    d["hashtags"] = ["#faux", "#histoire", tag, "#lesaviezvous", "#humour", "#animation", "#pourtoi", "#fyp"]
+    d["beats"][-1]["fx"]["cta"] = True
+    return d
+
+
+STORIES.append(histoire(
+    "fx03-vikings", "Les Vikings : tout ce que tu crois est faux", "Tout ce que tu crois sur les Vikings est FAUX",
+    "Tout ce que tu crois sur les Vikings est FAUX 😤 Tu y croyais à combien ?", "#vikings", [
+        croit("Tu crois que les Vikings portaient des casques à cornes ?", "burstblue", "CORNES"),
+        faux_toi("FAUX, espèce de fils de pute ! On n'en a jamais retrouvé un seul. Les cornes viennent "
+                 "des costumes d'un opéra, mille ans plus tard.", "burst"),
+        croit("Tu crois que les Vikings étaient sales et puants ?", "burstyellow", "SALES"),
+        faux_toi("FAUX, fils de pute ! On a retrouvé leurs peignes, leurs pinces à épiler et même leurs "
+                 "cure-oreilles.", "burstblue"),
+        croit("Tu crois que les Vikings, c'était un peuple ?", "park", "UN PEUPLE"),
+        faux_toi("Encore FAUX, espèce de gros fils de pute ! Partir en viking, c'était partir en expédition. "
+                 "Le reste du temps, ils étaient paysans.", "burst", "ENCORE FAUX"),
+        croit("Tu crois qu'ils buvaient dans les crânes de leurs ennemis ?", "burstblue", "CRÂNES"),
+        faux_toi("FAUX, fils de pute ! C'est une erreur de traduction. Ils buvaient dans des cornes.",
+                 "burstyellow"),
+        croit("Et tu crois que Christophe Colomb a été le premier Européen en Amérique ?", "burst", "1492"),
+        faux_toi("FAUX, fils de pute ! Un Viking, Leif Erikson, y est arrivé vers l'an mille. "
+                 "Presque cinq cents ans avant lui.", "burstblue"),
+        faux_toi("Alors, tu y croyais à combien ? Écris-le en commentaire, espèce de fils de pute. "
+                 "Et abonne-toi.", "burst", "ABONNE-TOI"),
+    ]))
+
+STORIES.append(histoire(
+    "fx04-egypte", "L'Égypte ancienne : tout ce que tu crois est faux", "Tout ce que tu crois sur l'Égypte est FAUX",
+    "Tout ce que tu crois sur l'Égypte ancienne est FAUX 😤 Tu y croyais à combien ?", "#egypte", [
+        croit("Tu crois que les pyramides ont été construites par des esclaves ?", "burstyellow", "ESCLAVES"),
+        faux_toi("FAUX, espèce de fils de pute ! Pour les archéologues, c'étaient surtout des ouvriers "
+                 "payés, nourris et soignés. On a même retrouvé leurs tombes.", "burst"),
+        croit("Tu crois que Cléopâtre était égyptienne ?", "burstblue", "CLÉOPÂTRE"),
+        faux_toi("FAUX, fils de pute ! Sa famille venait de Grèce, de Macédoine.", "burstyellow"),
+        croit("Tu crois que Cléopâtre vivait à l'époque où on a construit les pyramides ?", "burst", "PYRAMIDES"),
+        faux_toi("Encore FAUX, espèce de gros fils de pute ! Elle a vécu plus près de l'invention de l'iPhone "
+                 "que de la construction de la grande pyramide.", "burstblue", "ENCORE FAUX"),
+        croit("Tu crois qu'on ne momifiait que les pharaons ?", "burstyellow", "MOMIES"),
+        faux_toi("FAUX, fils de pute ! On a momifié plein de gens normaux. Et des millions d'animaux : "
+                 "des chats, des oiseaux, même des crocodiles.", "burst"),
+        croit("Et tu crois que Toutânkhamon était un pharaon très puissant ?", "burstblue", "TOUTÂNKHAMON"),
+        faux_toi("FAUX, fils de pute ! Il est mort vers dix-neuf ans. Il est célèbre parce que sa tombe "
+                 "a été retrouvée presque intacte.", "burstyellow"),
+        faux_toi("Alors, tu y croyais à combien ? Écris-le en commentaire, espèce de fils de pute. "
+                 "Et abonne-toi.", "burst", "ABONNE-TOI"),
+    ]))
