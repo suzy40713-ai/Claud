@@ -412,6 +412,14 @@ def frame_svg(segs, total, t):
         ui.append(text_el(230, y0 + 112, cur["fx"]["notif"], 44, INK, anchor="start"))
     if not (STORY.get("caps") == "keywords" and HOOK_TEXT and cur is segs[0]):
         ui.append(captions(cur, t))
+    if cur["fx"].get("stamp"):  # gros tampon rouge qui claque au début de la réplique
+        u_ = t - cur["t0"]
+        k = 1.6 - 0.6 * ease(u_ / 0.18)
+        ui.append('<g transform="translate(540 430) rotate(-8) scale(%.3f)">' % k)
+        tw_ = text_w(cur["fx"]["stamp"], 150) + 120
+        ui.append(rect(-tw_ / 2, -115, tw_, 210, "#ffffff", rx=30, stroke="#e3121b", sw=16))
+        ui.append(text_el(0, 52, cur["fx"]["stamp"], 150, "#e3121b", weight=900))
+        ui.append("</g>")
     if cur["fx"].get("inner") and u_beat > 0.55:
         k = ease((u_beat - 0.55) / 0.12)
         ui.append('<g transform="translate(540 520) scale(%.3f)">' % (k * (1 + 0.03 * math.sin(t * 7))))
@@ -718,6 +726,9 @@ def main():
     elif a.story.startswith("pc") or a.story.startswith("pg") or a.story == "percer":
         from percer import STORIES as PR
         stories = [s_ for s_ in PR if a.story == "percer" or s_["slug"].startswith(a.story)]
+    elif a.story.startswith("fx"):
+        from faux import STORIES as FX
+        stories = [s_ for s_ in FX if a.story == "fxall" or s_["slug"].startswith(a.story)]
     elif a.story.startswith("ab"):
         from absurde import STORIES as AB
         stories = [s_ for s_ in AB if a.story == "aball" or s_["slug"].startswith(a.story)]
