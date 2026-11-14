@@ -57,3 +57,53 @@ STORIES = [
 for b in STORIES[0]["beats"]:
     if b["fx"]["voice"] is V_F and b is STORIES[0]["beats"][-1]:
         b["fx"]["cta"] = True
+
+
+# --- Version 2 : un seul thème, et l'insulte vise le spectateur (le perso regarde la caméra) ---
+PROF = P(skin=SKIN[2], hair=("spiky", "#1c1412"), top=("hoodie", "#e63946", "#c92f3b"), bottom=("pants", "#264653"),
+         shoes="#ffffff", R=116)
+CLOSE = (540, 1000, 1.3)
+
+
+def croit(text, scene, tag=None):
+    o = dict(expr="smug", look="CAM")
+    if tag:
+        o["tag"] = (tag, "#ffd166")
+    return B(text, scene, [(PROF, 540, o)], CLOSE)
+
+
+def faux_toi(text, scene, stamp="FAUX !"):
+    return B(text, scene, [(PROF, 540, dict(expr="angry", look="CAM", pose="gesture"))], (540, 980, 1.45),
+             red=True, stamp=stamp)
+
+
+def corps(slug, theme, hook, caption, beats):
+    return dict(slug=slug, title=theme, hero=PROF, beats=beats, hook_text=hook, caption_y=1390, caps="keywords",
+                out="videos-faux", caption=caption,
+                hashtags=["#faux", "#corpshumain", "#lesaviezvous", "#humour", "#animation", "#pourtoi", "#fyp"])
+
+
+STORIES.append(corps(
+    "fx02-corps-humain", "Le corps humain : tout ce que tu crois est faux", "Tout ce que tu crois sur ton corps est FAUX",
+    "Tout ce que tu crois sur ton corps est FAUX 😤 Tu y croyais à combien ?", [
+        croit("Tu crois que les ongles et les cheveux continuent de pousser après la mort ?", "burstblue",
+              "APRÈS LA MORT"),
+        faux_toi("FAUX, espèce de fils de pute ! La peau sèche et se rétracte. Ça donne juste l'impression qu'ils "
+                 "poussent.", "burst"),
+        croit("Tu crois qu'on perd presque toute sa chaleur par la tête ?", "park", "LA TÊTE"),
+        faux_toi("FAUX, fils de pute ! La tête perd à peu près autant de chaleur que n'importe quelle partie "
+                 "de ton corps qui n'est pas couverte.", "burstyellow"),
+        croit("Tu crois que faire craquer ses doigts donne de l'arthrose ?", "waiting", "CRAC"),
+        faux_toi("Encore FAUX, espèce de gros fils de pute ! Les études n'ont trouvé aucun lien.", "burst",
+                 "ENCORE FAUX"),
+        croit("Tu crois qu'il faut attendre deux heures après avoir mangé avant de te baigner ?", "pool",
+              "2 HEURES"),
+        faux_toi("FAUX, fils de pute ! Aucune étude ne montre que manger avant de nager fait couler qui que ce soit.",
+                 "burstblue"),
+        croit("Et tu crois qu'on avale des araignées en dormant ?", "burstyellow", "ARAIGNÉES"),
+        faux_toi("FAUX, fils de pute ! Une araignée fuit un humain qui respire, qui bouge et qui ronfle. "
+                 "Même toi.", "burst"),
+        faux_toi("Alors, tu y croyais à combien ? Écris-le en commentaire, espèce de fils de pute. "
+                 "Et abonne-toi.", "burst", "ABONNE-TOI"),
+    ]))
+STORIES[-1]["beats"][-1]["fx"]["cta"] = True
