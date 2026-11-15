@@ -73,7 +73,7 @@ async function InvitationContent({ params }: { params: Promise<{ token: string }
           <Button asChild size="lg" className="w-full">
             <Link
               href={
-                `/inscription?email=${encodeURIComponent(invitation.email)}&redirection=${encodeURIComponent(returnTo)}` as Route
+                `/inscription?pro=1&email=${encodeURIComponent(invitation.email)}&redirection=${encodeURIComponent(returnTo)}` as Route
               }
             >
               Créer mon compte

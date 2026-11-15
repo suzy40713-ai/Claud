@@ -42,6 +42,7 @@ export function BookingSettingsForm({
   publicUrl: string;
   initial: {
     bookingEnabled: boolean;
+    listed: boolean;
     minNoticeMinutes: number;
     maxAdvanceDays: number;
     slotIntervalMinutes: number;
@@ -105,6 +106,23 @@ export function BookingSettingsForm({
                 checked={v.bookingEnabled}
                 onCheckedChange={(c) => setV((p) => ({ ...p, bookingEnabled: c }))}
                 aria-label="Réservation en ligne activée"
+              />
+            </label>
+            <label className="flex items-center justify-between gap-4">
+              <span>
+                <span className="block text-sm font-medium">
+                  Visible dans l&apos;annuaire BookSync
+                </span>
+                <span className="block text-[13px] text-muted-foreground">
+                  Les particuliers vous trouvent dans « Trouver un professionnel » : nom, métier,
+                  ville, prestations, tarifs et disponibilités. Vos rendez-vous et vos clients ne
+                  sont jamais publiés.
+                </span>
+              </span>
+              <Switch
+                checked={v.listed}
+                onCheckedChange={(c) => setV((p) => ({ ...p, listed: c }))}
+                aria-label="Visible dans l'annuaire BookSync"
               />
             </label>
             <div className="grid gap-5 sm:grid-cols-2">

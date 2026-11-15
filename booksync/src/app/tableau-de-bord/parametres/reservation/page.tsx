@@ -18,6 +18,7 @@ async function Content() {
       coverUrl={fileUrl(o.coverFileId)}
       initial={{
         bookingEnabled: o.bookingEnabled,
+        listed: o.listed,
         minNoticeMinutes: o.minNoticeMinutes,
         maxAdvanceDays: o.maxAdvanceDays,
         slotIntervalMinutes: o.slotIntervalMinutes,

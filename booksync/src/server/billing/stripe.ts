@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { appSetting } from "@/db/schema";
+import { PLANS } from "@/domain/billing/plans";
 import { env } from "@/lib/env";
 
 let client: Stripe | null = null;
@@ -25,8 +26,12 @@ export function isBillingConfigured() {
 /* ───────────── Configuration automatique (offres + webhook) ───────────── */
 
 export const PLAN_PRICES = {
-  starter: { lookupKey: "booksync_starter_monthly", name: "BookSync Starter", amount: 999 },
-  pro: { lookupKey: "booksync_pro_monthly", name: "BookSync Pro", amount: 1999 },
+  starter: {
+    lookupKey: "booksync_starter_monthly",
+    name: "BookSync Starter",
+    amount: PLANS.starter.priceCents,
+  },
+  pro: { lookupKey: "booksync_pro_monthly", name: "BookSync Pro", amount: PLANS.pro.priceCents },
 } as const;
 
 export type PaidPlanId = keyof typeof PLAN_PRICES;
@@ -55,23 +60,31 @@ export async function getPriceIds(): Promise<Record<PaidPlanId, string>> {
       limit: 1,
     });
     let price = found.data[0];
-    if (!price) {
-      const product = await stripe.products.create(
-        { name: def.name, metadata: { app: "booksync", plan } },
-        { idempotencyKey: `booksync-product-${def.lookupKey}` },
-      );
+    if (!price || price.unit_amount !== def.amount) {
+      // Nouveau tarif configuré : un nouveau prix est créé sur le même produit et reprend la
+      // « lookup key ». Les abonnements existants conservent leur prix jusqu'à leur changement.
+      const productId =
+        typeof price?.product === "string"
+          ? price.product
+          : (
+              await stripe.products.create(
+                { name: def.name, metadata: { app: "booksync", plan } },
+                { idempotencyKey: `booksync-product-${def.lookupKey}` },
+              )
+            ).id;
       price = await stripe.prices.create(
         {
-          product: product.id,
+          product: productId,
           currency: "eur",
           unit_amount: def.amount,
           recurring: { interval: "month" },
           tax_behavior: "inclusive",
           lookup_key: def.lookupKey,
+          transfer_lookup_key: true,
         },
-        { idempotencyKey: `booksync-price-${def.lookupKey}` },
+        { idempotencyKey: `booksync-price-${def.lookupKey}-${def.amount}` },
       );
-      console.info(`[stripe] prix créé : ${def.name} (${price.id})`);
+      console.info(`[stripe] prix créé : ${def.name} ${def.amount / 100} € (${price.id})`);
     }
     result[plan] = price.id;
   }

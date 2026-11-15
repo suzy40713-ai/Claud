@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db/client";
 import { organization } from "@/db/schema";
-import { ACTIVITIES } from "@/domain/activities";
+import { ACTIVITIES, HEALTH_ACTIVITIES, isDirectoryActivity } from "@/domain/activities";
 import { SLUG_ERROR_MESSAGES, validateSlug } from "@/domain/organization/slug";
 import { isValidTimeZone } from "@/domain/organization/timezones";
 import { assertCan, ForbiddenError } from "@/domain/permissions";
@@ -57,7 +57,11 @@ export async function updateOrganizationInfo(
     throw new UserError(SLUG_ERROR_MESSAGES.taken, { slug: SLUG_ERROR_MESSAGES.taken });
   }
   try {
-    await db.update(organization).set(data).where(eq(organization.id, ctx.organization.id));
+    await db
+      .update(organization)
+      // Une activité de santé retire automatiquement l'établissement de l'annuaire public.
+      .set({ ...data, ...(isDirectoryActivity(data.activity) ? {} : { listed: false }) })
+      .where(eq(organization.id, ctx.organization.id));
   } catch (error) {
     if (pgErrorCode(error) === "23505")
       throw new UserError(SLUG_ERROR_MESSAGES.taken, { slug: SLUG_ERROR_MESSAGES.taken });
@@ -67,6 +71,8 @@ export async function updateOrganizationInfo(
 
 export const bookingSettingsSchema = z.object({
   bookingEnabled: z.boolean(),
+  /** Visibilité dans l'annuaire public « Trouver un professionnel ». */
+  listed: z.boolean().default(false),
   minNoticeMinutes: z.coerce
     .number()
     .int()
@@ -86,6 +92,13 @@ export async function updateBookingSettings(
 ) {
   assertCan(ctx.role, "organization.update");
   const data = bookingSettingsSchema.parse(input);
+  if (data.listed && !isDirectoryActivity(ctx.organization.activity)) {
+    throw new UserError(
+      HEALTH_ACTIVITIES.has(ctx.organization.activity ?? "")
+        ? "Les activités de santé ne peuvent pas apparaître dans l'annuaire public (protection des données de santé)."
+        : "Indiquez d'abord votre activité dans les informations de l'entreprise.",
+    );
+  }
   await db.update(organization).set(data).where(eq(organization.id, ctx.organization.id));
 }
 

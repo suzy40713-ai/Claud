@@ -52,6 +52,30 @@ export const ACTIVITIES = [
     ],
   },
   {
+    value: "massage",
+    label: "Massage bien-être",
+    examples: [
+      ["Massage relaxant 1 h", 60, 6000],
+      ["Massage 30 min", 30, 3500],
+    ],
+  },
+  {
+    value: "onglerie",
+    label: "Prothésiste ongulaire",
+    examples: [
+      ["Pose semi-permanent", 45, 3500],
+      ["Remplissage gel", 60, 4500],
+    ],
+  },
+  {
+    value: "tatouage",
+    label: "Tatoueur",
+    examples: [
+      ["Consultation projet", 30, 0],
+      ["Séance (heure)", 60, 10000],
+    ],
+  },
+  {
     value: "kinesitherapie",
     label: "Kinésithérapeute",
     examples: [
@@ -80,3 +104,19 @@ export type ActivityId = (typeof ACTIVITIES)[number]["value"];
 export function activityLabel(value: string | null | undefined) {
   return ACTIVITIES.find((a) => a.value === value)?.label ?? null;
 }
+
+/**
+ * Activités de santé : un rendez-vous y révèle une donnée de santé, dont l'hébergement exige en France
+ * une certification HDS. Elles restent utilisables pour l'agenda du professionnel mais ne sont JAMAIS
+ * proposées dans l'annuaire public.
+ */
+export const HEALTH_ACTIVITIES: ReadonlySet<string> = new Set(["kinesitherapie"]);
+
+export function isDirectoryActivity(value: string | null | undefined) {
+  return Boolean(value) && !HEALTH_ACTIVITIES.has(value!);
+}
+
+/** Métiers proposés dans la recherche de l'annuaire (hors santé et hors « Autre »). */
+export const DIRECTORY_ACTIVITIES = ACTIVITIES.filter(
+  (a) => isDirectoryActivity(a.value) && a.value !== "autre",
+);

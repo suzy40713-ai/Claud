@@ -62,7 +62,7 @@ test.describe("inscription et entreprise", () => {
   });
 
   test("les erreurs de saisie sont affichées en français", async ({ page }) => {
-    await page.goto("/inscription");
+    await page.goto("/inscription?pro=1");
     await page.getByRole("button", { name: "Créer mon compte" }).click();
     await expect(page.getByText("Indiquez votre nom (2 caractères minimum).")).toBeVisible();
     await expect(page.getByText("Indiquez votre adresse email.")).toBeVisible();

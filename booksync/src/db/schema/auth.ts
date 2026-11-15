@@ -119,6 +119,8 @@ export const organization = pgTable(
     country: text().notNull().default("FR"),
     timezone: text().notNull().default("Europe/Paris"),
     currency: text().notNull().default("EUR"),
+    /** Établissement visible dans l'annuaire public « Trouver un professionnel » (choix du pro). */
+    listed: boolean().notNull().default(false),
     /** Réglages de réservation en ligne */
     bookingEnabled: boolean().notNull().default(true),
     minNoticeMinutes: integer().notNull().default(120),
@@ -143,6 +145,9 @@ export const organization = pgTable(
     createdAt: createdAt(),
   },
   (t) => [
+    index("organization_directory_idx")
+      .on(t.activity, t.postalCode)
+      .where(sql`${t.listed} and ${t.bookingEnabled}`),
     check("organization_slot_interval_ck", sql`${t.slotIntervalMinutes} between 5 and 120`),
     check("organization_min_notice_ck", sql`${t.minNoticeMinutes} between 0 and 43200`),
     check("organization_max_advance_ck", sql`${t.maxAdvanceDays} between 1 and 730`),

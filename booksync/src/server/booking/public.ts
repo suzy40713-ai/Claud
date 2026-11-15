@@ -4,6 +4,7 @@ import { loadStoredRules } from "@/server/autopilot/rules";
 import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import { db } from "@/db/client";
 import { organization, service, staff, staffService } from "@/db/schema";
+import { activityLabel } from "@/domain/activities";
 import { effectivePlan } from "@/domain/billing/plans";
 import { RESERVED_SLUGS } from "@/domain/organization/slug";
 import { fileUrl } from "@/lib/files";
@@ -81,6 +82,7 @@ export async function getPublicBookingPage(slug: string) {
       id: org.id,
       slug: org.slug,
       name: org.name,
+      activityLabel: activityLabel(org.activity),
       description: org.description,
       phone: org.phone,
       email: org.email,

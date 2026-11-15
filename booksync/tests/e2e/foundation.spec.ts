@@ -9,7 +9,7 @@ test.describe("site public", () => {
     for (const id of ["fonctionnalites", "avantages", "tarifs", "faq"])
       await expect(page.locator(`#${id}`)).toBeAttached();
     await expect(page.locator("#tarifs")).toContainText("9,99 €");
-    await expect(page.locator("#tarifs")).toContainText("19,99 €");
+    await expect(page.locator("#tarifs")).toContainText("24,99 €");
     await page.getByRole("link", { name: "Commencer gratuitement" }).first().click();
     await expect(page).toHaveURL(/\/inscription$/);
   });

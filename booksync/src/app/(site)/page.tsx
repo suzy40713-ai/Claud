@@ -9,9 +9,11 @@ import {
   Clock4,
   Globe2,
   LockKeyhole,
+  Search,
   ShieldCheck,
   Smartphone,
   Sparkles,
+  Store,
   Users,
   Zap,
 } from "lucide-react";
@@ -133,25 +135,54 @@ export default function LandingPage() {
         <div className="mx-auto grid w-full max-w-6xl gap-14 px-4 pt-14 pb-20 sm:px-6 sm:pt-24 lg:grid-cols-[1fr_1.05fr] lg:items-center">
           <div className="animate-fade-up text-center lg:text-left">
             <Badge variant="primary" className="mb-5">
-              <Sparkles className="size-3" /> Logiciel de prise de rendez-vous
+              <Sparkles className="size-3" /> Trouver, réserver, gérer ses rendez-vous
             </Badge>
             <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
               Vos rendez-vous, <span className="text-primary">parfaitement organisés.</span>
             </h1>
             <p className="mx-auto mt-5 max-w-xl text-lg text-pretty text-muted-foreground lg:mx-0">
-              BookSync réunit votre page de réservation en ligne, l&apos;agenda de votre équipe et
-              les rappels clients dans un outil simple et élégant.
+              Trouvez un professionnel près de chez vous et réservez en quelques secondes.
+              Professionnels : gérez votre agenda et automatisez vos rendez-vous.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
               <Button asChild size="lg">
-                <Link href="/inscription">Commencer gratuitement</Link>
+                <Link href="/professionnels">
+                  <Search /> Je cherche un professionnel
+                </Link>
               </Button>
               <Button asChild size="lg" variant="secondary">
-                <Link href="/#tarifs">Voir les tarifs</Link>
+                <Link href="/inscription?pro=1">
+                  <Store /> Je suis un professionnel
+                </Link>
               </Button>
             </div>
+            <form
+              action="/professionnels"
+              role="search"
+              className="mx-auto mt-5 flex max-w-xl gap-2 rounded-xl border bg-card p-1.5 shadow-xs lg:mx-0"
+            >
+              <input
+                name="q"
+                aria-label="Métier ou prestation"
+                placeholder="Coiffeur, barbier, coach…"
+                className="min-w-0 flex-1 rounded-lg bg-transparent px-3 text-[15px] outline-none"
+              />
+              <input
+                name="lieu"
+                aria-label="Ville ou code postal"
+                placeholder="Ville"
+                className="w-24 min-w-0 rounded-lg border-l bg-transparent px-3 text-[15px] outline-none sm:w-36"
+              />
+              <Button type="submit" size="icon" aria-label="Rechercher">
+                <Search />
+              </Button>
+            </form>
             <ul className="mt-6 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground lg:justify-start">
-              {["Sans carte bancaire", "Prêt en 5 minutes", "Paiement sur place"].map((t) => (
+              {[
+                "Gratuit pour les particuliers",
+                "Sans compte pour réserver",
+                "Paiement sur place",
+              ].map((t) => (
                 <li key={t} className="flex items-center gap-1.5">
                   <Check className="size-4 text-success" /> {t}
                 </li>
@@ -166,7 +197,7 @@ export default function LandingPage() {
       <section className="border-y bg-subtle">
         <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
           <p className="text-center text-sm font-medium text-muted-foreground">
-            Conçu pour les professionnels qui travaillent sur rendez-vous
+            Pour les professionnels qui travaillent sur rendez-vous
           </p>
           <ul className="mt-4 flex flex-wrap justify-center gap-2">
             {AUDIENCE.map((a) => (

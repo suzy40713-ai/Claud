@@ -38,11 +38,11 @@ export async function countEmails(to: string, template: string) {
 
 export async function signUp(
   page: Page,
-  { name = "Camille Martin", email = uniqueEmail(), password = PASSWORD } = {},
+  { name = "Camille Martin", email = uniqueEmail(), password = PASSWORD, pro = true } = {},
 ) {
-  await page.goto("/inscription");
+  await page.goto(pro ? "/inscription?pro=1" : "/inscription");
   await page.getByLabel("Nom complet").fill(name);
-  await page.getByLabel("Email professionnel").fill(email);
+  await page.getByLabel(pro ? "Email professionnel" : "Email", { exact: true }).fill(email);
   await page.getByLabel("Mot de passe", { exact: true }).fill(password);
   await page.getByRole("checkbox", { name: /J'accepte les conditions générales/ }).check();
   await page.getByRole("button", { name: "Créer mon compte" }).click();

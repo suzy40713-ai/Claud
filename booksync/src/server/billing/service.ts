@@ -26,7 +26,19 @@ export async function planForPrice(priceId: string | null | undefined): Promise<
   const ids = await getPriceIds();
   if (priceId === ids.starter) return "starter";
   if (priceId === ids.pro) return "pro";
-  return null;
+  // Ancien tarif (avant un changement de prix) : le forfait est porté par le produit Stripe.
+  const stripe = getStripe();
+  if (!stripe) return null;
+  try {
+    const price = await stripe.prices.retrieve(priceId, { expand: ["product"] });
+    const plan =
+      typeof price.product === "object" && !("deleted" in price.product && price.product.deleted)
+        ? (price.product as { metadata?: Record<string, string> }).metadata?.plan
+        : undefined;
+    return plan === "starter" || plan === "pro" ? plan : null;
+  } catch {
+    return null;
+  }
 }
 
 function requireStripe() {

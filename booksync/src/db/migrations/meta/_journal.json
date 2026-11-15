@@ -71,6 +71,20 @@
       "when": 1794515494979,
       "tag": "0009_remove_assistant",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794751357380,
+      "tag": "0010_directory",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794751875038,
+      "tag": "0011_restore_assistant",
+      "breakpoints": true
     }
   ]
 }

@@ -272,7 +272,7 @@ test.describe("parcours métier", () => {
     await expect(page.getByText(/statistiques avancées/)).toBeVisible();
     await page.goto("/tableau-de-bord/abonnement");
     await expect(page.getByTestId("current-plan")).toContainText("Free");
-    await expect(page.getByTestId("plan-pro")).toContainText("19,99 €");
+    await expect(page.getByTestId("plan-pro")).toContainText("24,99 €");
   });
 
   test("navigation mobile : barre d'onglets et menu « Plus »", async ({ page, isMobile }) => {

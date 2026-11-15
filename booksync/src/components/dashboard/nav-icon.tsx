@@ -5,6 +5,7 @@ import {
   CreditCard,
   Hourglass,
   LayoutDashboard,
+  MessageSquareText,
   Lightbulb,
   ListChecks,
   Scissors,
@@ -29,6 +30,7 @@ const ICONS = {
   autopilot: Sparkles,
   waitlist: Hourglass,
   insights: Lightbulb,
+  assistant: MessageSquareText,
 } as const;
 
 export function NavIcon({ name, className }: { name: NavItem["icon"]; className?: string }) {

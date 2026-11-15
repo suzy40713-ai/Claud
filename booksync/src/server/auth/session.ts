@@ -65,7 +65,7 @@ export const requireOrg = cache(async (): Promise<OrgContext> => {
   const session = await requireSession();
   if (!session.user.termsAcceptedAt) redirect("/accepter-conditions");
   const memberships = await listMemberships(session.user.id);
-  if (memberships.length === 0) redirect("/onboarding");
+  if (memberships.length === 0) redirect("/mon-espace");
   const preferred = (await cookies()).get(ACTIVE_ORG_COOKIE)?.value;
   const active = memberships.find((m) => m.organizationId === preferred) ?? memberships[0];
   return loadOrgContext(session.user, active, memberships);
@@ -119,5 +119,6 @@ export async function redirectIfAuthenticated() {
 export async function redirectToHome(userId: string, needsTerms = false): Promise<never> {
   if (needsTerms) redirect("/accepter-conditions");
   const memberships = await listMemberships(userId);
-  redirect(memberships.length > 0 ? "/tableau-de-bord" : "/onboarding");
+  // Professionnel → tableau de bord ; particulier (aucun établissement) → son espace.
+  redirect(memberships.length > 0 ? "/tableau-de-bord" : "/mon-espace");
 }

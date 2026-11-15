@@ -37,10 +37,23 @@
 | Analyses et recommandations  | Pro              | Heures de pointe/creuses, prestations, annulations, tendance, clients réguliers/à relancer ; recommandations chiffrées avec seuil de données | Unitaires + intégration + E2E                              |
 | Résumé quotidien             | Pro              | Email à 19 h (heure locale) au propriétaire et aux administrateurs ; envoi unique garanti                                                    | Unitaires + intégration                                    |
 
+## Plateforme particuliers + professionnels (novembre 2026)
+
+| Fonction                              | Contenu                                                                                                                                                         | Vérifié par                  |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| Compte particulier                    | Inscription « particulier » (par défaut) ou « professionnel » ; à la connexion : tableau de bord si l'utilisateur a un établissement, sinon « Mes rendez-vous » | E2E                          |
+| Mes rendez-vous                       | Rendez-vous de tous les établissements, retrouvés par l'email **vérifié** ; modifier/annuler selon les règles du professionnel                                  | Intégration + E2E            |
+| Annuaire « Trouver un professionnel » | Recherche par nom/prestation, métier, ville ou code postal, prix, disponibilité réelle (moteur de créneaux) ; fiches et « Prendre rendez-vous »                 | Intégration + E2E            |
+| Visibilité                            | Choisie par le professionnel (désactivée par défaut) ; activités de santé jamais affichées (données de santé, hébergement HDS requis)                           | Intégration                  |
+| Réservation connectée                 | Coordonnées pré-remplies pour un particulier connecté ; le rendez-vous arrive dans l'agenda du professionnel                                                    | E2E                          |
+| Avis vérifiés                         | Table prévue (un avis par rendez-vous honoré), pas encore exposée                                                                                               | —                            |
+| Tarifs                                | Starter 9,99 €, Pro 24,99 € — configurables dans `plans.ts`, prix Stripe créé automatiquement                                                                   | Typage + intégration         |
+| Assistant BookSync AI                 | Rétabli, **désactivé** sans `ANTHROPIC_API_KEY` (aucune dépense)                                                                                                | Intégration (client de test) |
+
 ## Tests
 
-- **147** tests unitaires et d'intégration (PostgreSQL réel).
-- **62** tests de bout en bout (Chromium, desktop + Pixel 7).
+- **152** tests unitaires et d'intégration (PostgreSQL réel).
+- **66** tests de bout en bout (Chromium, desktop + Pixel 7).
 - Build de production et image de production simulée sur une base vierge : OK.
 
 ## Bugs et limites connus

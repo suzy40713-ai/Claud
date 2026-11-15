@@ -55,7 +55,16 @@ function dayLabel(date: string) {
   };
 }
 
-export function BookingFlow({ page }: { page: PublicBookingPage }) {
+export type BookingPrefill = { firstName: string; lastName: string; email: string } | null;
+
+export function BookingFlow({
+  page,
+  prefill = null,
+}: {
+  page: PublicBookingPage;
+  /** Particulier connecté : coordonnées pré-remplies (son rendez-vous apparaîtra dans son espace). */
+  prefill?: BookingPrefill;
+}) {
   const { organization: org, services, staff } = page;
   const router = useRouter();
   const tz = org.timezone;
@@ -464,10 +473,22 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
             <form onSubmit={submit} noValidate className="grid gap-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field id="firstName" label="Prénom" error={fieldErrors.firstName}>
-                  <Input id="firstName" name="firstName" autoComplete="given-name" required />
+                  <Input
+                    id="firstName"
+                    name="firstName"
+                    autoComplete="given-name"
+                    defaultValue={prefill?.firstName}
+                    required
+                  />
                 </Field>
                 <Field id="lastName" label="Nom" error={fieldErrors.lastName}>
-                  <Input id="lastName" name="lastName" autoComplete="family-name" required />
+                  <Input
+                    id="lastName"
+                    name="lastName"
+                    autoComplete="family-name"
+                    defaultValue={prefill?.lastName}
+                    required
+                  />
                 </Field>
               </div>
               <Field
@@ -483,6 +504,7 @@ export function BookingFlow({ page }: { page: PublicBookingPage }) {
                   inputMode="email"
                   autoComplete="email"
                   autoCapitalize="none"
+                  defaultValue={prefill?.email}
                   required
                 />
               </Field>

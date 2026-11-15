@@ -7,7 +7,8 @@ import { Logo } from "@/components/brand/logo";
 import { Skeleton } from "@/components/ui/skeleton";
 import { describeDay, WEEKDAYS } from "@/domain/schedule/hours";
 import { getPublicBookingPage } from "@/server/booking/public";
-import { BookingFlow } from "./booking-flow";
+import { getSession } from "@/server/auth/session";
+import { BookingFlow, type BookingPrefill } from "./booking-flow";
 
 export async function generateMetadata(props: PageProps<"/[slug]">): Promise<Metadata> {
   const { slug } = await props.params;
@@ -26,6 +27,11 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
   const page = await getPublicBookingPage(slug);
   if (!page) notFound();
   const o = page.organization;
+  const session = await getSession();
+  const [firstName, ...rest] = (session?.user.name ?? "").trim().split(/\s+/);
+  const prefill: BookingPrefill = session?.user.emailVerified
+    ? { firstName: firstName ?? "", lastName: rest.join(" "), email: session.user.email }
+    : null;
   const brand = o.brandColor ?? undefined;
 
   return (
@@ -71,7 +77,10 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
             )}
             <div className="min-w-0">
               <h1 className="text-xl font-semibold tracking-tight">{o.name}</h1>
-              <p className="text-sm text-muted-foreground">Réservation en ligne</p>
+              <p className="text-sm text-muted-foreground">
+                {o.activityLabel ?? "Réservation en ligne"}
+                {o.address ? ` · ${o.address.split(", ").at(-1)}` : ""}
+              </p>
             </div>
           </div>
           {o.welcomeMessage || o.description ? (
@@ -129,7 +138,7 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
               </p>
             </div>
           ) : (
-            <BookingFlow page={page} />
+            <BookingFlow page={page} prefill={prefill} />
           )}
           {page.waitlistEnabled && page.services.length ? (
             <div className="mt-6 flex flex-col gap-3 rounded-2xl border bg-card p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">

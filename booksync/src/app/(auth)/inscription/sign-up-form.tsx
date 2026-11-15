@@ -19,7 +19,12 @@ export function SignUpForm() {
   const router = useRouter();
   const params = useSearchParams();
   const presetEmail = params.get("email") ?? "";
-  const redirection = safeRedirect(params.get("redirection"), "/verifier-email/confirme");
+  // Inscription professionnelle : après confirmation de l'email, création de l'établissement.
+  const pro = params.get("pro") === "1";
+  const redirection = safeRedirect(
+    params.get("redirection"),
+    pro ? "/onboarding" : "/verifier-email/confirme",
+  );
   const [terms, setTerms] = useState(false);
   const [termsError, setTermsError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -59,7 +64,7 @@ export function SignUpForm() {
       <Field id="name" label="Nom complet" error={errors.name}>
         <Input id="name" name="name" autoComplete="name" placeholder="Camille Martin" required />
       </Field>
-      <Field id="email" label="Email professionnel" error={errors.email}>
+      <Field id="email" label={pro ? "Email professionnel" : "Email"} error={errors.email}>
         <Input
           id="email"
           name="email"
@@ -69,7 +74,7 @@ export function SignUpForm() {
           autoComplete="email"
           autoCapitalize="none"
           spellCheck={false}
-          placeholder="vous@entreprise.fr"
+          placeholder={pro ? "vous@entreprise.fr" : "vous@exemple.fr"}
           required
         />
       </Field>

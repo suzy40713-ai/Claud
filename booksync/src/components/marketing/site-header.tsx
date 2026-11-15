@@ -10,10 +10,10 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
-  { href: "/#fonctionnalites", label: "Fonctionnalités" },
-  { href: "/#avantages", label: "Avantages" },
-  { href: "/#tarifs", label: "Tarifs" },
-  { href: "/#faq", label: "FAQ" },
+  { href: "/", label: "Accueil" },
+  { href: "/professionnels", label: "Trouver un professionnel" },
+  { href: "/mon-espace", label: "Mes rendez-vous" },
+  { href: "/tableau-de-bord", label: "Espace professionnel" },
 ];
 
 export function SiteHeader() {
@@ -24,7 +24,7 @@ export function SiteHeader() {
         <Link href="/" aria-label="BookSync — accueil" className="rounded-md">
           <Logo />
         </Link>
-        <nav aria-label="Navigation du site" className="hidden items-center gap-1 md:flex">
+        <nav aria-label="Navigation du site" className="hidden items-center gap-1 lg:flex">
           {LINKS.map((l) => (
             <Link
               key={l.href}
@@ -35,16 +35,16 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-2 lg:flex">
           <ThemeToggle />
           <Button asChild variant="ghost" size="sm">
-            <Link href="/connexion">Se connecter</Link>
+            <Link href="/connexion">Connexion</Link>
           </Button>
           <Button asChild size="sm">
-            <Link href="/inscription">Commencer gratuitement</Link>
+            <Link href="/inscription?pro=1">Je suis un professionnel</Link>
           </Button>
         </div>
-        <div className="flex items-center gap-1 md:hidden">
+        <div className="flex items-center gap-1 lg:hidden">
           <ThemeToggle />
           <Button
             variant="ghost"
@@ -57,7 +57,7 @@ export function SiteHeader() {
           </Button>
         </div>
       </div>
-      <div className={cn("border-t bg-background px-4 pb-5 md:hidden", open ? "block" : "hidden")}>
+      <div className={cn("border-t bg-background px-4 pb-5 lg:hidden", open ? "block" : "hidden")}>
         <nav aria-label="Navigation mobile" className="grid py-2">
           {LINKS.map((l) => (
             <Link
@@ -72,10 +72,19 @@ export function SiteHeader() {
         </nav>
         <div className="grid gap-2">
           <Button asChild size="lg">
-            <Link href="/inscription">Commencer gratuitement</Link>
+            <Link href="/professionnels" onClick={() => setOpen(false)}>
+              Je cherche un professionnel
+            </Link>
           </Button>
           <Button asChild size="lg" variant="secondary">
-            <Link href="/connexion">Se connecter</Link>
+            <Link href="/inscription?pro=1" onClick={() => setOpen(false)}>
+              Je suis un professionnel
+            </Link>
+          </Button>
+          <Button asChild size="lg" variant="ghost">
+            <Link href="/connexion" onClick={() => setOpen(false)}>
+              Connexion
+            </Link>
           </Button>
         </div>
       </div>

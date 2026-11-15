@@ -1,5 +1,7 @@
 /**
  * Forfaits BookSync et leurs limites. Toute vérification de limite côté serveur passe par ici.
+ * Les PRIX se configurent ici (`priceCents`) : au déploiement suivant, BookSync crée lui-même le
+ * nouveau prix dans Stripe et l'utilise pour les nouveaux abonnements (voir billing/stripe.ts).
  */
 
 export type PlanId = "free" | "starter" | "pro";
@@ -56,18 +58,18 @@ export const PLANS: Record<PlanId, Plan> = {
       bookingPageCustomization: false,
     },
     highlights: [
-      "Réservations illimitées",
+      "Gestion des rendez-vous et agenda professionnel",
+      "Réservations en ligne illimitées",
+      "Visibilité dans l'annuaire BookSync",
+      "Confirmations et rappels automatiques",
+      "Gestion des clients illimitée",
       "2 employés",
-      "Clients illimités",
-      "Confirmations et annulations par email",
-      "Rappels automatiques 24 h et 2 h",
-      "Statistiques basiques",
     ],
   },
   pro: {
     id: "pro",
     name: "Pro",
-    priceCents: 1999,
+    priceCents: 2499,
     tagline: "Pour les équipes qui veulent tout automatiser.",
     limits: { bookingsPerMonth: null, members: 10, customers: null },
     features: {
@@ -80,11 +82,12 @@ export const PLANS: Record<PlanId, Plan> = {
       "Réservations illimitées",
       "10 employés",
       "Clients illimités",
-      "Tout le forfait Starter",
+      "Tout le forfait Starter, jusqu'à 10 employés",
       "Liste d'attente intelligente",
-      "Analyses et recommandations",
+      "Statistiques avancées et recommandations",
       "Résumé quotidien par email",
-      "Page de réservation personnalisée",
+      "Automatisations avancées et page personnalisée",
+      "Assistant BookSync AI (bientôt disponible)",
     ],
   },
 };
