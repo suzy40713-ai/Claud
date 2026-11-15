@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
+  BadgePercent,
   BarChart3,
+  CalendarX2,
+  Euro,
+  HeartHandshake,
+  Hourglass,
   BellRing,
   CalendarCheck2,
   CalendarDays,
@@ -96,7 +101,44 @@ const BENEFITS = [
   },
 ];
 
+const USP = [
+  {
+    icon: Euro,
+    title: "Un prix clair, sans devis",
+    text: "Gratuit pour commencer, puis 9,99 € ou 24,99 € par mois. Le prix affiché est le prix payé.",
+  },
+  {
+    icon: BadgePercent,
+    title: "0 % de commission",
+    text: "Vos clients restent les vôtres, même ceux qui vous découvrent dans l'annuaire BookSync. Aucun pourcentage prélevé.",
+  },
+  {
+    icon: CalendarX2,
+    title: "Sans engagement",
+    text: "Résiliez depuis votre espace en un clic : l'abonnement s'arrête à la fin du mois payé et vous gardez vos données.",
+  },
+  {
+    icon: LockKeyhole,
+    title: "Vos données en Europe",
+    text: "Hébergement dans l'Union européenne, export et suppression à tout moment, conformément au RGPD.",
+  },
+  {
+    icon: HeartHandshake,
+    title: "Une vraie personne, pas un robot",
+    text: "On peut installer BookSync pour vous : prestations, horaires, lien sur votre Instagram. Et on vous répond directement.",
+  },
+  {
+    icon: Hourglass,
+    title: "Les annulations récupérées",
+    text: "La liste d'attente intelligente repropose automatiquement un créneau annulé à vos clients en attente (forfait Pro).",
+  },
+];
+
 const FAQ = [
+  {
+    q: "BookSync prend-il une commission sur mes clients ?",
+    a: "Non, jamais. Vous payez uniquement votre abonnement (ou rien avec le forfait gratuit), quel que soit le nombre de rendez-vous ou de nouveaux clients.",
+  },
   {
     q: "Mes clients doivent-ils créer un compte ?",
     a: "Non. Ils réservent avec leur nom et leur email, et reçoivent un lien personnel pour modifier ou annuler leur rendez-vous.",
@@ -289,6 +331,33 @@ export default function LandingPage() {
             ))}
           </ul>
         </div>
+      </section>
+
+      {/* Pourquoi BookSync (USP) */}
+      <section id="pourquoi" className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6">
+        <div className="mx-auto max-w-2xl text-center">
+          <Badge variant="primary" className="mb-4">
+            Pour les professionnels
+          </Badge>
+          <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+            La réservation en ligne au prix affiché.
+          </h2>
+          <p className="mt-3 text-lg text-pretty text-muted-foreground">
+            Dès 9,99 € par mois, sans commission, sans engagement, et une vraie personne pour vous
+            l&apos;installer.
+          </p>
+        </div>
+        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {USP.map(({ icon: Icon, title, text }) => (
+            <li key={title} className="rounded-2xl border bg-card p-6 shadow-xs" data-testid="usp">
+              <span className="inline-flex size-10 items-center justify-center rounded-xl bg-primary-soft text-primary">
+                <Icon className="size-5" />
+              </span>
+              <h3 className="mt-4 font-semibold">{title}</h3>
+              <p className="mt-1.5 text-sm text-muted-foreground">{text}</p>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* Tarifs */}
