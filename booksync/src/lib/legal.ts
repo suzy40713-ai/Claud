@@ -9,9 +9,9 @@ export const PUBLISHER = {
   companyName: process.env.NEXT_PUBLIC_LEGAL_COMPANY ?? "[Raison sociale à compléter]",
   legalForm: process.env.NEXT_PUBLIC_LEGAL_FORM ?? "[Forme juridique et capital à compléter]",
   address: process.env.NEXT_PUBLIC_LEGAL_ADDRESS ?? "[Adresse du siège à compléter]",
-  registration: process.env.NEXT_PUBLIC_LEGAL_SIREN ?? "[RCS / SIREN à compléter]",
-  vat: process.env.NEXT_PUBLIC_LEGAL_VAT ?? "[N° de TVA intracommunautaire à compléter]",
-  director: process.env.NEXT_PUBLIC_LEGAL_DIRECTOR ?? "[Directeur de la publication à compléter]",
+  registration: process.env.NEXT_PUBLIC_LEGAL_SIREN ?? "[Numéro SIRET à compléter]",
+  vat: process.env.NEXT_PUBLIC_LEGAL_VAT ?? "[Régime de TVA à compléter]",
+  director: process.env.NEXT_PUBLIC_LEGAL_DIRECTOR ?? "[Responsable de la publication à compléter]",
   email: process.env.NEXT_PUBLIC_LEGAL_EMAIL ?? "contact@booksync.fr",
 };
 
