@@ -257,3 +257,88 @@ STORIES += [
          "expédition autour du monde."),
     ]),
 ]
+
+
+# --- Nouvelle animation : décor du thème, costume, quiz VRAI / FAUX, écran qui tremble ---
+import engine
+from story import SCENES
+from render import rect as _rect, path as _path, line as _line, circle as _circle, ellipse as _ellipse
+
+
+class Colisee(engine.Scene):
+    """Ciel, gradins du Colisée en arcades, sable de l'arène."""
+
+    def back(self, t):
+        s = [_rect(-800, 0, 2700, 1300, "url(#sky)", stroke="none", sw=0)]
+        for row, (y0, h, col) in enumerate(((260, 300, "#d9b38c"), (560, 300, "#cfa57c"), (860, 330, "#c4986d"))):
+            s.append(_rect(-800, y0, 2700, h, col, stroke="#8a6440", sw=6))
+            for k in range(-6, 16):
+                ax = k * 170 + (85 if row % 2 else 0)
+                s.append(_path("M %d %d L %d %d A 55 55 0 0 1 %d %d L %d %d Z" % (
+                    ax - 55, y0 + h - 20, ax - 55, y0 + 110, ax + 55, y0 + 110, ax + 55, y0 + h - 20),
+                    fill="#6e4b2e", stroke="#8a6440", sw=5))
+        s.append(_rect(-800, 1190, 2700, 730, "#e9c98f", stroke="none", sw=0))
+        s.append(_line(-800, 1190, 1900, 1190, sw=6))
+        for x in (-300, 200, 700, 1300):
+            s.append(_ellipse(x, 1500, 90, 18, "#d8b277", stroke="none", sw=0))
+        return "".join(s)
+
+
+class Navire(engine.Scene):
+    """Mer, mât avec drapeau pirate, pont en bois."""
+
+    def back(self, t):
+        s = [_rect(-800, 0, 2700, 1000, "url(#sky)", stroke="none", sw=0),
+             _rect(-800, 1000, 2700, 300, "#1d6fa3", stroke="none", sw=0)]
+        for k in range(14):
+            x = -800 + k * 200 + (t * 40) % 200
+            s.append(_path("M %d 1040 q 50 -30 100 0" % x, stroke="#ffffff", sw=6))
+        s.append(_rect(880, 120, 34, 1180, "#7a4a24", sw=6))
+        s.append(_line(700, 420, 1100, 420, sw=16, stroke="#7a4a24"))
+        s.append(_path("M 914 160 L 1180 200 L 914 300 Z", fill="#1b1b1b", sw=5))
+        s.append(_circle(1000, 222, 26, "#ffffff", sw=4))
+        s.append(_rect(-800, 1200, 2700, 720, "#a0683a", stroke="none", sw=0))
+        for k in range(12):
+            s.append(_line(-800, 1260 + k * 60, 1900, 1260 + k * 60, sw=4, stroke="#7a4a24"))
+        s.append(_rect(-800, 1170, 2700, 40, "#7a4a24", sw=6))
+        return "".join(s)
+
+
+SCENES["colisee"], SCENES["navire"] = Colisee, Navire
+
+ROMAIN = P(skin=SKIN[2], hair=("short", "#1c1412"), top=("tank", "#ffffff"), bottom=("shorts", "#ffffff"),
+           shoes="#8a5a2b", hat=("laurel", "#3fa34d"), R=116)
+PIRATE = P(skin=SKIN[3], hair=("curly", "#1c1412"), top=("tshirt", "#e63946"), bottom=("pants", "#1f1f1f"),
+           shoes="#1b1b1b", beard="#1c1412", hat=("pirate", "#1b1b1b"), R=116)
+
+
+def lot2(slug, sujet, tag, scene, hero, items):
+    beats, total = [], len(items)
+    for k, (q, label, rep) in enumerate(items):
+        o = dict(expr="smug", look="CAM", tag=(label, "#ffd166"))
+        beats.append(B(q, scene, [(hero, 540, o)], (540, 1000, 1.25), quiz=(k + 1, total, False)))
+        beats.append(B(rep, scene, [(hero, 540, dict(expr="angry", look="CAM", pose="gesture"))], (540, 960, 1.5),
+                       red=True, dark=0.25, shake=True, stamp="ENCORE FAUX" if k == 2 else "FAUX !",
+                       quiz=(k + 1, total, True)))
+    beats.append(B("Alors, tu y croyais à combien ? Écris-le en commentaire, espèce de fils de pute. Et abonne-toi.",
+                   scene, [(hero, 540, dict(expr="angry", look="CAM", pose="gesture"))], (540, 960, 1.5),
+                   stamp="ABONNE-TOI", cta=True))
+    d = dict(slug=slug, title="%s : tout ce que tu crois est faux" % sujet, hero=hero, beats=beats,
+             voice=("fr_FR-miro-high", None, 0.82, 0.0),  # voix gratuite tant qu'il n'y a plus de crédits ElevenLabs
+             hook_text="%s ? TOUT est FAUX" % sujet, caption_y=1390, caps="keywords", out="videos-faux",
+             caption="%s : tout ce que tu crois est FAUX 😤 Tu y croyais à combien ?" % sujet,
+             hashtags=["#faux", "#histoire", tag, "#lesaviezvous", "#humour", "#animation", "#pourtoi", "#fyp"])
+    return d
+
+
+_ROM = next(x for x in STORIES if x["slug"] == "fx06-romains")
+_PIR = next(x for x in STORIES if x["slug"] == "fx07-pirates")
+
+
+def _items(st):
+    b = st["beats"]
+    return [(b[i]["text"], b[i]["cast"][0][2]["tag"][0], b[i + 1]["text"]) for i in range(0, 10, 2)]
+
+
+STORIES[STORIES.index(_ROM)] = lot2("fx06-romains", "Les Romains", "#rome", "colisee", ROMAIN, _items(_ROM))
+STORIES[STORIES.index(_PIR)] = lot2("fx07-pirates", "Les pirates", "#pirates", "navire", PIRATE, _items(_PIR))

@@ -325,6 +325,21 @@ def hat_parts(hat, x, hy, R):
                                                           f(hy - R * 1.3), f(x + R * 0.7), f(hy - R * 1.3),
                                                           f(x + R * 0.9), f(hy - R * 0.55)), fill=col, sw=6) +
                 line(x - R * 0.85, hy - R * 0.75, x + R * 0.85, hy - R * 0.75, sw=10, stroke="#ff8fab"))
+    if kind == "laurel":  # couronne de laurier romaine
+        out = []
+        for sd in (-1, 1):
+            for k in range(6):
+                a = math.radians(200 + k * 22) if sd < 0 else math.radians(-20 - k * 22)
+                lx, ly = x + math.cos(a) * R * 1.0, hy - R * 0.35 + math.sin(a) * R * 0.75
+                out.append(ellipse(lx, ly, R * 0.16, R * 0.08, col, sw=4))
+        return "".join(out)
+    if kind == "pirate":  # tricorne noir avec tête de mort
+        return (path("M %s %s Q %s %s %s %s Q %s %s %s %s Z" % (
+            f(x - R * 1.35), f(hy - R * 0.55), f(x), f(hy - R * 1.95), f(x + R * 1.35), f(hy - R * 0.55),
+            f(x), f(hy - R * 0.85), f(x - R * 1.35), f(hy - R * 0.55)), fill=col, sw=6) +
+                circle(x, hy - R * 1.12, R * 0.17, "#ffffff", sw=4) +
+                line(x - R * 0.28, hy - R * 0.82, x + R * 0.28, hy - R * 1.0, sw=7, stroke="#ffffff") +
+                line(x - R * 0.28, hy - R * 1.0, x + R * 0.28, hy - R * 0.82, sw=7, stroke="#ffffff"))
     if kind == "headphones":
         return (path("M %s %s A %s %s 0 0 1 %s %s" % (f(x - R * 1.02), f(hy), f(R * 1.05), f(R * 1.12),
                                                      f(x + R * 1.02), f(hy)), stroke=INK, sw=24) +

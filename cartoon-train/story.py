@@ -355,6 +355,10 @@ def frame_svg(segs, total, t):
     if cur["fx"].get("crowd"):
         effects.append(crowd_bubbles(cur["fx"]["crowd"], t, cur["t0"] + 0.2, cx, top_ if HEADER else 430, sc))
 
+    if cur["fx"].get("shake") and t - cur["t0"] < 0.45:  # tremblement d'écran
+        k_ = 1 - (t - cur["t0"]) / 0.45
+        cx += math.sin(t * 95) * 22 * k_
+        cy += math.cos(t * 83) * 16 * k_
     tr = "translate(%s %s) scale(%.4f) translate(%s %s)" % (f(W / 2), f(H / 2), sc, f(-cx), f(-cy))
     over = []
     dark = cur["fx"].get("dark", 0)
@@ -412,6 +416,8 @@ def frame_svg(segs, total, t):
         ui.append(text_el(230, y0 + 112, cur["fx"]["notif"], 44, INK, anchor="start"))
     if not (STORY.get("caps") == "keywords" and HOOK_TEXT and cur is segs[0]):
         ui.append(captions(cur, t))
+    if cur["fx"].get("quiz"):
+        ui.append(quiz_svg(cur["fx"]["quiz"], t - cur["t0"]))
     if cur["fx"].get("stamp"):  # gros tampon rouge qui claque au début de la réplique
         u_ = t - cur["t0"]
         k = 1.6 - 0.6 * ease(u_ / 0.18)
@@ -444,6 +450,32 @@ def frame_svg(segs, total, t):
     return ('<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d">%s'
             '<rect width="%d" height="%d" fill="#dfe7ec"/><g transform="%s">%s</g>%s<g transform="%s">%s</g>%s</svg>') % (
         W, H, W, H, defs, W, H, tr, "".join(world), "".join(over), tr, "".join(effects), "".join(ui))
+
+
+def quiz_svg(q, u):
+    """Jeu télé : boutons VRAI / FAUX en bas et compteur « n / total ». q = (n, total, révélé)."""
+    n, total, shown = q
+    s_ = [rect(800, 40, 230, 86, "#1b1b1b", rx=43, stroke="none", sw=0),
+          text_el(915, 100, "%d / %d" % (n, total), 50, "#ffffff", weight=900)]
+    for i in range(total):
+        s_.append(circle(540 - (total - 1) * 30 + i * 60, 1880, 14, "#ffffff" if i < n else "#555555",
+                         stroke="none", sw=0))
+    pulse = 1 + 0.05 * math.sin(u * 8)
+    for label, x, col in (("VRAI", 300, "#25d366"), ("FAUX", 780, "#ff2d2d")):
+        if shown:
+            on = label == "FAUX"
+            k = 1.18 if on else 0.9
+            fill = col if on else "#8a8a8a"
+            op = 1.0 if on else 0.55
+        else:
+            k, fill, op = pulse, col, 1.0
+        s_.append('<g opacity="%.2f" transform="translate(%s 1640) scale(%.3f)">' % (op, f(x), k))
+        s_.append(rect(-200, -75, 400, 150, fill, rx=40, sw=8))
+        s_.append(text_el(0, 30, label, 84, "#ffffff", weight=900))
+        if shown and label == "VRAI":
+            s_.append(line(-150, -55, 150, 55, sw=14, stroke="#1b1b1b") + line(-150, 55, 150, -55, sw=14, stroke="#1b1b1b"))
+        s_.append("</g>")
+    return "".join(s_)
 
 
 def sign_svg(txt, x=540, y=520):
