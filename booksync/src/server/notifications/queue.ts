@@ -13,7 +13,7 @@ export type BookingEvent = "created" | "rescheduled" | "cancelled";
 export type NotifyContext = {
   organization: { id: string };
   plan: Plan;
-  appointment: { id: string; staffId: string; startsAt: Date; status: string };
+  appointment: { id: string; staffId: string; startsAt: Date; endsAt: Date; status: string };
   customer: { email: string | null; emailOptIn: boolean };
   /** Qui est à l'origine de l'événement (pour ne pas notifier la personne qui vient d'agir). */
   actor: { kind: "customer" } | { kind: "staff"; email: string };
@@ -23,6 +23,9 @@ const REMINDERS = [
   { type: "reminder_24h" as const, hours: 24 },
   { type: "reminder_2h" as const, hours: 2 },
 ] satisfies Array<{ type: AutomationKey; hours: number }>;
+
+/** Délai entre la fin du rendez-vous et la demande d'avis. */
+export const REVIEW_DELAY_MS = 2 * 3_600_000;
 
 /** Destinataires internes : l'employé concerné + propriétaires et administrateurs (adresses uniques). */
 async function staffRecipients(tx: Tx, organizationId: string, staffId: string) {
@@ -107,6 +110,20 @@ export async function enqueueBookingNotifications(tx: Tx, event: BookingEvent, c
         dedupeKey: `${appt.id}:${r.type}:${startsIso}`,
       });
     }
+  }
+
+  // Demande d'avis : programmée 2 h après la fin (recalée à l'envoi si l'horaire a changé).
+  if (canEmailCustomer && event === "created" && active("review_request")) {
+    rows.push({
+      organizationId: org.id,
+      appointmentId: appt.id,
+      type: "review_request",
+      audience: "customer",
+      channel: "email",
+      recipient: customer.email!,
+      scheduledFor: new Date(appt.endsAt.getTime() + REVIEW_DELAY_MS),
+      dedupeKey: `${appt.id}:review_request:1`,
+    });
   }
 
   if (active("staff_alerts")) {

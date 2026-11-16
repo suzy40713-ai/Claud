@@ -11,6 +11,8 @@ import { createManageToken } from "@/lib/manage-token";
 import { getAvailability, staffForService } from "@/server/booking/availability";
 import { createAppointment, publicBookingSchema } from "@/server/booking/book";
 import { getOrgBySlug } from "@/server/booking/public";
+import { getStripe } from "@/server/billing/stripe";
+import { abandonDeposit, createDepositCheckout, depositFor } from "@/server/deposit/payment";
 import { runAction, UserError } from "@/server/errors";
 import { dispatchSoon } from "@/server/notifications/dispatch";
 import { clientIp, rateLimit } from "@/server/rate-limit";
@@ -80,6 +82,7 @@ export async function bookAction(
       throw new UserError("La réservation en ligne n'est pas disponible.");
     try {
       const appt = await createAppointment({
+        deposit: (priceCents) => depositFor(org, priceCents),
         org,
         serviceId: data.serviceId,
         staffId: data.staffId,
@@ -96,8 +99,23 @@ export async function bookAction(
         actor: { kind: "customer" },
         enforceSchedule: true,
       });
+      if (appt.status === "pending_payment") {
+        // Acompte : redirection vers la page de paiement Stripe du professionnel.
+        const stripe = getStripe();
+        try {
+          if (!stripe) throw new Error("Stripe non configuré");
+          const checkoutUrl = await createDepositCheckout(stripe, org, appt, data.email);
+          return { token: createManageToken(appt.id), checkoutUrl };
+        } catch (error) {
+          console.error("[acompte] page de paiement impossible", error);
+          await abandonDeposit(null, appt.id);
+          throw new UserError(
+            "Le paiement de l'acompte est momentanément indisponible. Réessayez dans quelques minutes ou contactez l'établissement.",
+          );
+        }
+      }
       dispatchSoon();
-      return { token: createManageToken(appt.id) };
+      return { token: createManageToken(appt.id), checkoutUrl: null as string | null };
     } catch (error) {
       // Les limites de forfait concernent le professionnel : message neutre pour le client.
       if (error instanceof PlanLimitError) {

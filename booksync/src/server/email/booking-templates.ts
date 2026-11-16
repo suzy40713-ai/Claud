@@ -16,6 +16,8 @@ export type BookingEmailData = {
   timeLabel: string;
   durationLabel: string;
   priceLabel: string | null;
+  /** Ex. « acompte de 5,00 € payé en ligne, reste 20,00 € à régler sur place » */
+  depositLabel?: string | null;
   manageUrl: string;
   bookingUrl: string;
   dashboardUrl: string;
@@ -49,7 +51,8 @@ function detailsTable(d: BookingEmailData) {
     ["Heure", `${d.timeLabel} (${d.durationLabel})`],
     ["Avec", d.staffName],
   ];
-  if (d.priceLabel) rows.push(["Prix", `${d.priceLabel} — à régler sur place`]);
+  if (d.priceLabel)
+    rows.push(["Prix", `${d.priceLabel} — ${d.depositLabel ?? "à régler sur place"}`]);
   if (d.organizationAddress) rows.push(["Adresse", d.organizationAddress]);
   if (d.organizationPhone) rows.push(["Téléphone", d.organizationPhone]);
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border:1px solid #e4e7ec;border-radius:10px;">${rows
@@ -70,7 +73,7 @@ function textDetails(d: BookingEmailData) {
     `Date : ${d.dateLabel}`,
     `Heure : ${d.timeLabel} (${d.durationLabel})`,
     `Avec : ${d.staffName}`,
-    d.priceLabel ? `Prix : ${d.priceLabel} — à régler sur place` : null,
+    d.priceLabel ? `Prix : ${d.priceLabel} — ${d.depositLabel ?? "à régler sur place"}` : null,
     d.organizationAddress ? `Adresse : ${d.organizationAddress}` : null,
     d.organizationPhone ? `Téléphone : ${d.organizationPhone}` : null,
   ]
@@ -242,6 +245,49 @@ ${notice}`;
     template: "waitlist_offer",
     subject: `Créneau disponible : ${d.dateLabel} à ${d.timeLabel} — ${d.organizationName}`,
     html: shell(title, `${d.dateLabel} à ${d.timeLabel}`, body, color),
+    text,
+  };
+}
+
+/** Demande d'avis envoyée quelques heures après le rendez-vous. */
+export function reviewRequestEmail(d: BookingEmailData & { reviewUrl: string }): RenderedEmail {
+  const color = d.brandColor ?? "#3563E9";
+  const org = escapeHtml(d.organizationName);
+  const title = "Comment s'est passé votre rendez-vous ?";
+  const intro = `Bonjour ${escapeHtml(d.customerFirstName)}, merci d'être venu(e) chez <strong>${org}</strong> pour votre ${escapeHtml(d.serviceName.toLowerCase())} du ${escapeHtml(d.dateLabel)}.`;
+  const ask =
+    "Votre avis aide l'établissement à s'améliorer et les autres clients à choisir. Cela prend 30 secondes.";
+  const stars = [1, 2, 3, 4, 5]
+    .map(
+      (n) =>
+        `<a href="${escapeHtml(`${d.reviewUrl}?note=${n}`)}" style="display:inline-block;margin:0 3px;font-size:30px;line-height:36px;color:#f5a524;text-decoration:none;" aria-label="${n} sur 5">★</a>`,
+    )
+    .join("");
+  const body = [
+    h1(title),
+    p(intro),
+    p(escapeHtml(ask)),
+    `<p style="margin:18px 0 6px;text-align:center;">${stars}</p>`,
+    `<p style="margin:0 0 18px;text-align:center;font-size:12px;color:#667085;">Touchez une étoile pour noter</p>`,
+    `<p style="margin:0;text-align:center;">${btn(d.reviewUrl, "Donner mon avis", color)}</p>`,
+  ].join("");
+  const text = `${title}
+
+${intro.replace(/<[^>]+>/g, "")}
+
+${ask}
+
+Donner mon avis : ${d.reviewUrl}`;
+  return {
+    template: "review_request",
+    subject: `Votre avis sur ${d.organizationName} ?`,
+    html: shell(
+      title,
+      ask,
+      body,
+      color,
+      "Email envoyé via BookSync pour le compte de l'établissement indiqué ci-dessus. Seuls les clients ayant eu un rendez-vous peuvent déposer un avis.",
+    ),
     text,
   };
 }

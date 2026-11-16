@@ -26,6 +26,7 @@ const NOTIFICATION_TITLES: Record<string, string> = {
   staff_new_booking: "Alerte équipe : nouvelle réservation",
   staff_booking_rescheduled: "Alerte équipe : rendez-vous déplacé",
   staff_booking_cancelled: "Alerte équipe : rendez-vous annulé",
+  review_request: "Demande d'avis",
 };
 
 const DAYS_30 = 30 * 24 * 3_600_000;

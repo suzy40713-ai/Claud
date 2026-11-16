@@ -29,6 +29,8 @@ const selection = {
   serviceName: appointment.serviceName,
   serviceId: appointment.serviceId,
   priceCents: appointment.priceCents,
+  depositCents: appointment.depositCents,
+  depositStatus: appointment.depositStatus,
   customerNote: appointment.customerNote,
   internalNote: appointment.internalNote,
   staffId: appointment.staffId,

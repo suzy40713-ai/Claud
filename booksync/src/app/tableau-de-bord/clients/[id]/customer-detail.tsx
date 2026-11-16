@@ -14,6 +14,7 @@ import { CustomerForm, type CustomerValues } from "../customer-form";
 import { deleteCustomerAction } from "../actions";
 
 const variant = {
+  pending_payment: "warning",
   confirmed: "primary",
   cancelled: "destructive",
   completed: "success",

@@ -2,15 +2,21 @@ import "server-only";
 import { after } from "next/server";
 import { and, eq, inArray, lt, lte, sql } from "drizzle-orm";
 import { db } from "@/db/client";
-import { appointment, customer, notification, organization, staff } from "@/db/schema";
+import { appointment, customer, notification, organization, review, staff } from "@/db/schema";
 import type { AutomationKey } from "@/domain/autopilot/automations";
 import { effectivePlan } from "@/domain/billing/plans";
 import { env } from "@/lib/env";
 import { capitalize, formatCents, formatDateLong, formatDuration, formatTime } from "@/lib/format";
-import { manageUrl } from "@/lib/manage-token";
-import { customerEmail, staffEmail, type BookingEmailData } from "@/server/email/booking-templates";
+import { manageUrl, reviewUrl } from "@/lib/manage-token";
+import {
+  customerEmail,
+  reviewRequestEmail,
+  staffEmail,
+  type BookingEmailData,
+} from "@/server/email/booking-templates";
 import { sendEmail } from "@/server/email/send";
 import { loadActiveChecker } from "@/server/autopilot/rules";
+import { REVIEW_DELAY_MS } from "./queue";
 
 const MAX_ATTEMPTS = 5;
 
@@ -26,6 +32,7 @@ const RULE_FOR_TYPE: Record<Row["type"], AutomationKey> = {
   staff_new_booking: "staff_alerts",
   staff_booking_rescheduled: "staff_alerts",
   staff_booking_cancelled: "staff_alerts",
+  review_request: "review_request",
 };
 
 /** Réserve un lot de notifications dues (SKIP LOCKED : plusieurs exécutions parallèles ne traitent jamais la même). */
@@ -97,6 +104,14 @@ async function buildData(n: Row) {
       Math.round((appt.endsAt.getTime() - appt.startsAt.getTime()) / 60_000),
     ),
     priceLabel: appt.priceCents ? formatCents(appt.priceCents) : null,
+    depositLabel:
+      appt.depositStatus === "paid"
+        ? `acompte de ${formatCents(appt.depositCents)} payé en ligne, reste ${formatCents(appt.priceCents - appt.depositCents)} à régler sur place`
+        : appt.depositStatus === "refunded"
+          ? `acompte de ${formatCents(appt.depositCents)} remboursé (5 à 10 jours selon votre banque)`
+          : appt.depositStatus === "refund_failed"
+            ? `remboursement de l'acompte de ${formatCents(appt.depositCents)} à traiter par l'établissement`
+            : null,
     manageUrl: manageUrl(env.NEXT_PUBLIC_APP_URL, appt.id),
     bookingUrl: `${env.NEXT_PUBLIC_APP_URL}/${org.slug}`,
     dashboardUrl: `${env.NEXT_PUBLIC_APP_URL}/tableau-de-bord/calendrier`,
@@ -130,6 +145,26 @@ async function processOne(n: Row): Promise<"sent" | "failed" | "skipped"> {
     await finish("skipped", { lastError: "Rappel devenu sans objet" });
     return "skipped";
   }
+  if (n.type === "review_request") {
+    if (!["confirmed", "completed"].includes(appt.status)) {
+      await finish("skipped", { lastError: "Rendez-vous annulé ou client absent" });
+      return "skipped";
+    }
+    // Rendez-vous déplacé plus tard : la demande est recalée après la nouvelle fin.
+    const due = new Date(appt.endsAt.getTime() + REVIEW_DELAY_MS);
+    if (due > new Date()) {
+      await finish("pending", { scheduledFor: due, attempts: Math.max(0, n.attempts - 1) });
+      return "skipped";
+    }
+    const [existing] = await db
+      .select({ id: review.id })
+      .from(review)
+      .where(eq(review.appointmentId, appt.id));
+    if (existing) {
+      await finish("skipped", { lastError: "Avis déjà déposé" });
+      return "skipped";
+    }
+  }
   // Automatisation désactivée depuis la programmation : on n'envoie pas.
   const active = await loadActiveChecker(db, appt.organizationId, plan.id);
   if (!active(RULE_FOR_TYPE[n.type])) {
@@ -142,7 +177,9 @@ async function processOne(n: Row): Promise<"sent" | "failed" | "skipped"> {
   }
 
   const email =
-    n.audience === "customer"
+    n.type === "review_request"
+      ? reviewRequestEmail({ ...data, reviewUrl: reviewUrl(env.NEXT_PUBLIC_APP_URL, appt.id) })
+      : n.audience === "customer"
       ? customerEmail(n.type as Parameters<typeof customerEmail>[0], data)
       : staffEmail(n.type as Parameters<typeof staffEmail>[0], data);
   const result = await sendEmail(n.recipient, email);

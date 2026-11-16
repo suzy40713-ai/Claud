@@ -122,7 +122,13 @@ export function ManageActions({
               startTransition(async () => {
                 const res = await cancelByTokenAction(token, reason);
                 if (!res.ok) return setError(res.error);
-                toast.success(res.message);
+                toast.success(
+                  res.data.depositStatus === "refunded"
+                    ? "Rendez-vous annulé. Votre acompte est remboursé (5 à 10 jours selon votre banque)."
+                    : res.data.depositStatus === "refund_failed"
+                      ? "Rendez-vous annulé. Le remboursement de votre acompte sera traité par l'établissement."
+                      : res.message,
+                );
                 setMode(null);
                 router.refresh();
               });

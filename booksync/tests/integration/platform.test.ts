@@ -120,6 +120,7 @@ describe("annuaire public", () => {
         "name",
         "nextSlot",
         "postalCode",
+        "rating",
         "services",
         "servicesCount",
         "slug",

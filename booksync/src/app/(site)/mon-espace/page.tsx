@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 };
 
 const STATUS = {
+  pending_payment: { label: "Acompte en attente", variant: "warning" },
   confirmed: { label: "Confirmé", variant: "success" },
   cancelled: { label: "Annulé", variant: "neutral" },
   completed: { label: "Honoré", variant: "neutral" },

@@ -12,7 +12,7 @@ function secret() {
   return s;
 }
 
-function sign(id: string, purpose: "rdv" | "attente" = "rdv") {
+function sign(id: string, purpose: "rdv" | "attente" | "avis" = "rdv") {
   return createHmac("sha256", secret())
     .update(`booksync:${purpose}:${id}`)
     .digest("base64url")
@@ -42,4 +42,19 @@ export function verifyOfferToken(token: string): string | null {
   const m = /^([0-9a-f-]{36})\.([A-Za-z0-9_-]{32})$/.exec(token);
   if (!m) return null;
   return safeEqual(m[2], sign(m[1], "attente")) ? m[1] : null;
+}
+
+/** Lien « donner mon avis » envoyé après le rendez-vous : clé de signature distincte du lien de gestion. */
+export function createReviewToken(appointmentId: string) {
+  return `${appointmentId}.${sign(appointmentId, "avis")}`;
+}
+
+export function verifyReviewToken(token: string): string | null {
+  const m = /^([0-9a-f-]{36})\.([A-Za-z0-9_-]{32})$/.exec(token);
+  if (!m) return null;
+  return safeEqual(m[2], sign(m[1], "avis")) ? m[1] : null;
+}
+
+export function reviewUrl(baseUrl: string, appointmentId: string) {
+  return `${baseUrl}/avis/${createReviewToken(appointmentId)}`;
 }

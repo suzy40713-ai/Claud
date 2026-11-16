@@ -31,6 +31,7 @@ export const env = createEnv({
     /** Stripe Billing (mode test : sk_test_…). */
     STRIPE_SECRET_KEY: z.string().startsWith("sk_").optional(),
     STRIPE_WEBHOOK_SECRET: z.string().startsWith("whsec_").optional(),
+    STRIPE_CONNECT_WEBHOOK_SECRET: z.string().startsWith("whsec_").optional(),
     STRIPE_PRICE_STARTER: z.string().startsWith("price_").optional(),
     STRIPE_PRICE_PRO: z.string().startsWith("price_").optional(),
     /** Secret partagé avec le planificateur (Supabase pg_cron) pour /api/cron/*. */
@@ -58,6 +59,7 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+    STRIPE_CONNECT_WEBHOOK_SECRET: process.env.STRIPE_CONNECT_WEBHOOK_SECRET,
     STRIPE_PRICE_STARTER: process.env.STRIPE_PRICE_STARTER,
     STRIPE_PRICE_PRO: process.env.STRIPE_PRICE_PRO,
     CRON_SECRET: process.env.CRON_SECRET,

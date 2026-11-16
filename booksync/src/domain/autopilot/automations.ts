@@ -10,6 +10,7 @@ export type AutomationKey =
   | "cancellation_notice"
   | "reminder_24h"
   | "reminder_2h"
+  | "review_request"
   | "staff_alerts"
   | "waitlist"
   | "daily_summary"
@@ -57,6 +58,15 @@ export const AUTOMATIONS: readonly AutomationDefinition[] = [
     key: "reminder_2h",
     title: "Rappel 2 heures avant",
     description: "Un dernier rappel le jour même.",
+    minPlan: "starter",
+    defaultEnabled: true,
+    category: "clients",
+  },
+  {
+    key: "review_request",
+    title: "Demande d'avis",
+    description:
+      "Deux heures après le rendez-vous, le client reçoit un email pour noter sa visite. Les avis vérifiés s'affichent sur votre page et dans l'annuaire.",
     minPlan: "starter",
     defaultEnabled: true,
     category: "clients",

@@ -217,7 +217,8 @@ export const appointment = pgTable(
     startsAt: timestamp({ withTimezone: true }).notNull(),
     endsAt: timestamp({ withTimezone: true }).notNull(),
     blockedUntil: timestamp({ withTimezone: true }).notNull(),
-    status: text({ enum: ["confirmed", "cancelled", "completed", "no_show"] })
+    /** `pending_payment` : créneau bloqué le temps du paiement de l'acompte (`paymentExpiresAt`). */
+    status: text({ enum: ["pending_payment", "confirmed", "cancelled", "completed", "no_show"] })
       .notNull()
       .default("confirmed"),
     source: text({ enum: ["online", "manual"] }).notNull(),
@@ -231,6 +232,14 @@ export const appointment = pgTable(
     cancelledAt: timestamp({ withTimezone: true }),
     cancelledBy: text({ enum: ["customer", "staff"] }),
     cancellationReason: text(),
+    /** Acompte payé en ligne sur le compte Stripe du professionnel. */
+    depositCents: integer().notNull().default(0),
+    depositStatus: text({ enum: ["none", "pending", "paid", "refunded", "refund_failed"] })
+      .notNull()
+      .default("none"),
+    paymentExpiresAt: timestamp({ withTimezone: true }),
+    stripeCheckoutSessionId: text().unique(),
+    stripePaymentIntentId: text(),
     createdByUserId: uuid().references(() => user.id, { onDelete: "set null" }),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
@@ -251,6 +260,9 @@ export const appointment = pgTable(
     index("appointment_org_starts_idx").on(t.organizationId, t.startsAt),
     index("appointment_staff_starts_idx").on(t.staffId, t.startsAt),
     index("appointment_customer_idx").on(t.customerId),
+    index("appointment_pending_payment_idx")
+      .on(t.paymentExpiresAt)
+      .where(sql`${t.status} = 'pending_payment'`),
     check(
       "appointment_range_ck",
       sql`${t.startsAt} < ${t.endsAt} and ${t.endsAt} <= ${t.blockedUntil}`,
@@ -293,6 +305,7 @@ export const notification = pgTable(
         "staff_new_booking",
         "staff_booking_cancelled",
         "staff_booking_rescheduled",
+        "review_request",
       ],
     }).notNull(),
     audience: text({ enum: ["customer", "staff"] }).notNull(),
@@ -517,6 +530,11 @@ export const review = pgTable(
     status: text({ enum: ["pending", "published", "hidden"] })
       .notNull()
       .default("pending"),
+    /** Réponse publique du professionnel. */
+    reply: text(),
+    repliedAt: timestamp({ withTimezone: true }),
+    /** Motif obligatoire du masquage (propos injurieux, hors sujet…), conservé pour transparence. */
+    hiddenReason: text(),
     createdAt: createdAt(),
   },
   (t) => [

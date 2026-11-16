@@ -4,10 +4,13 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { BellRing, CalendarX2, Clock, MapPin, Phone } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
+import { ReviewSection } from "@/components/reviews/review-list";
+import { RatingBadge } from "@/components/reviews/stars";
 import { Skeleton } from "@/components/ui/skeleton";
 import { describeDay, WEEKDAYS } from "@/domain/schedule/hours";
 import { getPublicBookingPage } from "@/server/booking/public";
 import { getSession } from "@/server/auth/session";
+import { getRatingSummaries, listPublicReviews } from "@/server/reviews";
 import { BookingFlow, type BookingPrefill } from "./booking-flow";
 
 export async function generateMetadata(props: PageProps<"/[slug]">): Promise<Metadata> {
@@ -27,7 +30,12 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
   const page = await getPublicBookingPage(slug);
   if (!page) notFound();
   const o = page.organization;
-  const session = await getSession();
+  const [session, summaries, reviews] = await Promise.all([
+    getSession(),
+    getRatingSummaries([o.id]),
+    listPublicReviews(o.id),
+  ]);
+  const rating = summaries.get(o.id);
   const [firstName, ...rest] = (session?.user.name ?? "").trim().split(/\s+/);
   const prefill: BookingPrefill = session?.user.emailVerified
     ? { firstName: firstName ?? "", lastName: rest.join(" "), email: session.user.email }
@@ -81,6 +89,11 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
                 {o.activityLabel ?? "Réservation en ligne"}
                 {o.address ? ` · ${o.address.split(", ").at(-1)}` : ""}
               </p>
+              {rating ? (
+                <a href="#avis-titre" className="mt-1 inline-block hover:underline">
+                  <RatingBadge average={rating.average} count={rating.count} />
+                </a>
+              ) : null}
             </div>
           </div>
           {o.welcomeMessage || o.description ? (
@@ -160,6 +173,12 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
               </Link>
             </div>
           ) : null}
+          <ReviewSection
+            organizationName={o.name}
+            summary={rating}
+            reviews={reviews}
+            timeZone={o.timezone}
+          />
           <p className="mt-8 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
             Propulsé par <Logo className="scale-75 [&>span:last-child]:text-sm" />
           </p>

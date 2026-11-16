@@ -1,4 +1,5 @@
 import "server-only";
+import { depositAllowed } from "@/domain/billing/deposit";
 import { isAutomationActive } from "@/domain/autopilot/automations";
 import { loadStoredRules } from "@/server/autopilot/rules";
 import { and, asc, eq, inArray, isNull } from "drizzle-orm";
@@ -76,7 +77,13 @@ export async function getPublicBookingPage(slug: string) {
     : [];
 
   const rules = await loadStoredRules(db, org.id);
+  const depositOn =
+    Boolean(org.stripeAccountId && org.stripeAccountReady) &&
+    depositAllowed(plan.id) &&
+    org.depositMode !== "none";
   return {
+    /** Acompte demandé à la réservation (calculé par prestation avec computeDeposit). */
+    deposit: depositOn ? { mode: org.depositMode, value: org.depositValue } : null,
     waitlistEnabled: org.bookingEnabled && isAutomationActive("waitlist", plan.id, rules),
     organization: {
       id: org.id,

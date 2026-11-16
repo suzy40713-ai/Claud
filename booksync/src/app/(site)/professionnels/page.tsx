@@ -6,6 +6,7 @@ import { CalendarClock, MapPin, Search, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
+import { RatingBadge } from "@/components/reviews/stars";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DIRECTORY_ACTIVITIES } from "@/domain/activities";
 import { capitalize, formatCents, formatDuration, formatInTz } from "@/lib/format";
@@ -46,6 +47,9 @@ function ResultCard({ r }: { r: DirectoryResult }) {
         <div className="min-w-0">
           <h2 className="truncate font-semibold">{r.name}</h2>
           <p className="text-sm text-muted-foreground">{r.activity}</p>
+          {r.rating ? (
+            <RatingBadge average={r.rating.average} count={r.rating.count} className="mt-0.5" />
+          ) : null}
           {r.city ? (
             <p className="mt-0.5 flex items-center gap-1 text-[13px] text-muted-foreground">
               <MapPin className="size-3.5 shrink-0" />

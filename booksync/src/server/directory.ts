@@ -1,4 +1,5 @@
 import "server-only";
+import { getRatingSummaries } from "@/server/reviews";
 import { and, asc, eq, ilike, inArray, isNull, or, sql, type SQL } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db/client";
@@ -148,6 +149,8 @@ export async function searchDirectory(input: DirectorySearch) {
         .orderBy(asc(service.position), asc(service.createdAt))
     : [];
 
+  const ratings = await getRatingSummaries(ids);
+
   return {
     hasMore,
     results: list.map(({ org, minPriceCents, nextSlot }) => ({
@@ -164,6 +167,7 @@ export async function searchDirectory(input: DirectorySearch) {
       services: services.filter((s) => s.organizationId === org.id).slice(0, 3),
       servicesCount: services.filter((s) => s.organizationId === org.id).length,
       nextSlot,
+      rating: ratings.get(org.id) ?? null,
     })),
   };
 }

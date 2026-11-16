@@ -58,9 +58,15 @@ describe("envoi des notifications et rappels", () => {
       .select()
       .from(notification)
       .where(eq(notification.appointmentId, appt.id));
-    expect(rows.filter((r) => r.audience === "customer").every((r) => r.status === "sent")).toBe(
-      true,
-    );
+    expect(
+      rows
+        .filter((r) => r.audience === "customer" && r.type !== "review_request")
+        .every((r) => r.status === "sent"),
+    ).toBe(true);
+    // La demande d'avis attend la fin du rendez-vous : recalée, pas envoyée.
+    const ask = rows.find((r) => r.type === "review_request")!;
+    expect(ask.status).toBe("pending");
+    expect(ask.scheduledFor.getTime()).toBe(appt.endsAt.getTime() + 2 * 3_600_000);
     const mails = await db.select().from(emailMessage).where(eq(emailMessage.to, email));
     expect(mails.map((m) => m.template).sort()).toEqual([
       "booking_confirmation",

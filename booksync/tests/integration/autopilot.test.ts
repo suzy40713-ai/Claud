@@ -52,6 +52,7 @@ describe("Autopilot : automatisations", () => {
       "booking_confirmation",
       "reminder_24h",
       "reminder_2h",
+      "review_request",
       "staff_new_booking",
     ]);
   });
@@ -63,7 +64,7 @@ describe("Autopilot : automatisations", () => {
     await setAutomation(ctx, "staff_alerts", false);
     await setAutomation(ctx, "staff_alerts", false); // sans changement : pas de doublon au journal
     const appt = await book(11);
-    expect(await typesOf(appt.id)).toEqual(["reminder_24h"]);
+    expect(await typesOf(appt.id)).toEqual(["reminder_24h", "review_request"]);
 
     const log = await db
       .select()
@@ -129,7 +130,7 @@ describe("Autopilot : automatisations", () => {
     const adminCtx = await ctxFor(admin, ctx.organization.id);
     const employeeCtx = await ctxFor(employee, ctx.organization.id);
     expect(adminCtx.role).toBe("admin");
-    await expect(listAutomations(adminCtx)).resolves.toHaveLength(9);
+    await expect(listAutomations(adminCtx)).resolves.toHaveLength(10);
     await expect(setAutomation(adminCtx, "reminder_2h", false)).rejects.toThrow(/droits/);
     await expect(listActivity(employeeCtx)).rejects.toThrow(/droits/);
   });
@@ -143,11 +144,12 @@ describe("Autopilot : automatisations", () => {
     expect(activityB).toHaveLength(1);
     expect(activityB[0]).toMatchObject({ origin: "user", status: "done" });
     const overviewA = await getAutopilotOverview(a.ctx);
-    expect(overviewA.scheduled).toBe(2); // rappels 24 h et 2 h à venir
+    expect(overviewA.scheduled).toBe(3); // rappels 24 h et 2 h + demande d'avis à venir
     expect(overviewA.toConfirm).toBe(0);
     expect((await listScheduled(a.ctx)).map((s) => s.type).sort()).toEqual([
       "reminder_24h",
       "reminder_2h",
+      "review_request",
     ]);
     expect(await listScheduled(b.ctx)).toHaveLength(0);
   });

@@ -1,5 +1,6 @@
 import "server-only";
 import { TZDate } from "@date-fns/tz";
+import type Stripe from "stripe";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db/client";
@@ -12,10 +13,12 @@ import {
   PlanLimitError,
   type Plan,
 } from "@/domain/billing/plans";
+import { DEPOSIT_HOLD_MINUTES } from "@/domain/billing/deposit";
 import { optionalPhone, optionalText } from "@/domain/validation";
 import { findOrCreateCustomer } from "@/server/customers/core";
 import { pgErrorCode, UserError } from "@/server/errors";
 import { enqueueBookingNotifications, type NotifyContext } from "@/server/notifications/queue";
+import { getStripe } from "@/server/billing/stripe";
 import { offerFreedSlot } from "@/server/waitlist/offers";
 import { loadAvailabilityInput, staffForService } from "./availability";
 
@@ -105,6 +108,11 @@ type CreateArgs = {
   enforceSchedule: boolean;
   /** Créneau proposé par la liste d'attente : la prestation peut ne pas être réservable en ligne. */
   allowOffline?: boolean;
+  /**
+   * Acompte à payer en ligne : le rendez-vous est créé « en attente de paiement » (créneau bloqué
+   * pendant DEPOSIT_HOLD_MINUTES), sans notification ; il est confirmé par le paiement.
+   */
+  deposit?: (priceCents: number) => number;
   /** Exécuté dans la même transaction, après la création (annule tout en cas d'erreur). */
   onCreated?: (tx: Tx, appt: typeof appointment.$inferSelect) => Promise<void>;
 };
@@ -195,6 +203,7 @@ export async function createAppointment(args: CreateArgs) {
       if (!cust) throw new UserError("Client introuvable.");
 
       const endsAt = new Date(args.startsAt.getTime() + svc.durationMinutes * 60_000);
+      const depositCents = args.deposit?.(svc.priceCents) ?? 0;
       const [appt] = await tx
         .insert(appointment)
         .values({
@@ -211,16 +220,25 @@ export async function createAppointment(args: CreateArgs) {
           customerNote: args.customerNote ?? null,
           internalNote: args.internalNote ?? null,
           createdByUserId: args.createdByUserId ?? null,
+          ...(depositCents
+            ? {
+                status: "pending_payment" as const,
+                depositCents,
+                depositStatus: "pending" as const,
+                paymentExpiresAt: new Date(Date.now() + DEPOSIT_HOLD_MINUTES * 60_000),
+              }
+            : {}),
         })
         .returning();
 
-      await enqueueBookingNotifications(tx, "created", {
-        organization: org,
-        plan,
-        appointment: appt,
-        customer: cust,
-        actor: args.actor,
-      });
+      if (!depositCents)
+        await enqueueBookingNotifications(tx, "created", {
+          organization: org,
+          plan,
+          appointment: appt,
+          customer: cust,
+          actor: args.actor,
+        });
       await args.onCreated?.(tx, appt);
       return appt;
     });
@@ -298,10 +316,12 @@ export async function cancelAppointment(args: {
   by: "customer" | "staff";
   reason?: string | null;
   actor: NotifyContext["actor"];
+  /** Client Stripe (tests) ; par défaut celui de l'application. */
+  stripe?: Stripe | null;
 }) {
   const { org } = args;
   const plan = effectivePlan(org.plan, org.subscriptionStatus);
-  return db.transaction(async (tx) => {
+  const cancelled = await db.transaction(async (tx) => {
     const [updated] = await tx
       .update(appointment)
       .set({
@@ -330,4 +350,11 @@ export async function cancelAppointment(args: {
     await offerFreedSlot(tx, org, { staffId: updated.staffId, startsAt: updated.startsAt });
     return updated;
   });
+  // Acompte payé : remboursé intégralement (annulation dans les délais par le client, ou par
+  // l'établissement). Après la transaction : un échec de Stripe n'empêche pas l'annulation.
+  if (cancelled.depositStatus === "paid") {
+    const { refundDeposit } = await import("@/server/deposit/payment");
+    return refundDeposit(org, cancelled, args.stripe === undefined ? getStripe() : args.stripe);
+  }
+  return cancelled;
 }

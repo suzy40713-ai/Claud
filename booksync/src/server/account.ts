@@ -7,6 +7,7 @@ import {
   autopilotAction,
   waitlistEntry,
   waitlistOffer,
+  review,
   account,
   appointment,
   customer,
@@ -75,6 +76,7 @@ export async function exportUserData(userId: string) {
         .select()
         .from(waitlistEntry)
         .where(eq(waitlistEntry.organizationId, orgId)),
+      reviews: await db.select().from(review).where(eq(review.organizationId, orgId)),
       waitlistOffers: await db
         .select()
         .from(waitlistOffer)

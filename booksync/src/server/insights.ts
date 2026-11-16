@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, gte } from "drizzle-orm";
+import { and, eq, gte, ne } from "drizzle-orm";
 import { db } from "@/db/client";
 import { appointment, customer } from "@/db/schema";
 import { isAutomationActive } from "@/domain/autopilot/automations";
@@ -48,13 +48,15 @@ export async function loadInsightAppointments(
     .where(
       and(
         eq(appointment.organizationId, organizationId),
+        ne(appointment.status, "pending_payment"),
         gte(appointment.startsAt, new Date(now.getTime() - 365 * 86_400_000)),
       ),
     )
     .limit(MAX_ROWS);
   return rows.map((r) => ({
     startsAt: r.startsAt,
-    status: r.status,
+    // Rendez-vous en attente de paiement exclus par la requête.
+    status: r.status as InsightAppointment["status"],
     cancelledAt: r.cancelledAt,
     serviceId: r.serviceId,
     serviceName: r.serviceName,

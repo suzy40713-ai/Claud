@@ -54,6 +54,7 @@ export function AppointmentSheet({
   }
 
   const statusVariant = {
+    pending_payment: "warning",
     confirmed: "primary",
     cancelled: "destructive",
     completed: "success",
@@ -80,6 +81,21 @@ export function AppointmentSheet({
           />
           <Row k="Avec" v={appt.staffName} />
           {appt.priceCents ? <Row k="Prix" v={formatCents(appt.priceCents)} /> : null}
+          {appt.depositCents ? (
+            <Row
+              k="Acompte"
+              v={`${formatCents(appt.depositCents)} — ${
+                {
+                  none: "",
+                  pending: "en attente de paiement (créneau bloqué 35 min)",
+                  paid: `payé en ligne, reste ${formatCents(appt.priceCents - appt.depositCents)} à encaisser`,
+                  refunded: "remboursé au client",
+                  refund_failed:
+                    "remboursement automatique impossible : remboursez-le depuis votre tableau de bord Stripe",
+                }[appt.depositStatus]
+              }`}
+            />
+          ) : null}
           {appt.customerNote ? <Row k="Message" v={appt.customerNote} /> : null}
           {appt.cancellationReason ? <Row k="Motif" v={appt.cancellationReason} /> : null}
         </dl>

@@ -127,6 +127,16 @@ export const organization = pgTable(
     maxAdvanceDays: integer().notNull().default(60),
     slotIntervalMinutes: integer().notNull().default(15),
     cancellationNoticeHours: integer().notNull().default(24),
+    /**
+     * Acompte en ligne (Stripe Connect) : l'argent est versé directement sur le compte Stripe
+     * du professionnel, BookSync ne le détient jamais. `depositValue` : centimes ou pourcentage.
+     */
+    depositMode: text({ enum: ["none", "fixed", "percent"] })
+      .notNull()
+      .default("none"),
+    depositValue: integer().notNull().default(0),
+    stripeAccountId: text().unique(),
+    stripeAccountReady: boolean().notNull().default(false),
     /** Personnalisation de la page de réservation (plan Pro) */
     brandColor: text(),
     coverFileId: uuid(),
@@ -151,6 +161,7 @@ export const organization = pgTable(
     check("organization_slot_interval_ck", sql`${t.slotIntervalMinutes} between 5 and 120`),
     check("organization_min_notice_ck", sql`${t.minNoticeMinutes} between 0 and 43200`),
     check("organization_max_advance_ck", sql`${t.maxAdvanceDays} between 1 and 730`),
+    check("organization_deposit_value_ck", sql`${t.depositValue} between 0 and 1000000`),
   ],
 );
 

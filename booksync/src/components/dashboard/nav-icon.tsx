@@ -11,6 +11,7 @@ import {
   Scissors,
   Settings,
   Sparkles,
+  Star,
   UserRound,
   Users,
 } from "lucide-react";
@@ -31,6 +32,7 @@ const ICONS = {
   waitlist: Hourglass,
   insights: Lightbulb,
   assistant: MessageSquareText,
+  reviews: Star,
 } as const;
 
 export function NavIcon({ name, className }: { name: NavItem["icon"]; className?: string }) {

@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+import { computeDeposit } from "@/domain/billing/deposit";
 import { formatCents, formatDuration } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { PublicBookingPage } from "@/server/booking/public";
@@ -151,6 +152,8 @@ export function BookingFlow({
     else setStep("service");
   }
 
+  const depositCents =
+    svc && page.deposit ? computeDeposit(page.deposit.mode, page.deposit.value, svc.priceCents) : 0;
   const currentDay = days?.find((d) => d.date === selectedDate) ?? null;
   const stepIndex = { service: 0, staff: 1, time: 2, details: 3 }[step];
 
@@ -179,6 +182,10 @@ export function BookingFlow({
           setStep("time");
           void loadSlots({ serviceId: svc.id, staffId, from: weekStart });
         }
+        return;
+      }
+      if (res.data.checkoutUrl) {
+        window.location.assign(res.data.checkoutUrl);
         return;
       }
       router.push(`/rdv/${res.data.token}?nouveau=1` as Route);
@@ -467,8 +474,30 @@ export function BookingFlow({
               </p>
               <p className="mt-1 text-muted-foreground">
                 {chosenStaff ? `Avec ${chosenStaff.name}` : "Sans préférence d'employé"}
-                {svc.priceCents ? ` · ${formatCents(svc.priceCents)} à régler sur place` : ""}
+                {svc.priceCents && !depositCents
+                  ? ` · ${formatCents(svc.priceCents)} à régler sur place`
+                  : ""}
               </p>
+              {depositCents ? (
+                <div
+                  className="mt-3 rounded-lg border border-primary/20 bg-primary-soft px-3 py-2.5 text-[13px] text-primary-soft-foreground"
+                  data-testid="deposit-notice"
+                >
+                  <p className="font-semibold">
+                    Acompte de {formatCents(depositCents)} à payer en ligne pour confirmer
+                  </p>
+                  <p className="mt-0.5">
+                    Prix total {formatCents(svc.priceCents)} : l&apos;acompte est déduit, le reste
+                    ({formatCents(svc.priceCents - depositCents)}) se règle sur place. Remboursé
+                    si vous annulez{" "}
+                    {org.cancellationNoticeHours > 0
+                      ? `au moins ${org.cancellationNoticeHours} h avant`
+                      : "avant le rendez-vous"}
+                    , conservé en cas d&apos;absence. Paiement sécurisé par Stripe, versé
+                    directement à {org.name}.
+                  </p>
+                </div>
+              ) : null}
             </div>
             <form onSubmit={submit} noValidate className="grid gap-4">
               <div className="grid gap-4 sm:grid-cols-2">
@@ -542,7 +571,9 @@ export function BookingFlow({
               </p>
               <Button type="submit" size="lg" disabled={pending} className="w-full">
                 {pending ? <Spinner /> : <Check />}
-                Confirmer le rendez-vous
+                {depositCents
+                  ? `Payer l'acompte de ${formatCents(depositCents)}`
+                  : "Confirmer le rendez-vous"}
               </Button>
             </form>
           </section>

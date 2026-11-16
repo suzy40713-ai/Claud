@@ -16,6 +16,11 @@ export const SETTINGS_TABS = [
     permission: "organization.update",
   },
   {
+    href: "/tableau-de-bord/parametres/paiements",
+    label: "Acompte et paiements",
+    permission: "billing.manage",
+  },
+  {
     href: "/tableau-de-bord/parametres/horaires",
     label: "Horaires et fermetures",
     permission: "closures.manage",

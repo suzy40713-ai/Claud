@@ -141,6 +141,50 @@ export async function ensureWebhookEndpoint() {
   console.info(`[stripe] webhook créé pour ${url}`);
 }
 
+const CONNECT_WEBHOOK_SETTING = "stripe_connect_webhook_secret";
+const CONNECT_WEBHOOK_EVENTS: Stripe.WebhookEndpointCreateParams.EnabledEvent[] = [
+  "checkout.session.completed",
+  "checkout.session.async_payment_succeeded",
+  "checkout.session.expired",
+  "account.updated",
+  "account.application.deauthorized",
+];
+
+/** Secret du webhook des comptes connectés (acomptes) : variable d'environnement ou créé automatiquement. */
+export async function getConnectWebhookSecret(): Promise<string | null> {
+  if (env.STRIPE_CONNECT_WEBHOOK_SECRET) return env.STRIPE_CONNECT_WEBHOOK_SECRET;
+  const [row] = await db
+    .select()
+    .from(appSetting)
+    .where(eq(appSetting.key, CONNECT_WEBHOOK_SETTING))
+    .limit(1);
+  return row?.value ?? null;
+}
+
+/** Point de réception des événements des comptes Stripe des professionnels (paiement des acomptes). */
+export async function ensureConnectWebhookEndpoint() {
+  const stripe = getStripe();
+  if (!stripe || env.STRIPE_CONNECT_WEBHOOK_SECRET) return;
+  const url = `${env.NEXT_PUBLIC_APP_URL}/api/stripe/connect`;
+  const stored = await getConnectWebhookSecret();
+  const endpoints = await stripe.webhookEndpoints.list({ limit: 100 });
+  const existing = endpoints.data.find((e) => e.url === url);
+  if (existing && stored) return;
+  if (existing) await stripe.webhookEndpoints.del(existing.id);
+  const created = await stripe.webhookEndpoints.create({
+    url,
+    connect: true,
+    enabled_events: CONNECT_WEBHOOK_EVENTS,
+    description: "BookSync — acomptes des comptes connectés (configuration automatique)",
+  });
+  if (!created.secret) throw new Error("Stripe n'a pas renvoyé de secret de webhook.");
+  await db
+    .insert(appSetting)
+    .values({ key: CONNECT_WEBHOOK_SETTING, value: created.secret })
+    .onConflictDoUpdate({ target: appSetting.key, set: { value: created.secret } });
+  console.info(`[stripe] webhook Connect créé pour ${url}`);
+}
+
 let setupDone = false;
 
 /** Configuration complète et idempotente (appelée par le planificateur et avant tout paiement). */
@@ -148,6 +192,13 @@ export async function ensureStripeSetup() {
   if (setupDone || !getStripe()) return;
   await getPriceIds();
   await ensureWebhookEndpoint();
+  // Acomptes (Stripe Connect) : un échec ne doit jamais bloquer les abonnements BookSync.
+  try {
+    await ensureConnectWebhookEndpoint();
+  } catch (error) {
+    console.error("[stripe] webhook Connect non créé (Connect activé sur le compte ?)", error);
+    return;
+  }
   setupDone = true;
 }
 

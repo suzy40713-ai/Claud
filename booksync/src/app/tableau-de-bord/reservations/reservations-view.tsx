@@ -16,6 +16,7 @@ import { capitalize, formatCents, formatInTz } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const variant = {
+  pending_payment: "warning",
   confirmed: "primary",
   cancelled: "destructive",
   completed: "success",

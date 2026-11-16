@@ -2,7 +2,7 @@ export type ApptView = {
   id: string;
   startsAt: string;
   endsAt: string;
-  status: "confirmed" | "cancelled" | "completed" | "no_show";
+  status: "pending_payment" | "confirmed" | "cancelled" | "completed" | "no_show";
   source: "online" | "manual";
   serviceName: string;
   serviceId: string | null;
@@ -20,6 +20,8 @@ export type ApptView = {
   customerPhone: string | null;
   cancelledBy: "customer" | "staff" | null;
   cancellationReason: string | null;
+  depositCents: number;
+  depositStatus: "none" | "pending" | "paid" | "refunded" | "refund_failed";
 };
 
 export type StaffOpt = { id: string; name: string; color: string };
@@ -32,6 +34,7 @@ export type ServiceOpt = {
 };
 
 export const STATUS_LABELS: Record<ApptView["status"], string> = {
+  pending_payment: "Acompte en attente",
   confirmed: "Confirmé",
   cancelled: "Annulé",
   completed: "Honoré",

@@ -1,7 +1,8 @@
 import { connection } from "next/server";
 import { env } from "@/lib/env";
 import { safeEqual } from "@/lib/tokens";
-import { ensureStripeSetup } from "@/server/billing/stripe";
+import { ensureStripeSetup, getStripe } from "@/server/billing/stripe";
+import { releaseExpiredDeposits } from "@/server/deposit/payment";
 import { processDueNotifications } from "@/server/notifications/dispatch";
 import { processWaitlist } from "@/server/waitlist/service";
 import { sendDueDailySummaries } from "@/server/autopilot/daily-summary";
@@ -32,6 +33,14 @@ async function handle(req: Request) {
     console.error("[résumé quotidien] traitement planifié impossible", error);
     summaries = "erreur";
   }
+  // Créneaux bloqués par un acompte non payé : libérés (ou confirmés si le paiement est arrivé).
+  let deposits: Awaited<ReturnType<typeof releaseExpiredDeposits>> | "erreur";
+  try {
+    deposits = await releaseExpiredDeposits(getStripe());
+  } catch (error) {
+    console.error("[acompte] traitement planifié impossible", error);
+    deposits = "erreur";
+  }
   // Configuration Stripe automatique (offres + webhook), sans bloquer les notifications.
   let billing: "ok" | "absent" | "erreur" = "absent";
   try {
@@ -42,7 +51,7 @@ async function handle(req: Request) {
     billing = "erreur";
   }
   return Response.json(
-    { ok: true, ...stats, waitlist, summaries, billing },
+    { ok: true, ...stats, waitlist, summaries, deposits, billing },
     { headers: { "Cache-Control": "no-store" } },
   );
 }
