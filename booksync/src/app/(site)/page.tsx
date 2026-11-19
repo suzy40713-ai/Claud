@@ -368,7 +368,7 @@ export default function LandingPage() {
               Des tarifs simples
             </h2>
             <p className="mt-3 text-muted-foreground">
-              Sans engagement. Prix TTC par mois. Vos clients paient sur place.
+              1er mois offert sur Starter et Pro. Sans engagement, prix TTC par mois.
             </p>
           </div>
           <div className="mt-12 grid gap-4 lg:grid-cols-3">
@@ -391,6 +391,11 @@ export default function LandingPage() {
                     {p.priceCents ? formatPrice(p.priceCents) : "0 €"}
                     <span className="text-sm font-normal text-muted-foreground"> /mois</span>
                   </p>
+                  {p.priceCents ? (
+                    <p className="mt-1 text-[13px] font-medium text-primary">
+                      1er mois offert · sans engagement
+                    </p>
+                  ) : null}
                   <ul className="mt-6 grid flex-1 gap-2.5 text-sm">
                     {p.highlights.map((h) => (
                       <li key={h} className="flex gap-2.5">
@@ -413,7 +418,8 @@ export default function LandingPage() {
           </div>
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Commencez sur Free, passez à un forfait payant quand vous le souhaitez depuis votre
-            espace.
+            espace : les 30 premiers jours sont offerts, aucun prélèvement avant la fin de l&apos;essai,
+            résiliable à tout moment.
           </p>
         </div>
       </section>

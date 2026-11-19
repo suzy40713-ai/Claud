@@ -94,6 +94,17 @@ export const PLANS: Record<PlanId, Plan> = {
 
 export const PLAN_ORDER: PlanId[] = ["free", "starter", "pro"];
 
+/** Essai gratuit offert au premier abonnement Starter ou Pro (carte enregistrée, aucun prélèvement). */
+export const TRIAL_DAYS = 30;
+
+/**
+ * Jours d'essai pour un nouvel abonnement : uniquement si l'entreprise n'a JAMAIS eu d'abonnement
+ * (statut Stripe encore vide). Une entreprise qui a résilié ne peut pas recommencer un essai.
+ */
+export function trialDaysFor(subscriptionStatus: string | null | undefined): number {
+  return subscriptionStatus ? 0 : TRIAL_DAYS;
+}
+
 export function getPlan(id: string | null | undefined): Plan {
   return PLANS[(id as PlanId) in PLANS ? (id as PlanId) : "free"];
 }

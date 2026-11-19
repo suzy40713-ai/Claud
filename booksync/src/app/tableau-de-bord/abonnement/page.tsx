@@ -4,7 +4,7 @@ import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PLAN_ORDER, PLANS } from "@/domain/billing/plans";
+import { PLAN_ORDER, PLANS, trialDaysFor } from "@/domain/billing/plans";
 import { formatCents, formatInTz } from "@/lib/format";
 import { requirePermission } from "@/server/auth/session";
 import { getMonthlyUsage } from "@/server/booking/book";
@@ -53,12 +53,16 @@ async function Content({
   const o = ctx.organization;
   const configured = isBillingConfigured();
   const current = ctx.plan;
+  const trialDays = trialDaysFor(o.subscriptionStatus);
 
   return (
     <div className="grid gap-6">
       {sp.paiement === "succes" ? (
         <Alert variant="success">
-          Merci ! Votre paiement a été accepté. Votre forfait est actif.
+          Merci ! Votre forfait est actif.
+          {o.subscriptionStatus === "trialing"
+            ? " Votre mois d'essai gratuit commence : aucun prélèvement avant sa fin."
+            : ""}
         </Alert>
       ) : null}
       {sp.paiement === "annule" ? (
@@ -96,7 +100,9 @@ async function Content({
             {o.currentPeriodEnd && current.id !== "free"
               ? o.cancelAtPeriodEnd
                 ? ` · se termine le ${formatInTz(o.currentPeriodEnd, tz, "d MMMM yyyy")}`
-                : ` · renouvellement le ${formatInTz(o.currentPeriodEnd, tz, "d MMMM yyyy")}`
+                : o.subscriptionStatus === "trialing"
+                  ? ` · essai gratuit jusqu'au ${formatInTz(o.currentPeriodEnd, tz, "d MMMM yyyy")}, premier prélèvement ce jour-là`
+                  : ` · renouvellement le ${formatInTz(o.currentPeriodEnd, tz, "d MMMM yyyy")}`
               : ""}
           </p>
           <p className="mt-2 text-[13px] text-muted-foreground">
@@ -141,6 +147,11 @@ async function Content({
                   {p.priceCents ? formatCents(p.priceCents) : "0 €"}
                   <span className="text-sm font-normal text-muted-foreground"> /mois TTC</span>
                 </p>
+                {p.priceCents && trialDays && !isCurrent ? (
+                  <p className="mt-1 text-[13px] font-medium text-primary">
+                    {trialDays} jours offerts · aucun prélèvement avant la fin de l&apos;essai
+                  </p>
+                ) : null}
                 <p className="mt-1 text-sm text-muted-foreground">{p.tagline}</p>
                 <ul className="mt-4 grid flex-1 gap-1.5 text-sm">
                   {p.highlights.map((h) => (

@@ -3,7 +3,7 @@ import type Stripe from "stripe";
 import { desc, eq, or } from "drizzle-orm";
 import { db } from "@/db/client";
 import { invoice, organization, stripeEvent } from "@/db/schema";
-import type { PlanId } from "@/domain/billing/plans";
+import { trialDaysFor, type PlanId } from "@/domain/billing/plans";
 import { assertCan } from "@/domain/permissions";
 import { env } from "@/lib/env";
 import type { OrgContext } from "@/server/auth/session";
@@ -106,6 +106,8 @@ export async function startSubscription(
   }
 
   const customer = await ensureCustomer(stripe, ctx);
+  // 1er mois offert : premier abonnement uniquement.
+  const trialDays = trialDaysFor(ctx.organization.subscriptionStatus);
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     customer,
@@ -114,7 +116,10 @@ export async function startSubscription(
     allow_promotion_codes: true,
     billing_address_collection: "auto",
     client_reference_id: ctx.organization.id,
-    subscription_data: { metadata: { organizationId: ctx.organization.id } },
+    subscription_data: {
+      metadata: { organizationId: ctx.organization.id },
+      ...(trialDays ? { trial_period_days: trialDays } : {}),
+    },
     metadata: { organizationId: ctx.organization.id },
     success_url: appUrl(
       "/tableau-de-bord/abonnement?paiement=succes&session={CHECKOUT_SESSION_ID}",
