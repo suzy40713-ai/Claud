@@ -2,9 +2,8 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
 import { MobileTabBar, SidebarNav } from "@/components/dashboard/sidebar";
-import { NAV_ITEMS } from "@/components/dashboard/nav-config";
+import { visibleNavItems } from "@/components/dashboard/visible-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { can } from "@/domain/permissions";
 import { requireOrg } from "@/server/auth/session";
 import { countUnread } from "@/server/notifications/unread";
 import { PlanBadge } from "@/components/dashboard/plan-badge";
@@ -12,7 +11,7 @@ import { UserMenu } from "./user-menu";
 
 async function visibleItems() {
   const ctx = await requireOrg();
-  return { ctx, items: NAV_ITEMS.filter((i) => !i.permission || can(ctx.role, i.permission)) };
+  return { ctx, items: visibleNavItems(ctx.role) };
 }
 
 async function Sidebar() {
@@ -65,7 +64,7 @@ async function MobileTabs() {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-dvh bg-subtle lg:grid lg:grid-cols-[248px_1fr]">
-      <aside className="sticky top-0 hidden h-dvh flex-col border-r bg-background px-3 py-4 lg:flex">
+      <aside className="sticky top-0 hidden h-dvh flex-col overflow-hidden border-r bg-background px-3 py-4 lg:flex">
         <Link
           href="/tableau-de-bord"
           className="mb-6 inline-flex rounded-md px-2.5"

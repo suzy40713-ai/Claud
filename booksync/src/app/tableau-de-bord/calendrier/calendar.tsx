@@ -244,7 +244,7 @@ export function Calendar({
               })
             }
           >
-            <Plus /> Rendez-vous
+            <Plus /> Nouveau rendez-vous
           </Button>
         </div>
       </div>

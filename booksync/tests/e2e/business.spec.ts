@@ -196,8 +196,8 @@ test.describe("parcours métier", () => {
     await emp.goto("/tableau-de-bord/menu");
     const menu = emp.getByRole("main");
     await expect(menu.getByRole("link", { name: "Calendrier" })).toBeVisible();
-    for (const hidden of ["Clients", "Services", "Abonnement", "Statistiques", "Employés"]) {
-      await expect(menu.getByRole("link", { name: hidden, exact: true })).toHaveCount(0);
+    for (const hidden of ["Clients", "Prestations", "Abonnement", "Statistiques", "Employés"]) {
+      await expect(menu.getByRole("link", { name: new RegExp(`^${hidden} `) })).toHaveCount(0);
     }
     await emp.goto("/tableau-de-bord/parametres/entreprise");
     await expect(emp).toHaveURL(/acces=refuse/);

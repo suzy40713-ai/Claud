@@ -72,7 +72,7 @@ async function Content() {
           L&apos;automatisation « Liste d&apos;attente intelligente » est désactivée : aucun créneau
           ne sera proposé.{" "}
           <Link href="/tableau-de-bord/autopilot" className="font-semibold underline">
-            L&apos;activer dans Autopilot
+            L&apos;activer dans Automatisations
           </Link>
         </p>
       ) : null}

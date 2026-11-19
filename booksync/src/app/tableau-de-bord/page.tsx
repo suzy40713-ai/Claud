@@ -45,16 +45,24 @@ async function Content({ searchParams }: { searchParams: Promise<{ acces?: strin
             {formatInTz(new Date(), tz, "EEEE d MMMM yyyy")}
           </p>
         </div>
-        <div className="flex min-w-0 items-center gap-1 rounded-lg border bg-card py-1 pr-1 pl-3 text-sm">
-          <span className="min-w-0 truncate font-mono text-[13px] text-muted-foreground">
-            {publicUrl.replace(/^https?:\/\//, "")}
-          </span>
-          <CopyButton value={publicUrl} />
-          <Button asChild variant="ghost" size="sm" aria-label="Ouvrir ma page de réservation">
-            <a href={publicUrl} target="_blank" rel="noreferrer">
-              <ExternalLink />
-            </a>
-          </Button>
+        <div className="grid min-w-0 gap-1.5" data-testid="booking-link">
+          <p className="text-[13px] font-medium">
+            Votre page de réservation{" "}
+            <span className="font-normal text-muted-foreground">
+              · à partager à vos clients (Instagram, SMS, Google)
+            </span>
+          </p>
+          <div className="flex min-w-0 items-center gap-1 rounded-lg border bg-card py-1 pr-1 pl-3 text-sm">
+            <span className="min-w-0 flex-1 truncate font-mono text-[13px] text-muted-foreground">
+              {publicUrl.replace(/^https?:\/\//, "")}
+            </span>
+            <CopyButton value={publicUrl} />
+            <Button asChild variant="ghost" size="sm" aria-label="Ouvrir ma page de réservation">
+              <a href={publicUrl} target="_blank" rel="noreferrer">
+                <ExternalLink />
+              </a>
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -131,9 +139,9 @@ async function Content({ searchParams }: { searchParams: Promise<{ acces?: strin
           icon={<UsersRound />}
         />
         <StatCard
-          label="CA enregistré ce mois"
+          label="Chiffre d'affaires du mois"
           value={formatCents(o.revenueCents)}
-          hint="rendez-vous passés non annulés"
+          hint="rendez-vous déjà passés, hors annulations"
           icon={<Euro />}
         />
       </div>
@@ -188,9 +196,19 @@ async function Content({ searchParams }: { searchParams: Promise<{ acces?: strin
               ))}
             </ul>
           ) : (
-            <p className="px-5 py-10 text-center text-sm text-muted-foreground">
-              Aucun rendez-vous à venir. Partagez votre page de réservation !
-            </p>
+            <div className="flex flex-col items-center gap-3 px-5 py-10 text-center">
+              <p className="text-sm font-medium">Aucun rendez-vous à venir</p>
+              <p className="max-w-xs text-[13px] text-muted-foreground">
+                Partagez le lien de votre page : vos clients réservent seuls, même le soir. Vous
+                pouvez aussi ajouter un rendez-vous pris par téléphone.
+              </p>
+              <div className="flex flex-wrap justify-center gap-2">
+                <CopyButton value={publicUrl} />
+                <Button asChild variant="secondary" size="sm">
+                  <Link href="/tableau-de-bord/calendrier">Ajouter un rendez-vous</Link>
+                </Button>
+              </div>
+            </div>
           )}
         </section>
       </div>

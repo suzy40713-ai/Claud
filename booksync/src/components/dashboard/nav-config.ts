@@ -19,69 +19,156 @@ export type NavItem = {
     | "insights"
     | "assistant"
     | "reviews";
+  /** Une phrase qui explique à quoi sert la page (menu mobile). */
+  hint: string;
+  group: NavGroup;
   permission?: Permission;
+  /** Visible seulement quand l'assistant IA est activé. */
+  requiresAssistant?: boolean;
   /** Affiché dans la barre d'onglets mobile */
   mobile?: boolean;
 };
 
+export type NavGroup = "accueil" | "rdv" | "clients" | "salon" | "suivi" | "compte";
+
+/** Sections du menu, dans l'ordre d'affichage (titre vide = pas de titre). */
+export const NAV_GROUPS: Array<{ id: NavGroup; title: string }> = [
+  { id: "accueil", title: "" },
+  { id: "rdv", title: "Rendez-vous" },
+  { id: "clients", title: "Clients" },
+  { id: "salon", title: "Mon salon" },
+  { id: "suivi", title: "Suivi et automatisations" },
+  { id: "compte", title: "Compte" },
+];
+
 export const NAV_ITEMS: NavItem[] = [
-  { href: "/tableau-de-bord", label: "Vue générale", icon: "home", mobile: true },
-  { href: "/tableau-de-bord/calendrier", label: "Calendrier", icon: "calendar", mobile: true },
-  { href: "/tableau-de-bord/reservations", label: "Réservations", icon: "list", mobile: true },
   {
-    href: "/tableau-de-bord/clients",
-    label: "Clients",
-    icon: "users",
-    permission: "customers.view_all",
+    href: "/tableau-de-bord",
+    label: "Vue générale",
+    hint: "Votre journée en un coup d'œil",
+    icon: "home",
+    group: "accueil",
     mobile: true,
   },
   {
-    href: "/tableau-de-bord/services",
-    label: "Services",
-    icon: "scissors",
-    permission: "services.manage",
+    href: "/tableau-de-bord/calendrier",
+    label: "Calendrier",
+    hint: "Votre agenda jour par jour",
+    icon: "calendar",
+    group: "rdv",
+    mobile: true,
   },
-  { href: "/tableau-de-bord/equipe", label: "Employés", icon: "team", permission: "team.view" },
-  { href: "/tableau-de-bord/assistant", label: "Assistant", icon: "assistant" },
   {
-    href: "/tableau-de-bord/autopilot",
-    label: "Autopilot",
-    icon: "autopilot",
-    permission: "autopilot.view",
+    href: "/tableau-de-bord/reservations",
+    label: "Réservations",
+    hint: "Liste de tous les rendez-vous",
+    icon: "list",
+    group: "rdv",
+    mobile: true,
   },
   {
     href: "/tableau-de-bord/liste-attente",
     label: "Liste d'attente",
+    hint: "Clients prévenus quand un créneau se libère",
     icon: "waitlist",
+    group: "rdv",
     permission: "customers.view_all",
+  },
+  {
+    href: "/tableau-de-bord/clients",
+    label: "Clients",
+    hint: "Fiches et historique de vos clients",
+    icon: "users",
+    group: "clients",
+    permission: "customers.view_all",
+    mobile: true,
   },
   {
     href: "/tableau-de-bord/avis",
     label: "Avis",
+    hint: "Notes laissées par vos clients",
     icon: "reviews",
+    group: "clients",
     permission: "reviews.manage",
   },
-  { href: "/tableau-de-bord/notifications", label: "Notifications", icon: "bell" },
+  {
+    href: "/tableau-de-bord/services",
+    label: "Prestations",
+    hint: "Ce que vous proposez : durée et prix",
+    icon: "scissors",
+    group: "salon",
+    permission: "services.manage",
+  },
+  {
+    href: "/tableau-de-bord/equipe",
+    label: "Employés",
+    hint: "Votre équipe et ses horaires",
+    icon: "team",
+    group: "salon",
+    permission: "team.view",
+  },
+  {
+    href: "/tableau-de-bord/parametres",
+    label: "Paramètres",
+    hint: "Horaires, page de réservation, acompte",
+    icon: "settings",
+    group: "salon",
+  },
   {
     href: "/tableau-de-bord/statistiques",
     label: "Statistiques",
+    hint: "Chiffre d'affaires et fréquentation",
     icon: "chart",
+    group: "suivi",
     permission: "stats.view",
   },
   {
     href: "/tableau-de-bord/analyses",
-    label: "Analyses",
+    label: "Conseils",
+    hint: "Recommandations pour remplir votre agenda",
     icon: "insights",
+    group: "suivi",
     permission: "stats.view",
   },
-  { href: "/tableau-de-bord/parametres", label: "Paramètres", icon: "settings" },
+  {
+    href: "/tableau-de-bord/autopilot",
+    label: "Automatisations",
+    hint: "Confirmations, rappels, demandes d'avis",
+    icon: "autopilot",
+    group: "suivi",
+    permission: "autopilot.view",
+  },
+  {
+    href: "/tableau-de-bord/assistant",
+    label: "Assistant",
+    hint: "Posez vos questions sur votre activité",
+    icon: "assistant",
+    group: "suivi",
+    requiresAssistant: true,
+  },
+  {
+    href: "/tableau-de-bord/notifications",
+    label: "Notifications",
+    hint: "Nouvelles réservations et annulations",
+    icon: "bell",
+    group: "suivi",
+  },
   {
     href: "/tableau-de-bord/abonnement",
     label: "Abonnement",
+    hint: "Votre forfait et vos factures",
     icon: "card",
+    group: "compte",
     permission: "billing.manage",
   },
 ];
+
+/** Entrées regroupées par section (sections vides retirées). */
+export function groupNavItems(items: NavItem[]) {
+  return NAV_GROUPS.map((g) => ({ ...g, items: items.filter((i) => i.group === g.id) })).filter(
+    (g) => g.items.length > 0,
+  );
+}
 
 export function isActive(pathname: string, href: string) {
   if (href === "/tableau-de-bord") return pathname === href;

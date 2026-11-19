@@ -20,7 +20,7 @@ import { buildDailySummary } from "@/server/autopilot/daily-summary";
 import { listAutomations } from "@/server/autopilot/rules";
 import { AutomationList, type AutomationItem } from "./automation-list";
 
-export const metadata: Metadata = { title: "Autopilot" };
+export const metadata: Metadata = { title: "Automatisations" };
 
 const STATUS: Record<
   ActivityEntry["status"],
@@ -49,7 +49,7 @@ function ActivityList({ entries, tz }: { entries: ActivityEntry[]; tz: string })
   if (!entries.length) {
     return (
       <p className="rounded-xl border border-dashed bg-card px-4 py-6 text-center text-sm text-muted-foreground">
-        Aucune opération pour l&apos;instant. Les actions d&apos;Autopilot apparaîtront ici dès la
+        Aucune opération pour l&apos;instant. Les actions automatiques apparaîtront ici dès la
         prochaine réservation.
       </p>
     );
@@ -243,7 +243,7 @@ export default function AutopilotPage() {
   return (
     <>
       <PageHeader
-        title="Autopilot"
+        title="Automatisations"
         description="BookSync s'occupe des tâches répétitives de vos rendez-vous. Vous gardez la main sur chaque automatisation."
       />
       <Suspense fallback={<Skeleton className="h-[480px]" />}>

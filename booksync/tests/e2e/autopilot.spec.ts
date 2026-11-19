@@ -15,7 +15,7 @@ test("Autopilot : automatisations par forfait, désactivation et historique", as
 
   // Forfait Free : les emails clients sont réservés au forfait Starter.
   await page.goto("/tableau-de-bord/autopilot");
-  await expect(page.getByRole("heading", { name: "Autopilot", level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Automatisations", level: 1 })).toBeVisible();
   const reminder = page.getByRole("switch", { name: "Rappel 24 heures avant" });
   await expect(reminder).toBeDisabled();
   await expect(reminder).not.toBeChecked();

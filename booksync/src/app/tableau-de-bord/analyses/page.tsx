@@ -21,7 +21,7 @@ import { formatCents } from "@/lib/format";
 import { requirePermission } from "@/server/auth/session";
 import { getInsights } from "@/server/insights";
 
-export const metadata: Metadata = { title: "Analyses" };
+export const metadata: Metadata = { title: "Conseils" };
 
 const TONE = {
   opportunity: { icon: Lightbulb, className: "bg-primary-soft text-primary" },
@@ -311,8 +311,8 @@ export default function InsightsPage() {
   return (
     <>
       <PageHeader
-        title="Analyses"
-        description="Ce que révèlent vos rendez-vous, et ce que vous pouvez en faire."
+        title="Conseils"
+        description="Ce que révèlent vos rendez-vous, et des conseils concrets pour remplir votre agenda."
       />
       <Suspense fallback={<Skeleton className="h-[520px]" />}>
         <Content />

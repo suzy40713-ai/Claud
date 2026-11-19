@@ -47,7 +47,7 @@ async function Content() {
           href="/tableau-de-bord/autopilot"
           className="text-sm font-semibold text-primary hover:underline"
         >
-          Réglages Autopilot →
+          Réglages des automatisations →
         </Link>
       </div>
 

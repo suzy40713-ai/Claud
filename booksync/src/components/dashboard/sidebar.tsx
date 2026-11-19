@@ -4,37 +4,47 @@ import Link from "next/link";
 import type { Route } from "next";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { isActive, type NavItem } from "./nav-config";
+import { groupNavItems, isActive, type NavItem } from "./nav-config";
 import { NavIcon } from "./nav-icon";
 
 export function SidebarNav({ items, unread }: { items: NavItem[]; unread: number }) {
   const pathname = usePathname();
   return (
-    <nav aria-label="Navigation principale" className="grid gap-0.5">
-      {items.map((item) => {
-        const active = isActive(pathname, item.href);
-        return (
-          <Link
-            key={item.href}
-            href={item.href as Route}
-            aria-current={active ? "page" : undefined}
-            className={cn(
-              "group flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm font-medium transition-colors",
-              active
-                ? "bg-primary-soft text-primary-soft-foreground"
-                : "text-muted-foreground hover:bg-accent hover:text-foreground",
-            )}
-          >
-            <NavIcon name={item.icon} />
-            <span className="flex-1">{item.label}</span>
-            {item.icon === "bell" && unread > 0 ? (
-              <span className="rounded-full bg-primary px-1.5 py-0.5 text-[11px] leading-none font-semibold text-primary-foreground tabular-nums">
-                {unread > 99 ? "99+" : unread}
-              </span>
-            ) : null}
-          </Link>
-        );
-      })}
+    <nav aria-label="Navigation principale" className="grid gap-4 overflow-y-auto pb-4">
+      {groupNavItems(items).map((group) => (
+        <div key={group.id} className="grid gap-0.5">
+          {group.title ? (
+            <p className="px-2.5 pb-1 text-[11px] font-semibold tracking-wide text-muted-foreground/80 uppercase">
+              {group.title}
+            </p>
+          ) : null}
+          {group.items.map((item) => {
+            const active = isActive(pathname, item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href as Route}
+                title={item.hint}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "group flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm font-medium transition-colors",
+                  active
+                    ? "bg-primary-soft text-primary-soft-foreground"
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                )}
+              >
+                <NavIcon name={item.icon} />
+                <span className="flex-1">{item.label}</span>
+                {item.icon === "bell" && unread > 0 ? (
+                  <span className="rounded-full bg-primary px-1.5 py-0.5 text-[11px] leading-none font-semibold text-primary-foreground tabular-nums">
+                    {unread > 99 ? "99+" : unread}
+                  </span>
+                ) : null}
+              </Link>
+            );
+          })}
+        </div>
+      ))}
     </nav>
   );
 }

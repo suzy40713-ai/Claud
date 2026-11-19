@@ -8,7 +8,7 @@ import { listServices } from "@/server/catalog/services";
 import { listStaff } from "@/server/catalog/staff";
 import { ServicesView } from "./services-view";
 
-export const metadata: Metadata = { title: "Services" };
+export const metadata: Metadata = { title: "Prestations" };
 
 async function Content() {
   const ctx = await requirePermission("services.manage");
@@ -45,8 +45,8 @@ export default function ServicesPage() {
   return (
     <>
       <PageHeader
-        title="Services"
-        description="Vos prestations : durée, prix et employés qui les réalisent."
+        title="Prestations"
+        description="Ce que vos clients peuvent réserver : durée, prix et employés qui les réalisent."
       />
       <Suspense fallback={<Skeleton className="h-96" />}>
         <Content />
