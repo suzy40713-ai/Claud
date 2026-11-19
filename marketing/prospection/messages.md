@@ -28,3 +28,11 @@ Remplace les [crochets] avant d'envoyer. Personnalise **toujours** la 1re phrase
 - 10 messages par jour maximum depuis ton compte Instagram (au-delà, Instagram peut bloquer les messages).
 - Jamais plus de 2 relances. Si quelqu'un dit non : on le note et on ne recontacte plus.
 - Note chaque envoi dans le tableau (colonnes « Contacté le », « Réponse », « Statut »).
+
+## Appel téléphonique (2 minutes) — à appeler entre 9 h 30 et 11 h, jamais en fin de journée
+
+> Bonjour, je m'appelle Iyya, je suis de [Quetigny]. Je ne vous dérange pas longtemps : je viens de lancer BookSync, un outil de rendez-vous en ligne pour les salons du coin.
+> Vos clients réservent seuls même quand vous êtes occupé(e), ils reçoivent un rappel automatique, et vous pouvez demander un petit acompte contre les lapins. C'est gratuit pour commencer, sans commission.
+> Est-ce que je peux vous envoyer le lien par SMS ou passer 10 minutes vous le montrer en visio ?
+
+Si la personne est occupée : « Pas de souci, je vous rappelle quand ? » — et note-le dans le tableau.
