@@ -92,6 +92,29 @@ export async function getPriceIds(): Promise<Record<PaidPlanId, string>> {
   return result;
 }
 
+/**
+ * Changement d'adresse du site (domaine personnalisé) : les points de réception créés
+ * automatiquement par BookSync pour l'ancienne adresse sont supprimés (leur secret n'est plus
+ * connu, Stripe les signalerait en échec). Les points créés à la main ne sont jamais touchés.
+ */
+async function removeStaleEndpoints(
+  stripe: Stripe,
+  endpoints: Stripe.WebhookEndpoint[],
+  path: string,
+  currentUrl: string,
+) {
+  for (const e of endpoints) {
+    if (
+      e.url !== currentUrl &&
+      e.url.endsWith(path) &&
+      e.description?.startsWith("BookSync")
+    ) {
+      await stripe.webhookEndpoints.del(e.id);
+      console.info(`[stripe] ancien webhook supprimé : ${e.url}`);
+    }
+  }
+}
+
 const WEBHOOK_SETTING = "stripe_webhook_secret";
 const WEBHOOK_EVENTS: Stripe.WebhookEndpointCreateParams.EnabledEvent[] = [
   "checkout.session.completed",
@@ -128,6 +151,7 @@ export async function ensureWebhookEndpoint() {
   if (existing && stored) return;
   // Point existant mais secret inconnu : on le recrée pour obtenir un secret.
   if (existing) await stripe.webhookEndpoints.del(existing.id);
+  await removeStaleEndpoints(stripe, endpoints.data, "/api/stripe/webhook", url);
   const created = await stripe.webhookEndpoints.create({
     url,
     enabled_events: WEBHOOK_EVENTS,
@@ -171,6 +195,7 @@ export async function ensureConnectWebhookEndpoint() {
   const existing = endpoints.data.find((e) => e.url === url);
   if (existing && stored) return;
   if (existing) await stripe.webhookEndpoints.del(existing.id);
+  await removeStaleEndpoints(stripe, endpoints.data, "/api/stripe/connect", url);
   const created = await stripe.webhookEndpoints.create({
     url,
     connect: true,

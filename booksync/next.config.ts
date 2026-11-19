@@ -8,6 +8,13 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
 ];
 
+/**
+ * Domaine personnalisé : l'ancienne adresse *.onrender.com redirige (301) vers l'adresse publique,
+ * sauf les routes /api (webhooks Stripe et planificateur appelés à l'ancienne adresse).
+ */
+const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+const usesCustomDomain = /^https:\/\//.test(appUrl) && !appUrl.includes(".onrender.com");
+
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
@@ -21,6 +28,17 @@ const nextConfig: NextConfig = {
         as: "*.css",
       },
     },
+  },
+  async redirects() {
+    if (!usesCustomDomain) return [];
+    return [
+      {
+        source: "/:path((?!api/).*)",
+        has: [{ type: "host", value: "(?<sub>.+)\\.onrender\\.com" }],
+        destination: `${appUrl}/:path`,
+        permanent: true,
+      },
+    ];
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
