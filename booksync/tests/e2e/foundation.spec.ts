@@ -4,7 +4,7 @@ test.describe("site public", () => {
   test("la page d'accueil commerciale est complète et en français", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("html")).toHaveAttribute("lang", "fr");
-    await expect(page).toHaveTitle(/BookSync — Vos rendez-vous, parfaitement organisés/);
+    await expect(page).toHaveTitle(/^BookSync — Prise de rendez-vous en ligne pour coiffeurs/);
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Vos rendez-vous");
     for (const id of ["fonctionnalites", "avantages", "tarifs", "faq"])
       await expect(page.locator(`#${id}`)).toBeAttached();
