@@ -40,6 +40,7 @@ export const RESERVED_SLUGS = new Set([
   "liste-attente",
   "professionnels",
   "avis",
+  "pack-visibilite",
   "mon-espace",
   "signup",
   "statut",

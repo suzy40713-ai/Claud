@@ -75,3 +75,12 @@ test.describe("site public", () => {
     expect((await request.get("/api/cron/notifications")).status()).toBe(401);
   });
 });
+
+test("pack visibilité : page de vente accessible depuis le pied de page", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("contentinfo").getByRole("link", { name: "Pack visibilité salon" }).click();
+  await expect(page).toHaveURL(/\/pack-visibilite$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Pack visibilité salon");
+  await expect(page.getByTestId("pack-price")).toContainText("99 €");
+  await expect(page.getByText(/remboursé intégralement/)).toBeVisible();
+});

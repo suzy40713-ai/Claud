@@ -10,6 +10,7 @@ const COLUMNS = [
       { href: "/#fonctionnalites", label: "Fonctionnalités" },
       { href: "/#tarifs", label: "Tarifs" },
       { href: "/#faq", label: "Questions fréquentes" },
+      { href: "/pack-visibilite", label: "Pack visibilité salon" },
       { href: "/inscription", label: "Créer un compte" },
     ],
   },
