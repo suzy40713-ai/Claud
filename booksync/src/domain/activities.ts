@@ -120,3 +120,8 @@ export function isDirectoryActivity(value: string | null | undefined) {
 export const DIRECTORY_ACTIVITIES = ACTIVITIES.filter(
   (a) => isDirectoryActivity(a.value) && a.value !== "autre",
 );
+
+/** Activité de santé : jamais dans l'annuaire ni indexée (données de santé). */
+export function isHealthActivity(value: string | null | undefined) {
+  return Boolean(value) && HEALTH_ACTIVITIES.has(value!);
+}

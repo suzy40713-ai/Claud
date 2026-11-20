@@ -27,10 +27,40 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PLAN_ORDER, PLANS, formatPrice } from "@/domain/billing/plans";
 import { site } from "@/lib/site";
+import { JsonLd } from "@/components/seo/json-ld";
+
+const SEO_DESCRIPTION =
+  "Logiciel de prise de rendez-vous en ligne pour coiffeurs, barbiers, esthéticiennes et ongleries : réservation 24h/24, rappels automatiques, acompte contre les lapins, avis clients. 1er mois offert, 0 % de commission.";
 
 export const metadata: Metadata = {
-  title: { absolute: `${site.name} — ${site.tagline}` },
-  description: site.description,
+  title: {
+    absolute: `${site.name} — Prise de rendez-vous en ligne pour coiffeurs, barbiers et instituts`,
+  },
+  description: SEO_DESCRIPTION,
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: `${site.name} — La prise de rendez-vous en ligne pour votre salon`,
+    description: SEO_DESCRIPTION,
+    url: "/",
+  },
+};
+
+/** Données structurées : BookSync est un logiciel en ligne, avec ses forfaits. */
+const SOFTWARE_LD = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: site.name,
+  url: site.url,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web, iOS, Android",
+  inLanguage: "fr-FR",
+  description: SEO_DESCRIPTION,
+  offers: PLAN_ORDER.map((id) => ({
+    "@type": "Offer",
+    name: PLANS[id].name,
+    price: (PLANS[id].priceCents / 100).toFixed(2),
+    priceCurrency: "EUR",
+  })),
 };
 
 const AUDIENCE = [
@@ -168,6 +198,7 @@ const FAQ = [
 export default function LandingPage() {
   return (
     <main className="overflow-x-clip">
+      <JsonLd data={SOFTWARE_LD} />
       {/* Hero */}
       <section className="relative isolate">
         <div

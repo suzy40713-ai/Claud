@@ -4,6 +4,19 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { BellRing, CalendarX2, Clock, MapPin, Phone } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { isHealthActivity } from "@/domain/activities";
+import { site } from "@/lib/site";
+
+/** Type schema.org selon le métier (aide Google à classer la fiche). */
+const SCHEMA_TYPE: Record<string, string> = {
+  coiffure: "HairSalon",
+  barbier: "HairSalon",
+  esthetique: "BeautySalon",
+  onglerie: "NailSalon",
+  massage: "HealthAndBeautyBusiness",
+  tatouage: "TattooParlor",
+};
 import { ReviewSection } from "@/components/reviews/review-list";
 import { RatingBadge } from "@/components/reviews/stars";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,11 +30,16 @@ export async function generateMetadata(props: PageProps<"/[slug]">): Promise<Met
   const { slug } = await props.params;
   const page = await getPublicBookingPage(slug);
   if (!page) return { title: "Page introuvable" };
+  const o = page.organization;
+  const where = [o.activityLabel, o.city].filter(Boolean).join(" à ");
   return {
-    title: `Réserver — ${page.organization.name}`,
+    title: `${o.name}${where ? ` — ${where}` : ""} · Réservation en ligne`,
     description:
-      page.organization.description ??
-      `Prenez rendez-vous en ligne avec ${page.organization.name}.`,
+      o.description ??
+      `Prenez rendez-vous en ligne avec ${o.name}${where ? `, ${where}` : ""} : prestations, prix et créneaux disponibles, réservation 24h/24.`,
+    alternates: { canonical: `/${o.slug}` },
+    // Indexé par Google seulement si l'établissement a choisi d'apparaître dans l'annuaire.
+    robots: o.listed && !isHealthActivity(o.activity) ? undefined : { index: false, follow: true },
   };
 }
 
@@ -36,6 +54,38 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
     listPublicReviews(o.id),
   ]);
   const rating = summaries.get(o.id);
+  const ld = isHealthActivity(o.activity)
+    ? null
+    : {
+        "@context": "https://schema.org",
+        "@type": SCHEMA_TYPE[o.activity ?? ""] ?? "LocalBusiness",
+        name: o.name,
+        url: `${site.url}/${o.slug}`,
+        ...(o.phone ? { telephone: o.phone } : {}),
+        ...(o.logoUrl ? { image: o.logoUrl.startsWith("http") ? o.logoUrl : `${site.url}${o.logoUrl}` } : {}),
+        ...(o.city
+          ? {
+              address: {
+                "@type": "PostalAddress",
+                streetAddress: o.addressLine1 ?? undefined,
+                postalCode: o.postalCode ?? undefined,
+                addressLocality: o.city,
+                addressCountry: "FR",
+              },
+            }
+          : {}),
+        ...(rating
+          ? {
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: rating.average,
+                reviewCount: rating.count,
+                bestRating: 5,
+                worstRating: 1,
+              },
+            }
+          : {}),
+      };
   const [firstName, ...rest] = (session?.user.name ?? "").trim().split(/\s+/);
   const prefill: BookingPrefill = session?.user.emailVerified
     ? { firstName: firstName ?? "", lastName: rest.join(" "), email: session.user.email }
@@ -55,6 +105,7 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
           : undefined
       }
     >
+      {ld ? <JsonLd data={ld} /> : null}
       {o.coverUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={o.coverUrl} alt="" className="h-36 w-full object-cover sm:h-56" />

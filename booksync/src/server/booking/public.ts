@@ -89,7 +89,13 @@ export async function getPublicBookingPage(slug: string) {
       id: org.id,
       slug: org.slug,
       name: org.name,
+      activity: org.activity,
       activityLabel: activityLabel(org.activity),
+      /** Choix du professionnel : apparaître dans l'annuaire (et donc dans Google). */
+      listed: org.listed,
+      city: org.city,
+      postalCode: org.postalCode,
+      addressLine1: org.addressLine1,
       description: org.description,
       phone: org.phone,
       email: org.email,

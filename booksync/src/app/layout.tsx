@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   description: site.description,
   applicationName: site.name,
   openGraph: { type: "website", locale: "fr_FR", siteName: site.name },
+  // Google Search Console : code de la balise de validation (variable d'environnement publique).
+  ...(process.env.GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
+    : {}),
 };
 
 export const viewport: Viewport = {
