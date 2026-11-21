@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Vidéos Express</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: e-commerce product page. Promo bar with countdown, header, two-column product (gallery | buy box), features, footer. */
+:root {
+  --bg: #ffffff;
+  --soft: #f5f5f4;
+  --ink: #121212;
+  --muted: #6b6b6b;
+  --line: #e4e4e2;
+  --btn: #121212;
+  --btn-ink: #ffffff;
+  --sale: #d1243a;
+  --sale-soft: #fde8eb;
+  --bar: #121212;
+  --bar-ink: #ffffff;
+  --ok: #18794e;
+  --font: "Manrope", "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121212; --soft: #1d1d1d; --ink: #f2f2f0; --muted: #a3a3a0; --line: #2e2e2c;
+    --btn: #f2f2f0; --btn-ink: #121212; --sale: #ff5a6e; --sale-soft: #3a1a20;
+    --bar: #d1243a; --bar-ink: #ffffff; --ok: #4cc98a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121212; --soft: #1d1d1d; --ink: #f2f2f0; --muted: #a3a3a0; --line: #2e2e2c;
+  --btn: #f2f2f0; --btn-ink: #121212; --sale: #ff5a6e; --sale-soft: #3a1a20;
+  --bar: #d1243a; --bar-ink: #ffffff; --ok: #4cc98a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.6; }
+.gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.inner { max-width: 1160px; margin: 0 auto; }
+h1, h2, h3 { margin: 0; line-height: 1.15; text-wrap: balance; }
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* Promo bar */
+.promo { background: var(--bar); color: var(--bar-ink); font-size: .85rem; font-weight: 600; }
+.promo .inner { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 14px; padding-block: 9px; text-align: center; }
+.timer { display: inline-flex; gap: 4px; font-variant-numeric: tabular-nums; }
+.timer b { background: rgba(255,255,255,.16); padding: 1px 6px; border-radius: 4px; min-width: 2.2em; text-align: center; }
+
+/* Header */
+header { border-bottom: 1px solid var(--line); }
+header .inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 18px; }
+.logo { font-weight: 800; font-size: 1.25rem; letter-spacing: -.02em; text-decoration: none; }
+.logo span { color: var(--sale); }
+nav { display: flex; gap: 24px; font-size: .9rem; }
+nav a { text-decoration: none; color: var(--muted); }
+nav a:hover { color: var(--ink); }
+.cart { position: relative; display: inline-flex; width: 36px; height: 36px; align-items: center; justify-content: center; }
+.cart svg { width: 22px; height: 22px; fill: none; stroke: var(--ink); stroke-width: 1.7; }
+.cart i { position: absolute; top: 2px; right: 0; background: var(--sale); color: #fff; font-style: normal; font-size: .65rem; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; }
+
+.crumbs { font-size: .8rem; color: var(--muted); padding-block: 16px 0; }
+
+/* Product */
+.product { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 48px; padding-block: 20px 56px; }
+.gallery { display: grid; gap: 12px; align-content: start; }
+.main-img { position: relative; background: var(--soft); border-radius: 6px; aspect-ratio: 1 / 1; display: grid; place-items: center; overflow: hidden; }
+.main-img .sale-tag { position: absolute; top: 14px; left: 14px; background: var(--sale); color: #fff; font-weight: 700; font-size: .8rem; padding: 4px 10px; border-radius: 4px; }
+.phone { width: 46%; aspect-ratio: 9 / 16; border-radius: 26px; background: #111; padding: 7px; box-shadow: 0 30px 60px -30px rgba(0,0,0,.5); }
+.screen { position: relative; height: 100%; border-radius: 20px; overflow: hidden; color: #fff; display: flex; flex-direction: column; justify-content: flex-end; padding: 14px; transition: background .4s; }
+.screen .tag { position: absolute; top: 12px; left: 12px; font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; background: rgba(0,0,0,.35); padding: 3px 8px; border-radius: 999px; }
+.screen .cap { font-weight: 800; font-size: clamp(.8rem, 2.2vw, 1.1rem); line-height: 1.2; }
+.screen .cap span { background: #fff; color: #111; padding: 1px 5px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.screen .bar { height: 3px; background: rgba(255,255,255,.3); border-radius: 3px; margin-top: 10px; overflow: hidden; }
+.screen .bar i { display: block; height: 100%; background: #fff; animation: prog 6s linear infinite; transform-origin: left; }
+@keyframes prog { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .screen .bar i { animation: none; transform: scaleX(.6); } }
+.thumbs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.thumb { aspect-ratio: 1 / 1; border-radius: 6px; border: 2px solid transparent; cursor: pointer; padding: 0; display: grid; place-items: end start; color: #fff; font: 700 .7rem var(--font); text-align: left; }
+.thumb span { padding: 8px; }
+.thumb[aria-pressed="true"] { border-color: var(--ink); }
+
+.buy { display: grid; gap: 20px; align-content: start; }
+.vendor { font-size: .75rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.buy h1 { font-size: clamp(1.7rem, 3.4vw, 2.3rem); font-weight: 800; letter-spacing: -.02em; }
+.prices { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.now { font-size: 1.7rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.now.on-sale { color: var(--sale); }
+.later { font-size: .9rem; color: var(--muted); }
+.badge { background: var(--sale-soft); color: var(--sale); font-weight: 700; font-size: .78rem; padding: 3px 10px; border-radius: 999px; }
+.tax { font-size: .8rem; color: var(--muted); margin-top: -12px; }
+
+.countdown { border: 1px solid var(--sale); background: var(--sale-soft); border-radius: 8px; padding: 12px 14px; display: grid; gap: 8px; }
+.countdown p { font-size: .85rem; font-weight: 700; color: var(--sale); }
+.cd { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; text-align: center; }
+.cd div { background: var(--bg); border-radius: 6px; padding: 6px 0; }
+.cd b { display: block; font-size: 1.35rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.cd small { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+
+.opt-label { font-size: .85rem; font-weight: 600; margin-bottom: 8px; }
+.opt-label span { color: var(--muted); font-weight: 500; }
+.variants { display: flex; flex-wrap: wrap; gap: 8px; }
+.variant { font: 600 .9rem var(--font); background: var(--bg); color: var(--ink); border: 1.5px solid var(--line); border-radius: 999px; padding: 9px 18px; cursor: pointer; }
+.variant[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.variant em { font-style: normal; font-size: .72rem; color: var(--sale); margin-left: 4px; }
+.variant[aria-pressed="true"] em { color: inherit; opacity: .8; }
+
+label.field { display: grid; gap: 6px; font-size: .85rem; font-weight: 600; }
+input[type="email"] { font: 400 1rem var(--font); padding: 13px 14px; border: 1.5px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); width: 100%; }
+input[type="email"]:focus { outline: none; border-color: var(--ink); }
+.check { display: grid; grid-template-columns: auto 1fr; gap: 10px; font-size: .8rem; color: var(--muted); }
+.check input { width: 17px; height: 17px; margin-top: 2px; accent-color: var(--ink); }
+.btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 16px; border-radius: 6px; font: 700 1rem var(--font); text-decoration: none; background: var(--btn); color: var(--btn-ink); letter-spacing: .02em; transition: opacity .15s; }
+.btn:hover { opacity: .88; }
+.btn[aria-disabled="true"] { opacity: .35; cursor: not-allowed; }
+.hint { font-size: .8rem; color: var(--muted); margin-top: -10px; }
+.hint.err { color: var(--sale); }
+.cards { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.cards span { font-size: .68rem; font-weight: 700; border: 1px solid var(--line); border-radius: 4px; padding: 3px 7px; color: var(--muted); }
+
+.perks { display: grid; gap: 10px; border-top: 1px solid var(--line); padding-top: 18px; }
+.perk { display: grid; grid-template-columns: 22px 1fr; gap: 10px; font-size: .9rem; align-items: start; }
+.perk svg { width: 20px; height: 20px; stroke: var(--ink); fill: none; stroke-width: 1.7; margin-top: 2px; }
+
+details { border-bottom: 1px solid var(--line); }
+details:first-of-type { border-top: 1px solid var(--line); }
+summary { cursor: pointer; padding: 14px 0; font-weight: 600; list-style: none; display: flex; justify-content: space-between; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; font-weight: 400; font-size: 1.2rem; line-height: 1; }
+details[open] summary::after { content: "−"; }
+details p, details ul { color: var(--muted); font-size: .9rem; padding-bottom: 14px; margin: 0; }
+details ul { padding-left: 18px; }
+
+/* Features */
+.features { background: var(--soft); }
+.features .inner { padding-block: 56px; display: grid; gap: 32px; }
+.features h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 800; text-align: center; }
+.feat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.feat { background: var(--bg); border-radius: 8px; padding: 24px; display: grid; gap: 8px; }
+.feat .n { font-size: .75rem; font-weight: 700; color: var(--sale); letter-spacing: .1em; text-transform: uppercase; }
+.feat h3 { font-size: 1.05rem; font-weight: 700; }
+.feat p { color: var(--muted); font-size: .9rem; }
+
+footer { border-top: 1px solid var(--line); }
+footer .inner { padding-block: 28px; display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: .8rem; color: var(--muted); }
+
+/* Sticky mobile buy bar */
+.sticky { display: none; }
+@media (max-width: 860px) {
+  .product { grid-template-columns: 1fr; gap: 28px; }
+  nav { display: none; }
+  .feat-grid { grid-template-columns: 1fr; }
+  .sticky {
+    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; gap: 12px; align-items: center;
+    background: var(--bg); border-top: 1px solid var(--line);
+    padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  }
+  .sticky .sp { font-weight: 800; font-size: 1.1rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .sticky a { flex: 1; padding: 12px; }
+  footer .inner { padding-bottom: 90px; }
+}
+</style>
+
+<div class="promo gutter" id="promo">
+  <div class="inner">
+    <span>🔥 OFFRE DE LANCEMENT : jusqu'à −34 % sur tous les packs</span>
+    <span class="timer" id="bar-timer" aria-live="off"><b id="bd">00</b>j <b id="bh">00</b>h <b id="bm">00</b>m <b id="bs">00</b>s</span>
+  </div>
+</div>
+
+<header class="gutter">
+  <div class="inner">
+    <a class="logo" href="#top">Vidéos<span>.</span>Express</a>
+    <nav><a href="#produit">Boutique</a><a href="#comment">Comment ça marche</a><a href="#faq">FAQ</a></nav>
+    <span class="cart" aria-label="Panier, 1 article">
+      <svg viewBox="0 0 24 24"><path d="M5 7h14l-1.2 12.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 7Z"/><path d="M9 7V6a3 3 0 0 1 6 0v1"/></svg><i>1</i>
+    </span>
+  </div>
+</header>
+
+<main id="top">
+  <div class="gutter"><div class="inner crumbs">Accueil / Vidéos / Pack vidéos Reels &amp; TikTok</div></div>
+
+  <section class="gutter" id="produit">
+    <div class="inner product">
+      <div class="gallery">
+        <div class="main-img">
+          <span class="sale-tag" id="img-tag">−34 %</span>
+          <div class="phone" aria-hidden="true">
+            <div class="screen" id="screen">
+              <span class="tag">Reel · 0:15</span>
+              <div class="cap" id="cap"><span>Le pain sort du four tous les matins à 7 h</span></div>
+              <div class="bar"><i></i></div>
+            </div>
+          </div>
+        </div>
+        <div class="thumbs" id="thumbs"></div>
+      </div>
+
+      <div class="buy">
+        <span class="vendor">Vidéos Express</span>
+        <h1>Pack vidéos Reels &amp; TikTok pour votre commerce</h1>
+
+        <div class="prices">
+          <span class="now on-sale" id="price-now">79 €</span>
+          <span class="badge" id="price-badge">Prix de lancement</span>
+        </div>
+        <p class="later" id="price-later">Puis 119 € après la fin de l'offre · soit 15,80 € la vidéo</p>
+        <p class="tax">TVA non applicable, art. 293 B du CGI.</p>
+
+        <div class="countdown" id="countdown">
+          <p>⏳ L'offre de lancement se termine le 7 décembre à minuit</p>
+          <div class="cd">
+            <div><b id="cd-d">00</b><small>jours</small></div>
+            <div><b id="cd-h">00</b><small>heures</small></div>
+            <div><b id="cd-m">00</b><small>min</small></div>
+            <div><b id="cd-s">00</b><small>sec</small></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="opt-label">Nombre de vidéos : <span id="opt-current">5 vidéos</span></div>
+          <div class="variants" id="variants"></div>
+        </div>
+
+        <form id="order-form" novalidate style="display:grid;gap:16px">
+          <label class="field" for="email">E-mail de livraison
+            <input type="email" id="email" name="email" autocomplete="email" placeholder="vous@exemple.fr" required>
+          </label>
+          <label class="check" for="consent">
+            <input type="checkbox" id="consent" name="consent">
+            <span>Je demande que la création commence dès le paiement et je reconnais perdre mon droit de rétractation une fois les vidéos livrées.</span>
+          </label>
+          <a class="btn" id="pay" href="#produit" target="_blank" rel="noopener" aria-disabled="true">Acheter maintenant · 79 €</a>
+          <p class="hint" id="form-hint">Indiquez votre e-mail et cochez la case pour continuer.</p>
+          <div class="cards" aria-label="Moyens de paiement"><span>VISA</span><span>MASTERCARD</span><span>CB</span><span>APPLE PAY</span><span>GOOGLE PAY</span></div>
+        </form>
+
+        <div class="perks">
+          <div class="perk"><svg viewBox="0 0 24 24"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="17.5" r="1.5"/><circle cx="17" cy="17.5" r="1.5"/></svg><span><b>Livraison par e-mail sous 72 h</b></span></div>
+          <div class="perk"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4"/></svg><span>1 retouche gratuite par vidéo</span></div>
+          <div class="perk"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span>Paiement 100 % sécurisé par Stripe</span></div>
+        </div>
+
+        <div id="faq">
+          <details open><summary>Ce qui est inclus</summary>
+            <ul><li>Vidéos verticales 9:16 en 1080 × 1920, de 15 à 30 secondes</li><li>Sous-titres animés et voix off en français</li><li>Musique libre de droits</li><li>Utilisation commerciale illimitée</li></ul>
+          </details>
+          <details><summary>Comment se passe la commande ?</summary>
+            <p>Après le paiement, vous décrivez votre commerce, votre offre et le ton voulu sur la page de paiement. Vos vidéos arrivent ensuite à l'e-mail indiqué.</p>
+          </details>
+          <details><summary>Comment sont faites les vidéos ?</summary>
+            <p>Elles sont créées avec des outils d'intelligence artificielle (images, animation, voix off), puis vérifiées à la main avant l'envoi.</p>
+          </details>
+          <details><summary>Et si je n'ai rien reçu ?</summary>
+            <p>Vérifiez vos courriers indésirables, puis répondez à l'e-mail de confirmation de paiement.</p>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features gutter" id="comment">
+    <div class="inner">
+      <h2>Comment ça marche</h2>
+      <div class="feat-grid">
+        <div class="feat"><span class="n">Étape 1</span><h3>Choisissez votre pack</h3><p>1, 5 ou 10 vidéos, réglées en ligne par carte.</p></div>
+        <div class="feat"><span class="n">Étape 2</span><h3>Décrivez votre commerce</h3><p>Activité, offre du moment, ton souhaité. Quelques lignes suffisent.</p></div>
+        <div class="feat"><span class="n">Étape 3</span><h3>Publiez vos vidéos</h3><p>Reçues par e-mail sous 72 h, prêtes pour Instagram, TikTok et Facebook.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="gutter">
+  <div class="inner">
+    <span>© 2026 Vidéos Express</span><span>Mentions légales</span><span>CGV</span><span>Paiement sécurisé Stripe</span>
+  </div>
+</footer>
+
+<div class="sticky" id="sticky">
+  <span class="sp" id="sticky-price">79 €</span>
+  <a class="btn" href="#produit" id="sticky-btn">Acheter</a>
+</div>
+
+<script>
+// Fin réelle de l'offre de lancement. Après cette date, la page affiche automatiquement les prix normaux.
+const PROMO_END = new Date("2026-12-07T23:59:59+01:00");
+
+// Liens de paiement Stripe : un lien au prix de lancement et un au prix normal pour chaque pack.
+const PACKS = [
+  { id: "p1",  count: 1,  promo: 19,  normal: 29,  linkPromo: "", linkNormal: "" },
+  { id: "p5",  count: 5,  promo: 79,  normal: 119, linkPromo: "", linkNormal: "", best: true },
+  { id: "p10", count: 10, promo: 139, normal: 199, linkPromo: "", linkNormal: "" }
+];
+
+const SCENES = [
+  { label: "Boulangerie", cap: "Le pain sort du four tous les matins à 7 h", bg: "radial-gradient(120% 70% at 20% 10%, #ffb067, transparent 60%), linear-gradient(160deg, #7a3e1d, #24130a)" },
+  { label: "Coiffure", cap: "Nouvelle coupe, nouvelle saison ✂️", bg: "radial-gradient(120% 70% at 80% 15%, #ff7aa8, transparent 60%), linear-gradient(160deg, #5a1d4a, #170a15)" },
+  { label: "Restaurant", cap: "Le menu du midi à 14,90 €", bg: "radial-gradient(120% 70% at 25% 20%, #ffd25a, transparent 60%), linear-gradient(160deg, #6b2a12, #1c0d07)" },
+  { label: "Salle de sport", cap: "1re séance offerte cette semaine 💪", bg: "radial-gradient(120% 70% at 75% 20%, #5ad1ff, transparent 60%), linear-gradient(160deg, #123a6b, #07121f)" }
+];
+
+const $ = id => document.getElementById(id);
+const euro = n => n.toLocaleString("fr-FR", { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 }) + " €";
+const pad = n => String(n).padStart(2, "0");
+let selected = PACKS[1];
+const promoOn = () => Date.now() < PROMO_END.getTime();
+
+// Gallery
+const thumbs = $("thumbs");
+SCENES.forEach((s, i) => {
+  const t = document.createElement("button");
+  t.type = "button"; t.className = "thumb"; t.id = "thumb-" + i;
+  t.style.background = s.bg; t.setAttribute("aria-pressed", String(i === 0));
+  t.innerHTML = `<span>${s.label}</span>`;
+  t.addEventListener("click", () => showScene(i));
+  thumbs.appendChild(t);
+});
+function showScene(i) {
+  $("screen").style.background = SCENES[i].bg;
+  $("cap").innerHTML = `<span>${SCENES[i].cap}</span>`;
+  thumbs.querySelectorAll(".thumb").forEach((t, j) => t.setAttribute("aria-pressed", String(i === j)));
+}
+showScene(0);
+
+// Variants
+const variants = $("variants");
+PACKS.forEach(p => {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "variant"; b.id = "var-" + p.id;
+  b.addEventListener("click", () => { selected = p; render(); });
+  variants.appendChild(b);
+});
+
+function validEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()); }
+
+function render() {
+  const on = promoOn();
+  const p = selected;
+  const price = on ? p.promo : p.normal;
+  const link = on ? p.linkPromo : p.linkNormal;
+  const off = Math.round((1 - p.promo / p.normal) * 100);
+
+  PACKS.forEach(x => {
+    const b = $("var-" + x.id);
+    b.setAttribute("aria-pressed", String(x === p));
+    b.innerHTML = `${x.count} vidéo${x.count > 1 ? "s" : ""}` + (x.best ? `<em>populaire</em>` : "");
+  });
+  $("opt-current").textContent = `${p.count} vidéo${p.count > 1 ? "s" : ""}`;
+  $("price-now").textContent = euro(price);
+  $("price-now").classList.toggle("on-sale", on);
+  $("price-badge").hidden = !on;
+  $("img-tag").hidden = !on;
+  $("img-tag").textContent = "−" + off + " %";
+  $("price-later").textContent = on
+    ? `Puis ${euro(p.normal)} après la fin de l'offre · soit ${euro(p.promo / p.count)} la vidéo`
+    : `Soit ${euro(p.normal / p.count)} la vidéo`;
+  $("countdown").hidden = !on;
+  $("promo").hidden = !on;
+  $("sticky-price").textContent = euro(price);
+
+  const pay = $("pay"), hint = $("form-hint"), email = $("email");
+  pay.textContent = "Acheter maintenant · " + euro(price);
+  hint.classList.remove("err");
+  const bad = email.value && !validEmail(email.value);
+  if (!link) {
+    pay.setAttribute("aria-disabled", "true"); pay.href = "#produit";
+    hint.textContent = "Le paiement en ligne ouvre très bientôt.";
+  } else if (!validEmail(email.value) || !$("consent").checked) {
+    pay.setAttribute("aria-disabled", "true"); pay.href = "#produit";
+    hint.textContent = bad ? "Cette adresse e-mail semble incomplète. Vérifiez-la." : "Indiquez votre e-mail et cochez la case pour continuer.";
+    if (bad) hint.classList.add("err");
+  } else {
+    pay.href = link + (link.includes("?") ? "&" : "?") + "prefilled_email=" + encodeURIComponent(email.value.trim());
+    pay.setAttribute("aria-disabled", "false");
+    hint.textContent = "Le paiement s'ouvre dans un nouvel onglet.";
+  }
+}
+
+function tick() {
+  const ms = Math.max(0, PROMO_END.getTime() - Date.now());
+  const s = Math.floor(ms / 1000);
+  const parts = [Math.floor(s / 86400), Math.floor(s % 86400 / 3600), Math.floor(s % 3600 / 60), s % 60].map(pad);
+  ["d", "h", "m", "s"].forEach((k, i) => { $("cd-" + k).textContent = parts[i]; $("b" + k).textContent = parts[i]; });
+  if (ms === 0 && !$("countdown").hidden) render();
+}
+
+$("pay").addEventListener("click", e => { if ($("pay").getAttribute("aria-disabled") === "true") e.preventDefault(); });
+$("sticky-btn").addEventListener("click", e => { e.preventDefault(); $("email").focus(); $("email").scrollIntoView({ behavior: "smooth", block: "center" }); });
+$("order-form").addEventListener("submit", e => e.preventDefault());
+$("email").addEventListener("input", render);
+$("consent").addEventListener("change", render);
+render(); tick(); setInterval(tick, 1000);
+</script>
+
+</body>
+</html>
