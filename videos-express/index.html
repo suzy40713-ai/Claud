@@ -6,7 +6,8 @@
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
-<title>Vidéos Express</title>
+<title>Vidéos Express · Votre vidéo sur mesure</title>
+<meta name="description" content="Décrivez la vidéo que vous voulez, on la crée pour vous : anniversaire, surprise, annonce, humour… Livrée par e-mail sous 72 h.">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
@@ -187,7 +188,7 @@ footer a { color: var(--muted); }
 </header>
 
 <main id="top">
-  <div class="gutter"><div class="inner crumbs">Accueil / Vidéos / Pack vidéos Reels &amp; TikTok</div></div>
+  <div class="gutter"><div class="inner crumbs">Accueil / Vidéos / Vidéo sur mesure</div></div>
 
   <section class="gutter" id="produit">
     <div class="inner product">
@@ -197,7 +198,7 @@ footer a { color: var(--muted); }
           <div class="phone" aria-hidden="true">
             <div class="screen" id="screen">
               <span class="tag">Reel · 0:15</span>
-              <div class="cap" id="cap"><span>Le pain sort du four tous les matins à 7 h</span></div>
+              <div class="cap" id="cap"><span>Joyeux anniversaire Léa ! 🎂</span></div>
               <div class="bar"><i></i></div>
             </div>
           </div>
@@ -207,7 +208,7 @@ footer a { color: var(--muted); }
 
       <div class="buy">
         <span class="vendor">Vidéos Express</span>
-        <h1>Pack vidéos Reels &amp; TikTok pour votre commerce</h1>
+        <h1>Votre vidéo sur mesure : vous la décrivez, on la crée</h1>
 
         <div class="prices">
           <span class="now on-sale" id="price-now">79 €</span>
@@ -252,10 +253,13 @@ footer a { color: var(--muted); }
 
         <div id="faq">
           <details open><summary>Ce qui est inclus</summary>
-            <ul><li>Vidéos verticales 9:16 en 1080 × 1920, de 15 à 30 secondes</li><li>Sous-titres animés et voix off en français</li><li>Musique libre de droits</li><li>Utilisation commerciale illimitée</li></ul>
+            <ul><li>Vidéos verticales 9:16 en 1080 × 1920, de 15 à 30 secondes</li><li>Sous-titres animés et voix off en français</li><li>Musique libre de droits</li><li>À partager où vous voulez : WhatsApp, Instagram, TikTok, Facebook…</li></ul>
           </details>
           <details><summary>Comment se passe la commande ?</summary>
-            <p>Après le paiement, vous décrivez votre commerce, votre offre et le ton voulu sur la page de paiement. Vos vidéos arrivent ensuite à l'e-mail indiqué.</p>
+            <p>Sur la page de paiement, vous décrivez la vidéo que vous voulez : le sujet, le texte à dire ou à afficher, le ton (drôle, émouvant, festif…). Vos vidéos arrivent ensuite à l'e-mail indiqué.</p>
+          </details>
+          <details><summary>Qu'est-ce que je peux demander ?</summary>
+            <p>Presque tout : un anniversaire, une surprise, une annonce, une blague, une invitation, une histoire… Nous refusons seulement les contenus illégaux, haineux, violents ou sexuels, et toute vidéo qui imite une personne réelle (son visage, sa voix) sans son accord. Si nous ne pouvons pas réaliser votre demande, vous êtes remboursé intégralement.</p>
           </details>
           <details><summary>Comment sont faites les vidéos ?</summary>
             <p>Elles sont créées avec des outils d'intelligence artificielle (images, animation, voix off), puis vérifiées à la main avant l'envoi.</p>
@@ -273,8 +277,8 @@ footer a { color: var(--muted); }
       <h2>Comment ça marche</h2>
       <div class="feat-grid">
         <div class="feat"><span class="n">Étape 1</span><h3>Choisissez votre pack</h3><p>1, 5 ou 10 vidéos, réglées en ligne par carte.</p></div>
-        <div class="feat"><span class="n">Étape 2</span><h3>Décrivez votre commerce</h3><p>Activité, offre du moment, ton souhaité. Quelques lignes suffisent.</p></div>
-        <div class="feat"><span class="n">Étape 3</span><h3>Publiez vos vidéos</h3><p>Reçues par e-mail sous 72 h, prêtes pour Instagram, TikTok et Facebook.</p></div>
+        <div class="feat"><span class="n">Étape 2</span><h3>Décrivez votre vidéo</h3><p>Le sujet, le texte, le ton souhaité. Quelques lignes suffisent.</p></div>
+        <div class="feat"><span class="n">Étape 3</span><h3>Recevez vos vidéos</h3><p>Par e-mail sous 72 h, prêtes à envoyer ou à publier où vous voulez.</p></div>
       </div>
     </div>
   </section>
@@ -303,10 +307,10 @@ const PACKS = [
 ];
 
 const SCENES = [
-  { label: "Boulangerie", cap: "Le pain sort du four tous les matins à 7 h", bg: "radial-gradient(120% 70% at 20% 10%, #ffb067, transparent 60%), linear-gradient(160deg, #7a3e1d, #24130a)" },
-  { label: "Coiffure", cap: "Nouvelle coupe, nouvelle saison ✂️", bg: "radial-gradient(120% 70% at 80% 15%, #ff7aa8, transparent 60%), linear-gradient(160deg, #5a1d4a, #170a15)" },
-  { label: "Restaurant", cap: "Le menu du midi à 14,90 €", bg: "radial-gradient(120% 70% at 25% 20%, #ffd25a, transparent 60%), linear-gradient(160deg, #6b2a12, #1c0d07)" },
-  { label: "Salle de sport", cap: "1re séance offerte cette semaine 💪", bg: "radial-gradient(120% 70% at 75% 20%, #5ad1ff, transparent 60%), linear-gradient(160deg, #123a6b, #07121f)" }
+  { label: "Anniversaire", cap: "Joyeux anniversaire Léa ! 🎂", bg: "radial-gradient(120% 70% at 20% 10%, #ffb067, transparent 60%), linear-gradient(160deg, #7a3e1d, #24130a)" },
+  { label: "Surprise", cap: "Tu veux être mon témoin ? 💍", bg: "radial-gradient(120% 70% at 80% 15%, #ff7aa8, transparent 60%), linear-gradient(160deg, #5a1d4a, #170a15)" },
+  { label: "Humour", cap: "Moi le lundi à 7 h quand le réveil sonne 😴", bg: "radial-gradient(120% 70% at 25% 20%, #ffd25a, transparent 60%), linear-gradient(160deg, #6b2a12, #1c0d07)" },
+  { label: "Annonce", cap: "On a une grande nouvelle… 👶", bg: "radial-gradient(120% 70% at 75% 20%, #5ad1ff, transparent 60%), linear-gradient(160deg, #123a6b, #07121f)" }
 ];
 
 const $ = id => document.getElementById(id);
