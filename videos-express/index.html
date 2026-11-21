@@ -172,7 +172,7 @@ footer a { color: var(--muted); }
 
 <div class="promo gutter" id="promo">
   <div class="inner">
-    <span>🔥 OFFRE DE LANCEMENT : jusqu'à −34 % sur tous les packs</span>
+    <span>🔥 PRIX DE LANCEMENT jusqu'au 7 décembre</span>
     <span class="timer" id="bar-timer" aria-live="off"><b id="bd">00</b>j <b id="bh">00</b>h <b id="bm">00</b>m <b id="bs">00</b>s</span>
   </div>
 </div>
@@ -194,7 +194,6 @@ footer a { color: var(--muted); }
     <div class="inner product">
       <div class="gallery">
         <div class="main-img">
-          <span class="sale-tag" id="img-tag">−34 %</span>
           <div class="phone" aria-hidden="true">
             <div class="screen" id="screen">
               <span class="tag">Reel · 0:15</span>
@@ -352,7 +351,6 @@ function render() {
   const p = selected;
   const price = on ? p.promo : p.normal;
   const link = on ? p.linkPromo : p.linkNormal;
-  const off = Math.round((1 - p.promo / p.normal) * 100);
 
   PACKS.forEach(x => {
     const b = $("var-" + x.id);
@@ -363,8 +361,6 @@ function render() {
   $("price-now").textContent = euro(price);
   $("price-now").classList.toggle("on-sale", on);
   $("price-badge").hidden = !on;
-  $("img-tag").hidden = !on;
-  $("img-tag").textContent = "−" + off + " %";
   $("price-later").textContent = on
     ? `Puis ${euro(p.normal)} après la fin de l'offre · soit ${euro(p.promo / p.count)} la vidéo`
     : `Soit ${euro(p.normal / p.count)} la vidéo`;
