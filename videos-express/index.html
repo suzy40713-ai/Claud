@@ -211,10 +211,10 @@ footer a { color: var(--muted); }
         <h1>Votre vidéo sur mesure : vous la décrivez, on la crée</h1>
 
         <div class="prices">
-          <span class="now on-sale" id="price-now">79 €</span>
+          <span class="now on-sale" id="price-now">39 €</span>
           <span class="badge" id="price-badge">Prix de lancement</span>
         </div>
-        <p class="later" id="price-later">Puis 119 € après la fin de l'offre · soit 15,80 € la vidéo</p>
+        <p class="later" id="price-later">Puis 59 € après la fin de l'offre · soit 7,80 € la vidéo</p>
         <p class="tax">TVA non applicable, art. 293 B du CGI.</p>
 
         <div class="countdown" id="countdown">
@@ -240,7 +240,7 @@ footer a { color: var(--muted); }
             <input type="checkbox" id="consent" name="consent">
             <span>Je demande que la création commence dès le paiement et je reconnais perdre mon droit de rétractation une fois les vidéos livrées. J'accepte les <a href="cgv.html" target="_blank">CGV</a>.</span>
           </label>
-          <a class="btn" id="pay" href="#produit" target="_blank" rel="noopener" aria-disabled="true">Acheter maintenant · 79 €</a>
+          <a class="btn" id="pay" href="#produit" target="_blank" rel="noopener" aria-disabled="true">Acheter maintenant · 39 €</a>
           <p class="hint" id="form-hint">Indiquez votre e-mail et cochez la case pour continuer.</p>
           <div class="cards" aria-label="Moyens de paiement"><span>VISA</span><span>MASTERCARD</span><span>CB</span><span>APPLE PAY</span><span>GOOGLE PAY</span></div>
         </form>
@@ -291,7 +291,7 @@ footer a { color: var(--muted); }
 </footer>
 
 <div class="sticky" id="sticky">
-  <span class="sp" id="sticky-price">79 €</span>
+  <span class="sp" id="sticky-price">39 €</span>
   <a class="btn" href="#produit" id="sticky-btn">Acheter</a>
 </div>
 
@@ -301,9 +301,9 @@ const PROMO_END = new Date("2026-12-07T23:59:59+01:00");
 
 // Liens de paiement Stripe : un lien au prix de lancement et un au prix normal pour chaque pack.
 const PACKS = [
-  { id: "p1",  count: 1,  promo: 19,  normal: 29,  linkPromo: "", linkNormal: "" },
-  { id: "p5",  count: 5,  promo: 79,  normal: 119, linkPromo: "", linkNormal: "", best: true },
-  { id: "p10", count: 10, promo: 139, normal: 199, linkPromo: "", linkNormal: "" }
+  { id: "p1",  count: 1,  promo: 9.9, normal: 14.9, linkPromo: "", linkNormal: "" },
+  { id: "p5",  count: 5,  promo: 39,  normal: 59,   linkPromo: "", linkNormal: "", best: true },
+  { id: "p10", count: 10, promo: 69,  normal: 99,   linkPromo: "", linkNormal: "" }
 ];
 
 const SCENES = [
