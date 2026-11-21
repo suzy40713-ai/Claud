@@ -1,5 +1,8 @@
 # Kit de livraison — Pack visibilité salon (99 €)
 
+**Lien de paiement (99 €) :** https://buy.stripe.com/3cIbJ39gYfgb2wXalFeIw00
+**Page de présentation :** https://booksync-oft8.onrender.com/pack-visibilite
+
 À suivre dès qu'un salon a payé. Objectif : **tout livré en 7 jours maximum** (c'est promis sur la page de vente).
 
 ---
