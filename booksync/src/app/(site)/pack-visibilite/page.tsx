@@ -32,6 +32,13 @@ const INCLUDED = [
   },
 ];
 
+const SCREENS = [
+  { src: "/pack/10-page-note.jpg", title: "Votre page de réservation", text: "Vos prestations, vos prix et votre note." },
+  { src: "/pack/03-creneaux.jpg", title: "Vos clients choisissent un créneau", text: "24h/24, sans vous appeler." },
+  { src: "/pack/17-agenda.jpg", title: "Tout arrive dans votre agenda", text: "Sur votre téléphone, en temps réel." },
+  { src: "/pack/14-avis-publics.jpg", title: "Vos avis clients", text: "Avis vérifiés, demandés automatiquement." },
+];
+
 const STEPS = [
   "Vous réglez 99 € en ligne, par paiement sécurisé.",
   "Vous m'envoyez par message vos prestations, vos prix, vos horaires et quelques photos.",
@@ -84,6 +91,37 @@ export default function PackPage() {
               </span>
               <h3 className="mt-3 font-semibold">{title}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{text}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="mt-14" aria-labelledby="apercu">
+        <h2 id="apercu" className="text-center text-2xl font-semibold tracking-tight">
+          À quoi ça ressemble
+        </h2>
+        <p className="mt-1 text-center text-sm text-muted-foreground">
+          Captures du site avec un salon d&apos;exemple.
+        </p>
+        <ul
+          className="-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-4 sm:overflow-visible sm:px-0"
+          data-testid="pack-screens"
+        >
+          {SCREENS.map((s) => (
+            <li key={s.src} className="w-[62%] shrink-0 snap-center sm:w-auto">
+              <div className="overflow-hidden rounded-[28px] border-[6px] border-foreground/90 bg-white shadow-md">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={s.src}
+                  alt={`${s.title} (exemple)`}
+                  width={600}
+                  height={1299}
+                  loading="lazy"
+                  className="aspect-[390/844] w-full object-cover object-top"
+                />
+              </div>
+              <p className="mt-3 text-sm font-semibold">{s.title}</p>
+              <p className="text-[13px] text-muted-foreground">{s.text}</p>
             </li>
           ))}
         </ul>

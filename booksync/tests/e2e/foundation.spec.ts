@@ -83,4 +83,11 @@ test("pack visibilité : page de vente accessible depuis le pied de page", async
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Pack visibilité salon");
   await expect(page.getByTestId("pack-price")).toContainText("99 €");
   await expect(page.getByText(/remboursé intégralement/)).toBeVisible();
+  // Captures du site : 4 écrans d'exemple, images chargées.
+  const shots = page.getByTestId("pack-screens").getByRole("img");
+  await expect(shots).toHaveCount(4);
+  for (const img of await shots.all()) {
+    await img.scrollIntoViewIfNeeded();
+    await expect.poll(() => img.evaluate((i: HTMLImageElement) => i.naturalWidth)).toBeGreaterThan(0);
+  }
 });
