@@ -19,6 +19,7 @@ export const LAUNCH_ACTIVITIES = [
   "cours",
   "consultation",
   "freelance",
+  "photographie",
 ] as const satisfies ReadonlyArray<ActivityId>;
 
 /** Métiers qui se pratiquent surtout en ligne (visio). */
@@ -107,6 +108,7 @@ const STYLE: Record<
     job: "Consultante",
   },
   freelance: { word: "Studio", short: "Créa", emoji: "💻", search: "freelance", job: "Freelance" },
+  photographie: { word: "Photo", short: "Photo", emoji: "📸", search: "photo", job: "Photographe" },
 };
 
 /** Remise appliquée aux prix d'exemple quand on débute (pour remplir l'agenda vite). */
@@ -124,20 +126,33 @@ export function roundPrice(cents: number) {
 
 export function nameIdeas(input: Pick<LaunchInput, "activity" | "firstName" | "city" | "place">) {
   const s = STYLE[input.activity];
-  const name = capitalize(clean(input.firstName)) || "Studio";
+  const name = capitalize(clean(input.firstName));
   const city = capitalize(clean(input.city));
-  const ideas = [
-    `${name} ${s.word}`,
-    `L'Atelier de ${name}`,
-    `${s.short} by ${name}`,
-    `Studio ${name}`,
-    city ? `${city} ${s.word}` : `${name} ${s.short}`,
+  const last =
     input.place === "domicile"
-      ? `${name} ${s.word} à domicile`
+      ? `${name || s.short} ${s.word} à domicile`
       : input.place === "en-ligne"
-        ? `${name} ${s.word} Online`
-        : `Maison ${name}`,
-  ];
+        ? `${name || s.short} ${s.word} Online`
+        : name
+          ? `Maison ${name}`
+          : `La Maison ${s.word}`;
+  const ideas = name
+    ? [
+        `${name} ${s.word}`,
+        `L'Atelier de ${name}`,
+        `${s.short} by ${name}`,
+        `Studio ${name}`,
+        city ? `${city} ${s.word}` : `${name} ${s.short}`,
+        last,
+      ]
+    : [
+        `${s.word} Lab`,
+        `L'Atelier ${s.word}`,
+        `${s.short} & Co`,
+        `Studio ${s.word}`,
+        city ? `${city} ${s.word}` : `Mon ${s.short}`,
+        last,
+      ];
   return [...new Set(ideas)];
 }
 

@@ -30,6 +30,7 @@ describe("lance ton activité", () => {
     const names = nameIdeas({ ...base, firstName: "", city: "" });
     expect(names.length).toBeGreaterThan(3);
     expect(names.every((n) => n.trim().length > 0)).toBe(true);
+    expect(names.some((n) => /Studio Studio|de Studio/.test(n))).toBe(false);
   });
 
   it("baisse un peu les prix quand on débute, arrondis à 5 €", () => {

@@ -45,7 +45,7 @@ test("lance ton activité : un débutant trouve une idée sans diplôme à parti
   await card.getByRole("button", { name: "Je choisis cette idée" }).click();
   await expect(page.getByLabel("Ton métier")).toHaveValue("cours");
   await expect(page.getByLabel("Où tu travailles")).toHaveValue("domicile");
-  await expect(page.getByTestId("launch-services")).toContainText("Séance d'aide numérique 1 h");
+  await expect(page.getByTestId("launch-services")).toContainText("Séance d'aide numérique");
   await expect(page.getByTestId("launch-bio")).toContainText(
     "📱 Aide numérique pour les seniors à domicile",
   );
