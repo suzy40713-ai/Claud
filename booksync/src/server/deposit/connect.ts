@@ -21,7 +21,9 @@ function requireStripe(stripe: Stripe | null = getStripe()) {
 }
 
 /** Recopie l'état d'un compte Stripe connecté (peut-il encaisser ?) sur l'entreprise. */
-export async function syncConnectedAccount(account: Pick<Stripe.Account, "id" | "charges_enabled">) {
+export async function syncConnectedAccount(
+  account: Pick<Stripe.Account, "id" | "charges_enabled">,
+) {
   const ready = Boolean(account.charges_enabled);
   await db
     .update(organization)
@@ -131,7 +133,11 @@ export async function updateDepositSettings(
     .set({
       depositMode: data.mode,
       depositValue:
-        data.mode === "fixed" ? Math.round(data.value * 100) : data.mode === "percent" ? data.value : 0,
+        data.mode === "fixed"
+          ? Math.round(data.value * 100)
+          : data.mode === "percent"
+            ? data.value
+            : 0,
     })
     .where(eq(organization.id, ctx.organization.id));
 }

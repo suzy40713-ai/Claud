@@ -54,7 +54,9 @@ function PendingPayment({
           <CreditCard className="size-7" />
         </span>
         <h1 className="text-2xl font-semibold tracking-tight" data-testid="manage-title">
-          {returned === "ok" ? "Paiement en cours de vérification" : "Acompte en attente de paiement"}
+          {returned === "ok"
+            ? "Paiement en cours de vérification"
+            : "Acompte en attente de paiement"}
         </h1>
         <p className="mt-2 text-[15px] text-muted-foreground">
           {returned === "ok"

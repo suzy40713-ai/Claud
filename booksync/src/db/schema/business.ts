@@ -585,3 +585,59 @@ export const assistantUsage = pgTable(
   },
   (t) => [primaryKey({ columns: [t.organizationId, t.month] })],
 );
+
+/**
+ * Carte cadeau vendue en ligne par un établissement. Payée sur le compte Stripe du professionnel
+ * (paiement direct) : `pending` jusqu'à confirmation du paiement, puis `active`. Le solde baisse à
+ * chaque utilisation au salon (historique dans `gift_card_use`).
+ */
+export const giftCard = pgTable(
+  "gift_card",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    organizationId: orgId(),
+    code: text().notNull(),
+    status: text({ enum: ["pending", "active"] })
+      .notNull()
+      .default("pending"),
+    amountCents: integer().notNull(),
+    balanceCents: integer().notNull(),
+    buyerName: text().notNull(),
+    buyerEmail: text().notNull(),
+    recipientName: text().notNull(),
+    message: text(),
+    stripeCheckoutSessionId: text().unique(),
+    stripePaymentIntentId: text(),
+    paidAt: timestamp({ withTimezone: true }),
+    expiresAt: timestamp({ withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    unique("gift_card_org_id_uq").on(t.organizationId, t.id),
+    uniqueIndex("gift_card_org_code_uq").on(t.organizationId, t.code),
+    index("gift_card_org_created_idx").on(t.organizationId, t.createdAt),
+    check("gift_card_amount_ck", sql`${t.amountCents} between 100 and 100000`),
+    check("gift_card_balance_ck", sql`${t.balanceCents} between 0 and ${t.amountCents}`),
+  ],
+);
+
+/** Utilisation d'une carte cadeau au salon (journal non modifiable : qui, quand, combien). */
+export const giftCardUse = pgTable(
+  "gift_card_use",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    organizationId: orgId(),
+    giftCardId: uuid().notNull(),
+    amountCents: integer().notNull(),
+    userId: uuid().references(() => user.id, { onDelete: "set null" }),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    foreignKey({
+      columns: [t.organizationId, t.giftCardId],
+      foreignColumns: [giftCard.organizationId, giftCard.id],
+    }).onDelete("cascade"),
+    index("gift_card_use_card_idx").on(t.giftCardId),
+    check("gift_card_use_amount_ck", sql`${t.amountCents} > 0`),
+  ],
+);

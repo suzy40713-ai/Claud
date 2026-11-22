@@ -42,7 +42,9 @@ function fakeStripe(state: SessionState = { status: "open", payment_status: "unp
   };
   let currentAppt = "";
   const stripe = {
-    checkout: { sessions: { create: calls.create, retrieve: calls.retrieve, expire: calls.expire } },
+    checkout: {
+      sessions: { create: calls.create, retrieve: calls.retrieve, expire: calls.expire },
+    },
     refunds: { create: calls.refund },
   } as unknown as Stripe;
   return { stripe, calls, setAppt: (id: string) => (currentAppt = id) };
@@ -66,7 +68,10 @@ async function depositOrg(opts: { plan?: "free" | "starter" | "pro"; ready?: boo
     priceCents: 6000,
     staffIds: [ctx.staffId!],
   });
-  const [org] = await db.select().from(organization).where(eq(organization.id, ctx.organization.id));
+  const [org] = await db
+    .select()
+    .from(organization)
+    .where(eq(organization.id, ctx.organization.id));
   return { ctx: { ...ctx, organization: org }, org, svc, acct };
 }
 
@@ -101,7 +106,11 @@ describe("acompte à la réservation", () => {
   it("réservation en attente de paiement : créneau bloqué, aucune notification", async () => {
     const { org, svc } = await depositOrg();
     const appt = await book(org, svc.id);
-    expect(appt).toMatchObject({ status: "pending_payment", depositCents: 1000, depositStatus: "pending" });
+    expect(appt).toMatchObject({
+      status: "pending_payment",
+      depositCents: 1000,
+      depositStatus: "pending",
+    });
     expect(appt.paymentExpiresAt!.getTime()).toBeGreaterThan(Date.now() + 30 * 60_000);
     expect(await notifs(appt.id)).toHaveLength(0);
     // Personne d'autre ne peut prendre le créneau pendant le paiement.
@@ -191,7 +200,9 @@ describe("acompte à la réservation", () => {
     open.setAppt(unpaid.id);
     await releaseExpiredDeposits(open.stripe);
     expect(open.calls.expire).toHaveBeenCalled();
-    expect(await db.select().from(appointment).where(eq(appointment.id, unpaid.id))).toHaveLength(0);
+    expect(await db.select().from(appointment).where(eq(appointment.id, unpaid.id))).toHaveLength(
+      0,
+    );
     // Le créneau est de nouveau réservable.
     const again = await book(org, svc.id, 10);
     expect(again.status).toBe("pending_payment");
@@ -221,7 +232,13 @@ describe("acompte à la réservation", () => {
     const appt = await book(org, svc.id, 10);
     await confirmDepositPayment(
       fakeStripe().stripe,
-      { id: "cs_x", payment_status: "paid", payment_intent: "pi_ok", amount_total: 1000, metadata: { appointmentId: appt.id } },
+      {
+        id: "cs_x",
+        payment_status: "paid",
+        payment_intent: "pi_ok",
+        amount_total: 1000,
+        metadata: { appointmentId: appt.id },
+      },
       acct,
     );
     const ok = fakeStripe();
@@ -242,7 +259,13 @@ describe("acompte à la réservation", () => {
     const appt2 = await book(org, svc.id, 14);
     await confirmDepositPayment(
       fakeStripe().stripe,
-      { id: "cs_y", payment_status: "paid", payment_intent: "pi_ko", amount_total: 1000, metadata: { appointmentId: appt2.id } },
+      {
+        id: "cs_y",
+        payment_status: "paid",
+        payment_intent: "pi_ko",
+        amount_total: 1000,
+        metadata: { appointmentId: appt2.id },
+      },
       acct,
     );
     const ko = fakeStripe();
@@ -279,7 +302,9 @@ describe("acompte à la réservation", () => {
       /Connectez d'abord/,
     );
     const ready = await depositOrg();
-    await expect(updateDepositSettings(ready.ctx, { mode: "percent", value: 150 })).rejects.toThrow();
+    await expect(
+      updateDepositSettings(ready.ctx, { mode: "percent", value: 150 }),
+    ).rejects.toThrow();
     await expect(updateDepositSettings(ready.ctx, { mode: "fixed", value: 0.2 })).rejects.toThrow();
     await updateDepositSettings(ready.ctx, { mode: "percent", value: 30 });
     const [o] = await db.select().from(organization).where(eq(organization.id, ready.org.id));

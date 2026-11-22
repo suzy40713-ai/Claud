@@ -41,6 +41,7 @@ export const RESERVED_SLUGS = new Set([
   "professionnels",
   "avis",
   "pack-visibilite",
+  "carte-cadeau",
   "mon-espace",
   "signup",
   "statut",

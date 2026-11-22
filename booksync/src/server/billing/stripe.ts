@@ -104,11 +104,7 @@ async function removeStaleEndpoints(
   currentUrl: string,
 ) {
   for (const e of endpoints) {
-    if (
-      e.url !== currentUrl &&
-      e.url.endsWith(path) &&
-      e.description?.startsWith("BookSync")
-    ) {
+    if (e.url !== currentUrl && e.url.endsWith(path) && e.description?.startsWith("BookSync")) {
       await stripe.webhookEndpoints.del(e.id);
       console.info(`[stripe] ancien webhook supprimé : ${e.url}`);
     }

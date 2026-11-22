@@ -47,9 +47,7 @@ export function ReviewSection({
                 · {r.serviceName} · {capitalize(formatInTz(r.createdAt, timeZone, "d MMMM yyyy"))}
               </span>
             </div>
-            {r.comment ? (
-              <p className="mt-1.5 text-sm whitespace-pre-line">{r.comment}</p>
-            ) : null}
+            {r.comment ? <p className="mt-1.5 text-sm whitespace-pre-line">{r.comment}</p> : null}
             {r.reply ? (
               <div className="mt-2 rounded-lg bg-subtle px-3 py-2 text-sm">
                 <p className="text-[13px] font-semibold">Réponse de {organizationName}</p>
@@ -61,8 +59,8 @@ export function ReviewSection({
       </ul>
       <p className="mt-4 flex items-start gap-1.5 text-xs text-muted-foreground">
         <BadgeCheck className="mt-px size-3.5 shrink-0" />
-        Avis vérifiés : seuls les clients ayant eu un rendez-vous via BookSync peuvent noter,
-        une seule fois par rendez-vous. Aucune contrepartie. Les avis sont publiés sans modération
+        Avis vérifiés : seuls les clients ayant eu un rendez-vous via BookSync peuvent noter, une
+        seule fois par rendez-vous. Aucune contrepartie. Les avis sont publiés sans modération
         préalable et classés du plus récent au plus ancien.
       </p>
     </section>

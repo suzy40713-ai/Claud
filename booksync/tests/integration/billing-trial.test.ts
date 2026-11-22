@@ -46,7 +46,10 @@ describe("1er mois offert", () => {
       .update(organization)
       .set({ subscriptionStatus: "canceled", plan: "free" })
       .where(eq(organization.id, ctx.organization.id));
-    const [org] = await db.select().from(organization).where(eq(organization.id, ctx.organization.id));
+    const [org] = await db
+      .select()
+      .from(organization)
+      .where(eq(organization.id, ctx.organization.id));
     await startSubscription({ ...ctx, organization: org }, "pro");
     const sub = created.at(-1)!.subscription_data as Record<string, unknown>;
     expect(sub.trial_period_days).toBeUndefined();

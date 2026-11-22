@@ -18,7 +18,8 @@ export type NavItem = {
     | "waitlist"
     | "insights"
     | "assistant"
-    | "reviews";
+    | "reviews"
+    | "gift";
   /** Une phrase qui explique à quoi sert la page (menu mobile). */
   hint: string;
   group: NavGroup;
@@ -90,6 +91,14 @@ export const NAV_ITEMS: NavItem[] = [
     icon: "reviews",
     group: "clients",
     permission: "reviews.manage",
+  },
+  {
+    href: "/tableau-de-bord/cartes-cadeaux",
+    label: "Cartes cadeaux",
+    hint: "Vendez en ligne, encaissez avant la visite",
+    icon: "gift",
+    group: "clients",
+    permission: "appointments.manage_own",
   },
   {
     href: "/tableau-de-bord/services",

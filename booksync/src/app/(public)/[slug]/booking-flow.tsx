@@ -487,9 +487,9 @@ export function BookingFlow({
                     Acompte de {formatCents(depositCents)} à payer en ligne pour confirmer
                   </p>
                   <p className="mt-0.5">
-                    Prix total {formatCents(svc.priceCents)} : l&apos;acompte est déduit, le reste
-                    ({formatCents(svc.priceCents - depositCents)}) se règle sur place. Remboursé
-                    si vous annulez{" "}
+                    Prix total {formatCents(svc.priceCents)} : l&apos;acompte est déduit, le reste (
+                    {formatCents(svc.priceCents - depositCents)}) se règle sur place. Remboursé si
+                    vous annulez{" "}
                     {org.cancellationNoticeHours > 0
                       ? `au moins ${org.cancellationNoticeHours} h avant`
                       : "avant le rendez-vous"}

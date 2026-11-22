@@ -14,7 +14,10 @@ export async function startConnectAction() {
   return runAction(async () => ({ url: await startConnectOnboarding(ctx) }));
 }
 
-export async function updateDepositAction(input: { mode: "none" | "fixed" | "percent"; value: number }) {
+export async function updateDepositAction(input: {
+  mode: "none" | "fixed" | "percent";
+  value: number;
+}) {
   const ctx = await requireOrg();
   const res = await runAction(
     () => updateDepositSettings(ctx, input),

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { BellRing, CalendarX2, Clock, MapPin, Phone } from "lucide-react";
+import { BellRing, CalendarX2, Clock, Gift, MapPin, Phone } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { JsonLd } from "@/components/seo/json-ld";
 import { isHealthActivity } from "@/domain/activities";
@@ -62,7 +62,9 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
         name: o.name,
         url: `${site.url}/${o.slug}`,
         ...(o.phone ? { telephone: o.phone } : {}),
-        ...(o.logoUrl ? { image: o.logoUrl.startsWith("http") ? o.logoUrl : `${site.url}${o.logoUrl}` } : {}),
+        ...(o.logoUrl
+          ? { image: o.logoUrl.startsWith("http") ? o.logoUrl : `${site.url}${o.logoUrl}` }
+          : {}),
         ...(o.city
           ? {
               address: {
@@ -204,6 +206,27 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
           ) : (
             <BookingFlow page={page} prefill={prefill} />
           )}
+          {page.giftCardAmounts.length ? (
+            <div
+              className="mt-6 flex flex-col gap-3 rounded-2xl border bg-card p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between"
+              data-testid="gift-card-cta"
+            >
+              <div>
+                <p className="flex items-center gap-2 font-semibold">
+                  <Gift className="size-4 text-primary" aria-hidden /> Offrir une carte cadeau
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Payée en ligne, reçue tout de suite par email, valable 12 mois chez {o.name}.
+                </p>
+              </div>
+              <Link
+                href={`/${o.slug}/carte-cadeau`}
+                className="inline-flex h-10 shrink-0 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
+              >
+                Offrir une carte cadeau
+              </Link>
+            </div>
+          ) : null}
           {page.waitlistEnabled && page.services.length ? (
             <div className="mt-6 flex flex-col gap-3 rounded-2xl border bg-card p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
               <div>

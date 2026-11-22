@@ -294,7 +294,7 @@ describe("réservation (base réelle)", () => {
     // Demande d'avis : 2 h après la fin du rendez-vous.
     expect(rows.find((r) => r.type === "review_request")!.scheduledFor.getTime()).toBe(
       appt.endsAt.getTime() + 2 * 3_600_000,
-    )
+    );
     const r24 = rows.find((r) => r.type === "reminder_24h")!;
     expect(r24.scheduledFor.getTime()).toBe(appt.startsAt.getTime() - 24 * 3_600_000);
     expect(rows.find((r) => r.type === "staff_new_booking")!.recipient).toBe(

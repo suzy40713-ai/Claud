@@ -37,9 +37,7 @@ export function RatingBadge({
     <span className={cn("inline-flex items-center gap-1.5 text-sm", className)}>
       <Stars value={average} className="text-[15px]" />
       <strong className="tabular-nums">{average.toLocaleString("fr-FR")}</strong>
-      <span className="text-muted-foreground">
-        ({count} avis)
-      </span>
+      <span className="text-muted-foreground">({count} avis)</span>
     </span>
   );
 }

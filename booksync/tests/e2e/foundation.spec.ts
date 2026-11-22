@@ -88,6 +88,8 @@ test("pack visibilité : page de vente accessible depuis le pied de page", async
   await expect(shots).toHaveCount(4);
   for (const img of await shots.all()) {
     await img.scrollIntoViewIfNeeded();
-    await expect.poll(() => img.evaluate((i: HTMLImageElement) => i.naturalWidth)).toBeGreaterThan(0);
+    await expect
+      .poll(() => img.evaluate((i: HTMLImageElement) => i.naturalWidth))
+      .toBeGreaterThan(0);
   }
 });

@@ -137,6 +137,12 @@ export const organization = pgTable(
     depositValue: integer().notNull().default(0),
     stripeAccountId: text().unique(),
     stripeAccountReady: boolean().notNull().default(false),
+    /** Vente de cartes cadeaux en ligne (même compte Stripe que l'acompte). Montants en centimes. */
+    giftCardsEnabled: boolean().notNull().default(false),
+    giftCardAmounts: integer()
+      .array()
+      .notNull()
+      .default(sql`'{3000,5000,10000}'::integer[]`),
     /** Personnalisation de la page de réservation (plan Pro) */
     brandColor: text(),
     coverFileId: uuid(),

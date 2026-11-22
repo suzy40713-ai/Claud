@@ -10,6 +10,7 @@ import { effectivePlan } from "@/domain/billing/plans";
 import { RESERVED_SLUGS } from "@/domain/organization/slug";
 import { fileUrl } from "@/lib/files";
 import { getOrganizationHours } from "@/server/catalog/staff";
+import { giftCardsOffered } from "@/server/gift-cards";
 
 export async function getOrgBySlug(slug: string) {
   if (!slug || RESERVED_SLUGS.has(slug) || !/^[a-z0-9-]{3,48}$/.test(slug)) return null;
@@ -115,6 +116,8 @@ export async function getPublicBookingPage(slug: string) {
       coverUrl: plan.features.bookingPageCustomization ? fileUrl(org.coverFileId) : null,
       welcomeMessage: plan.features.bookingPageCustomization ? org.welcomeMessage : null,
     },
+    /** Vente de cartes cadeaux en ligne (montants en centimes), si le salon la propose. */
+    giftCardAmounts: giftCardsOffered(org) ? org.giftCardAmounts : [],
     hours: await getOrganizationHours(org.id),
     services: services
       .map((s) => ({

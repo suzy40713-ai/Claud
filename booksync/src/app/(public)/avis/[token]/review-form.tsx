@@ -92,8 +92,8 @@ export function ReviewForm({ token, initialRating }: { token: string; initialRat
         Publier mon avis
       </Button>
       <p className="text-center text-xs text-muted-foreground">
-        Votre avis sera publié avec votre prénom et l&apos;initiale de votre nom. L&apos;établissement
-        peut y répondre publiquement.
+        Votre avis sera publié avec votre prénom et l&apos;initiale de votre nom.
+        L&apos;établissement peut y répondre publiquement.
       </p>
     </form>
   );

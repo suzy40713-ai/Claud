@@ -33,10 +33,26 @@ const INCLUDED = [
 ];
 
 const SCREENS = [
-  { src: "/pack/10-page-note.jpg", title: "Votre page de réservation", text: "Vos prestations, vos prix et votre note." },
-  { src: "/pack/03-creneaux.jpg", title: "Vos clients choisissent un créneau", text: "24h/24, sans vous appeler." },
-  { src: "/pack/17-agenda.jpg", title: "Tout arrive dans votre agenda", text: "Sur votre téléphone, en temps réel." },
-  { src: "/pack/14-avis-publics.jpg", title: "Vos avis clients", text: "Avis vérifiés, demandés automatiquement." },
+  {
+    src: "/pack/10-page-note.jpg",
+    title: "Votre page de réservation",
+    text: "Vos prestations, vos prix et votre note.",
+  },
+  {
+    src: "/pack/03-creneaux.jpg",
+    title: "Vos clients choisissent un créneau",
+    text: "24h/24, sans vous appeler.",
+  },
+  {
+    src: "/pack/17-agenda.jpg",
+    title: "Tout arrive dans votre agenda",
+    text: "Sur votre téléphone, en temps réel.",
+  },
+  {
+    src: "/pack/14-avis-publics.jpg",
+    title: "Vos avis clients",
+    text: "Avis vérifiés, demandés automatiquement.",
+  },
 ];
 
 const STEPS = [
@@ -51,7 +67,9 @@ export default function PackPage() {
   return (
     <main className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-16">
       <div className="text-center">
-        <p className="text-sm font-semibold text-primary">Pour les salons de coiffure, barbiers et instituts</p>
+        <p className="text-sm font-semibold text-primary">
+          Pour les salons de coiffure, barbiers et instituts
+        </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-5xl">
           Pack visibilité salon
         </h1>
@@ -60,8 +78,7 @@ export default function PackPage() {
           vous, à distance, par message.
         </p>
         <p className="mt-6 text-5xl font-semibold tracking-tight" data-testid="pack-price">
-          99 €
-          <span className="ml-2 text-base font-normal text-muted-foreground">en une fois</span>
+          99 €<span className="ml-2 text-base font-normal text-muted-foreground">en une fois</span>
         </p>
         <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           {PAYMENT_URL ? (
@@ -143,7 +160,10 @@ export default function PackPage() {
         </ol>
       </section>
 
-      <section className="mx-auto mt-14 max-w-2xl rounded-2xl bg-subtle p-5 sm:p-6" aria-labelledby="conditions">
+      <section
+        className="mx-auto mt-14 max-w-2xl rounded-2xl bg-subtle p-5 sm:p-6"
+        aria-labelledby="conditions"
+      >
         <h2 id="conditions" className="font-semibold">
           Bon à savoir
         </h2>

@@ -291,3 +291,56 @@ Donner mon avis : ${d.reviewUrl}`;
     text,
   };
 }
+
+export type GiftCardEmailData = {
+  organizationName: string;
+  buyerFirstName: string;
+  recipientName: string;
+  amountLabel: string;
+  code: string;
+  expiresLabel: string;
+  cardUrl: string;
+  bookingUrl: string;
+  brandColor?: string | null;
+};
+
+/** Email à l'acheteur : la carte cadeau est payée, avec le lien pour l'imprimer ou la transférer. */
+export function giftCardEmail(d: GiftCardEmailData): RenderedEmail {
+  const color = d.brandColor ?? "#3563E9";
+  const org = escapeHtml(d.organizationName);
+  const title = "Votre carte cadeau est prête 🎁";
+  const intro = `Bonjour ${escapeHtml(d.buyerFirstName)}, merci pour votre achat ! Votre carte cadeau <strong>${escapeHtml(d.amountLabel)}</strong> chez <strong>${org}</strong> pour ${escapeHtml(d.recipientName)} est prête.`;
+  const how =
+    "Imprimez-la ou transférez le lien à la personne qui la reçoit. Elle présente le code au salon, et le montant est déduit de sa prestation.";
+  const body = [
+    h1(title),
+    p(intro),
+    `<p style="margin:18px 0;text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:26px;letter-spacing:3px;font-weight:700;">${escapeHtml(d.code)}</p>`,
+    p(escapeHtml(how)),
+    p(`Valable jusqu'au ${escapeHtml(d.expiresLabel)}.`),
+    `<p style="margin:18px 0 0;text-align:center;">${btn(d.cardUrl, "Voir et imprimer la carte", color)}</p>`,
+  ].join("");
+  const text = `${title}
+
+${intro.replace(/<[^>]+>/g, "")}
+
+Code : ${d.code}
+Valable jusqu'au ${d.expiresLabel}.
+
+${how}
+
+Voir et imprimer la carte : ${d.cardUrl}
+Réserver chez ${d.organizationName} : ${d.bookingUrl}`;
+  return {
+    template: "gift_card",
+    subject: `Votre carte cadeau ${d.organizationName}`,
+    html: shell(
+      title,
+      `Carte cadeau ${d.amountLabel} — code ${d.code}`,
+      body,
+      color,
+      "Email envoyé via BookSync pour le compte de l'établissement indiqué ci-dessus. Le paiement a été encaissé directement par l'établissement.",
+    ),
+    text,
+  };
+}

@@ -31,7 +31,10 @@ async function pastBooking(opts: { plan?: "free" | "starter" | "pro"; hoursAgo?:
     priceCents: 2000,
     staffIds: [ctx.staffId!],
   });
-  const [org] = await db.select().from(organization).where(eq(organization.id, ctx.organization.id));
+  const [org] = await db
+    .select()
+    .from(organization)
+    .where(eq(organization.id, ctx.organization.id));
   const email = `${uid()}@example.com`;
   const appt = await createAppointment({
     org,
@@ -43,7 +46,13 @@ async function pastBooking(opts: { plan?: "free" | "starter" | "pro"; hoursAgo?:
     actor: { kind: "staff", email: ctx.user.email },
     enforceSchedule: false,
   });
-  return { ctx: { ...ctx, organization: org }, org, appt, email, token: createReviewToken(appt.id) };
+  return {
+    ctx: { ...ctx, organization: org },
+    org,
+    appt,
+    email,
+    token: createReviewToken(appt.id),
+  };
 }
 
 async function loadDispatcher() {

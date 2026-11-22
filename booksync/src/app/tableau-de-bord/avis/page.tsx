@@ -70,8 +70,7 @@ async function Content() {
                   {r.firstName} {r.lastName}
                 </Link>
                 <span className="text-muted-foreground">
-                  · {r.serviceName} du{" "}
-                  {formatInTz(r.appointmentStartsAt, tz, "d MMM")} · avis du{" "}
+                  · {r.serviceName} du {formatInTz(r.appointmentStartsAt, tz, "d MMM")} · avis du{" "}
                   {capitalize(formatInTz(r.createdAt, tz, "d MMM yyyy"))}
                 </span>
                 {r.status === "hidden" ? (

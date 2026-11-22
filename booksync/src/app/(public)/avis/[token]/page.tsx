@@ -50,8 +50,8 @@ async function Content({
             Comment s&apos;est passé votre rendez-vous ?
           </h1>
           <p className="mt-2 text-[15px] text-muted-foreground">
-            Bonjour {view.customerFirstName}, votre avis aide {view.organizationName} et les
-            autres clients.
+            Bonjour {view.customerFirstName}, votre avis aide {view.organizationName} et les autres
+            clients.
           </p>
         </div>
         <div className="rounded-2xl border bg-card shadow-sm">
@@ -81,10 +81,7 @@ async function Content({
           {message}
         </h1>
         {done && view.rating ? <Stars value={view.rating} className="text-2xl" /> : null}
-        <Link
-          href={`/${view.slug}`}
-          className="text-sm font-semibold text-primary hover:underline"
-        >
+        <Link href={`/${view.slug}`} className="text-sm font-semibold text-primary hover:underline">
           Voir la page de {view.organizationName} →
         </Link>
       </div>

@@ -87,7 +87,9 @@ export function DepositForm({
       }}
     >
       <fieldset className="grid gap-2 sm:grid-cols-3">
-        <legend className="mb-2 text-sm font-medium">Acompte demandé à la réservation en ligne</legend>
+        <legend className="mb-2 text-sm font-medium">
+          Acompte demandé à la réservation en ligne
+        </legend>
         {MODES.map((m) => (
           <label
             key={m.value}
@@ -138,7 +140,9 @@ export function DepositForm({
           <p>
             Exemple pour une prestation à 30 € :{" "}
             <strong className="text-foreground">
-              {example ? `${formatCents(example)} payés en ligne` : "pas d'acompte (montant trop faible)"}
+              {example
+                ? `${formatCents(example)} payés en ligne`
+                : "pas d'acompte (montant trop faible)"}
             </strong>
             {example ? `, ${formatCents(3000 - example)} sur place.` : "."}
           </p>

@@ -12,7 +12,7 @@ function secret() {
   return s;
 }
 
-function sign(id: string, purpose: "rdv" | "attente" | "avis" = "rdv") {
+function sign(id: string, purpose: "rdv" | "attente" | "avis" | "cadeau" = "rdv") {
   return createHmac("sha256", secret())
     .update(`booksync:${purpose}:${id}`)
     .digest("base64url")
@@ -57,4 +57,19 @@ export function verifyReviewToken(token: string): string | null {
 
 export function reviewUrl(baseUrl: string, appointmentId: string) {
   return `${baseUrl}/avis/${createReviewToken(appointmentId)}`;
+}
+
+/** Lien d'une carte cadeau (consultation, impression) : clé de signature distincte. */
+export function createGiftCardToken(giftCardId: string) {
+  return `${giftCardId}.${sign(giftCardId, "cadeau")}`;
+}
+
+export function verifyGiftCardToken(token: string): string | null {
+  const m = /^([0-9a-f-]{36})\.([A-Za-z0-9_-]{32})$/.exec(token);
+  if (!m) return null;
+  return safeEqual(m[2], sign(m[1], "cadeau")) ? m[1] : null;
+}
+
+export function giftCardUrl(baseUrl: string, giftCardId: string) {
+  return `${baseUrl}/carte-cadeau/${createGiftCardToken(giftCardId)}`;
 }

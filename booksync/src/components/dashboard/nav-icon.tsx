@@ -3,6 +3,7 @@ import {
   Bell,
   CalendarDays,
   CreditCard,
+  Gift,
   Hourglass,
   LayoutDashboard,
   MessageSquareText,
@@ -33,6 +34,7 @@ const ICONS = {
   insights: Lightbulb,
   assistant: MessageSquareText,
   reviews: Star,
+  gift: Gift,
 } as const;
 
 export function NavIcon({ name, className }: { name: NavItem["icon"]; className?: string }) {

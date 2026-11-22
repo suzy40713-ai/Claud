@@ -44,9 +44,9 @@ async function Content({
         ) : !o.stripeAccountId ? (
           <div className="grid gap-4">
             <p className="text-sm">
-              Connectez votre compte Stripe pour demander un acompte à la réservation. L&apos;inscription
-              (identité, IBAN) se fait sur le site sécurisé de Stripe et prend environ 5 minutes. Si
-              vous avez déjà un compte Stripe, vous pourrez l&apos;utiliser.
+              Connectez votre compte Stripe pour demander un acompte à la réservation.
+              L&apos;inscription (identité, IBAN) se fait sur le site sécurisé de Stripe et prend
+              environ 5 minutes. Si vous avez déjà un compte Stripe, vous pourrez l&apos;utiliser.
             </p>
             <div>
               <ConnectButton label="Connecter mon compte Stripe" />

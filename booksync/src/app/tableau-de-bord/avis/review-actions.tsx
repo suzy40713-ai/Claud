@@ -51,12 +51,7 @@ export function ReplyButton({ id, reply }: { id: string; reply: string | null })
           />
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             {reply ? (
-              <Button
-                type="button"
-                variant="ghost"
-                disabled={pending}
-                onClick={() => setText("")}
-              >
+              <Button type="button" variant="ghost" disabled={pending} onClick={() => setText("")}>
                 Effacer
               </Button>
             ) : null}

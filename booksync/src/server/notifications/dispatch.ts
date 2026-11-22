@@ -180,8 +180,8 @@ async function processOne(n: Row): Promise<"sent" | "failed" | "skipped"> {
     n.type === "review_request"
       ? reviewRequestEmail({ ...data, reviewUrl: reviewUrl(env.NEXT_PUBLIC_APP_URL, appt.id) })
       : n.audience === "customer"
-      ? customerEmail(n.type as Parameters<typeof customerEmail>[0], data)
-      : staffEmail(n.type as Parameters<typeof staffEmail>[0], data);
+        ? customerEmail(n.type as Parameters<typeof customerEmail>[0], data)
+        : staffEmail(n.type as Parameters<typeof staffEmail>[0], data);
   const result = await sendEmail(n.recipient, email);
 
   if (result.status === "failed") {

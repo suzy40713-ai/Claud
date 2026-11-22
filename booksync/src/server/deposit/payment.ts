@@ -149,7 +149,10 @@ export async function confirmDepositPayment(
         { payment_intent: paymentIntent, reason: "requested_by_customer" },
         { stripeAccount, idempotencyKey: `deposit-late-refund-${paymentIntent}` },
       );
-      console.warn("[acompte] paiement reçu après libération du créneau : remboursé", appointmentId);
+      console.warn(
+        "[acompte] paiement reçu après libération du créneau : remboursé",
+        appointmentId,
+      );
       return "refunded";
     }
     return "ignored";
@@ -196,7 +199,11 @@ export async function syncDepositReturn(stripe: Stripe | null, appointmentId: st
     !row.org.stripeAccountId
   )
     return;
-  const session = await stripe.checkout.sessions.retrieve(row.appt.stripeCheckoutSessionId, {}, { stripeAccount: row.org.stripeAccountId });
+  const session = await stripe.checkout.sessions.retrieve(
+    row.appt.stripeCheckoutSessionId,
+    {},
+    { stripeAccount: row.org.stripeAccountId },
+  );
   await confirmDepositPayment(stripe, session, row.org.stripeAccountId);
 }
 
@@ -212,7 +219,11 @@ export async function resumeDepositCheckout(stripe: Stripe | null, appointmentId
     throw new UserError("Ce rendez-vous n'attend plus de paiement.");
   if (!stripe || !row.org.stripeAccountId) throw new UserError("Paiement en ligne indisponible.");
   if (row.appt.stripeCheckoutSessionId) {
-    const s = await stripe.checkout.sessions.retrieve(row.appt.stripeCheckoutSessionId, {}, { stripeAccount: row.org.stripeAccountId });
+    const s = await stripe.checkout.sessions.retrieve(
+      row.appt.stripeCheckoutSessionId,
+      {},
+      { stripeAccount: row.org.stripeAccountId },
+    );
     if (s.status === "open" && s.url) return s.url;
     if (s.status === "complete") {
       await confirmDepositPayment(stripe, s, row.org.stripeAccountId);
@@ -231,7 +242,11 @@ export async function abandonDeposit(stripe: Stripe | null, appointmentId: strin
     .where(eq(appointment.id, appointmentId));
   if (!row || row.appt.status !== "pending_payment") return false;
   if (stripe && row.org.stripeAccountId && row.appt.stripeCheckoutSessionId) {
-    const s = await stripe.checkout.sessions.retrieve(row.appt.stripeCheckoutSessionId, {}, { stripeAccount: row.org.stripeAccountId });
+    const s = await stripe.checkout.sessions.retrieve(
+      row.appt.stripeCheckoutSessionId,
+      {},
+      { stripeAccount: row.org.stripeAccountId },
+    );
     if (s.status === "complete") {
       await confirmDepositPayment(stripe, s, row.org.stripeAccountId);
       return false;
@@ -257,7 +272,11 @@ export async function releaseExpiredDeposits(stripe: Stripe | null, now = new Da
   for (const { appt, org } of due) {
     try {
       if (stripe && org.stripeAccountId && appt.stripeCheckoutSessionId) {
-        const s = await stripe.checkout.sessions.retrieve(appt.stripeCheckoutSessionId, {}, { stripeAccount: org.stripeAccountId });
+        const s = await stripe.checkout.sessions.retrieve(
+          appt.stripeCheckoutSessionId,
+          {},
+          { stripeAccount: org.stripeAccountId },
+        );
         if (s.status === "complete" && s.payment_status === "paid") {
           if ((await confirmDepositPayment(stripe, s, org.stripeAccountId)) === "confirmed")
             stats.confirmed++;
@@ -287,17 +306,28 @@ export async function handleDepositEvent(event: Stripe.Event, stripe: Stripe) {
       const s = event.data.object;
       if (s.metadata?.kind === "booksync_deposit")
         await confirmDepositPayment(stripe, s, event.account);
+      if (s.metadata?.kind === "booksync_gift_card") {
+        const { confirmGiftCardPayment } = await import("@/server/gift-cards");
+        await confirmGiftCardPayment(s, event.account);
+      }
       break;
     }
     case "checkout.session.expired": {
       const s = event.data.object;
+      if (s.metadata?.kind === "booksync_gift_card" && s.metadata.giftCardId) {
+        const { discardUnpaidGiftCard } = await import("@/server/gift-cards");
+        await discardUnpaidGiftCard(s.metadata.giftCardId, event.account);
+        break;
+      }
       const id = s.metadata?.appointmentId;
       if (s.metadata?.kind === "booksync_deposit" && id) {
         const [appt] = await db
           .select({ id: appointment.id })
           .from(appointment)
           .innerJoin(organization, eq(organization.id, appointment.organizationId))
-          .where(and(eq(appointment.id, id), eq(organization.stripeAccountId, event.account ?? "")));
+          .where(
+            and(eq(appointment.id, id), eq(organization.stripeAccountId, event.account ?? "")),
+          );
         if (appt) await releaseHold(id);
       }
       break;
