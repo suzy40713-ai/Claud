@@ -54,7 +54,10 @@ function detailsTable(d: BookingEmailData) {
     ["Avec", d.staffName],
   ];
   if (d.priceLabel)
-    rows.push(["Prix", `${d.priceLabel} — ${d.depositLabel ?? "à régler sur place"}`]);
+    rows.push([
+      "Prix",
+      `${d.priceLabel} — ${d.depositLabel ?? (d.meetingUrl ? "à régler directement" : "à régler sur place")}`,
+    ]);
   if (d.meetingUrl) rows.push(["Visio", d.meetingUrl]);
   else if (d.organizationAddress) rows.push(["Adresse", d.organizationAddress]);
   if (d.organizationPhone) rows.push(["Téléphone", d.organizationPhone]);
@@ -76,7 +79,9 @@ function textDetails(d: BookingEmailData) {
     `Date : ${d.dateLabel}`,
     `Heure : ${d.timeLabel} (${d.durationLabel})`,
     `Avec : ${d.staffName}`,
-    d.priceLabel ? `Prix : ${d.priceLabel} — ${d.depositLabel ?? "à régler sur place"}` : null,
+    d.priceLabel
+      ? `Prix : ${d.priceLabel} — ${d.depositLabel ?? (d.meetingUrl ? "à régler directement" : "à régler sur place")}`
+      : null,
     d.meetingUrl
       ? `Visio : ${d.meetingUrl}`
       : d.organizationAddress

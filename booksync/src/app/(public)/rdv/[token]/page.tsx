@@ -22,18 +22,21 @@ import { ManageActions } from "./manage-actions";
 
 type Data = NonNullable<Awaited<ReturnType<typeof getAppointmentByToken>>>;
 
-function priceLine(appt: Data["appt"]) {
+function priceLine(appt: Data["appt"], online = false) {
   const price = formatCents(appt.priceCents);
   const dep = formatCents(appt.depositCents);
+  const rest = online ? "à régler directement" : "à régler sur place";
   switch (appt.depositStatus) {
     case "paid":
-      return `${price} — acompte de ${dep} payé en ligne, reste ${formatCents(appt.priceCents - appt.depositCents)} à régler sur place`;
+      return appt.depositCents >= appt.priceCents
+        ? `${price} — payé en ligne`
+        : `${price} — acompte de ${dep} payé en ligne, reste ${formatCents(appt.priceCents - appt.depositCents)} ${rest}`;
     case "refunded":
       return `${price} — acompte de ${dep} remboursé`;
     case "refund_failed":
       return `${price} — remboursement de l'acompte de ${dep} en cours de traitement par l'établissement`;
     default:
-      return `${price} — à régler sur place`;
+      return `${price} — ${rest}`;
   }
 }
 
@@ -190,7 +193,7 @@ async function Content({
               `${formatTime(appt.startsAt, tz)} · ${formatDuration(Math.round((appt.endsAt.getTime() - appt.startsAt.getTime()) / 60000))}`,
             ],
             ["Avec", data.staffName],
-            ...(appt.priceCents ? [["Prix", priceLine(appt)]] : []),
+            ...(appt.priceCents ? [["Prix", priceLine(appt, Boolean(meetingUrl))]] : []),
             ...(org.phone ? [["Téléphone", org.phone]] : []),
           ].map(([k, v]) => (
             <div key={k} className="grid grid-cols-[100px_1fr] gap-3">

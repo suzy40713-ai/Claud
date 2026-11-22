@@ -108,7 +108,9 @@ async function buildData(n: Row) {
     priceLabel: appt.priceCents ? formatCents(appt.priceCents) : null,
     depositLabel:
       appt.depositStatus === "paid"
-        ? `acompte de ${formatCents(appt.depositCents)} payé en ligne, reste ${formatCents(appt.priceCents - appt.depositCents)} à régler sur place`
+        ? appt.depositCents >= appt.priceCents
+          ? "payé en ligne"
+          : `acompte de ${formatCents(appt.depositCents)} payé en ligne, reste ${formatCents(appt.priceCents - appt.depositCents)} à régler sur place`
         : appt.depositStatus === "refunded"
           ? `acompte de ${formatCents(appt.depositCents)} remboursé (5 à 10 jours selon votre banque)`
           : appt.depositStatus === "refund_failed"
