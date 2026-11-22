@@ -12,6 +12,9 @@ import { site } from "@/lib/site";
 const SCHEMA_TYPE: Record<string, string> = {
   coiffure: "HairSalon",
   barbier: "HairSalon",
+  tresses: "HairSalon",
+  cils: "BeautySalon",
+  maquillage: "BeautySalon",
   esthetique: "BeautySalon",
   onglerie: "NailSalon",
   massage: "HealthAndBeautyBusiness",

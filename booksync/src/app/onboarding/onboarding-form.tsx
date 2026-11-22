@@ -12,7 +12,14 @@ import { slugify } from "@/domain/organization/slug";
 import { PREFERRED_TIMEZONES } from "@/domain/organization/timezones";
 import { checkSlugAvailability, createOrganizationAction, type OnboardingState } from "./actions";
 
-export function OnboardingForm({ publicBaseUrl }: { publicBaseUrl: string }) {
+export function OnboardingForm({
+  publicBaseUrl,
+  initial,
+}: {
+  publicBaseUrl: string;
+  /** Pré-remplissage depuis « Lance ton activité » (nom et métier choisis). */
+  initial?: { name?: string; activity?: string };
+}) {
   const [state, formAction, pending] = useActionState<OnboardingState | null, FormData>(
     createOrganizationAction,
     null,
@@ -20,8 +27,10 @@ export function OnboardingForm({ publicBaseUrl }: { publicBaseUrl: string }) {
   const fieldErrors: Record<string, string> = state && !state.ok ? (state.fieldErrors ?? {}) : {};
   const formError =
     state && !state.ok && Object.keys(fieldErrors).length === 0 ? state.error : null;
-  const [name, setName] = useState(state?.values?.name ?? "");
-  const [slug, setSlug] = useState(state?.values?.slug ?? "");
+  const [name, setName] = useState(state?.values?.name ?? initial?.name ?? "");
+  const [slug, setSlug] = useState(
+    state?.values?.slug ?? (initial?.name ? slugify(initial.name) : ""),
+  );
   const [slugTouched, setSlugTouched] = useState(Boolean(state?.values?.slug));
   const [slugCheck, setSlugCheck] = useState<{ slug: string; error: string | null } | null>(null);
   const [timezone, setTimezone] = useState(state?.values?.timezone ?? "Europe/Paris");
@@ -72,7 +81,7 @@ export function OnboardingForm({ publicBaseUrl }: { publicBaseUrl: string }) {
         <NativeSelect
           id="activity"
           name="activity"
-          defaultValue={state?.values?.activity ?? ""}
+          defaultValue={state?.values?.activity ?? initial?.activity ?? ""}
           required
         >
           <option value="" disabled>

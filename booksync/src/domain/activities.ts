@@ -19,12 +19,38 @@ export const ACTIVITIES = [
     ],
   },
   {
+    value: "tresses",
+    label: "Tresses / coiffure afro",
+    examples: [
+      ["Tresses collées", 120, 6000],
+      ["Box braids", 240, 12000],
+      ["Nattes enfant", 60, 2500],
+    ],
+  },
+  {
     value: "esthetique",
     label: "Esthéticienne",
     examples: [
       ["Soin du visage", 60, 6000],
       ["Épilation jambes", 45, 3500],
       ["Manucure", 45, 3000],
+    ],
+  },
+  {
+    value: "cils",
+    label: "Extensions de cils",
+    examples: [
+      ["Pose cil à cil", 120, 6000],
+      ["Remplissage", 60, 3500],
+      ["Rehaussement de cils", 60, 4500],
+    ],
+  },
+  {
+    value: "maquillage",
+    label: "Maquilleuse",
+    examples: [
+      ["Maquillage soirée", 60, 4500],
+      ["Maquillage mariée (essai + jour J)", 120, 12000],
     ],
   },
   {

@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 const LINKS = [
   { href: "/", label: "Accueil" },
   { href: "/professionnels", label: "Trouver un professionnel" },
+  { href: "/lancer-mon-activite", label: "Lance ton activité" },
   { href: "/mon-espace", label: "Mes rendez-vous" },
   { href: "/tableau-de-bord", label: "Espace professionnel" },
 ];
