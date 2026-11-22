@@ -43,7 +43,7 @@ export type LaunchInput = {
 
 export const PLACE_LABELS: Record<LaunchPlace, string> = {
   "en-ligne": "En ligne, en visio",
-  domicile: "Je me déplace chez mes clientes",
+  domicile: "Je me déplace à domicile",
   "chez-moi": "Je reçois chez moi",
   salon: "Dans un salon ou un local",
 };

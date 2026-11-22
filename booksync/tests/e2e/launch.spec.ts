@@ -32,3 +32,25 @@ test("lance ton activité : plan personnalisé puis page pré-remplie à l'inscr
   await expect(page.getByLabel("Votre activité")).toHaveValue("tresses");
   await expect(page.getByLabel(/Adresse de votre page/)).toHaveValue("lille-braids");
 });
+
+test("lance ton activité : un débutant trouve une idée sans diplôme à partir de ce qu'il sait faire", async ({
+  page,
+}) => {
+  await page.goto("/lancer-mon-activite");
+  const finder = page.getByTestId("idea-finder");
+  await finder.getByRole("button", { name: /à l'aise avec le téléphone/ }).click();
+  const card = page.getByTestId("idea-card");
+  await expect(card).toContainText("Aide numérique pour les seniors");
+  await expect(card).toContainText("sans diplôme");
+  await card.getByRole("button", { name: "Je choisis cette idée" }).click();
+  await expect(page.getByLabel("Ton métier")).toHaveValue("cours");
+  await expect(page.getByLabel("Où tu travailles")).toHaveValue("domicile");
+  await expect(page.getByTestId("launch-services")).toContainText("Séance d'aide numérique 1 h");
+  await expect(page.getByTestId("launch-bio")).toContainText(
+    "📱 Aide numérique pour les seniors à domicile",
+  );
+  await expect(page.getByRole("link", { name: /Créer ma page gratuite/ })).toHaveAttribute(
+    "href",
+    /activite%3Dcours/,
+  );
+});
