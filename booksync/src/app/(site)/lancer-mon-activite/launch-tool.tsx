@@ -13,6 +13,7 @@ import { activityLabel } from "@/domain/activities";
 import {
   buildLaunchPlan,
   LAUNCH_ACTIVITIES,
+  ONLINE_ACTIVITIES,
   PLACE_LABELS,
   type LaunchActivity,
   type LaunchLevel,
@@ -52,7 +53,12 @@ export function LaunchTool() {
           <NativeSelect
             id="activity"
             value={activity}
-            onChange={(e) => setActivity(e.target.value as LaunchActivity)}
+            onChange={(e) => {
+              const next = e.target.value as LaunchActivity;
+              setActivity(next);
+              if (ONLINE_ACTIVITIES.has(next)) setPlace("en-ligne");
+              else if (place === "en-ligne") setPlace("domicile");
+            }}
           >
             {LAUNCH_ACTIVITIES.map((a) => (
               <option key={a} value={a}>
@@ -221,8 +227,9 @@ export function LaunchTool() {
             Crée ta page « {name} » maintenant
           </h2>
           <p className="mt-2 max-w-md text-white/60">
-            Gratuit, sans carte bancaire. Tes prestations sont déjà prêtes : tes clientes peuvent
-            réserver dès aujourd&apos;hui.
+            {place === "en-ligne"
+              ? "Gratuit pour commencer. Visio et paiement des séances à l'avance avec le forfait Starter : 1er mois offert."
+              : "Gratuit, sans carte bancaire. Tes prestations sont déjà prêtes : tes clientes peuvent réserver dès aujourd'hui."}
           </p>
           <Button
             asChild

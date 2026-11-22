@@ -143,6 +143,8 @@ export const organization = pgTable(
       .array()
       .notNull()
       .default(sql`'{3000,5000,10000}'::integer[]`),
+    /** Lien de visio (Google Meet, Zoom…) des rendez-vous en ligne (forfait Starter et plus). */
+    meetingUrl: text(),
     /** Personnalisation de la page de réservation (plan Pro) */
     brandColor: text(),
     coverFileId: uuid(),

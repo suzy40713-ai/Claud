@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { BellRing, CalendarX2, Clock, Gift, MapPin, Phone } from "lucide-react";
+import { BellRing, CalendarX2, Clock, Gift, MapPin, Phone, Video } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { JsonLd } from "@/components/seo/json-ld";
 import { isHealthActivity } from "@/domain/activities";
@@ -158,6 +158,12 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
             </p>
           ) : null}
           <ul className="mt-4 grid gap-2 text-sm">
+            {o.online ? (
+              <li className="flex gap-2 font-medium" data-testid="online-badge">
+                <Video className="mt-0.5 size-4 shrink-0 text-primary" />
+                Rendez-vous en visio : le lien vous est envoyé après la réservation
+              </li>
+            ) : null}
             {o.address ? (
               <li className="flex gap-2">
                 <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />

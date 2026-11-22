@@ -62,6 +62,31 @@ export const ACTIVITIES = [
     ],
   },
   {
+    value: "coach",
+    label: "Coach en ligne (business, bien-être…)",
+    examples: [
+      ["Appel découverte", 20, 0],
+      ["Séance de coaching en visio", 60, 6000],
+      ["Pack 4 séances", 60, 20000],
+    ],
+  },
+  {
+    value: "consultation",
+    label: "Consultante / conseil en ligne",
+    examples: [
+      ["Consultation en visio", 45, 4500],
+      ["Suivi mensuel", 60, 8000],
+    ],
+  },
+  {
+    value: "freelance",
+    label: "Freelance (graphisme, réseaux sociaux…)",
+    examples: [
+      ["Appel découverte", 20, 0],
+      ["Atelier de travail en visio", 60, 7000],
+    ],
+  },
+  {
     value: "photographie",
     label: "Photographe",
     examples: [

@@ -15,10 +15,22 @@ export const LAUNCH_ACTIVITIES = [
   "maquillage",
   "esthetique",
   "massage",
+  "coach",
+  "cours",
+  "consultation",
+  "freelance",
 ] as const satisfies ReadonlyArray<ActivityId>;
+
+/** Métiers qui se pratiquent surtout en ligne (visio). */
+export const ONLINE_ACTIVITIES: ReadonlySet<LaunchActivity> = new Set([
+  "coach",
+  "cours",
+  "consultation",
+  "freelance",
+]);
 export type LaunchActivity = (typeof LAUNCH_ACTIVITIES)[number];
 
-export type LaunchPlace = "domicile" | "chez-moi" | "salon";
+export type LaunchPlace = "en-ligne" | "domicile" | "chez-moi" | "salon";
 export type LaunchLevel = "debutant" | "confirme";
 
 export type LaunchInput = {
@@ -30,6 +42,7 @@ export type LaunchInput = {
 };
 
 export const PLACE_LABELS: Record<LaunchPlace, string> = {
+  "en-ligne": "En ligne, en visio",
   domicile: "Je me déplace chez mes clientes",
   "chez-moi": "Je reçois chez moi",
   salon: "Dans un salon ou un local",
@@ -78,6 +91,22 @@ const STYLE: Record<
     search: "massage",
     job: "Praticienne massage",
   },
+  coach: { word: "Coaching", short: "Coaching", emoji: "🚀", search: "coaching", job: "Coach" },
+  cours: {
+    word: "Academy",
+    short: "Cours",
+    emoji: "📚",
+    search: "cours en ligne",
+    job: "Professeur",
+  },
+  consultation: {
+    word: "Conseil",
+    short: "Conseil",
+    emoji: "💡",
+    search: "consultation",
+    job: "Consultante",
+  },
+  freelance: { word: "Studio", short: "Créa", emoji: "💻", search: "freelance", job: "Freelance" },
 };
 
 /** Remise appliquée aux prix d'exemple quand on débute (pour remplir l'agenda vite). */
@@ -103,7 +132,11 @@ export function nameIdeas(input: Pick<LaunchInput, "activity" | "firstName" | "c
     `${s.short} by ${name}`,
     `Studio ${name}`,
     city ? `${city} ${s.word}` : `${name} ${s.short}`,
-    input.place === "domicile" ? `${name} ${s.word} à domicile` : `Maison ${name}`,
+    input.place === "domicile"
+      ? `${name} ${s.word} à domicile`
+      : input.place === "en-ligne"
+        ? `${name} ${s.word} Online`
+        : `Maison ${name}`,
   ];
   return [...new Set(ideas)];
 }
@@ -121,11 +154,13 @@ export function instagramBio(input: LaunchInput) {
   const s = STYLE[input.activity];
   const city = capitalize(clean(input.city));
   const where =
-    input.place === "domicile"
-      ? `à domicile${city ? ` · ${city} et alentours` : ""}`
-      : city
-        ? `à ${city}`
-        : "";
+    input.place === "en-ligne"
+      ? "en visio · partout en France"
+      : input.place === "domicile"
+        ? `à domicile${city ? ` · ${city} et alentours` : ""}`
+        : city
+          ? `à ${city}`
+          : "";
   return [
     `${s.emoji} ${s.job} ${where}`.trim(),
     "📅 Réservation en ligne 24h/24",
@@ -139,7 +174,8 @@ export function launchChecklist(input: LaunchInput): LaunchStep[] {
   const s = STYLE[input.activity];
   const city = capitalize(clean(input.city));
   const regulated = ["coiffure", "esthetique", "tresses", "barbier"].includes(input.activity);
-  return [
+  const online = input.place === "en-ligne";
+  const steps: LaunchStep[] = [
     {
       day: "Jour 1",
       title: "Déclare ta micro-entreprise",
@@ -168,6 +204,16 @@ export function launchChecklist(input: LaunchInput): LaunchStep[] {
       detail:
         "Ton nom, tes prestations et tes prix : tes clientes réservent seules, même la nuit, sans t'appeler.",
     },
+    ...(online
+      ? [
+          {
+            day: "Jour 2",
+            title: "Active la visio et le paiement à l'avance",
+            detail:
+              "Colle ton lien Google Meet ou Zoom : il part tout seul dans chaque confirmation. Fais payer la séance à la réservation : plus de rendez-vous oubliés. Inclus dans le forfait Starter, 1er mois offert.",
+          },
+        ]
+      : []),
     {
       day: "Jour 3",
       title: "Prépare ton Instagram et ton TikTok",
@@ -177,19 +223,30 @@ export function launchChecklist(input: LaunchInput): LaunchStep[] {
     {
       day: "Jour 4",
       title: "Trouve tes 5 premières clientes",
-      detail: `Propose un prix de lancement à ton entourage en échange d'un avis et d'une photo.${city ? ` Poste dans les groupes Facebook de ${city}.` : ""}`,
+      detail: online
+        ? "Offre un appel découverte gratuit de 20 minutes à 10 personnes de ton réseau, puis demande-leur un avis."
+        : `Propose un prix de lancement à ton entourage en échange d'un avis et d'une photo.${city ? ` Poste dans les groupes Facebook de ${city}.` : ""}`,
     },
     {
       day: "Jours 5 à 7",
       title: "Publie une vidéo par jour",
-      detail: `Avant/après, ta journée, un conseil ${s.search} : montre ton travail, pas ton visage si tu préfères. Termine par « réserve via le lien en bio ».`,
+      detail: online
+        ? `Un conseil utile par vidéo, un résultat client, une question fréquente sur le ${s.search}. Termine par « réserve ton appel via le lien en bio ».`
+        : `Avant/après, ta journée, un conseil ${s.search} : montre ton travail, pas ton visage si tu préfères. Termine par « réserve via le lien en bio ».`,
     },
   ];
+  return steps;
 }
 
 export function firstVideoIdeas(input: LaunchInput) {
   const s = STYLE[input.activity];
   const city = capitalize(clean(input.city));
+  if (input.place === "en-ligne")
+    return [
+      `« 3 erreurs que je vois chez tous ceux qui commencent en ${s.search} »`,
+      `« Ce que je fais pendant un appel découverte de 20 minutes »`,
+      `« Tu peux réserver ta séance à 23 h, même un dimanche »`,
+    ];
   return [
     `Avant / après : ${s.search} en accéléré`,
     `« Ce que personne ne te dit avant de te lancer en ${s.search} »`,

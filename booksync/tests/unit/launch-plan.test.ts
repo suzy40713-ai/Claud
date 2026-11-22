@@ -68,3 +68,33 @@ describe("lance ton activité", () => {
     expect(coiffure.checklist[1].title).toMatch(/diplôme/);
   });
 });
+
+describe("lance ton activité — business en ligne", () => {
+  const online = {
+    activity: "coach" as const,
+    firstName: "Sarah",
+    city: "",
+    place: "en-ligne" as const,
+    level: "debutant" as const,
+  };
+
+  it("bio en visio et nom « Online »", () => {
+    const plan = buildLaunchPlan(online);
+    expect(plan.bio.split("\n")[0]).toBe("🚀 Coach en visio · partout en France");
+    expect(plan.names).toContain("Sarah Coaching Online");
+  });
+
+  it("le plan met en avant la visio et le paiement à l'avance (forfait Starter)", () => {
+    const steps = buildLaunchPlan(online).checklist;
+    const visio = steps.find((s) => s.title.includes("visio"));
+    expect(visio?.detail).toMatch(/Starter/);
+    expect(steps.find((s) => s.title.includes("5 premières"))?.detail).toMatch(/appel découverte/);
+  });
+
+  it("garde l'appel découverte gratuit", () => {
+    expect(buildLaunchPlan(online).services[0]).toMatchObject({
+      name: "Appel découverte",
+      priceCents: 0,
+    });
+  });
+});

@@ -17,6 +17,7 @@ import {
 import { sendEmail } from "@/server/email/send";
 import { loadActiveChecker } from "@/server/autopilot/rules";
 import { REVIEW_DELAY_MS } from "./queue";
+import { meetingLinkFor } from "@/domain/organization/meeting";
 
 const MAX_ATTEMPTS = 5;
 
@@ -94,6 +95,7 @@ async function buildData(n: Row) {
         .filter(Boolean)
         .join(", ") || null,
     organizationPhone: org.phone,
+    meetingUrl: meetingLinkFor(org, plan.features),
     customerFirstName: cust.firstName,
     customerName: `${cust.firstName} ${cust.lastName}`,
     serviceName: appt.serviceName,

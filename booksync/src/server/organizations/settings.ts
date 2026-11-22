@@ -18,6 +18,7 @@ import type { OrgContext } from "@/server/auth/session";
 import { pgErrorCode, UserError } from "@/server/errors";
 import { deleteFile, storeImage, type FileKind } from "@/server/files";
 import { isSlugTaken } from "./service";
+import { normalizeMeetingUrl } from "@/domain/organization/meeting";
 
 export const organizationInfoSchema = z.object({
   name: z
@@ -117,6 +118,20 @@ export async function updateBranding(ctx: OrgContext, input: z.input<typeof bran
   }
   const data = brandingSchema.parse(input);
   await db.update(organization).set(data).where(eq(organization.id, ctx.organization.id));
+}
+
+/** Lien de visio des rendez-vous en ligne : forfait Starter et plus. Vide = pas de visio. */
+export async function updateMeetingUrl(ctx: OrgContext, input: string) {
+  assertCan(ctx.role, "organization.update");
+  if (!ctx.plan.features.onlineMeetings) {
+    throw new ForbiddenError("Les rendez-vous en visio sont inclus à partir du forfait Starter.");
+  }
+  const res = normalizeMeetingUrl(input);
+  if (!res.ok) throw new UserError(res.error, { meetingUrl: res.error });
+  await db
+    .update(organization)
+    .set({ meetingUrl: res.url })
+    .where(eq(organization.id, ctx.organization.id));
 }
 
 const IMAGE_COLUMNS = { logo: "logoFileId", cover: "coverFileId" } as const;

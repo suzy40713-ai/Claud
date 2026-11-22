@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { CalendarCheck2, CalendarX2, Clock3, CreditCard } from "lucide-react";
+import { CalendarCheck2, CalendarX2, Clock3, CreditCard, Video } from "lucide-react";
+import { effectivePlan } from "@/domain/billing/plans";
+import { meetingLinkFor } from "@/domain/organization/meeting";
 import { Logo } from "@/components/brand/logo";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -118,9 +120,12 @@ async function Content({
   const tz = org.timezone;
   const cancelled = appt.status === "cancelled";
   const past = appt.startsAt < new Date();
-  const address = [org.addressLine1, [org.postalCode, org.city].filter(Boolean).join(" ")]
-    .filter(Boolean)
-    .join(", ");
+  const meetingUrl = meetingLinkFor(org, effectivePlan(org.plan, org.subscriptionStatus).features);
+  const address = meetingUrl
+    ? "Rendez-vous en visio"
+    : [org.addressLine1, [org.postalCode, org.city].filter(Boolean).join(" ")]
+        .filter(Boolean)
+        .join(", ");
 
   return (
     <>
@@ -198,6 +203,22 @@ async function Content({
             </div>
           ))}
         </dl>
+        {meetingUrl && !cancelled && !past ? (
+          <div className="border-t p-4 sm:p-5" data-testid="meeting-link">
+            <a
+              href={meetingUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
+            >
+              <Video className="size-4" /> Rejoindre la visio
+            </a>
+            <p className="mt-2 text-center text-xs text-muted-foreground">
+              Le lien s&apos;ouvre à l&apos;heure du rendez-vous. Gardez cette page ou l&apos;email
+              de confirmation.
+            </p>
+          </div>
+        ) : null}
         <div className="border-t p-4 sm:p-5">
           <ManageActions
             token={token}

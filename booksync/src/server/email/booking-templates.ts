@@ -16,6 +16,8 @@ export type BookingEmailData = {
   timeLabel: string;
   durationLabel: string;
   priceLabel: string | null;
+  /** Lien de visio (rendez-vous en ligne), si l'établissement en a un. */
+  meetingUrl?: string | null;
   /** Ex. « acompte de 5,00 € payé en ligne, reste 20,00 € à régler sur place » */
   depositLabel?: string | null;
   manageUrl: string;
@@ -53,7 +55,8 @@ function detailsTable(d: BookingEmailData) {
   ];
   if (d.priceLabel)
     rows.push(["Prix", `${d.priceLabel} — ${d.depositLabel ?? "à régler sur place"}`]);
-  if (d.organizationAddress) rows.push(["Adresse", d.organizationAddress]);
+  if (d.meetingUrl) rows.push(["Visio", d.meetingUrl]);
+  else if (d.organizationAddress) rows.push(["Adresse", d.organizationAddress]);
   if (d.organizationPhone) rows.push(["Téléphone", d.organizationPhone]);
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border:1px solid #e4e7ec;border-radius:10px;">${rows
     .map(
@@ -74,7 +77,11 @@ function textDetails(d: BookingEmailData) {
     `Heure : ${d.timeLabel} (${d.durationLabel})`,
     `Avec : ${d.staffName}`,
     d.priceLabel ? `Prix : ${d.priceLabel} — ${d.depositLabel ?? "à régler sur place"}` : null,
-    d.organizationAddress ? `Adresse : ${d.organizationAddress}` : null,
+    d.meetingUrl
+      ? `Visio : ${d.meetingUrl}`
+      : d.organizationAddress
+        ? `Adresse : ${d.organizationAddress}`
+        : null,
     d.organizationPhone ? `Téléphone : ${d.organizationPhone}` : null,
   ]
     .filter(Boolean)

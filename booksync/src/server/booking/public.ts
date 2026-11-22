@@ -11,6 +11,7 @@ import { RESERVED_SLUGS } from "@/domain/organization/slug";
 import { fileUrl } from "@/lib/files";
 import { getOrganizationHours } from "@/server/catalog/staff";
 import { giftCardsOffered } from "@/server/gift-cards";
+import { meetingLinkFor } from "@/domain/organization/meeting";
 
 export async function getOrgBySlug(slug: string) {
   if (!slug || RESERVED_SLUGS.has(slug) || !/^[a-z0-9-]{3,48}$/.test(slug)) return null;
@@ -108,6 +109,8 @@ export async function getPublicBookingPage(slug: string) {
         .filter(Boolean)
         .join(", "),
       timezone: org.timezone,
+      /** Rendez-vous en visio (lien transmis après la réservation, jamais affiché ici). */
+      online: Boolean(meetingLinkFor(org, plan.features)),
       logoUrl: fileUrl(org.logoFileId),
       bookingEnabled: org.bookingEnabled,
       maxAdvanceDays: org.maxAdvanceDays,

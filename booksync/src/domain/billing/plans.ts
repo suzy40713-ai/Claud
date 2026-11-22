@@ -11,6 +11,8 @@ export type PlanFeatures = {
   automaticReminders: boolean;
   advancedStats: boolean;
   bookingPageCustomization: boolean;
+  /** Lien de visio (Meet, Zoom…) transmis aux clients pour les rendez-vous en ligne. */
+  onlineMeetings: boolean;
 };
 
 export type Plan = {
@@ -36,6 +38,7 @@ export const PLANS: Record<PlanId, Plan> = {
       automaticReminders: false,
       advancedStats: false,
       bookingPageCustomization: false,
+      onlineMeetings: false,
     },
     highlights: [
       "5 réservations par mois",
@@ -56,12 +59,14 @@ export const PLANS: Record<PlanId, Plan> = {
       automaticReminders: true,
       advancedStats: false,
       bookingPageCustomization: false,
+      onlineMeetings: true,
     },
     highlights: [
       "Gestion des rendez-vous et agenda professionnel",
       "Réservations en ligne illimitées",
       "Visibilité dans l'annuaire BookSync",
       "Confirmations et rappels automatiques",
+      "Rendez-vous en visio (lien Meet ou Zoom envoyé au client)",
       "Gestion des clients illimitée",
       "2 employés",
     ],
@@ -77,6 +82,7 @@ export const PLANS: Record<PlanId, Plan> = {
       automaticReminders: true,
       advancedStats: true,
       bookingPageCustomization: true,
+      onlineMeetings: true,
     },
     highlights: [
       "Réservations illimitées",

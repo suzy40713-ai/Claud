@@ -7,6 +7,7 @@ import {
   replaceOrganizationImage,
   updateBookingSettings,
   updateBranding,
+  updateMeetingUrl,
   updateOrganizationInfo,
 } from "@/server/organizations/settings";
 
@@ -49,6 +50,16 @@ export async function uploadOrganizationImageAction(formData: FormData) {
     await runAction(
       () => replaceOrganizationImage(ctx, kind, upload instanceof File ? upload : null),
       upload instanceof File ? "Image enregistrée." : "Image supprimée.",
+    ),
+  );
+}
+
+export async function updateMeetingUrlAction(url: string) {
+  const ctx = await requireOrg();
+  return done(
+    await runAction(
+      () => updateMeetingUrl(ctx, url),
+      url.trim() ? "Lien de visio enregistré." : "Lien de visio retiré.",
     ),
   );
 }
