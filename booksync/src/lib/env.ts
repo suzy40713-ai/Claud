@@ -22,6 +22,14 @@ export const env = createEnv({
       .enum(["on", "off"])
       .default("on")
       .transform((v) => v === "on"),
+    /**
+     * Confirmation de l'email obligatoire avant d'utiliser le compte. À n'éteindre que
+     * tant que l'envoi d'emails n'est pas opérationnel (domaine non vérifié chez Resend).
+     */
+    EMAIL_VERIFICATION: z
+      .enum(["on", "off"])
+      .default("on")
+      .transform((v) => v === "on"),
     /** Clé Resend. Absente : les emails sont journalisés en base sans être envoyés (développement). */
     RESEND_API_KEY: z.string().startsWith("re_").optional(),
     EMAIL_FROM: z.string().min(3).default("BookSync <onboarding@resend.dev>"),
@@ -53,6 +61,7 @@ export const env = createEnv({
     DATABASE_POOL_MAX: process.env.DATABASE_POOL_MAX,
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     AUTH_RATE_LIMIT: process.env.AUTH_RATE_LIMIT,
+    EMAIL_VERIFICATION: process.env.EMAIL_VERIFICATION,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     EMAIL_FROM: process.env.EMAIL_FROM,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,

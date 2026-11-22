@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import type { Route } from "next";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -43,7 +44,7 @@ export function SignUpForm() {
     if (!result.ok || !terms) return;
 
     startTransition(async () => {
-      const { error } = await authClient.signUp.email({
+      const { data, error } = await authClient.signUp.email({
         name: result.data.name,
         email: result.data.email,
         password: result.data.password,
@@ -52,6 +53,13 @@ export function SignUpForm() {
       } as Parameters<typeof authClient.signUp.email>[0]);
       if (error) {
         setFormError(authErrorMessage(error));
+        return;
+      }
+      // Confirmation d'email désactivée côté serveur : le compte est déjà connecté.
+      if (data?.token) {
+        const next = params.get("redirection") ? redirection : pro ? "/onboarding" : "/mon-espace";
+        router.push(next as Route);
+        router.refresh();
         return;
       }
       router.push(`/verifier-email?email=${encodeURIComponent(result.data.email)}`);
