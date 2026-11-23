@@ -283,7 +283,7 @@ test.describe("parcours métier", () => {
     await expect(tabs.getByRole("link", { name: "Calendrier" })).toBeVisible();
     await tabs.getByRole("link", { name: "Plus" }).click();
     await expect(page).toHaveURL(/\/tableau-de-bord\/menu$/);
-    await page.getByRole("link", { name: "Statistiques" }).click();
+    await page.getByRole("link", { name: /^Statistiques(?! marketing)/ }).click();
     await expect(page).toHaveURL(/statistiques/);
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
