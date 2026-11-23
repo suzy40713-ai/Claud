@@ -21,7 +21,11 @@ export type NavItem = {
     | "reviews"
     | "gift"
     | "package"
-    | "analysis";
+    | "analysis"
+    | "strategy"
+    | "megaphone"
+    | "content"
+    | "booster";
   /** Une phrase qui explique à quoi sert la page (menu mobile). */
   hint: string;
   group: NavGroup;
@@ -69,6 +73,38 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Analyse IA",
     hint: "Forces, cibles et angles de vente de vos produits",
     icon: "analysis",
+    group: "marketing",
+    permission: "marketing.manage",
+  },
+  {
+    href: "/tableau-de-bord/strategies",
+    label: "Stratégies",
+    hint: "Votre plan marketing sur 30 jours",
+    icon: "strategy",
+    group: "marketing",
+    permission: "marketing.manage",
+  },
+  {
+    href: "/tableau-de-bord/publicites",
+    label: "Publicités",
+    hint: "Publicités TikTok, Instagram, Facebook, Google",
+    icon: "megaphone",
+    group: "marketing",
+    permission: "marketing.manage",
+  },
+  {
+    href: "/tableau-de-bord/contenus",
+    label: "Contenus",
+    hint: "Scripts vidéo, carrousels et posts",
+    icon: "content",
+    group: "marketing",
+    permission: "marketing.manage",
+  },
+  {
+    href: "/tableau-de-bord/sales-booster",
+    label: "Sales Booster",
+    hint: "Plus d'acheteurs parmi vos visiteurs",
+    icon: "booster",
     group: "marketing",
     permission: "marketing.manage",
   },

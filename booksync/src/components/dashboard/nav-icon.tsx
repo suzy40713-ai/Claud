@@ -9,6 +9,10 @@ import {
   MessageSquareText,
   Package,
   ScanSearch,
+  Map as MapIcon,
+  Megaphone,
+  Clapperboard,
+  Rocket,
   Lightbulb,
   ListChecks,
   Scissors,
@@ -39,6 +43,10 @@ const ICONS = {
   gift: Gift,
   package: Package,
   analysis: ScanSearch,
+  strategy: MapIcon,
+  megaphone: Megaphone,
+  content: Clapperboard,
+  booster: Rocket,
 } as const;
 
 export function NavIcon({ name, className }: { name: NavItem["icon"]; className?: string }) {

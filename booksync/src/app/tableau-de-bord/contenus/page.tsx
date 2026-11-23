@@ -1,0 +1,35 @@
+import type { Metadata } from "next";
+import { Suspense } from "react";
+import { PageHeader } from "@/components/ui/page-header";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ToolLanding } from "@/components/marketing/tool-landing";
+import { requirePermission } from "@/server/auth/session";
+
+export const metadata: Metadata = { title: "Contenus" };
+
+async function Content({ searchParams }: { searchParams: Promise<{ produit?: string }> }) {
+  const ctx = await requirePermission("marketing.manage");
+  const { produit } = await searchParams;
+  return (
+    <ToolLanding
+      ctx={ctx}
+      kind="content"
+      submitLabel="Créer mes contenus"
+      productId={typeof produit === "string" ? produit : undefined}
+    />
+  );
+}
+
+export default function Page(props: PageProps<"/tableau-de-bord/contenus">) {
+  return (
+    <>
+      <PageHeader
+        title="Contenus"
+        description="Des scripts vidéo, carrousels et posts prêts à publier, avec légendes et hashtags."
+      />
+      <Suspense fallback={<Skeleton className="h-96" />}>
+        <Content searchParams={props.searchParams as Promise<{ produit?: string }>} />
+      </Suspense>
+    </>
+  );
+}

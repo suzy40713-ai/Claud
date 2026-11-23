@@ -73,6 +73,20 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
           </div>
         ))}
       </dl>
+      <nav aria-label="Outils marketing" className="grid gap-2 sm:grid-cols-4" data-testid="product-tools">
+        {(
+          [
+            ["strategies", "Stratégie 30 jours"],
+            ["publicites", "Publicités"],
+            ["contenus", "Contenus"],
+            ["sales-booster", "Sales Booster"],
+          ] as const
+        ).map(([slug, label]) => (
+          <Button key={slug} asChild variant="secondary">
+            <Link href={`/tableau-de-bord/${slug}?produit=${p.id}` as Route}>{label}</Link>
+          </Button>
+        ))}
+      </nav>
       <section className="grid gap-4" aria-labelledby="analyse-titre">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>

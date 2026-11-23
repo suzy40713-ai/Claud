@@ -99,6 +99,8 @@ export type GenerateOptions<S extends z.ZodType> = {
   maxTokens?: number;
   /** Réutiliser une réponse identique déjà produite (gratuit, hors quota). */
   reuse?: boolean;
+  /** Contrôle supplémentaire (ex. 30 jours présents) : message d'erreur si la réponse est incomplète. */
+  check?: (output: z.infer<S>) => string | null;
   deps?: { client?: AiClient | null; now?: Date };
 };
 
@@ -131,7 +133,7 @@ export async function generateStructured<S extends z.ZodType>(
       .orderBy(desc(aiGeneration.createdAt))
       .limit(1);
     const parsed = hit ? schema.safeParse(hit.output) : null;
-    if (hit && parsed?.success) {
+    if (hit && parsed?.success && !opts.check?.(parsed.data)) {
       const [row] = await db
         .insert(aiGeneration)
         .values({
@@ -191,6 +193,11 @@ export async function generateStructured<S extends z.ZodType>(
   const output = response.parsed_output;
   const checked = output == null ? null : schema.safeParse(output);
   if (!checked?.success) throw fail("La réponse de l'IA était incomplète. Réessayez.");
+  const problem = opts.check?.(checked.data);
+  if (problem) {
+    console.error("[ia] réponse rejetée", kind, problem);
+    throw fail("La réponse de l'IA était incomplète. Réessayez.");
+  }
 
   const [row] = await db
     .insert(aiGeneration)
@@ -242,4 +249,14 @@ export async function listGenerations(
     .where(and(...conds))
     .orderBy(desc(aiGeneration.createdAt))
     .limit(filter.limit ?? 50);
+}
+
+/** Une génération de l'entreprise par son identifiant (jamais celle d'une autre entreprise). */
+export async function getGeneration(ctx: OrgContext, id: string) {
+  if (!/^[0-9a-f-]{36}$/.test(id)) return null;
+  const [row] = await db
+    .select()
+    .from(aiGeneration)
+    .where(and(eq(aiGeneration.organizationId, ctx.organization.id), eq(aiGeneration.id, id)));
+  return row ?? null;
 }
