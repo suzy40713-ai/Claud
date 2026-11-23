@@ -353,8 +353,10 @@ def frame_svg(segs, total, t):
     world.append(scene.front(t))
     world.extend(standing)
     if cur["fx"].get("crowd"):
-        effects.append(crowd_bubbles(cur["fx"]["crowd"], t, cur["t0"] + 0.2, cx, top_ if HEADER else 430, sc))
+        effects.append(crowd_bubbles(cur["fx"]["crowd"], t, cur["t0"] + 0.2, cx, top_ if HEADER else (600 if cur["fx"].get("money") is not None else 430), sc))
 
+    if cur["fx"].get("bills"):
+        effects.append(bills_svg(t - cur["t0"] + 0.35, cx, cy, sc))
     if cur["fx"].get("shake") and t - cur["t0"] < 0.45:  # tremblement d'écran
         k_ = 1 - (t - cur["t0"]) / 0.45
         cx += math.sin(t * 95) * 22 * k_
@@ -407,7 +409,7 @@ def frame_svg(segs, total, t):
         ui.append(text_el(540, 225 + li * 56, l_, tsize, "#ffffff"))
     if cur["fx"].get("notif") and u_beat > cur["fx"].get("notif_at", 0.1):
         k_ = ease((u_beat - cur["fx"].get("notif_at", 0.1)) / 0.1)
-        y0 = lerp(-200, 560 if HEADER else 330, k_)
+        y0 = lerp(-200, 560 if HEADER or cur["fx"].get("money") is not None else 330, k_)
         ui.append(rect(80, y0, 920, 150, "#ffffff", rx=36, sw=5, extra='opacity="0.97"'))
         ui.append(rect(110, y0 + 30, 90, 90, "#25d366", rx=22, stroke="none", sw=0))
         ui.append(text_el(155, y0 + 92, "!", 60, "#ffffff"))
@@ -416,12 +418,14 @@ def frame_svg(segs, total, t):
         ui.append(text_el(230, y0 + 112, cur["fx"]["notif"], 44, INK, anchor="start"))
     if not (STORY.get("caps") == "keywords" and HOOK_TEXT and cur is segs[0]):
         ui.append(captions(cur, t))
+    if cur["fx"].get("money") is not None:
+        ui.append(money_svg(cur, prev, t))
     if cur["fx"].get("quiz"):
         ui.append(quiz_svg(cur["fx"]["quiz"], t - cur["t0"]))
     if cur["fx"].get("stamp"):  # gros tampon rouge qui claque au début de la réplique
         u_ = t - cur["t0"]
         k = 1.6 - 0.6 * ease(u_ / 0.18)
-        ui.append('<g transform="translate(540 430) rotate(-8) scale(%.3f)">' % k)
+        ui.append('<g transform="translate(540 %d) rotate(-8) scale(%.3f)">' % (1120 if cur["fx"].get("money") is not None else 430, k))
         tw_ = text_w(cur["fx"]["stamp"], 150) + 120
         ui.append(rect(-tw_ / 2, -115, tw_, 210, "#ffffff", rx=30, stroke="#e3121b", sw=16))
         ui.append(text_el(0, 52, cur["fx"]["stamp"], 150, "#e3121b", weight=900))
@@ -450,6 +454,60 @@ def frame_svg(segs, total, t):
     return ('<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d">%s'
             '<rect width="%d" height="%d" fill="#dfe7ec"/><g transform="%s">%s</g>%s<g transform="%s">%s</g>%s</svg>') % (
         W, H, W, H, defs, W, H, tr, "".join(world), "".join(over), tr, "".join(effects), "".join(ui))
+
+
+def euros(v):
+    return "{:,}".format(int(round(v))).replace(",", " ") + " €"
+
+
+def money_svg(cur, prev, t):
+    """Compteur « RESTE » qui descend quand le montant est annoncé, horloge, et « -X € » qui s'envole."""
+    m1 = cur["fx"]["money"]
+    m0 = prev["fx"].get("money", m1) if prev is not cur else m1
+    ta = cur["t0"] + cur["fx"].get("money_at", 0.55) * (cur["t1"] - cur["t0"])
+    k = ease((t - ta) / 0.8) if t >= ta else 0.0
+    v = m0 + (m1 - m0) * k
+    hit = 0 < t - ta < 0.3 and m1 != m0
+    col = "#2dc653" if v > 3e8 else ("#ffb703" if v > 1e6 else "#ff3b3b")
+    s_ = ['<g transform="translate(540 330) scale(%.3f)">' % (1.08 if hit else 1.0)]
+    txt = euros(v)
+    tw_ = max(text_w(txt, 74), 520) + 90
+    s_.append(rect(-tw_ / 2, -70, tw_, 150, "#111111", rx=30, stroke=col, sw=10))
+    s_.append(text_el(0, -24, "IL TE RESTE", 30, "#bbbbbb", weight=800))
+    s_.append(text_el(0, 56, txt, 74, col, weight=900))
+    s_.append("</g>")
+    clock = cur["fx"].get("clock")
+    if clock:
+        s_.append(rect(390, 430, 300, 84, "#ffffff", rx=42, sw=6))
+        s_.append(circle(442, 472, 24, "#ffffff", sw=5))
+        a_ = t * 4
+        s_.append(line(442, 472, 442 + 16 * math.sin(a_), 472 - 16 * math.cos(a_), sw=5))
+        s_.append(text_el(570, 494, clock, 56, INK, weight=900))
+    if m1 < m0 and t >= ta:
+        u_ = (t - ta) / 1.4
+        if u_ < 1:
+            s_.append('<g opacity="%.2f">' % (1 - u_ ** 2)
+                      + text_el(540, 600 + 90 * u_, "-" + euros(m0 - m1), 54, "#ff3b3b", stroke="#ffffff",
+                                sw=8, weight=900)
+                      + text_el(540, 600 + 90 * u_, "-" + euros(m0 - m1), 54, "#ff3b3b", weight=900)
+                      + "</g>")
+    return "".join(s_)
+
+
+def bills_svg(u, cx, cy, sc):
+    """Pluie de billets (repère monde : on la place autour de la caméra)."""
+    s_ = []
+    for i in range(26):
+        sx = (i * 137.5) % 1080
+        sp = 520 + (i * 53) % 300
+        y = -120 + ((u * sp + i * 211) % 2100)
+        x = sx + 60 * math.sin(u * 2 + i)
+        r = (u * 160 + i * 40) % 360
+        wx, wy = cx + (x - 540) / sc, cy + (y - 960) / sc
+        s_.append('<g transform="translate(%s %s) rotate(%.0f) scale(%.3f)">' % (f(wx), f(wy), r, 1 / sc)
+                  + rect(-55, -28, 110, 56, "#7bc67b", rx=6, stroke="#2b6b2b", sw=4)
+                  + circle(0, 0, 15, "#a8e0a8", stroke="#2b6b2b", sw=3) + "</g>")
+    return "".join(s_)
 
 
 def quiz_svg(q, u):
@@ -779,6 +837,9 @@ def main():
     elif a.story.startswith("b"):
         from galere_bio import STORIES as Bs
         stories = [s_ for s_ in Bs if a.story == "ball" or s_["slug"].startswith(a.story)]
+    elif a.story.startswith("mi"):
+        from milliard import STORIES as MI
+        stories = [s_ for s_ in MI if a.story == "miall" or s_["slug"].startswith(a.story)]
     elif a.story.startswith("m"):
         from momo import STORIES as Ms
         stories = [s_ for s_ in Ms if a.story == "mall" or s_["slug"].startswith(a.story)]
