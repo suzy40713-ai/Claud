@@ -756,3 +756,34 @@ export const marketingTask = pgTable(
     check("marketing_task_day_ck", sql`${t.day} between 1 and 30`),
   ],
 );
+
+/** Résultats marketing déclarés par l'entreprise (dépense, clics, ventes…). Jamais estimés. */
+export const marketingResult = pgTable(
+  "marketing_result",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    organizationId: orgId(),
+    productId: uuid(),
+    date: date({ mode: "string" }).notNull(),
+    channel: text().notNull(),
+    spendCents: integer().notNull().default(0),
+    impressions: integer(),
+    clicks: integer(),
+    sales: integer(),
+    revenueCents: integer(),
+    note: text(),
+    createdByUserId: uuid().references(() => user.id, { onDelete: "set null" }),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    foreignKey({
+      columns: [t.organizationId, t.productId],
+      foreignColumns: [product.organizationId, product.id],
+    }).onDelete("cascade"),
+    index("marketing_result_org_date_idx").on(t.organizationId, t.date),
+    check(
+      "marketing_result_values_ck",
+      sql`${t.spendCents} between 0 and 100000000 and coalesce(${t.impressions}, 0) between 0 and 1000000000 and coalesce(${t.clicks}, 0) between 0 and 1000000000 and coalesce(${t.sales}, 0) between 0 and 10000000 and coalesce(${t.revenueCents}, 0) between 0 and 1000000000`,
+    ),
+  ],
+);

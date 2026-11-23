@@ -117,6 +117,14 @@ export const NAV_ITEMS: NavItem[] = [
     permission: "marketing.manage",
   },
   {
+    href: "/tableau-de-bord/resultats",
+    label: "Statistiques marketing",
+    hint: "Dépenses, ventes et retour sur dépense",
+    icon: "chart",
+    group: "marketing",
+    permission: "marketing.manage",
+  },
+  {
     href: "/tableau-de-bord/calendrier",
     bookingModule: true,
     label: "Calendrier",

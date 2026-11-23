@@ -1,16 +1,26 @@
 import Link from "next/link";
 import type { Route } from "next";
-import { ArrowRight, Package, Plus } from "lucide-react";
+import { ArrowRight, Package, Plus, Rocket, Sparkles, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/ui/stat-card";
 import { categoryLabel } from "@/domain/marketing/product";
 import { formatCents, formatInTz } from "@/lib/format";
 import type { OrgContext } from "@/server/auth/session";
+import { totals } from "@/domain/marketing/results";
+import { aiQuota } from "@/server/ai/gateway";
+import { getActivePlan } from "@/server/marketing/autopilot";
 import { listProducts } from "@/server/marketing/products";
+import { listResults } from "@/server/marketing/results";
 
 /** Accueil du copilote marketing : uniquement des données réelles de l'entreprise. */
 export async function MarketingHome({ ctx }: { ctx: OrgContext }) {
-  const products = await listProducts(ctx);
+  const [products, plan, quota, results] = await Promise.all([
+    listProducts(ctx),
+    getActivePlan(ctx),
+    aiQuota(ctx),
+    listResults(ctx, 30),
+  ]);
+  const t = totals(results);
   const firstName = ctx.user.name.split(/\s+/)[0];
   return (
     <div className="grid gap-6" data-testid="marketing-home">
@@ -29,7 +39,59 @@ export async function MarketingHome({ ctx }: { ctx: OrgContext }) {
           hint={`Forfait ${ctx.plan.name}`}
           icon={<Package />}
         />
+        <StatCard
+          label="Générations IA ce mois-ci"
+          value={`${quota.used} / ${quota.limit}`}
+          icon={<Sparkles />}
+        />
+        <StatCard
+          label="Ventes déclarées (30 j)"
+          value={t.sales === null ? "—" : String(t.sales)}
+          hint={
+            results.length ? `Dépense : ${formatCents(t.spendCents)}` : "Saisissez vos résultats"
+          }
+          icon={<Wallet />}
+        />
       </div>
+      {plan ? (
+        <section className="grid gap-3 rounded-2xl border bg-card p-5 shadow-xs" data-testid="home-autopilot">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 font-semibold">
+              <Rocket className="size-4 text-primary" />
+              {plan.progress.finished
+                ? "Autopilot terminé"
+                : `Autopilot · jour ${plan.day} / 30`}
+            </h2>
+            <span className="text-sm text-muted-foreground">
+              {plan.progress.done} / {plan.progress.total} actions
+            </span>
+          </div>
+          {plan.progress.finished ? null : (
+            <ul className="grid gap-1 text-sm">
+              {plan.today.map((task) => (
+                <li key={task.id} className={task.doneAt ? "text-muted-foreground line-through" : ""}>
+                  {task.title}
+                </li>
+              ))}
+            </ul>
+          )}
+          <div>
+            <Button asChild size="sm">
+              <Link href="/tableau-de-bord/autopilot-marketing">Ouvrir l&apos;Autopilot</Link>
+            </Button>
+          </div>
+        </section>
+      ) : products.length ? (
+        <section className="flex flex-col gap-3 rounded-2xl border bg-card p-5 shadow-xs sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm">
+            <strong>Prochaine étape :</strong> créez une stratégie 30 jours puis lancez
+            l&apos;Autopilot.
+          </p>
+          <Button asChild size="sm">
+            <Link href="/tableau-de-bord/strategies">Créer ma stratégie</Link>
+          </Button>
+        </section>
+      ) : null}
       {products.length === 0 ? (
         <div className="rounded-2xl border bg-card p-6 shadow-xs">
           <p className="text-lg font-semibold">Commencez par votre premier produit</p>
