@@ -1,4 +1,5 @@
 import "server-only";
+import { aiSpendThisMonth } from "@/server/ai/gateway";
 import Anthropic from "@anthropic-ai/sdk";
 import { and, desc, eq, gte, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -67,10 +68,8 @@ async function quotaState(ctx: OrgContext, now: Date) {
     .where(
       and(eq(assistantUsage.organizationId, ctx.organization.id), eq(assistantUsage.month, month)),
     );
-  const [global] = await db
-    .select({ cost: sql<number>`coalesce(sum(${assistantUsage.costMicroUsd}), 0)`.mapWith(Number) })
-    .from(assistantUsage)
-    .where(eq(assistantUsage.month, month));
+  // Plafond commun à toutes les fonctions IA (assistant + copilote marketing).
+  const globalCost = await aiSpendThisMonth(now);
   const dayStart = localMinuteToInstant(
     localDateOf(now, ctx.organization.timezone),
     0,
@@ -90,7 +89,7 @@ async function quotaState(ctx: OrgContext, now: Date) {
   return {
     orgQuestionsThisMonth: org?.questions ?? 0,
     userQuestionsToday: today.n,
-    globalCostMicroUsdThisMonth: global.cost,
+    globalCostMicroUsdThisMonth: globalCost,
     monthlyBudgetUsd: env.ASSISTANT_MONTHLY_BUDGET_USD,
   };
 }

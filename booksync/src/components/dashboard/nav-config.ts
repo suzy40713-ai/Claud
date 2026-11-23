@@ -20,7 +20,8 @@ export type NavItem = {
     | "assistant"
     | "reviews"
     | "gift"
-    | "package";
+    | "package"
+    | "analysis";
   /** Une phrase qui explique à quoi sert la page (menu mobile). */
   hint: string;
   group: NavGroup;
@@ -60,6 +61,14 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Mes produits",
     hint: "Ce que vous vendez, base de vos analyses",
     icon: "package",
+    group: "marketing",
+    permission: "marketing.manage",
+  },
+  {
+    href: "/tableau-de-bord/analyse-ia",
+    label: "Analyse IA",
+    hint: "Forces, cibles et angles de vente de vos produits",
+    icon: "analysis",
     group: "marketing",
     permission: "marketing.manage",
   },

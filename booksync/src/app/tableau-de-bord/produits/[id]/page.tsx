@@ -12,6 +12,11 @@ import { formatCents } from "@/lib/format";
 import { requirePermission } from "@/server/auth/session";
 import { getProduct } from "@/server/marketing/products";
 import { DeleteProductButton } from "./delete-button";
+import { AnalyzeButton } from "./analyze-button";
+import { Alert } from "@/components/ui/alert";
+import { ProductAnalysisView } from "@/components/marketing/product-analysis";
+import { aiQuota, isAiConfigured } from "@/server/ai/gateway";
+import { latestAnalysis } from "@/server/marketing/analysis";
 
 export const metadata: Metadata = { title: "Produit" };
 
@@ -20,6 +25,8 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
   const ctx = await requirePermission("marketing.manage");
   const p = await getProduct(ctx, id);
   if (!p) notFound();
+  const [latest, quota] = await Promise.all([latestAnalysis(ctx, p.id), aiQuota(ctx)]);
+  const configured = isAiConfigured();
   const rows: Array<[string, string | null]> = [
     ["Description", p.description],
     ["Avantages", p.benefits],
@@ -66,6 +73,41 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
           </div>
         ))}
       </dl>
+      <section className="grid gap-4" aria-labelledby="analyse-titre">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 id="analyse-titre" className="text-lg font-semibold">
+              Analyse IA
+            </h2>
+            <p className="text-sm text-muted-foreground" data-testid="ai-quota">
+              {quota.used} / {quota.limit} générations IA utilisées ce mois-ci
+              {latest
+                ? ` · dernière analyse le ${latest.createdAt.toLocaleDateString("fr-FR")}`
+                : ""}
+            </p>
+          </div>
+          {configured ? <AnalyzeButton id={p.id} again={Boolean(latest)} /> : null}
+        </div>
+        {!configured ? (
+          <Alert data-testid="ai-not-configured">
+            Les fonctions IA ne sont pas encore activées sur BookSync. Elles arrivent très
+            bientôt : vos produits sont déjà prêts à être analysés.
+          </Alert>
+        ) : null}
+        <Alert>
+          L&apos;analyse s&apos;appuie uniquement sur les informations ci-dessus. Les points
+          marqués « Hypothèse à vérifier » ne sont pas des données de marché : testez-les
+          auprès de vrais clients. Aucun résultat de vente n&apos;est garanti.
+        </Alert>
+        {latest ? (
+          <ProductAnalysisView analysis={latest.analysis} />
+        ) : configured ? (
+          <p className="text-sm text-muted-foreground">
+            Pas encore d&apos;analyse. Plus votre description est précise, plus l&apos;analyse
+            sera utile.
+          </p>
+        ) : null}
+      </section>
     </div>
   );
 }

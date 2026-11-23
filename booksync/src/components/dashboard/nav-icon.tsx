@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   MessageSquareText,
   Package,
+  ScanSearch,
   Lightbulb,
   ListChecks,
   Scissors,
@@ -37,6 +38,7 @@ const ICONS = {
   reviews: Star,
   gift: Gift,
   package: Package,
+  analysis: ScanSearch,
 } as const;
 
 export function NavIcon({ name, className }: { name: NavItem["icon"]; className?: string }) {

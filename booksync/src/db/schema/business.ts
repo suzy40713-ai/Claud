@@ -671,3 +671,37 @@ export const product = pgTable(
     ),
   ],
 );
+
+/**
+ * Génération IA du copilote marketing (analyse, stratégie, publicité, contenu…) : historique,
+ * coût réel et cache (même demande = même empreinte, réponse réutilisée sans nouvel appel).
+ */
+export const aiGeneration = pgTable(
+  "ai_generation",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    organizationId: orgId(),
+    userId: uuid().references(() => user.id, { onDelete: "set null" }),
+    productId: uuid(),
+    kind: text().notNull(),
+    model: text().notNull(),
+    inputHash: text().notNull(),
+    input: jsonb().notNull(),
+    output: jsonb().notNull(),
+    inputTokens: integer().notNull().default(0),
+    outputTokens: integer().notNull().default(0),
+    costMicroUsd: integer().notNull().default(0),
+    /** Réponse servie depuis le cache (aucun appel, aucun coût, hors quota). */
+    cached: boolean().notNull().default(false),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    foreignKey({
+      columns: [t.organizationId, t.productId],
+      foreignColumns: [product.organizationId, product.id],
+    }).onDelete("cascade"),
+    index("ai_generation_org_created_idx").on(t.organizationId, t.createdAt),
+    index("ai_generation_org_kind_hash_idx").on(t.organizationId, t.kind, t.inputHash),
+    index("ai_generation_product_idx").on(t.productId, t.kind, t.createdAt),
+  ],
+);
