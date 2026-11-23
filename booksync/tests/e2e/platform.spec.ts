@@ -79,8 +79,6 @@ test("annuaire : page publique sans compte, sans débordement mobile", async ({ 
   );
   expect(overflow).toBeLessThanOrEqual(0);
   await page.goto("/");
-  await expect(
-    page.getByRole("link", { name: "Je cherche un professionnel" }).first(),
-  ).toBeVisible();
-  await expect(page.getByRole("link", { name: "Je suis un professionnel" }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: /Commencer gratuitement/ }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: /Je ne sais pas quoi vendre/ })).toBeVisible();
 });

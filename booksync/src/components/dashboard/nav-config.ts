@@ -35,9 +35,9 @@ export type NavGroup = "accueil" | "rdv" | "clients" | "salon" | "suivi" | "comp
 /** Sections du menu, dans l'ordre d'affichage (titre vide = pas de titre). */
 export const NAV_GROUPS: Array<{ id: NavGroup; title: string }> = [
   { id: "accueil", title: "" },
-  { id: "rdv", title: "Rendez-vous" },
-  { id: "clients", title: "Clients" },
-  { id: "salon", title: "Mon salon" },
+  { id: "rdv", title: "Module rendez-vous" },
+  { id: "clients", title: "Clients et ventes" },
+  { id: "salon", title: "Mon activité" },
   { id: "suivi", title: "Suivi et automatisations" },
   { id: "compte", title: "Compte" },
 ];

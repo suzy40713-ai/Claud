@@ -42,7 +42,7 @@ export function SiteHeader() {
             <Link href="/connexion">Connexion</Link>
           </Button>
           <Button asChild size="sm">
-            <Link href="/inscription?pro=1">Je suis un professionnel</Link>
+            <Link href="/inscription?pro=1">Commencer gratuitement</Link>
           </Button>
         </div>
         <div className="flex items-center gap-1 lg:hidden">
@@ -79,7 +79,7 @@ export function SiteHeader() {
           </Button>
           <Button asChild size="lg" variant="secondary">
             <Link href="/inscription?pro=1" onClick={() => setOpen(false)}>
-              Je suis un professionnel
+              Commencer gratuitement
             </Link>
           </Button>
           <Button asChild size="lg" variant="ghost">

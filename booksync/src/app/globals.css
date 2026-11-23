@@ -5,35 +5,35 @@
 
 /*
  * Design tokens BookSync
- * Charte : bleu nuit #101828, bleu principal #3563E9, bleu clair #EFF4FF, blanc, gris clair #F5F7FA.
+ * Charte : bleu nuit #0A1230, bleu électrique #2F5BFF, bleu clair #EEF2FF, blanc, gris clair #F5F7FA.
  * Toutes les couleurs de l'interface passent par ces variables.
  */
 :root {
   --radius: 0.625rem;
 
   --background: #ffffff;
-  --foreground: #101828;
+  --foreground: #0a1230;
   --muted: #f2f4f7;
   --muted-foreground: #5d6679;
   --subtle: #f5f7fa;
   --card: #ffffff;
-  --card-foreground: #101828;
+  --card-foreground: #0a1230;
   --popover: #ffffff;
-  --popover-foreground: #101828;
+  --popover-foreground: #0a1230;
   --border: #e4e7ec;
   --input: #d0d5dd;
-  --ring: #3563e9;
+  --ring: #2f5bff;
 
-  --primary: #3563e9;
-  --primary-hover: #2a52cc;
+  --primary: #2f5bff;
+  --primary-hover: #1e46e6;
   --primary-foreground: #ffffff;
-  --primary-soft: #eff4ff;
-  --primary-soft-foreground: #2448b8;
+  --primary-soft: #eef2ff;
+  --primary-soft-foreground: #1e3fc2;
 
   --secondary: #f2f4f7;
-  --secondary-foreground: #101828;
+  --secondary-foreground: #0a1230;
   --accent: #f2f4f7;
-  --accent-foreground: #101828;
+  --accent-foreground: #0a1230;
 
   --success: #079455;
   --success-soft: #ecfdf3;
@@ -43,12 +43,12 @@
   --destructive-foreground: #ffffff;
   --destructive-soft: #fef3f2;
 
-  --navy: #101828;
-  --shadow-color: 220 43% 11%;
+  --navy: #0a1230;
+  --shadow-color: 228 66% 11%;
 }
 
 .dark {
-  --background: #0b111e;
+  --background: #070d1f;
   --foreground: #f2f4f7;
   --muted: #182033;
   --muted-foreground: #98a2b3;
@@ -59,13 +59,13 @@
   --popover-foreground: #f2f4f7;
   --border: #1f2a40;
   --input: #2a3650;
-  --ring: #6b8ff2;
+  --ring: #7a97ff;
 
-  --primary: #4f7bf0;
-  --primary-hover: #6b8ff2;
+  --primary: #4d74ff;
+  --primary-hover: #6d8dff;
   --primary-foreground: #ffffff;
-  --primary-soft: #16244a;
-  --primary-soft-foreground: #a9c0fa;
+  --primary-soft: #131e45;
+  --primary-soft-foreground: #afc2ff;
 
   --secondary: #182033;
   --secondary-foreground: #f2f4f7;
@@ -80,8 +80,8 @@
   --destructive-foreground: #ffffff;
   --destructive-soft: #2e1513;
 
-  --navy: #0b111e;
-  --shadow-color: 220 50% 2%;
+  --navy: #070d1f;
+  --shadow-color: 228 60% 2%;
 }
 
 @theme inline {

@@ -4,14 +4,17 @@ test.describe("site public", () => {
   test("la page d'accueil commerciale est complète et en français", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("html")).toHaveAttribute("lang", "fr");
-    await expect(page).toHaveTitle(/^BookSync — Prise de rendez-vous en ligne pour coiffeurs/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Vos rendez-vous");
+    await expect(page).toHaveTitle(/^BookSync — De votre idée à vos premières ventes/);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("De votre idée");
+    // Statut honnête de chaque outil : disponible ou en déploiement.
+    await expect(page.getByTestId("tools")).toContainText("Disponible");
+    await expect(page.getByTestId("tools")).toContainText("En déploiement");
     for (const id of ["fonctionnalites", "avantages", "tarifs", "faq"])
       await expect(page.locator(`#${id}`)).toBeAttached();
     await expect(page.locator("#tarifs")).toContainText("9,99 €");
     await expect(page.locator("#tarifs")).toContainText("24,99 €");
     await page.getByRole("link", { name: "Commencer gratuitement" }).first().click();
-    await expect(page).toHaveURL(/\/inscription$/);
+    await expect(page).toHaveURL(/\/inscription(\?pro=1)?$/);
   });
 
   test("les pages légales sont accessibles depuis le pied de page", async ({ page }) => {
