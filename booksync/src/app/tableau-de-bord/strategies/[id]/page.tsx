@@ -11,6 +11,8 @@ import { StrategyView } from "@/components/marketing/tool-results";
 import { requirePermission } from "@/server/auth/session";
 import { getProduct } from "@/server/marketing/products";
 import { getToolResult } from "@/server/marketing/tools";
+import { getActivePlan } from "@/server/marketing/autopilot";
+import { StartPlanButton } from "../../autopilot-marketing/controls";
 
 export const metadata: Metadata = { title: "Stratégie 30 jours" };
 
@@ -20,6 +22,8 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
   const r = await getToolResult(ctx, "strategy", id);
   if (!r) notFound();
   const product = r.productId ? await getProduct(ctx, r.productId) : null;
+  const active = await getActivePlan(ctx);
+  const running = active?.plan.strategyId === r.id;
   return (
     <div className="grid gap-5">
       <div>
@@ -36,6 +40,19 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
         </p>
       </div>
       <ToolChoices choix={r.input.choix} />
+      {product ? (
+        running ? (
+          <div>
+            <Button asChild>
+              <Link href="/tableau-de-bord/autopilot-marketing">Voir l&apos;Autopilot en cours</Link>
+            </Button>
+          </div>
+        ) : (
+          <div>
+            <StartPlanButton strategyId={r.id} replace={Boolean(active)} />
+          </div>
+        )
+      ) : null}
       <AiDisclaimer />
       <StrategyView s={r.output} />
       {product ? (

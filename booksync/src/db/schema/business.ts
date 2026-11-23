@@ -705,3 +705,54 @@ export const aiGeneration = pgTable(
     index("ai_generation_product_idx").on(t.productId, t.kind, t.createdAt),
   ],
 );
+
+/** Autopilot marketing : un plan de 30 jours lancé à partir d'une stratégie générée. */
+export const marketingPlan = pgTable(
+  "marketing_plan",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    organizationId: orgId(),
+    productId: uuid().notNull(),
+    /** Génération « strategy » d'origine (même entreprise, vérifié à la création). */
+    strategyId: uuid().notNull(),
+    /** Jour 1 du plan (date locale de l'entreprise). */
+    startDate: date({ mode: "string" }).notNull(),
+    active: boolean().notNull().default(true),
+    createdByUserId: uuid().references(() => user.id, { onDelete: "set null" }),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    unique("marketing_plan_org_id_uq").on(t.organizationId, t.id),
+    foreignKey({
+      columns: [t.organizationId, t.productId],
+      foreignColumns: [product.organizationId, product.id],
+    }).onDelete("cascade"),
+    // Un seul plan actif par entreprise.
+    uniqueIndex("marketing_plan_one_active_uq")
+      .on(t.organizationId)
+      .where(sql`${t.active}`),
+  ],
+);
+
+export const marketingTask = pgTable(
+  "marketing_task",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    organizationId: orgId(),
+    planId: uuid().notNull(),
+    day: smallint().notNull(),
+    position: smallint().notNull(),
+    title: text().notNull(),
+    detail: text().notNull(),
+    channel: text().notNull(),
+    doneAt: timestamp({ withTimezone: true }),
+  },
+  (t) => [
+    foreignKey({
+      columns: [t.organizationId, t.planId],
+      foreignColumns: [marketingPlan.organizationId, marketingPlan.id],
+    }).onDelete("cascade"),
+    unique("marketing_task_plan_day_pos_uq").on(t.planId, t.day, t.position),
+    check("marketing_task_day_ck", sql`${t.day} between 1 and 30`),
+  ],
+);

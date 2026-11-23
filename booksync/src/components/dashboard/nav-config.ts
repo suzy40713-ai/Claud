@@ -109,6 +109,14 @@ export const NAV_ITEMS: NavItem[] = [
     permission: "marketing.manage",
   },
   {
+    href: "/tableau-de-bord/autopilot-marketing",
+    label: "Autopilot",
+    hint: "Vos 3 actions marketing du jour",
+    icon: "autopilot",
+    group: "marketing",
+    permission: "marketing.manage",
+  },
+  {
     href: "/tableau-de-bord/calendrier",
     bookingModule: true,
     label: "Calendrier",

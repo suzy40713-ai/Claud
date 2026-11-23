@@ -2,6 +2,10 @@ import "server-only";
 import type Anthropic from "@anthropic-ai/sdk";
 import { and, asc, eq, ilike, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
+import { categoryLabel } from "@/domain/marketing/product";
+import { latestAnalysis } from "@/server/marketing/analysis";
+import { getActivePlan } from "@/server/marketing/autopilot";
+import { listProducts } from "@/server/marketing/products";
 import { db } from "@/db/client";
 import { appointment, autopilotAction, customer, service, staff } from "@/db/schema";
 import { ASSISTANT_LIMITS } from "@/domain/assistant/limits";
@@ -415,7 +419,57 @@ const proposeCancel = tool({
   },
 });
 
+const marketingTool = tool({
+  definition: {
+    name: "copilote_marketing",
+    description:
+      "Produits de l'entreprise (nom, catégorie, prix, description), résumé de leur dernière analyse IA et Autopilot marketing en cours (jour, progression, actions du jour). À utiliser pour toute question sur la vente ou le marketing de ses produits.",
+    strict: true,
+    input_schema: { type: "object", properties: {}, required: [], additionalProperties: false },
+  },
+  schema: z.object({}),
+  run: async (ctx) => {
+    if (!can(ctx.role, "marketing.manage"))
+      return { erreur: "Réservé au propriétaire et aux administrateurs." };
+    const products = await listProducts(ctx);
+    const analyses = await Promise.all(products.slice(0, 10).map((p) => latestAnalysis(ctx, p.id)));
+    const plan = await getActivePlan(ctx);
+    return {
+      produits: products.slice(0, 10).map((p, i) => ({
+        nom: p.name,
+        categorie: categoryLabel(p.category),
+        prix_euros: p.priceCents === null ? null : p.priceCents / 100,
+        description: p.description.slice(0, 600),
+        public_cible: p.targetAudience,
+        derniere_analyse: analyses[i]
+          ? {
+              resume: analyses[i]!.analysis.summary,
+              positionnement: analyses[i]!.analysis.positioning,
+              premieres_actions: analyses[i]!.analysis.firstActions,
+            }
+          : null,
+      })),
+      autopilot: plan
+        ? {
+            produit: plan.productName,
+            jour: plan.progress.finished ? "terminé" : plan.day,
+            actions_faites: plan.progress.done,
+            actions_total: plan.progress.total,
+            en_retard: plan.progress.late,
+            actions_du_jour: plan.today.map((t) => ({
+              titre: t.title,
+              detail: t.detail,
+              canal: t.channel,
+              faite: Boolean(t.doneAt),
+            })),
+          }
+        : null,
+    };
+  },
+});
+
 export const ASSISTANT_TOOLS = [
+  marketingTool,
   listAppointments,
   freeSlots,
   findCustomerAppointments,

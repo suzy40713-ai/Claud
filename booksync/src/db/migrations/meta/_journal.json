@@ -120,6 +120,13 @@
       "when": 1795471513075,
       "tag": "0016_ai_generation",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1795472776125,
+      "tag": "0017_marketing_autopilot",
+      "breakpoints": true
     }
   ]
 }
