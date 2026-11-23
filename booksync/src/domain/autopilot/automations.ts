@@ -3,7 +3,7 @@
  * Chaque automatisation a un forfait minimal, un état par défaut, et peut être « verrouillée »
  * quand il s'agit d'une protection de sécurité qu'on ne doit jamais désactiver.
  */
-import { PLAN_ORDER, type PlanId } from "@/domain/billing/plans";
+import { planAtLeast, type PlanId } from "@/domain/billing/plans";
 
 export type AutomationKey =
   | "booking_confirmation"
@@ -131,7 +131,7 @@ export function getAutomation(key: AutomationKey): AutomationDefinition {
 }
 
 export function planIncludes(plan: PlanId, minPlan: PlanId) {
-  return PLAN_ORDER.indexOf(plan) >= PLAN_ORDER.indexOf(minPlan);
+  return planAtLeast(plan, minPlan);
 }
 
 export type StoredRules = Partial<Record<AutomationKey, boolean>>;

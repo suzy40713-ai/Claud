@@ -11,6 +11,7 @@ import { loadStoredRules } from "@/server/autopilot/rules";
 import { groupByWeekday } from "@/domain/schedule/hours";
 import { workingHours } from "@/db/schema";
 import { getOrganizationHours } from "@/server/catalog/staff";
+import { planAtLeast } from "@/domain/billing/plans";
 
 /** Horaires d'ouverture de l'entreprise, ou à défaut l'union des horaires de l'équipe. */
 async function openingHoursOf(organizationId: string) {
@@ -88,7 +89,7 @@ export async function getInsights(ctx: OrgContext, now = new Date()) {
     automations: {
       reminders: isAutomationActive("reminder_24h", ctx.plan.id, rules),
       waitlist: isAutomationActive("waitlist", ctx.plan.id, rules),
-      waitlistAvailable: ctx.plan.id === "pro",
+      waitlistAvailable: planAtLeast(ctx.plan.id, "pro"),
     },
   });
 }

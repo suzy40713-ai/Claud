@@ -152,7 +152,7 @@ export const organization = pgTable(
     coverFileId: uuid(),
     welcomeMessage: text(),
     /** Abonnement (synchronisé depuis Stripe par webhook) */
-    plan: text({ enum: ["free", "starter", "pro"] })
+    plan: text({ enum: ["free", "starter", "pro", "business"] })
       .notNull()
       .default("free"),
     stripeCustomerId: text().unique(),

@@ -65,6 +65,19 @@ describe("Stripe Billing (webhooks)", () => {
     expect(effectivePlan(org.plan, org.subscriptionStatus).limits.members).toBe(10);
   });
 
+  it("abonnement Business → forfait Business (200 produits, 1 000 générations IA)", async () => {
+    const ctx = await makeOrg();
+    const sub = subscription(ctx.organization.id, `cus_b${seq}`, "price_test_business", "trialing");
+    expect(await handleStripeEvent(event("customer.subscription.created", sub), stripe)).toBe(true);
+    const [org] = await db
+      .select()
+      .from(organization)
+      .where(eq(organization.id, ctx.organization.id));
+    expect(org.plan).toBe("business");
+    const plan = effectivePlan(org.plan, org.subscriptionStatus);
+    expect(plan.limits).toMatchObject({ products: 200, aiGenerationsPerMonth: 1000 });
+  });
+
   it("changement d'offre, résiliation programmée puis fin d'abonnement → retour à Free", async () => {
     const ctx = await makeOrg();
     const cus = `cus_x${seq}`;

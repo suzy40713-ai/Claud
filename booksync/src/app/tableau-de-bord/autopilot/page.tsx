@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatCard } from "@/components/ui/stat-card";
-import { PLANS } from "@/domain/billing/plans";
+import { PLANS, planAtLeast } from "@/domain/billing/plans";
 import { can } from "@/domain/permissions";
 import { formatInTz, fromNow } from "@/lib/format";
 import { requirePermission } from "@/server/auth/session";
@@ -108,7 +108,7 @@ async function Content() {
   }));
   const canManage = can(ctx.role, "autopilot.manage");
   const pending = activity.filter((a) => a.status === "pending");
-  const tomorrow = ctx.plan.id === "pro" ? await buildDailySummary(ctx.organization) : null;
+  const tomorrow = planAtLeast(ctx.plan.id, "pro") ? await buildDailySummary(ctx.organization) : null;
 
   return (
     <div className="grid gap-8">

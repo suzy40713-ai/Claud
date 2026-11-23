@@ -17,7 +17,7 @@ import {
 } from "@/db/schema";
 import { isAutomationActive } from "@/domain/autopilot/automations";
 import { addDays, localDateOf, localMinuteToInstant } from "@/domain/availability/engine";
-import { effectivePlan } from "@/domain/billing/plans";
+import { effectivePlan, planAtLeast } from "@/domain/billing/plans";
 import { env } from "@/lib/env";
 import { capitalize, formatDateLong, formatInTz, formatTime } from "@/lib/format";
 import { loadStoredRules } from "@/server/autopilot/rules";
@@ -193,10 +193,10 @@ async function recipients(organizationId: string) {
  */
 export async function sendDueDailySummaries(now = new Date()) {
   const stats = { sent: 0, failed: 0 };
-  const orgs = await db.select().from(organization).where(eq(organization.plan, "pro"));
+  const orgs = await db.select().from(organization).where(inArray(organization.plan, ["pro", "business"]));
   for (const org of orgs) {
     const plan = effectivePlan(org.plan, org.subscriptionStatus);
-    if (plan.id !== "pro") continue;
+    if (!planAtLeast(plan.id, "pro")) continue;
     const hour = Number(formatInTz(now, org.timezone, "H"));
     if (hour < SUMMARY_HOUR) continue;
     const rules = await loadStoredRules(db, org.id);

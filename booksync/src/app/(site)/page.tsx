@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { Route } from "next";
 import {
   BarChart3,
   CalendarCheck2,
@@ -22,6 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/seo/json-ld";
 import { PLAN_ORDER, PLANS, formatPrice } from "@/domain/billing/plans";
+import { isAiConfigured } from "@/lib/ai-config";
 import { site } from "@/lib/site";
 
 const SEO_DESCRIPTION =
@@ -82,61 +84,72 @@ const TOOLS: Array<{
   icon: typeof Target;
   title: string;
   text: string;
-  status: "live" | "soon";
+  /** live : disponible ; ai : disponible dès que les fonctions IA sont activées. */
+  status: "live" | "ai";
+  href: string;
 }> = [
   {
     icon: Lightbulb,
     title: "Trouver quoi vendre",
     text: "Vous ne savez pas encore quoi proposer ? À partir de ce que vous savez faire, BookSync vous propose une idée, un nom, des prix et un plan sur 7 jours.",
     status: "live",
+    href: "/lancer-mon-activite",
   },
   {
     icon: Target,
     title: "Analyse de produit",
     text: "Proposition de valeur, clients cibles, problème résolu, arguments de vente, risques et pistes d'amélioration. Les hypothèses sont toujours signalées comme telles.",
-    status: "soon",
+    status: "ai",
+    href: "/inscription",
   },
   {
     icon: Compass,
     title: "Stratégie marketing",
     text: "Objectifs, positionnement, canaux, contenu, budget conseillé et calendrier de 30 jours, avec des actions concrètes.",
-    status: "soon",
+    status: "ai",
+    href: "/inscription",
   },
   {
     icon: Megaphone,
     title: "Créateur de publicités",
     text: "TikTok, Instagram, Facebook et Google Ads : accroche, texte, appel à l'action, idée de visuel et variantes, dans 5 styles.",
-    status: "soon",
+    status: "ai",
+    href: "/inscription",
   },
   {
     icon: PenLine,
     title: "Contenus et scripts vidéo",
     text: "Idées de vidéos, scripts (accroche, développement, produit, appel à l'action), carrousels, descriptions et calendrier de publication.",
-    status: "soon",
+    status: "ai",
+    href: "/inscription",
   },
   {
     icon: LineChart,
     title: "Sales Booster",
     text: "Analyse de votre page de vente, descriptions améliorées, offres commerciales et idées de tests A/B.",
-    status: "soon",
+    status: "ai",
+    href: "/inscription",
   },
   {
     icon: MessageCircle,
     title: "Assistant marketing",
     text: "« Comment trouver mes 10 premiers clients ? » Des réponses qui tiennent compte de vos produits et de votre stratégie.",
-    status: "soon",
+    status: "ai",
+    href: "/inscription",
   },
   {
     icon: Wand2,
     title: "Autopilot",
     text: "Chaque jour, les 3 prochaines actions pour promouvoir votre produit, à cocher, et la progression de votre plan sur 30 jours.",
-    status: "soon",
+    status: "ai",
+    href: "/inscription",
   },
   {
     icon: BarChart3,
     title: "Tableau de bord",
     text: "Produits, stratégies, publicités et contenus, budget, dépenses et résultats déclarés, retour sur investissement quand les données le permettent.",
-    status: "soon",
+    status: "live",
+    href: "/inscription",
   },
 ];
 
@@ -170,7 +183,7 @@ const FAQ = [
   },
   {
     q: "D'où viennent les analyses et les chiffres ?",
-    a: "Les analyses s'appuient sur les informations que vous donnez. BookSync n'invente pas de données de marché : une hypothèse est toujours présentée comme une hypothèse à vérifier. Au tableau de bord, vos résultats déclarés sont distingués des estimations.",
+    a: "Les analyses s'appuient sur les informations que vous donnez. BookSync n'invente pas de données de marché : une hypothèse est toujours présentée comme une hypothèse à vérifier. Les statistiques marketing utilisent uniquement les résultats que vous saisissez : aucune estimation n'est présentée comme un résultat.",
   },
   {
     q: "BookSync publie-t-il à ma place sur TikTok ou Instagram ?",
@@ -201,6 +214,7 @@ function StatusBadge({ status }: { status: "live" | "soon" }) {
 }
 
 export default function LandingPage() {
+  const aiLive = isAiConfigured();
   return (
     <main className="overflow-x-clip">
       <JsonLd data={SOFTWARE_LD} />
@@ -301,7 +315,9 @@ export default function LandingPage() {
             </p>
           </div>
           <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="tools">
-            {TOOLS.map(({ icon: Icon, title, text, status }) => (
+            {TOOLS.map(({ icon: Icon, title, text, status: kind, href }) => {
+              const status = kind === "live" || aiLive ? "live" : "soon";
+              return (
               <li key={title} className="flex flex-col rounded-3xl bg-card p-7">
                 <div className="flex items-start justify-between gap-3">
                   <Icon className="size-8 text-primary" strokeWidth={1.6} />
@@ -311,14 +327,15 @@ export default function LandingPage() {
                 <p className="mt-2 text-[15px] text-muted-foreground">{text}</p>
                 {status === "live" ? (
                   <Link
-                    href="/lancer-mon-activite"
+                    href={href as Route}
                     className="mt-4 text-sm font-semibold text-primary hover:underline"
                   >
                     Essayer maintenant →
                   </Link>
                 ) : null}
               </li>
-            ))}
+              );
+            })}
           </ul>
         </div>
       </section>
@@ -356,11 +373,10 @@ export default function LandingPage() {
               Des tarifs simples.
             </h2>
             <p className="mt-5 text-lg text-muted-foreground">
-              1er mois offert sur Starter et Pro. Sans engagement, prix TTC par mois. Les forfaits
-              s&apos;enrichissent à mesure que les outils du copilote arrivent.
+              1er mois offert sur les forfaits payants. Sans engagement, prix TTC par mois.
             </p>
           </div>
-          <div className="mt-14 grid gap-4 lg:grid-cols-3">
+          <div className="mt-14 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {PLAN_ORDER.map((id) => {
               const p = PLANS[id];
               const featured = id === "starter";
@@ -371,7 +387,7 @@ export default function LandingPage() {
                 >
                   {featured ? (
                     <Badge variant="primary" className="absolute -top-2.5 left-8">
-                      Le plus choisi
+                      Recommandé
                     </Badge>
                   ) : null}
                   <h3 className="text-xl font-semibold tracking-tight">{p.name}</h3>

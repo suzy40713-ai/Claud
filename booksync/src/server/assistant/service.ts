@@ -21,6 +21,7 @@ import type { OrgContext } from "@/server/auth/session";
 import { ForbiddenError } from "@/domain/permissions";
 import { UserError } from "@/server/errors";
 import { ASSISTANT_TOOLS, runTool } from "./tools";
+import { planAtLeast } from "@/domain/billing/plans";
 
 /** Sous-ensemble du client Anthropic utilisé (permet d'injecter un client de test). */
 export type MessagesClient = { messages: Pick<Anthropic["messages"], "create"> };
@@ -57,7 +58,7 @@ function dynamicContext(ctx: OrgContext, now: Date) {
 }
 
 function assertAssistantAllowed(ctx: OrgContext) {
-  if (ctx.plan.id !== "pro")
+  if (!planAtLeast(ctx.plan.id, "pro"))
     throw new ForbiddenError("L'assistant BookSync est inclus dans le forfait Pro.");
 }
 
@@ -306,10 +307,10 @@ export async function getAssistantState(ctx: OrgContext) {
     ctx.organization.id,
     rows.flatMap((r) => r.actionIds),
   );
-  const q = ctx.plan.id === "pro" ? await quotaState(ctx, now) : null;
+  const q = planAtLeast(ctx.plan.id, "pro") ? await quotaState(ctx, now) : null;
   return {
     configured: isAssistantConfigured(),
-    allowed: ctx.plan.id === "pro",
+    allowed: planAtLeast(ctx.plan.id, "pro"),
     messages: rows.map((r) => ({
       id: r.id,
       role: r.role,

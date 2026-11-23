@@ -9,7 +9,7 @@ import {
 } from "@/server/billing/service";
 import { runAction } from "@/server/errors";
 
-export async function subscribeAction(plan: "starter" | "pro") {
+export async function subscribeAction(plan: "starter" | "pro" | "business") {
   const ctx = await requireOrg();
   const res = await runAction(() => startSubscription(ctx, plan));
   revalidatePath("/tableau-de-bord", "layout");

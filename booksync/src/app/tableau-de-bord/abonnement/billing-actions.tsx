@@ -13,7 +13,7 @@ export function PlanButton({
   label,
   disabled,
 }: {
-  plan: "starter" | "pro";
+  plan: "starter" | "pro" | "business";
   label: string;
   disabled?: boolean;
 }) {

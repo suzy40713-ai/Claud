@@ -42,6 +42,7 @@ export const env = createEnv({
     STRIPE_CONNECT_WEBHOOK_SECRET: z.string().startsWith("whsec_").optional(),
     STRIPE_PRICE_STARTER: z.string().startsWith("price_").optional(),
     STRIPE_PRICE_PRO: z.string().startsWith("price_").optional(),
+    STRIPE_PRICE_BUSINESS: z.string().startsWith("price_").optional(),
     /** Secret partagé avec le planificateur (Supabase pg_cron) pour /api/cron/*. */
     CRON_SECRET: z.string().min(24).optional(),
     /**
@@ -74,6 +75,7 @@ export const env = createEnv({
     STRIPE_CONNECT_WEBHOOK_SECRET: process.env.STRIPE_CONNECT_WEBHOOK_SECRET,
     STRIPE_PRICE_STARTER: process.env.STRIPE_PRICE_STARTER,
     STRIPE_PRICE_PRO: process.env.STRIPE_PRICE_PRO,
+    STRIPE_PRICE_BUSINESS: process.env.STRIPE_PRICE_BUSINESS,
     CRON_SECRET: process.env.CRON_SECRET,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     ASSISTANT_MONTHLY_BUDGET_USD: process.env.ASSISTANT_MONTHLY_BUDGET_USD,

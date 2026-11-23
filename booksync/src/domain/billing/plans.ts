@@ -4,7 +4,7 @@
  * nouveau prix dans Stripe et l'utilise pour les nouveaux abonnements (voir billing/stripe.ts).
  */
 
-export type PlanId = "free" | "starter" | "pro";
+export type PlanId = "free" | "starter" | "pro" | "business";
 
 export type PlanFeatures = {
   emailNotifications: boolean;
@@ -55,11 +55,10 @@ export const PLANS: Record<PlanId, Plan> = {
       onlineMeetings: false,
     },
     highlights: [
-      "5 réservations par mois",
-      "1 employé",
-      "20 clients",
-      "Page de réservation en ligne",
-      "Statistiques basiques",
+      "1 produit suivi par le copilote",
+      "10 générations IA par mois (analyse, stratégie, contenus…)",
+      "Autopilot marketing et statistiques",
+      "Module rendez-vous : 5 réservations par mois, 20 clients",
     ],
   },
   starter: {
@@ -82,13 +81,13 @@ export const PLANS: Record<PlanId, Plan> = {
       onlineMeetings: true,
     },
     highlights: [
-      "Gestion des rendez-vous et agenda professionnel",
-      "Réservations en ligne illimitées",
+      "10 produits suivis",
+      "100 générations IA par mois",
+      "Stratégie 30 jours, publicités, contenus, Sales Booster",
+      "Module rendez-vous : réservations et clients illimités",
+      "Confirmations et rappels automatiques, visio",
       "Visibilité dans l'annuaire BookSync",
-      "Confirmations et rappels automatiques",
-      "Rendez-vous en visio (lien Meet ou Zoom envoyé au client)",
-      "Gestion des clients illimitée",
-      "2 employés",
+      "2 membres",
     ],
   },
   pro: {
@@ -111,22 +110,50 @@ export const PLANS: Record<PlanId, Plan> = {
       onlineMeetings: true,
     },
     highlights: [
-      "Réservations illimitées",
-      "10 employés",
-      "Clients illimités",
-      "Tout le forfait Starter, jusqu'à 10 employés",
+      "50 produits suivis",
+      "400 générations IA par mois",
+      "Tout le forfait Starter, jusqu'à 10 membres",
+      "Assistant BookSync (produits, Autopilot, rendez-vous)",
       "Liste d'attente intelligente",
       "Statistiques avancées et recommandations",
       "Résumé quotidien par email",
-      "Automatisations avancées et page personnalisée",
-      "Assistant BookSync AI (bientôt disponible)",
+    ],
+  },
+  business: {
+    id: "business",
+    name: "Business",
+    priceCents: 4999,
+    tagline: "Pour les entreprises qui vendent beaucoup de produits.",
+    limits: {
+      bookingsPerMonth: null,
+      members: 25,
+      customers: null,
+      products: 200,
+      aiGenerationsPerMonth: 1000,
+    },
+    features: {
+      emailNotifications: true,
+      automaticReminders: true,
+      advancedStats: true,
+      bookingPageCustomization: true,
+      onlineMeetings: true,
+    },
+    highlights: [
+      "200 produits suivis",
+      "1 000 générations IA par mois",
+      "Tout le forfait Pro, jusqu'à 25 membres",
     ],
   },
 };
 
-export const PLAN_ORDER: PlanId[] = ["free", "starter", "pro"];
+export const PLAN_ORDER: PlanId[] = ["free", "starter", "pro", "business"];
 
-/** Essai gratuit offert au premier abonnement Starter ou Pro (carte enregistrée, aucun prélèvement). */
+/** Le forfait inclut-il tout ce que contient `min` ? (Business inclut Pro, Pro inclut Starter…) */
+export function planAtLeast(plan: PlanId, min: PlanId) {
+  return PLAN_ORDER.indexOf(plan) >= PLAN_ORDER.indexOf(min);
+}
+
+/** Essai gratuit offert au premier abonnement payant (carte enregistrée, aucun prélèvement). */
 export const TRIAL_DAYS = 30;
 
 /**

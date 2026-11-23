@@ -48,7 +48,7 @@ test("cartes cadeaux : activation, page d'achat, carte imprimable et utilisation
   await v.getByLabel("Votre email").fill(`julie.${Date.now()}@example.com`);
   await v.getByRole("button", { name: "Payer 50 €" }).click();
   // Aucune clé Stripe dans cet environnement : refus clair, aucune carte créée.
-  await expect(v.getByRole("alert")).toBeVisible();
+  await expect(v.getByRole("alert").filter({ hasText: "Ce salon ne vend pas" })).toBeVisible();
   const [{ n }] = await sql<{ n: number }[]>`
     select count(*)::int as n from gift_card g join organization o on o.id = g.organization_id where o.slug = ${slug}`;
   expect(n).toBe(0);

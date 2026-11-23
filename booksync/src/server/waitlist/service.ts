@@ -13,7 +13,7 @@ import {
 } from "@/db/schema";
 import { isAutomationActive } from "@/domain/autopilot/automations";
 import { addDays, localDateOf } from "@/domain/availability/engine";
-import { effectivePlan, type Plan } from "@/domain/billing/plans";
+import { effectivePlan, planAtLeast, type Plan } from "@/domain/billing/plans";
 import { assertCan, ForbiddenError } from "@/domain/permissions";
 import { optionalPhone, optionalText } from "@/domain/validation";
 import { TIME_RANGES, type TimeRange } from "@/domain/waitlist/match";
@@ -150,7 +150,7 @@ async function insertEntry(
 }
 
 function assertPro(ctx: OrgContext) {
-  if (ctx.plan.id !== "pro")
+  if (!planAtLeast(ctx.plan.id, "pro"))
     throw new ForbiddenError("La liste d'attente intelligente est incluse dans le forfait Pro.");
 }
 

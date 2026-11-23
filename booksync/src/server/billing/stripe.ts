@@ -32,6 +32,11 @@ export const PLAN_PRICES = {
     amount: PLANS.starter.priceCents,
   },
   pro: { lookupKey: "booksync_pro_monthly", name: "BookSync Pro", amount: PLANS.pro.priceCents },
+  business: {
+    lookupKey: "booksync_business_monthly",
+    name: "BookSync Business",
+    amount: PLANS.business.priceCents,
+  },
 } as const;
 
 export type PaidPlanId = keyof typeof PLAN_PRICES;
@@ -39,12 +44,16 @@ export type PaidPlanId = keyof typeof PLAN_PRICES;
 let priceCache: Record<PaidPlanId, string> | null = null;
 
 /**
- * Identifiants des prix Starter et Pro : variables d'environnement si fournies,
+ * Identifiants des prix des forfaits payants : variables d'environnement si fournies,
  * sinon retrouvés (ou créés une seule fois) dans Stripe grâce à leur « lookup key ».
  */
 export async function getPriceIds(): Promise<Record<PaidPlanId, string>> {
-  if (env.STRIPE_PRICE_STARTER && env.STRIPE_PRICE_PRO) {
-    return { starter: env.STRIPE_PRICE_STARTER, pro: env.STRIPE_PRICE_PRO };
+  if (env.STRIPE_PRICE_STARTER && env.STRIPE_PRICE_PRO && env.STRIPE_PRICE_BUSINESS) {
+    return {
+      starter: env.STRIPE_PRICE_STARTER,
+      pro: env.STRIPE_PRICE_PRO,
+      business: env.STRIPE_PRICE_BUSINESS,
+    };
   }
   if (priceCache) return priceCache;
   const stripe = getStripe();

@@ -32,6 +32,7 @@ export default defineConfig({
             STRIPE_WEBHOOK_SECRET: "whsec_test_booksync",
             STRIPE_PRICE_STARTER: "price_test_starter",
             STRIPE_PRICE_PRO: "price_test_pro",
+            STRIPE_PRICE_BUSINESS: "price_test_business",
           },
           // Une seule base de test partagée : on exécute les fichiers séquentiellement.
           fileParallelism: false,

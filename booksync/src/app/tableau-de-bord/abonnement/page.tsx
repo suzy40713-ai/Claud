@@ -125,7 +125,7 @@ async function Content({
         <h2 id="plans-title" className="mb-3 text-[15px] font-semibold">
           Changer d&apos;offre
         </h2>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {PLAN_ORDER.map((id) => {
             const p = PLANS[id];
             const isCurrent = id === current.id;
@@ -139,7 +139,7 @@ async function Content({
                   <h3 className="font-semibold">{p.name}</h3>
                   {isCurrent ? (
                     <Badge variant="primary">Actuel</Badge>
-                  ) : id === "pro" ? (
+                  ) : id === "business" ? (
                     <Badge variant="outline">Le plus complet</Badge>
                   ) : null}
                 </div>

@@ -23,9 +23,7 @@ function defaultClient(): AiClient | null {
   return client;
 }
 
-export function isAiConfigured() {
-  return Boolean(env.ANTHROPIC_API_KEY);
-}
+export { isAiConfigured } from "@/lib/ai-config";
 
 export function modelFor(tier: AiTier) {
   const m = (tier === "fast" ? env.AI_MODEL_FAST : env.AI_MODEL_STRONG) ?? DEFAULT_MODELS[tier];

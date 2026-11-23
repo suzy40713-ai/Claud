@@ -16,6 +16,7 @@ import { listAutomations } from "@/server/autopilot/rules";
 import { listBookableOptions } from "@/server/waitlist/options";
 import { listWaitlist } from "@/server/waitlist/service";
 import { AddEntryButton, CancelEntryButton } from "./waitlist-client";
+import { planAtLeast } from "@/domain/billing/plans";
 
 export const metadata: Metadata = { title: "Liste d'attente" };
 
@@ -41,7 +42,7 @@ function shortDate(iso: string) {
 async function Content() {
   const ctx = await requirePermission("customers.view_all");
   const tz = ctx.organization.timezone;
-  const isPro = ctx.plan.id === "pro";
+  const isPro = planAtLeast(ctx.plan.id, "pro");
   if (!isPro) {
     return (
       <div className="grid gap-4">
