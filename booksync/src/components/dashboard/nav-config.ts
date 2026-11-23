@@ -19,22 +19,26 @@ export type NavItem = {
     | "insights"
     | "assistant"
     | "reviews"
-    | "gift";
+    | "gift"
+    | "package";
   /** Une phrase qui explique à quoi sert la page (menu mobile). */
   hint: string;
   group: NavGroup;
   permission?: Permission;
+  /** Entrée du module rendez-vous : masquée quand l'entreprise l'a désactivé. */
+  bookingModule?: boolean;
   /** Visible seulement quand l'assistant IA est activé. */
   requiresAssistant?: boolean;
   /** Affiché dans la barre d'onglets mobile */
   mobile?: boolean;
 };
 
-export type NavGroup = "accueil" | "rdv" | "clients" | "salon" | "suivi" | "compte";
+export type NavGroup = "accueil" | "marketing" | "rdv" | "clients" | "salon" | "suivi" | "compte";
 
 /** Sections du menu, dans l'ordre d'affichage (titre vide = pas de titre). */
 export const NAV_GROUPS: Array<{ id: NavGroup; title: string }> = [
   { id: "accueil", title: "" },
+  { id: "marketing", title: "Marketing" },
   { id: "rdv", title: "Module rendez-vous" },
   { id: "clients", title: "Clients et ventes" },
   { id: "salon", title: "Mon activité" },
@@ -52,7 +56,16 @@ export const NAV_ITEMS: NavItem[] = [
     mobile: true,
   },
   {
+    href: "/tableau-de-bord/produits",
+    label: "Mes produits",
+    hint: "Ce que vous vendez, base de vos analyses",
+    icon: "package",
+    group: "marketing",
+    permission: "marketing.manage",
+  },
+  {
     href: "/tableau-de-bord/calendrier",
+    bookingModule: true,
     label: "Calendrier",
     hint: "Votre agenda jour par jour",
     icon: "calendar",
@@ -61,6 +74,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/tableau-de-bord/reservations",
+    bookingModule: true,
     label: "Réservations",
     hint: "Liste de tous les rendez-vous",
     icon: "list",
@@ -69,6 +83,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/tableau-de-bord/liste-attente",
+    bookingModule: true,
     label: "Liste d'attente",
     hint: "Clients prévenus quand un créneau se libère",
     icon: "waitlist",
@@ -77,6 +92,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/tableau-de-bord/clients",
+    bookingModule: true,
     label: "Clients",
     hint: "Fiches et historique de vos clients",
     icon: "users",
@@ -86,6 +102,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/tableau-de-bord/avis",
+    bookingModule: true,
     label: "Avis",
     hint: "Notes laissées par vos clients",
     icon: "reviews",
@@ -94,6 +111,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/tableau-de-bord/cartes-cadeaux",
+    bookingModule: true,
     label: "Cartes cadeaux",
     hint: "Vendez en ligne, encaissez avant la visite",
     icon: "gift",
@@ -102,6 +120,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/tableau-de-bord/services",
+    bookingModule: true,
     label: "Prestations",
     hint: "Ce que vous proposez : durée et prix",
     icon: "scissors",
@@ -125,6 +144,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/tableau-de-bord/statistiques",
+    bookingModule: true,
     label: "Statistiques",
     hint: "Chiffre d'affaires et fréquentation",
     icon: "chart",
@@ -133,6 +153,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/tableau-de-bord/analyses",
+    bookingModule: true,
     label: "Conseils",
     hint: "Recommandations pour remplir votre agenda",
     icon: "insights",
@@ -141,6 +162,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/tableau-de-bord/autopilot",
+    bookingModule: true,
     label: "Automatisations",
     hint: "Confirmations, rappels, demandes d'avis",
     icon: "autopilot",
@@ -157,6 +179,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/tableau-de-bord/notifications",
+    bookingModule: true,
     label: "Notifications",
     hint: "Nouvelles réservations et annulations",
     icon: "bell",

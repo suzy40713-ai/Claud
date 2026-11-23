@@ -21,7 +21,15 @@ export type Plan = {
   priceCents: number;
   tagline: string;
   /** null = illimité */
-  limits: { bookingsPerMonth: number | null; members: number; customers: number | null };
+  limits: {
+    bookingsPerMonth: number | null;
+    members: number;
+    customers: number | null;
+    /** Produits suivis par le copilote marketing. */
+    products: number;
+    /** Générations IA par mois (analyses, stratégies, publicités, contenus, assistant). */
+    aiGenerationsPerMonth: number;
+  };
   features: PlanFeatures;
   highlights: string[];
 };
@@ -32,7 +40,13 @@ export const PLANS: Record<PlanId, Plan> = {
     name: "Free",
     priceCents: 0,
     tagline: "Pour découvrir BookSync.",
-    limits: { bookingsPerMonth: 5, members: 1, customers: 20 },
+    limits: {
+      bookingsPerMonth: 5,
+      members: 1,
+      customers: 20,
+      products: 1,
+      aiGenerationsPerMonth: 10,
+    },
     features: {
       emailNotifications: false,
       automaticReminders: false,
@@ -53,7 +67,13 @@ export const PLANS: Record<PlanId, Plan> = {
     name: "Starter",
     priceCents: 999,
     tagline: "Pour les indépendants qui se lancent.",
-    limits: { bookingsPerMonth: null, members: 2, customers: null },
+    limits: {
+      bookingsPerMonth: null,
+      members: 2,
+      customers: null,
+      products: 10,
+      aiGenerationsPerMonth: 100,
+    },
     features: {
       emailNotifications: true,
       automaticReminders: true,
@@ -76,7 +96,13 @@ export const PLANS: Record<PlanId, Plan> = {
     name: "Pro",
     priceCents: 2499,
     tagline: "Pour les équipes qui veulent tout automatiser.",
-    limits: { bookingsPerMonth: null, members: 10, customers: null },
+    limits: {
+      bookingsPerMonth: null,
+      members: 10,
+      customers: null,
+      products: 50,
+      aiGenerationsPerMonth: 400,
+    },
     features: {
       emailNotifications: true,
       automaticReminders: true,
@@ -125,7 +151,7 @@ export function effectivePlan(plan: string, subscriptionStatus: string | null | 
   return ok ? getPlan(plan) : PLANS.free;
 }
 
-export type LimitKind = "bookings" | "members" | "customers";
+export type LimitKind = "bookings" | "members" | "customers" | "products" | "ai";
 
 export function hasRoom(limit: number | null, current: number, adding = 1): boolean {
   return limit === null || current + adding <= limit;
@@ -138,6 +164,10 @@ export const LIMIT_MESSAGES: Record<LimitKind, (plan: Plan) => string> = {
     `Votre forfait ${p.name} est limité à ${p.limits.members} membre${p.limits.members > 1 ? "s" : ""} (vous compris, invitations en attente incluses). Passez à un forfait supérieur pour agrandir votre équipe.`,
   customers: (p) =>
     `Votre forfait ${p.name} est limité à ${p.limits.customers} clients. Passez au forfait Starter pour des clients illimités.`,
+  products: (p) =>
+    `Votre forfait ${p.name} est limité à ${p.limits.products} produit${p.limits.products > 1 ? "s" : ""}. Passez à un forfait supérieur pour en suivre davantage.`,
+  ai: (p) =>
+    `Vous avez utilisé les ${p.limits.aiGenerationsPerMonth} générations IA incluses ce mois-ci dans le forfait ${p.name}. Elles se renouvellent le 1er du mois, ou passez à un forfait supérieur.`,
 };
 
 export class PlanLimitError extends Error {

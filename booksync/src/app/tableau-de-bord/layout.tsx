@@ -11,7 +11,10 @@ import { UserMenu } from "./user-menu";
 
 async function visibleItems() {
   const ctx = await requireOrg();
-  return { ctx, items: visibleNavItems(ctx.role) };
+  return {
+    ctx,
+    items: visibleNavItems(ctx.role, { bookingModule: ctx.organization.bookingModule }),
+  };
 }
 
 async function Sidebar() {

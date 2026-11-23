@@ -8,7 +8,7 @@ import { ACTIVE_ORG_COOKIE, getSession } from "@/server/auth/session";
 import { createOrganization, isSlugTaken } from "@/server/organizations/service";
 
 export type OnboardingState = ActionResult<undefined> & {
-  values?: { name: string; slug: string; timezone: string; activity: string };
+  values?: { name: string; slug: string; timezone: string; activity: string; booking: string };
 };
 
 export async function createOrganizationAction(_prev: OnboardingState | null, formData: FormData) {
@@ -20,8 +20,11 @@ export async function createOrganizationAction(_prev: OnboardingState | null, fo
     slug: String(formData.get("slug") ?? ""),
     timezone: String(formData.get("timezone") ?? ""),
     activity: String(formData.get("activity") ?? ""),
+    booking: formData.get("booking") === "0" ? "0" : "1",
   };
-  const result = await runAction(() => createOrganization(session.user, values));
+  const result = await runAction(() =>
+    createOrganization(session.user, { ...values, bookingModule: values.booking === "1" }),
+  );
   if (!result.ok) return { ...result, values } satisfies OnboardingState;
   (await cookies()).set(ACTIVE_ORG_COOKIE, result.data.id, {
     httpOnly: true,
@@ -30,7 +33,12 @@ export async function createOrganizationAction(_prev: OnboardingState | null, fo
     path: "/",
     maxAge: 60 * 60 * 24 * 365,
   });
-  redirect("/tableau-de-bord/demarrage");
+  // Vente de services sur rendez-vous : installation de l'agenda ; sinon, premier produit.
+  redirect(
+    values.booking === "1"
+      ? "/tableau-de-bord/demarrage"
+      : "/tableau-de-bord/produits/nouveau?premier=1",
+  );
 }
 
 /** Vérification en direct de la disponibilité d'une adresse. */

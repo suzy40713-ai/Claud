@@ -39,7 +39,8 @@ export type Permission =
   | "stats.view"
   | "autopilot.view"
   | "autopilot.manage"
-  | "reviews.manage";
+  | "reviews.manage"
+  | "marketing.manage";
 
 const MATRIX: Record<Role, ReadonlySet<Permission>> = {
   owner: new Set<Permission>([
@@ -65,6 +66,7 @@ const MATRIX: Record<Role, ReadonlySet<Permission>> = {
     "autopilot.view",
     "autopilot.manage",
     "reviews.manage",
+    "marketing.manage",
   ]),
   admin: new Set<Permission>([
     "team.view",
@@ -82,6 +84,7 @@ const MATRIX: Record<Role, ReadonlySet<Permission>> = {
     "stats.view",
     "autopilot.view",
     "reviews.manage",
+    "marketing.manage",
   ]),
   employee: new Set<Permission>(["appointments.manage_own", "schedule.manage_own"]),
 };

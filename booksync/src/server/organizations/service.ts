@@ -35,6 +35,8 @@ export const createOrganizationSchema = z.object({
     message: "Choisissez votre activité.",
   }),
   timezone: z.string().refine(isValidTimeZone, "Fuseau horaire invalide."),
+  /** Module rendez-vous (agenda, page de réservation) activé dès la création. */
+  bookingModule: z.boolean().default(true),
 });
 
 export async function isSlugTaken(slug: string, exceptOrgId?: string) {
@@ -66,6 +68,7 @@ export async function createOrganization(
           slug: data.slug,
           activity: data.activity,
           timezone: data.timezone,
+          bookingModule: data.bookingModule,
         })
         .returning();
       const [owner] = await tx

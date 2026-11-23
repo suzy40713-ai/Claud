@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireOrg } from "@/server/auth/session";
 import { runAction } from "@/server/errors";
+import { setBookingModule } from "@/server/marketing/products";
 import {
   replaceOrganizationImage,
   updateBookingSettings,
@@ -60,6 +61,16 @@ export async function updateMeetingUrlAction(url: string) {
     await runAction(
       () => updateMeetingUrl(ctx, url),
       url.trim() ? "Lien de visio enregistré." : "Lien de visio retiré.",
+    ),
+  );
+}
+
+export async function setBookingModuleAction(enabled: boolean) {
+  const ctx = await requireOrg();
+  return done(
+    await runAction(
+      () => setBookingModule(ctx, enabled),
+      enabled ? "Module rendez-vous activé." : "Module rendez-vous désactivé.",
     ),
   );
 }

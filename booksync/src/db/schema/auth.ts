@@ -143,6 +143,8 @@ export const organization = pgTable(
       .array()
       .notNull()
       .default(sql`'{3000,5000,10000}'::integer[]`),
+    /** Module « vente de services sur rendez-vous » activé (agenda, réservations, acompte…). */
+    bookingModule: boolean().notNull().default(true),
     /** Lien de visio (Google Meet, Zoom…) des rendez-vous en ligne (forfait Starter et plus). */
     meetingUrl: text(),
     /** Personnalisation de la page de réservation (plan Pro) */

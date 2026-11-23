@@ -121,6 +121,35 @@ export function OnboardingForm({
           />
         </div>
       </Field>
+      <fieldset className="grid gap-2">
+        <legend className="mb-1 text-sm font-medium">
+          Vendez-vous des services sur rendez-vous ?
+        </legend>
+        <p className="-mt-1 text-[13px] text-muted-foreground">
+          Coaching, cours, soins, prestations… Active la page de réservation et l&apos;agenda. Vous
+          pourrez changer d&apos;avis dans les paramètres.
+        </p>
+        {(
+          [
+            ["1", "Oui, mes clients prennent rendez-vous"],
+            ["0", "Non, je vends des produits ou je travaille sans rendez-vous"],
+          ] as const
+        ).map(([v, label]) => (
+          <label
+            key={v}
+            className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary-soft"
+          >
+            <input
+              type="radio"
+              name="booking"
+              value={v}
+              defaultChecked={(state?.values?.booking ?? "1") === v}
+              className="accent-[var(--primary)]"
+            />
+            {label}
+          </label>
+        ))}
+      </fieldset>
       <Field id="timezone" label="Fuseau horaire" error={fieldErrors.timezone}>
         <NativeSelect
           id="timezone"

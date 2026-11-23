@@ -11,6 +11,11 @@ export const SETTINGS_TABS = [
     permission: "organization.update",
   },
   {
+    href: "/tableau-de-bord/parametres/modules",
+    label: "Modules",
+    permission: "organization.update",
+  },
+  {
     href: "/tableau-de-bord/parametres/reservation",
     label: "Réservation en ligne",
     permission: "organization.update",

@@ -15,7 +15,9 @@ export const metadata: Metadata = { title: "Menu" };
 
 async function Content() {
   const ctx = await requireOrg();
-  const groups = groupNavItems(visibleNavItems(ctx.role));
+  const groups = groupNavItems(
+    visibleNavItems(ctx.role, { bookingModule: ctx.organization.bookingModule }),
+  );
   return (
     <div className="grid gap-5">
       <div className="rounded-xl border bg-card p-4">

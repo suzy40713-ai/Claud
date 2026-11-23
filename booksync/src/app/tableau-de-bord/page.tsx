@@ -18,12 +18,16 @@ import { requireOrg } from "@/server/auth/session";
 import { getMonthlyUsage } from "@/server/booking/book";
 import { getSetupProgress } from "@/server/onboarding";
 import { getOverview } from "@/server/stats";
+import { MarketingHome, MarketingStrip } from "@/components/marketing-dashboard/marketing-home";
 
 export const metadata: Metadata = { title: "Vue générale" };
 
 async function Content({ searchParams }: { searchParams: Promise<{ acces?: string }> }) {
   const sp = await searchParams;
   const ctx = await requireOrg();
+  const marketing = can(ctx.role, "marketing.manage");
+  // Module rendez-vous désactivé : accueil du copilote marketing.
+  if (!ctx.organization.bookingModule && marketing) return <MarketingHome ctx={ctx} />;
   const tz = ctx.organization.timezone;
   const [o, usage, setup] = await Promise.all([
     getOverview(ctx),
@@ -36,6 +40,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ acces?: strin
 
   return (
     <div className="grid gap-6">
+      {marketing ? <MarketingStrip ctx={ctx} /> : null}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight sm:text-[28px]">

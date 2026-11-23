@@ -143,6 +143,21 @@ export const ACTIVITIES = [
       ["Changement de pneus", 60, 4000],
     ],
   },
+  {
+    value: "ecommerce",
+    label: "E-commerce / boutique en ligne",
+    examples: [["Appel conseil", 20, 0]],
+  },
+  {
+    value: "contenu",
+    label: "Créateur de contenu",
+    examples: [["Collaboration (appel)", 30, 0]],
+  },
+  {
+    value: "numerique",
+    label: "Produits numériques (formations, ebooks…)",
+    examples: [["Appel découverte", 20, 0]],
+  },
   { value: "autre", label: "Autre activité", examples: [["Rendez-vous", 30, 0]] },
 ] as const satisfies ReadonlyArray<{
   value: string;

@@ -641,3 +641,33 @@ export const giftCardUse = pgTable(
     check("gift_card_use_amount_ck", sql`${t.amountCents} > 0`),
   ],
 );
+
+/** Produit ou service suivi par le copilote marketing (base de toutes les analyses IA). */
+export const product = pgTable(
+  "product",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    organizationId: orgId(),
+    name: text().notNull(),
+    description: text().notNull(),
+    /** Prix TTC en centimes ; null = prix non communiqué (devis, variable…). */
+    priceCents: integer(),
+    category: text({
+      enum: ["physique", "numerique", "service", "formation", "abonnement", "autre"],
+    }).notNull(),
+    benefits: text(),
+    targetAudience: text(),
+    url: text(),
+    createdByUserId: uuid().references(() => user.id, { onDelete: "set null" }),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    unique("product_org_id_uq").on(t.organizationId, t.id),
+    index("product_org_created_idx").on(t.organizationId, t.createdAt),
+    check(
+      "product_price_ck",
+      sql`${t.priceCents} is null or ${t.priceCents} between 0 and 100000000`,
+    ),
+  ],
+);
