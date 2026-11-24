@@ -1,37 +1,27 @@
 import "server-only";
-import {
-  PRODUCT_ANALYSIS_INSTRUCTIONS,
-  productAnalysisSchema,
-  productPayload,
-  type ProductAnalysis,
-} from "@/domain/marketing/analysis";
+import { productAnalysisSchema, productPayload, type ProductAnalysis } from "@/domain/marketing/analysis";
+import { analysisTemplate } from "@/domain/marketing/templates";
 import { assertCan } from "@/domain/permissions";
 import type { OrgContext } from "@/server/auth/session";
 import { UserError } from "@/server/errors";
-import { generateStructured, latestGeneration, type AiClient } from "@/server/ai/gateway";
+import { latestGeneration, saveGeneration } from "@/server/ai/gateway";
 import { getProduct } from "./products";
 
 export const ANALYSIS_KIND = "product_analysis";
 
-export async function analyzeProduct(
-  ctx: OrgContext,
-  productId: string,
-  deps?: { client?: AiClient | null; now?: Date },
-) {
+/** Analyse gratuite construite à partir de la fiche produit (aucune IA, aucun coût). */
+export async function analyzeProduct(ctx: OrgContext, productId: string) {
   assertCan(ctx.role, "marketing.manage");
   const p = await getProduct(ctx, productId);
   if (!p) throw new UserError("Produit introuvable.");
-  return generateStructured({
-    ctx,
+  const output = productAnalysisSchema.parse(analysisTemplate(p));
+  const id = await saveGeneration(ctx, {
     kind: ANALYSIS_KIND,
     productId: p.id,
-    schema: productAnalysisSchema,
-    instructions: PRODUCT_ANALYSIS_INSTRUCTIONS,
-    payload: productPayload(p),
-    tier: "fast",
-    maxTokens: 6000,
-    deps,
+    input: { produit: productPayload(p) },
+    output,
   });
+  return { id, output };
 }
 
 /** Dernière analyse valide du produit (null si aucune ou si le format a changé). */

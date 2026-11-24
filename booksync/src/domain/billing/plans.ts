@@ -27,8 +27,6 @@ export type Plan = {
     customers: number | null;
     /** Produits suivis par le copilote marketing. */
     products: number;
-    /** Générations IA par mois (analyses, stratégies, publicités, contenus, assistant). */
-    aiGenerationsPerMonth: number;
   };
   features: PlanFeatures;
   highlights: string[];
@@ -45,7 +43,6 @@ export const PLANS: Record<PlanId, Plan> = {
       members: 1,
       customers: 20,
       products: 1,
-      aiGenerationsPerMonth: 10,
     },
     features: {
       emailNotifications: false,
@@ -56,7 +53,7 @@ export const PLANS: Record<PlanId, Plan> = {
     },
     highlights: [
       "1 produit suivi par le copilote",
-      "10 générations IA par mois (analyse, stratégie, contenus…)",
+      "Analyse, stratégie 30 jours, publicités, contenus et Sales Booster illimités",
       "Autopilot marketing et statistiques",
       "Module rendez-vous : 5 réservations par mois, 20 clients",
     ],
@@ -71,7 +68,6 @@ export const PLANS: Record<PlanId, Plan> = {
       members: 2,
       customers: null,
       products: 10,
-      aiGenerationsPerMonth: 100,
     },
     features: {
       emailNotifications: true,
@@ -82,8 +78,7 @@ export const PLANS: Record<PlanId, Plan> = {
     },
     highlights: [
       "10 produits suivis",
-      "100 générations IA par mois",
-      "Stratégie 30 jours, publicités, contenus, Sales Booster",
+      "Tous les outils marketing, sans limite",
       "Module rendez-vous : réservations et clients illimités",
       "Confirmations et rappels automatiques, visio",
       "Visibilité dans l'annuaire BookSync",
@@ -100,7 +95,6 @@ export const PLANS: Record<PlanId, Plan> = {
       members: 10,
       customers: null,
       products: 50,
-      aiGenerationsPerMonth: 400,
     },
     features: {
       emailNotifications: true,
@@ -111,9 +105,7 @@ export const PLANS: Record<PlanId, Plan> = {
     },
     highlights: [
       "50 produits suivis",
-      "400 générations IA par mois",
       "Tout le forfait Starter, jusqu'à 10 membres",
-      "Assistant BookSync (produits, Autopilot, rendez-vous)",
       "Liste d'attente intelligente",
       "Statistiques avancées et recommandations",
       "Résumé quotidien par email",
@@ -129,7 +121,6 @@ export const PLANS: Record<PlanId, Plan> = {
       members: 25,
       customers: null,
       products: 200,
-      aiGenerationsPerMonth: 1000,
     },
     features: {
       emailNotifications: true,
@@ -140,8 +131,8 @@ export const PLANS: Record<PlanId, Plan> = {
     },
     highlights: [
       "200 produits suivis",
-      "1 000 générations IA par mois",
       "Tout le forfait Pro, jusqu'à 25 membres",
+      "Pour les catalogues de nombreux produits",
     ],
   },
 };
@@ -178,7 +169,7 @@ export function effectivePlan(plan: string, subscriptionStatus: string | null | 
   return ok ? getPlan(plan) : PLANS.free;
 }
 
-export type LimitKind = "bookings" | "members" | "customers" | "products" | "ai";
+export type LimitKind = "bookings" | "members" | "customers" | "products";
 
 export function hasRoom(limit: number | null, current: number, adding = 1): boolean {
   return limit === null || current + adding <= limit;
@@ -193,8 +184,6 @@ export const LIMIT_MESSAGES: Record<LimitKind, (plan: Plan) => string> = {
     `Votre forfait ${p.name} est limité à ${p.limits.customers} clients. Passez au forfait Starter pour des clients illimités.`,
   products: (p) =>
     `Votre forfait ${p.name} est limité à ${p.limits.products} produit${p.limits.products > 1 ? "s" : ""}. Passez à un forfait supérieur pour en suivre davantage.`,
-  ai: (p) =>
-    `Vous avez utilisé les ${p.limits.aiGenerationsPerMonth} générations IA incluses ce mois-ci dans le forfait ${p.name}. Elles se renouvellent le 1er du mois, ou passez à un forfait supérieur.`,
 };
 
 export class PlanLimitError extends Error {

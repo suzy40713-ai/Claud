@@ -11,7 +11,7 @@ export async function runToolAction(kind: string, productId: string, options: un
   const res = await runAction(async () => {
     if (!isToolKind(kind)) throw new UserError("Outil inconnu.");
     const r = await runTool(ctx, kind, productId, options);
-    return { id: r.id, cached: r.cached };
+    return { id: r.id };
   }, "C'est prêt.");
   revalidatePath("/tableau-de-bord", "layout");
   return res;

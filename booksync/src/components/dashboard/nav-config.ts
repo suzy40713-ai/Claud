@@ -69,8 +69,8 @@ export const NAV_ITEMS: NavItem[] = [
     permission: "marketing.manage",
   },
   {
-    href: "/tableau-de-bord/analyse-ia",
-    label: "Analyse IA",
+    href: "/tableau-de-bord/analyse-produit",
+    label: "Analyse produit",
     hint: "Forces, cibles et angles de vente de vos produits",
     icon: "analysis",
     group: "marketing",

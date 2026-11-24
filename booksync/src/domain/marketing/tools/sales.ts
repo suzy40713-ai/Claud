@@ -56,10 +56,3 @@ export const salesSchema = z.object({
 
 export type SalesOutput = z.infer<typeof salesSchema>;
 
-export const SALES_INSTRUCTIONS = `Outil : Sales Booster.
-Propose des améliorations concrètes pour transformer plus de visiteurs en acheteurs.
-- Si un texte de page est fourni, appuie-toi dessus et cite les passages à changer. Sinon, base-toi sur la fiche produit et dis-le.
-- Tu n'as pas visité le site : ne prétends rien savoir de son design, de sa vitesse ou de ses statistiques.
-- Tout est une hypothèse à tester ; aucune hausse de ventes ou de taux de conversion n'est promise ni chiffrée.
-- Les éléments de confiance (avis, garanties, labels) ne doivent être ajoutés que s'ils sont réels.
-- Pas de fausse urgence, de faux stock limité ni de faux avis.`;

@@ -57,12 +57,5 @@ export const adSchema = z.object({
 
 export type AdOutput = z.infer<typeof adSchema>;
 
-export const AD_INSTRUCTIONS = `Outil : créateur de publicités.
-Écris 3 variantes de publicité pour la plateforme et le style choisis.
-- Pour Google Ads : titres de 30 caractères maximum, descriptions de 90 caractères maximum, pas de script vidéo, 10 mots-clés.
-- Pour TikTok, Instagram, Facebook : une vidéo verticale tournable au téléphone, accroche dans les 2 premières secondes.
-- N'invente aucune offre, aucun avis client, aucun chiffre, aucune caution d'expert. Utilise uniquement l'offre réelle fournie, sinon aucune offre.
-- Aucune promesse de résultat garanti, pas de fausse urgence ni de faux compte à rebours.
-- Le ciblage proposé est une hypothèse à tester, présente-le comme tel.`;
 
 export const GOOGLE_LIMITS = { headline: 30, description: 90 } as const;

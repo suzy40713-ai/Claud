@@ -5,34 +5,28 @@ import { parseToolOptions } from "@/domain/marketing/tools/options";
 import { assertCan } from "@/domain/permissions";
 import type { OrgContext } from "@/server/auth/session";
 import { UserError } from "@/server/errors";
-import { generateStructured, getGeneration, listGenerations, type AiClient } from "@/server/ai/gateway";
+import { generationCount, getGeneration, listGenerations, saveGeneration } from "@/server/ai/gateway";
+import { runTemplate } from "@/domain/marketing/templates";
 import { getProduct } from "./products";
 
-/** Lance un outil du copilote (stratégie, publicité, contenus, Sales Booster) sur un produit. */
-export async function runTool(
-  ctx: OrgContext,
-  kind: ToolKind,
-  productId: string,
-  rawOptions: unknown,
-  deps?: { client?: AiClient | null; now?: Date },
-) {
+/** Lance un outil du copilote (stratégie, publicité, contenus, Sales Booster) : modèles gratuits, sans IA. */
+export async function runTool(ctx: OrgContext, kind: ToolKind, productId: string, rawOptions: unknown) {
   assertCan(ctx.role, "marketing.manage");
   const tool = TOOLS[kind];
   const p = await getProduct(ctx, productId);
   if (!p) throw new UserError("Choisissez un de vos produits.", { productId: "Produit introuvable." });
   const { values, labelled } = parseToolOptions(tool.options, rawOptions);
-  return generateStructured({
-    ctx,
+  const seed = await generationCount(ctx, kind, p.id);
+  const output = tool.schema.parse(runTemplate(kind, p, values, seed)) as object;
+  const problem = (tool as { check?: (o: unknown) => string | null }).check?.(output);
+  if (problem) throw new Error(`Modèle ${kind} incomplet : ${problem}`);
+  const id = await saveGeneration(ctx, {
     kind,
     productId: p.id,
-    schema: tool.schema,
-    instructions: tool.instructions,
-    payload: { produit: productPayload(p), choix: labelled },
-    tier: "fast",
-    maxTokens: tool.maxTokens,
-    check: tool.check as ((o: unknown) => string | null) | undefined,
-    deps,
-  }).then((r) => ({ ...r, options: values }));
+    input: { produit: productPayload(p), choix: labelled },
+    output,
+  });
+  return { id, output, options: values };
 }
 
 /** Résultat d'un outil, validé : null s'il n'existe pas, appartient à une autre entreprise ou est invalide. */

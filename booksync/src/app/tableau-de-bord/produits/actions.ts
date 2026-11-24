@@ -38,9 +38,9 @@ export async function analyzeProductAction(id: string) {
   const ctx = await requireOrg();
   const res = await runAction(async () => {
     const r = await analyzeProduct(ctx, id);
-    return { cached: r.cached };
+    return { id: r.id };
   }, "Analyse terminée.");
   revalidatePath(`/tableau-de-bord/produits/${id}`);
-  revalidatePath("/tableau-de-bord/analyse-ia");
+  revalidatePath("/tableau-de-bord/analyse-produit");
   return res;
 }

@@ -45,7 +45,7 @@ export function ToolForm({
         setError({ text: res.error, limit: Boolean(res.limit) });
         return;
       }
-      toast.success(res.data.cached ? "Résultat déjà disponible (non décompté)." : "C'est prêt.");
+      toast.success("C'est prêt.");
       router.push(`${tool.section}/${res.data.id}` as Route);
     });
   }
@@ -146,7 +146,7 @@ export function ToolForm({
       })}
       <div>
         <Button type="submit" disabled={pending || !productId} data-testid="tool-submit">
-          <Sparkles /> {pending ? "Génération en cours… (jusqu'à une minute)" : submitLabel}
+          <Sparkles /> {pending ? "Préparation…" : submitLabel}
         </Button>
       </div>
     </form>

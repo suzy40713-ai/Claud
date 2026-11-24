@@ -65,9 +65,3 @@ export const contentSchema = z.object({
 
 export type ContentOutput = z.infer<typeof contentSchema>;
 
-export const CONTENT_INSTRUCTIONS = `Outil : générateur de contenus.
-Écris 5 contenus prêts à publier pour la plateforme, le format et le but choisis.
-- Structure de chaque contenu : accroche, développement, moment produit, appel à l'action.
-- Contenus réalisables seul, au téléphone, sans montrer son visage si ce n'est pas nécessaire.
-- Ton naturel, phrases courtes, pas de jargon marketing. Hashtags pertinents, sans le #.
-- N'invente ni témoignage, ni chiffre, ni avis client. Aucune promesse de viralité ou de ventes.`;

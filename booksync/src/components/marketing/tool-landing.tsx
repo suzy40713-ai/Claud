@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TOOLS, type ToolKind } from "@/domain/marketing/tools";
 import type { OrgContext } from "@/server/auth/session";
-import { aiQuota, isAiConfigured } from "@/server/ai/gateway";
 import { listProducts } from "@/server/marketing/products";
 import { toolHistory } from "@/server/marketing/tools";
 import { ToolForm } from "./tool-form";
@@ -24,18 +23,10 @@ export async function ToolLanding({
   productId?: string;
 }) {
   const tool = TOOLS[kind];
-  const [products, history, quota] = await Promise.all([
-    listProducts(ctx),
-    toolHistory(ctx, kind),
-    aiQuota(ctx),
-  ]);
+  const [products, history] = await Promise.all([listProducts(ctx), toolHistory(ctx, kind)]);
   const names = new Map(products.map((p) => [p.id, p.name]));
-  const configured = isAiConfigured();
   return (
     <div className="grid gap-6">
-      <p className="text-sm text-muted-foreground" data-testid="ai-quota">
-        {quota.used} / {quota.limit} générations IA utilisées ce mois-ci · forfait {ctx.plan.name}
-      </p>
       {products.length === 0 ? (
         <EmptyState
           icon={<Package />}
@@ -49,18 +40,13 @@ export async function ToolLanding({
             </Button>
           }
         />
-      ) : configured ? (
+      ) : (
         <ToolForm
           kind={kind}
           products={products.map((p) => ({ id: p.id, name: p.name }))}
           defaultProductId={products.some((p) => p.id === productId) ? productId : undefined}
           submitLabel={submitLabel}
         />
-      ) : (
-        <Alert data-testid="ai-not-configured">
-          Les fonctions IA ne sont pas encore activées sur BookSync. Vos produits sont prêts :
-          cet outil sera disponible dès l&apos;activation.
-        </Alert>
       )}
       {history.length > 0 ? (
         <section className="grid gap-3">
@@ -99,9 +85,10 @@ export async function ToolLanding({
 export function AiDisclaimer() {
   return (
     <Alert>
-      Contenu généré par IA à partir de vos informations : relisez-le et adaptez-le avant de
-      l&apos;utiliser. Les hypothèses doivent être vérifiées et aucun résultat (vues, ventes,
-      chiffre d&apos;affaires) n&apos;est garanti.
+      Proposition préparée automatiquement à partir de votre fiche produit (modèles BookSync,
+      sans IA) : relisez-la et adaptez-la à votre style avant de l&apos;utiliser. Les hypothèses
+      doivent être vérifiées et aucun résultat (vues, ventes, chiffre d&apos;affaires) n&apos;est
+      garanti.
     </Alert>
   );
 }

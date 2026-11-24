@@ -10,7 +10,6 @@ import {
   Lightbulb,
   LineChart,
   Megaphone,
-  MessageCircle,
   PenLine,
   Rocket,
   ShieldCheck,
@@ -23,7 +22,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/seo/json-ld";
 import { PLAN_ORDER, PLANS, formatPrice } from "@/domain/billing/plans";
-import { isAiConfigured } from "@/lib/ai-config";
 import { site } from "@/lib/site";
 
 const SEO_DESCRIPTION =
@@ -84,71 +82,54 @@ const TOOLS: Array<{
   icon: typeof Target;
   title: string;
   text: string;
-  /** live : disponible ; ai : disponible dès que les fonctions IA sont activées. */
-  status: "live" | "ai";
   href: string;
 }> = [
   {
     icon: Lightbulb,
     title: "Trouver quoi vendre",
     text: "Vous ne savez pas encore quoi proposer ? À partir de ce que vous savez faire, BookSync vous propose une idée, un nom, des prix et un plan sur 7 jours.",
-    status: "live",
     href: "/lancer-mon-activite",
   },
   {
     icon: Target,
     title: "Analyse de produit",
     text: "Proposition de valeur, clients cibles, problème résolu, arguments de vente, risques et pistes d'amélioration. Les hypothèses sont toujours signalées comme telles.",
-    status: "ai",
     href: "/inscription",
   },
   {
     icon: Compass,
     title: "Stratégie marketing",
     text: "Objectifs, positionnement, canaux, contenu, budget conseillé et calendrier de 30 jours, avec des actions concrètes.",
-    status: "ai",
     href: "/inscription",
   },
   {
     icon: Megaphone,
     title: "Créateur de publicités",
     text: "TikTok, Instagram, Facebook et Google Ads : accroche, texte, appel à l'action, idée de visuel et variantes, dans 5 styles.",
-    status: "ai",
     href: "/inscription",
   },
   {
     icon: PenLine,
     title: "Contenus et scripts vidéo",
     text: "Idées de vidéos, scripts (accroche, développement, produit, appel à l'action), carrousels, descriptions et calendrier de publication.",
-    status: "ai",
     href: "/inscription",
   },
   {
     icon: LineChart,
     title: "Sales Booster",
     text: "Analyse de votre page de vente, descriptions améliorées, offres commerciales et idées de tests A/B.",
-    status: "ai",
-    href: "/inscription",
-  },
-  {
-    icon: MessageCircle,
-    title: "Assistant marketing",
-    text: "« Comment trouver mes 10 premiers clients ? » Des réponses qui tiennent compte de vos produits et de votre stratégie.",
-    status: "ai",
     href: "/inscription",
   },
   {
     icon: Wand2,
     title: "Autopilot",
     text: "Chaque jour, les 3 prochaines actions pour promouvoir votre produit, à cocher, et la progression de votre plan sur 30 jours.",
-    status: "ai",
     href: "/inscription",
   },
   {
     icon: BarChart3,
     title: "Tableau de bord",
     text: "Produits, stratégies, publicités et contenus, budget, dépenses et résultats déclarés, retour sur investissement quand les données le permettent.",
-    status: "live",
     href: "/inscription",
   },
 ];
@@ -183,7 +164,7 @@ const FAQ = [
   },
   {
     q: "D'où viennent les analyses et les chiffres ?",
-    a: "Les analyses s'appuient sur les informations que vous donnez. BookSync n'invente pas de données de marché : une hypothèse est toujours présentée comme une hypothèse à vérifier. Les statistiques marketing utilisent uniquement les résultats que vous saisissez : aucune estimation n'est présentée comme un résultat.",
+    a: "Les analyses et propositions sont préparées par BookSync à partir des informations que vous donnez, avec des modèles conçus pour débutants (pas d'IA payante). BookSync n'invente pas de données de marché : une hypothèse est toujours présentée comme une hypothèse à vérifier. Les statistiques marketing utilisent uniquement les résultats que vous saisissez : aucune estimation n'est présentée comme un résultat.",
   },
   {
     q: "BookSync publie-t-il à ma place sur TikTok ou Instagram ?",
@@ -205,16 +186,8 @@ const FAQ = [
 
 const pill = "rounded-full px-6";
 
-function StatusBadge({ status }: { status: "live" | "soon" }) {
-  return status === "live" ? (
-    <Badge variant="success">Disponible</Badge>
-  ) : (
-    <Badge variant="neutral">En déploiement</Badge>
-  );
-}
 
 export default function LandingPage() {
-  const aiLive = isAiConfigured();
   return (
     <main className="overflow-x-clip">
       <JsonLd data={SOFTWARE_LD} />
@@ -310,32 +283,26 @@ export default function LandingPage() {
               Tout votre marketing au même endroit.
             </h2>
             <p className="mt-5 text-lg text-muted-foreground">
-              Les outils arrivent progressivement : chaque carte indique s&apos;il est déjà
-              disponible.
+              Tous les outils sont disponibles, dès le forfait gratuit.
             </p>
           </div>
           <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="tools">
-            {TOOLS.map(({ icon: Icon, title, text, status: kind, href }) => {
-              const status = kind === "live" || aiLive ? "live" : "soon";
-              return (
+            {TOOLS.map(({ icon: Icon, title, text, href }) => (
               <li key={title} className="flex flex-col rounded-3xl bg-card p-7">
                 <div className="flex items-start justify-between gap-3">
                   <Icon className="size-8 text-primary" strokeWidth={1.6} />
-                  <StatusBadge status={status} />
+                  <Badge variant="success">Disponible</Badge>
                 </div>
                 <h3 className="mt-6 text-xl font-semibold tracking-tight">{title}</h3>
                 <p className="mt-2 text-[15px] text-muted-foreground">{text}</p>
-                {status === "live" ? (
-                  <Link
-                    href={href as Route}
-                    className="mt-4 text-sm font-semibold text-primary hover:underline"
-                  >
-                    Essayer maintenant →
-                  </Link>
-                ) : null}
+                <Link
+                  href={href as Route}
+                  className="mt-4 text-sm font-semibold text-primary hover:underline"
+                >
+                  Essayer maintenant →
+                </Link>
               </li>
-              );
-            })}
+            ))}
           </ul>
         </div>
       </section>

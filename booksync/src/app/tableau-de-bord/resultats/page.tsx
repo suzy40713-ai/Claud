@@ -148,7 +148,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ jours?: strin
         <h2 className="text-lg font-semibold">Votre activité sur BookSync</h2>
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4" data-testid="copilot-activity">
           <StatCard label="Produits" value={String(products.length)} />
-          <StatCard label="Générations IA" value={String(activity.generations)} hint="Depuis le début" />
+          <StatCard label="Propositions préparées" value={String(activity.generations)} hint="Analyses, stratégies, publicités, contenus" />
           <StatCard label="Actions Autopilot faites" value={String(activity.tasksDone)} hint="Depuis le début" />
         </div>
       </section>

@@ -27,12 +27,13 @@ test("copilote : inscription sans rendez-vous, premier produit, fiche, modificat
   await page.getByRole("button", { name: "Ajouter le produit" }).click();
   await expect(page.getByTestId("product-name")).toHaveText("Bougies Lumi");
   await expect(page.getByText("24,90 €")).toBeVisible();
-  // Analyse IA : sans clé API configurée, aucun bouton factice, un message honnête.
-  await expect(page.getByTestId("ai-quota")).toContainText("0 / 10");
-  await expect(page.getByTestId("ai-not-configured")).toBeVisible();
-  await expect(page.getByTestId("analyze-product")).toHaveCount(0);
-  await page.goto("/tableau-de-bord/analyse-ia");
+  // Analyse gratuite (sans IA) : disponible tout de suite.
+  await page.goto("/tableau-de-bord/analyse-produit");
   await expect(page.getByTestId("analysis-products")).toContainText("Pas encore analysé");
+  await page.goBack();
+  await page.getByTestId("analyze-product").click();
+  await expect(page.getByTestId("product-analysis")).toContainText("Bougies Lumi");
+  await expect(page.getByTestId("product-analysis")).toContainText("Hypothèse à vérifier");
 
   // Module rendez-vous désactivé : accueil marketing, pas de calendrier dans le menu.
   await page.goto("/tableau-de-bord");

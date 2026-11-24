@@ -642,7 +642,7 @@ export const giftCardUse = pgTable(
   ],
 );
 
-/** Produit ou service suivi par le copilote marketing (base de toutes les analyses IA). */
+/** Produit ou service suivi par le copilote marketing (base de toutes les analyses). */
 export const product = pgTable(
   "product",
   {
@@ -673,7 +673,7 @@ export const product = pgTable(
 );
 
 /**
- * Génération IA du copilote marketing (analyse, stratégie, publicité, contenu…) : historique,
+ * Résultat du copilote marketing (analyse, stratégie, publicité, contenu…) : historique,
  * coût réel et cache (même demande = même empreinte, réponse réutilisée sans nouvel appel).
  */
 export const aiGeneration = pgTable(

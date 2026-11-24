@@ -3,25 +3,23 @@ import { Suspense } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import { Package, Plus, ScanSearch } from "lucide-react";
-import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { requirePermission } from "@/server/auth/session";
-import { aiQuota, isAiConfigured, listGenerations } from "@/server/ai/gateway";
+import { listGenerations } from "@/server/ai/gateway";
 import { ANALYSIS_KIND } from "@/server/marketing/analysis";
 import { listProducts } from "@/server/marketing/products";
 
-export const metadata: Metadata = { title: "Analyse IA" };
+export const metadata: Metadata = { title: "Analyse produit" };
 
 async function Content() {
   const ctx = await requirePermission("marketing.manage");
-  const [products, history, quota] = await Promise.all([
+  const [products, history] = await Promise.all([
     listProducts(ctx),
     listGenerations(ctx, { kind: ANALYSIS_KIND, limit: 200 }),
-    aiQuota(ctx),
   ]);
   const lastByProduct = new Map<string, Date>();
   for (const h of history)
@@ -29,20 +27,11 @@ async function Content() {
 
   return (
     <div className="grid gap-4">
-      <p className="text-sm text-muted-foreground" data-testid="ai-quota">
-        {quota.used} / {quota.limit} générations IA utilisées ce mois-ci · forfait {ctx.plan.name}
-      </p>
-      {!isAiConfigured() ? (
-        <Alert data-testid="ai-not-configured">
-          Les fonctions IA ne sont pas encore activées sur BookSync. Ajoutez vos produits dès
-          maintenant : ils seront prêts à être analysés.
-        </Alert>
-      ) : null}
       {products.length === 0 ? (
         <EmptyState
           icon={<Package />}
           title="Ajoutez d'abord un produit"
-          description="L'analyse IA part de ce que vous vendez : description, prix, avantages et public visé."
+          description="L'analyse part de ce que vous vendez : description, prix, avantages et public visé."
           action={
             <Button asChild>
               <Link href="/tableau-de-bord/produits/nouveau">
@@ -90,7 +79,7 @@ export default function AnalysisPage() {
   return (
     <>
       <PageHeader
-        title="Analyse IA"
+        title="Analyse produit"
         description="Points forts, acheteurs possibles, angles de vente et premières actions pour chacun de vos produits."
       />
       <Suspense fallback={<Skeleton className="h-64" />}>

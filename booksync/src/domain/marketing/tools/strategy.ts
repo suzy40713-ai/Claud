@@ -87,11 +87,3 @@ export function checkStrategy(s: Strategy): string | null {
   return null;
 }
 
-export const STRATEGY_INSTRUCTIONS = `Outil : stratégie marketing sur 30 jours.
-À partir du produit et des choix de l'utilisateur, construis une stratégie réaliste pour une personne seule.
-- Respecte le temps disponible : les 3 actions d'une journée tiennent dans ce temps (divisé par 7).
-- N'utilise que les canaux choisis (plus « Préparation » pour le travail de fond).
-- Si le budget est nul, aucune action payante. Sinon, la publicité payante ne commence qu'après avoir testé des contenus gratuits.
-- Varie les actions : créer, publier, échanger avec des personnes, mesurer, ajuster. Le jour 7, 14, 21 et 28 contient un bilan.
-- Ne promets aucun chiffre de ventes, d'abonnés ou de vues. Les indicateurs à suivre n'ont pas d'objectif chiffré.
-- Exactement 30 jours numérotés de 1 à 30, 3 actions par jour, phrases courtes.`;

@@ -8,7 +8,7 @@ test.describe("site public", () => {
     await expect(page.getByRole("heading", { level: 1 })).toContainText("De votre idée");
     // Statut honnête de chaque outil : disponible ou en déploiement.
     await expect(page.getByTestId("tools")).toContainText("Disponible");
-    await expect(page.getByTestId("tools")).toContainText("En déploiement");
+    await expect(page.getByTestId("tools")).not.toContainText("En déploiement");
     for (const id of ["fonctionnalites", "avantages", "tarifs", "faq"])
       await expect(page.locator(`#${id}`)).toBeAttached();
     await expect(page.locator("#tarifs")).toContainText("9,99 €");

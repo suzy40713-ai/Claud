@@ -63,7 +63,7 @@ export async function copilotActivity(ctx: OrgContext) {
   const [gen] = await db
     .select({ n: count() })
     .from(aiGeneration)
-    .where(and(eq(aiGeneration.organizationId, ctx.organization.id), eq(aiGeneration.cached, false)));
+    .where(eq(aiGeneration.organizationId, ctx.organization.id));
   const [tasks] = await db
     .select({ n: count() })
     .from(marketingTask)

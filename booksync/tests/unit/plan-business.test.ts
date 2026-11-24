@@ -16,7 +16,6 @@ describe("forfait Business", () => {
     const pro = PLANS.pro.limits;
     const biz = PLANS.business.limits;
     expect(biz.products).toBeGreaterThan(pro.products);
-    expect(biz.aiGenerationsPerMonth).toBeGreaterThan(pro.aiGenerationsPerMonth);
     expect(biz.members).toBeGreaterThanOrEqual(pro.members);
   });
   it("retombe sur Free sans abonnement valable", () => {

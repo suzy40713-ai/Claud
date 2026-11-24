@@ -7,17 +7,16 @@ import { categoryLabel } from "@/domain/marketing/product";
 import { formatCents, formatInTz } from "@/lib/format";
 import type { OrgContext } from "@/server/auth/session";
 import { totals } from "@/domain/marketing/results";
-import { aiQuota } from "@/server/ai/gateway";
 import { getActivePlan } from "@/server/marketing/autopilot";
 import { listProducts } from "@/server/marketing/products";
-import { listResults } from "@/server/marketing/results";
+import { copilotActivity, listResults } from "@/server/marketing/results";
 
 /** Accueil du copilote marketing : uniquement des données réelles de l'entreprise. */
 export async function MarketingHome({ ctx }: { ctx: OrgContext }) {
-  const [products, plan, quota, results] = await Promise.all([
+  const [products, plan, activity, results] = await Promise.all([
     listProducts(ctx),
     getActivePlan(ctx),
-    aiQuota(ctx),
+    copilotActivity(ctx),
     listResults(ctx, 30),
   ]);
   const t = totals(results);
@@ -40,8 +39,8 @@ export async function MarketingHome({ ctx }: { ctx: OrgContext }) {
           icon={<Package />}
         />
         <StatCard
-          label="Générations IA ce mois-ci"
-          value={`${quota.used} / ${quota.limit}`}
+          label="Actions Autopilot faites"
+          value={String(activity.tasksDone)}
           icon={<Sparkles />}
         />
         <StatCard

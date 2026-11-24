@@ -51,8 +51,6 @@ export const env = createEnv({
      */
     ANTHROPIC_API_KEY: z.string().startsWith("sk-ant-").optional(),
     /** Modèles du copilote (niveau rapide / puissant). Par défaut : Claude Haiku 5.5 pour les deux. */
-    AI_MODEL_FAST: z.string().min(3).optional(),
-    AI_MODEL_STRONG: z.string().min(3).optional(),
     /** Plafond de dépense mensuel de l'assistant, toutes entreprises confondues, en dollars. */
     ASSISTANT_MONTHLY_BUDGET_USD: z.coerce.number().min(0).max(1000).default(5),
   },
@@ -79,8 +77,6 @@ export const env = createEnv({
     CRON_SECRET: process.env.CRON_SECRET,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     ASSISTANT_MONTHLY_BUDGET_USD: process.env.ASSISTANT_MONTHLY_BUDGET_USD,
-    AI_MODEL_FAST: process.env.AI_MODEL_FAST,
-    AI_MODEL_STRONG: process.env.AI_MODEL_STRONG,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   },
   // Permet le build Docker sans secrets (ils sont injectés à l'exécution par Render).
