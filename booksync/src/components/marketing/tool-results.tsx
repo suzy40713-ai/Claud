@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { CopyButton } from "@/components/ui/copy-button";
 import { BASIS_LABELS } from "@/domain/marketing/analysis";
+import { AddToPlanButton } from "@/app/tableau-de-bord/autopilot-marketing/controls";
 import { GOOGLE_LIMITS, type AdOutput } from "@/domain/marketing/tools/ad";
 import type { CompetitorsOutput } from "@/domain/marketing/tools/competitors";
 import type { ContentOutput } from "@/domain/marketing/tools/content";
@@ -99,7 +100,9 @@ export function StrategyView({ s }: { s: Strategy }) {
               <details key={w} open={w === 1} className="rounded-xl border p-3">
                 <summary className="cursor-pointer font-medium">
                   {w === 5 ? "Jours 29 et 30" : `Semaine ${w}`}
-                  {focus ? <span className="font-normal text-muted-foreground"> · {focus}</span> : null}
+                  {focus ? (
+                    <span className="font-normal text-muted-foreground"> · {focus}</span>
+                  ) : null}
                 </summary>
                 <ol className="mt-3 grid gap-3">
                   {list.map((d) => (
@@ -171,7 +174,9 @@ export function AdView({ ad, google }: { ad: AdOutput; google: boolean }) {
         <Card
           key={i}
           title={`Variante ${i + 1} · ${v.angle}`}
-          aside={<CopyButton label="Copier" value={`${v.headline}\n\n${v.primaryText}\n\n${v.cta}`} />}
+          aside={
+            <CopyButton label="Copier" value={`${v.headline}\n\n${v.primaryText}\n\n${v.cta}`} />
+          }
         >
           <p className="font-semibold">
             {v.headline}
@@ -197,7 +202,10 @@ export function AdView({ ad, google }: { ad: AdOutput; google: boolean }) {
         </Card>
       ))}
       {ad.keywords.length ? (
-        <Card title="Mots-clés à tester" aside={<CopyButton label="Copier" value={ad.keywords.join("\n")} />}>
+        <Card
+          title="Mots-clés à tester"
+          aside={<CopyButton label="Copier" value={ad.keywords.join("\n")} />}
+        >
           <p>{ad.keywords.join(" · ")}</p>
         </Card>
       ) : null}
@@ -238,7 +246,11 @@ export function ContentView({ c }: { c: ContentOutput }) {
           p.hashtags.map((h) => `#${h.replace(/^#/, "")}`).join(" "),
         ].join("\n");
         return (
-          <Card key={i} title={`${i + 1}. ${p.title}`} aside={<CopyButton label="Copier" value={full} />}>
+          <Card
+            key={i}
+            title={`${i + 1}. ${p.title}`}
+            aside={<CopyButton label="Copier" value={full} />}
+          >
             <p>
               <span className="font-semibold">Accroche :</span> {p.hook}
             </p>
@@ -254,7 +266,9 @@ export function ContentView({ c }: { c: ContentOutput }) {
               <span className="font-semibold">Appel à l&apos;action :</span> {p.cta}
             </p>
             {p.onScreenText ? (
-              <p className="mt-1 text-sm text-muted-foreground">Texte à l&apos;écran : {p.onScreenText}</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Texte à l&apos;écran : {p.onScreenText}
+              </p>
             ) : null}
             <div className="mt-3 rounded-lg bg-muted p-3 text-sm">
               <p className="whitespace-pre-line">{p.caption}</p>
@@ -289,7 +303,7 @@ export function ContentView({ c }: { c: ContentOutput }) {
 
 const EFFORT = { faible: "success", moyen: "warning", important: "destructive" } as const;
 
-export function SalesView({ s }: { s: SalesOutput }) {
+export function SalesView({ s, canPlan = false }: { s: SalesOutput; canPlan?: boolean }) {
   return (
     <div className="grid gap-4" data-testid="sales-view">
       <Card title="Diagnostic (hypothèse)">
@@ -302,6 +316,7 @@ export function SalesView({ s }: { s: SalesOutput }) {
               <span className="font-medium">{q.action}</span>{" "}
               <Badge variant={EFFORT[q.effort]}>effort {q.effort}</Badge>
               <p className="text-muted-foreground">{q.why}</p>
+              {canPlan ? <AddToPlanButton title={q.action} detail={q.why} /> : null}
             </li>
           ))}
         </ol>
@@ -385,7 +400,8 @@ export function CustomersView({ c }: { c: CustomersOutput }) {
             ))}
           </div>
           <p className="mt-3 text-sm">
-            <span className="font-semibold">Centres d&apos;intérêt :</span> {p.interests.join(" · ")}
+            <span className="font-semibold">Centres d&apos;intérêt :</span>{" "}
+            {p.interests.join(" · ")}
           </p>
           <ul className="mt-2 grid gap-1 text-sm">
             {p.channels.map((ch, j) => (
@@ -419,7 +435,13 @@ export function CustomersView({ c }: { c: CustomersOutput }) {
   );
 }
 
-export function CompetitorsView({ c }: { c: CompetitorsOutput }) {
+export function CompetitorsView({
+  c,
+  canPlan = false,
+}: {
+  c: CompetitorsOutput;
+  canPlan?: boolean;
+}) {
   return (
     <div className="grid gap-4" data-testid="competitors-view">
       {c.competitors.length === 0 ? (
@@ -474,9 +496,14 @@ export function CompetitorsView({ c }: { c: CompetitorsOutput }) {
       ))}
       <div className="grid gap-4 md:grid-cols-2">
         <Card title="Comment vous différencier">
-          <ul className="list-disc pl-5">
+          <ul className="grid list-disc gap-1 pl-5">
             {c.differentiation.map((t, i) => (
-              <li key={i}>{t}</li>
+              <li key={i}>
+                {t}
+                {canPlan ? (
+                  <AddToPlanButton title={t} detail="Idée issue de l'analyse de la concurrence." />
+                ) : null}
+              </li>
             ))}
           </ul>
         </Card>

@@ -30,7 +30,7 @@ test.describe("inscription et entreprise", () => {
     await expect(page.getByTestId("idea-finder")).toBeVisible();
     await page.goto("/tableau-de-bord");
     await expect(page.getByRole("heading", { name: "Bonjour Camille" })).toBeVisible();
-    await expect(page.getByTestId("journey")).toContainText("Choisir ce que tu vends");
+    await expect(page.getByTestId("journey")).toContainText("Choisir ce que vous vendez");
 
     // L'entreprise et l'appartenance sont bien en base.
     const [row] = await sql<{ role: string; timezone: string }[]>`

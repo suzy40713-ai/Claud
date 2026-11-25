@@ -14,6 +14,7 @@ import { journey, profitability } from "@/domain/marketing/profitability";
 import { academyProgress } from "@/server/academy/progress";
 import { listGenerations } from "@/server/ai/gateway";
 import { ANALYSIS_KIND } from "@/server/marketing/analysis";
+import { ActivityPanel } from "./activity";
 
 /** Accueil : prochaine étape, objectif de rentabilité, Autopilot du jour, Académie. */
 export async function MarketingHome({ ctx }: { ctx: OrgContext }) {
@@ -62,8 +63,8 @@ export async function MarketingHome({ ctx }: { ctx: OrgContext }) {
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {goal.reached
-                  ? `Abonnement rentabilisé ce mois-ci 🎉 Tout ce que tu vends en plus, c'est pour toi (+${formatCents(goal.profitCents)}).`
-                  : `Ventes de ${formatCents(month.revenueCents)} ce mois-ci sur ${formatCents(ctx.plan.priceCents)} : encore ${formatCents(goal.remainingCents)} pour rentabiliser ton forfait ${ctx.plan.name}.`}
+                  ? `Abonnement rentabilisé ce mois-ci 🎉 Tout ce que vous vendez en plus, c'est pour vous (+${formatCents(goal.profitCents)}).`
+                  : `Ventes de ${formatCents(month.revenueCents)} ce mois-ci sur ${formatCents(ctx.plan.priceCents)} : encore ${formatCents(goal.remainingCents)} pour rentabiliser votre forfait ${ctx.plan.name}.`}
               </p>
             </div>
             <span className="text-2xl font-semibold tabular-nums">{goal.percent} %</span>
@@ -93,7 +94,7 @@ export async function MarketingHome({ ctx }: { ctx: OrgContext }) {
           data-testid="first-sale-goal"
         >
           <p className="text-sm">
-            <strong>Ton objectif : ta première vente.</strong>{" "}
+            <strong>Votre objectif : votre première vente.</strong>{" "}
             {month.sales > 0
               ? `${month.sales} vente${month.sales > 1 ? "s" : ""} notée${month.sales > 1 ? "s" : ""} ce mois-ci, bravo !`
               : "Avec Starter : Académie complète, outils illimités et objectif de rentabilité suivi chaque mois."}
@@ -111,7 +112,7 @@ export async function MarketingHome({ ctx }: { ctx: OrgContext }) {
         >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-medium text-primary">Ta prochaine étape</p>
+              <p className="text-sm font-medium text-primary">Votre prochaine étape</p>
               <h2 className="text-lg font-semibold">{next.label}</h2>
             </div>
             <Button asChild>
@@ -169,7 +170,7 @@ export async function MarketingHome({ ctx }: { ctx: OrgContext }) {
         </section>
       ) : null}
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2">
         <StatCard
           label="Ventes ce mois-ci"
           value={String(month.sales)}
@@ -182,13 +183,9 @@ export async function MarketingHome({ ctx }: { ctx: OrgContext }) {
           hint="Leçons terminées"
           icon={<GraduationCap />}
         />
-        <StatCard
-          label="Produits"
-          value={`${products.length} / ${ctx.plan.limits.products}`}
-          hint={`Forfait ${ctx.plan.name}`}
-          icon={<Package />}
-        />
       </div>
+
+      <ActivityPanel ctx={ctx} />
 
       {lesson ? (
         <section className="flex flex-col gap-3 rounded-2xl border bg-primary-soft p-5 sm:flex-row sm:items-center sm:justify-between">

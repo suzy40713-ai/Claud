@@ -33,8 +33,8 @@ test("copilote : inscription sans rendez-vous, premier produit, fiche, modificat
 
   // Module rendez-vous désactivé : accueil marketing, pas de calendrier dans le menu.
   await page.goto("/tableau-de-bord");
-  await expect(page.getByTestId("journey")).toContainText("Créer ta stratégie 30 jours");
-  await expect(page.getByTestId("marketing-home")).toContainText("1 / 1");
+  await expect(page.getByTestId("journey")).toContainText("Créer votre stratégie 30 jours");
+  await expect(page.getByTestId("activity-counts")).toContainText("Produits1");
   await expect(page.getByTestId("first-sale-goal")).toBeVisible();
   await expect(page.getByRole("link", { name: "Calendrier" })).toHaveCount(0);
 

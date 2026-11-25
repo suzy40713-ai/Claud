@@ -11,6 +11,7 @@ import { CompetitorsView } from "@/components/marketing/tool-results";
 import { requirePermission } from "@/server/auth/session";
 import { getProduct } from "@/server/marketing/products";
 import { getToolResult } from "@/server/marketing/tools";
+import { getActivePlan } from "@/server/marketing/autopilot";
 
 export const metadata: Metadata = { title: "Concurrence" };
 
@@ -37,7 +38,7 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
       </div>
       <ToolChoices choix={r.input.choix} />
       <AiDisclaimer model={r.model} />
-      <CompetitorsView c={r.output} />
+      <CompetitorsView c={r.output} canPlan={Boolean(await getActivePlan(ctx))} />
       {product ? (
         <div>
           <Button asChild variant="secondary">

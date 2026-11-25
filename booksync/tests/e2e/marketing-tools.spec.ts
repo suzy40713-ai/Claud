@@ -65,6 +65,19 @@ test("copilote : stratégie, plan d'action, publicités, contenus, ventes, clien
   await page.getByLabel(/Texte de votre page de vente/).fill("Bougie Lumi, coulée à la main.");
   await page.getByTestId("tool-submit").click();
   await expect(page.getByTestId("sales-view")).toContainText("Afficher le prix");
+  // Une amélioration peut rejoindre le plan d'action du jour.
+  await page.getByTestId("add-to-plan").first().click();
+  await expect(page.getByTestId("add-to-plan").first()).toHaveText(/Ajoutée au plan/);
+  await page.goto("/tableau-de-bord/autopilot-marketing");
+  await expect(page.getByTestId("today-tasks").getByTestId("marketing-task")).toHaveCount(4);
+  await page.getByTestId("add-task").getByRole("textbox").fill("Appeler 3 boutiques déco");
+  await page.getByTestId("add-task").getByRole("button", { name: "Ajouter" }).click();
+  await expect(page.getByTestId("today-tasks")).toContainText("Appeler 3 boutiques déco");
+
+  // Tableau de bord : compteurs et activité récente réels.
+  await page.goto("/tableau-de-bord");
+  await expect(page.getByTestId("activity-counts")).toContainText("Stratégies");
+  await expect(page.getByTestId("activity-history")).toContainText("Optimisation des ventes");
 
   // Recherche de clients et concurrence (sans adresse : analyse générale, rien d'inventé).
   await page.goto("/tableau-de-bord/clients-cibles");

@@ -135,3 +135,13 @@ export async function getGeneration(ctx: OrgContext, id: string) {
     .where(and(eq(aiGeneration.organizationId, ctx.organization.id), eq(aiGeneration.id, id)));
   return row ?? null;
 }
+
+/** Nombre de résultats par outil (tableau de bord). */
+export async function generationCountsByKind(ctx: OrgContext) {
+  const rows = await db
+    .select({ kind: aiGeneration.kind, n: count() })
+    .from(aiGeneration)
+    .where(eq(aiGeneration.organizationId, ctx.organization.id))
+    .groupBy(aiGeneration.kind);
+  return Object.fromEntries(rows.map((r) => [r.kind, r.n])) as Record<string, number>;
+}

@@ -1,5 +1,6 @@
 import "server-only";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
+import { z } from "zod";
 import { db } from "@/db/client";
 import { marketingPlan, marketingTask, product } from "@/db/schema";
 import { addDays, localDateOf } from "@/domain/availability/engine";
@@ -32,7 +33,9 @@ export async function startPlan(ctx: OrgContext, strategyId: string, now = new D
     await tx
       .update(marketingPlan)
       .set({ active: false })
-      .where(and(eq(marketingPlan.organizationId, ctx.organization.id), eq(marketingPlan.active, true)));
+      .where(
+        and(eq(marketingPlan.organizationId, ctx.organization.id), eq(marketingPlan.active, true)),
+      );
     const [plan] = await tx
       .insert(marketingPlan)
       .values({
@@ -45,7 +48,13 @@ export async function startPlan(ctx: OrgContext, strategyId: string, now = new D
       .returning();
     await tx
       .insert(marketingTask)
-      .values([...unique.values()].map((r) => ({ ...r, organizationId: ctx.organization.id, planId: plan.id })));
+      .values(
+        [...unique.values()].map((r) => ({
+          ...r,
+          organizationId: ctx.organization.id,
+          planId: plan.id,
+        })),
+      );
     return plan;
   });
 }
@@ -58,14 +67,24 @@ export async function getActivePlan(ctx: OrgContext, now = new Date()) {
     .from(marketingPlan)
     .innerJoin(
       product,
-      and(eq(product.organizationId, marketingPlan.organizationId), eq(product.id, marketingPlan.productId)),
+      and(
+        eq(product.organizationId, marketingPlan.organizationId),
+        eq(product.id, marketingPlan.productId),
+      ),
     )
-    .where(and(eq(marketingPlan.organizationId, ctx.organization.id), eq(marketingPlan.active, true)));
+    .where(
+      and(eq(marketingPlan.organizationId, ctx.organization.id), eq(marketingPlan.active, true)),
+    );
   if (!row) return null;
   const tasks = await db
     .select()
     .from(marketingTask)
-    .where(and(eq(marketingTask.organizationId, ctx.organization.id), eq(marketingTask.planId, row.plan.id)))
+    .where(
+      and(
+        eq(marketingTask.organizationId, ctx.organization.id),
+        eq(marketingTask.planId, row.plan.id),
+      ),
+    )
     .orderBy(asc(marketingTask.day), asc(marketingTask.position));
   const today = localDateOf(now, ctx.organization.timezone);
   const day = planDay(row.plan.startDate, today);
@@ -97,5 +116,50 @@ export async function stopPlan(ctx: OrgContext) {
   await db
     .update(marketingPlan)
     .set({ active: false })
-    .where(and(eq(marketingPlan.organizationId, ctx.organization.id), eq(marketingPlan.active, true)));
+    .where(
+      and(eq(marketingPlan.organizationId, ctx.organization.id), eq(marketingPlan.active, true)),
+    );
+}
+
+const taskSchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(3, "Décrivez l'action (3 caractères minimum).")
+    .max(200, "200 caractères maximum."),
+  detail: z.string().trim().max(500, "500 caractères maximum.").optional().default(""),
+  channel: z.string().trim().max(60).optional().default("Préparation"),
+});
+
+/** Ajoute une action au jour courant du plan d'action actif (tâche libre ou issue d'un outil). */
+export async function addTask(
+  ctx: OrgContext,
+  input: { title: string; detail?: string; channel?: string },
+  now = new Date(),
+) {
+  assertCan(ctx.role, "marketing.manage");
+  const v = taskSchema.parse(input);
+  const active = await getActivePlan(ctx, now);
+  if (!active) throw new UserError("Lancez d'abord votre plan d'action à partir d'une stratégie.");
+  const day = Math.min(PLAN_DAYS, active.day);
+  return db.transaction(async (tx) => {
+    const [{ max }] = await tx
+      .select({ max: sql<number>`coalesce(max(${marketingTask.position}), -1)`.mapWith(Number) })
+      .from(marketingTask)
+      .where(and(eq(marketingTask.planId, active.plan.id), eq(marketingTask.day, day)));
+    if (max >= 19) throw new UserError("20 actions maximum par jour.");
+    const [row] = await tx
+      .insert(marketingTask)
+      .values({
+        organizationId: ctx.organization.id,
+        planId: active.plan.id,
+        day,
+        position: max + 1,
+        title: v.title,
+        detail: v.detail || "Ajoutée par vous.",
+        channel: v.channel || "Préparation",
+      })
+      .returning();
+    return row;
+  });
 }

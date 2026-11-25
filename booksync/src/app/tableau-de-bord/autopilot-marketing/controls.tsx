@@ -1,13 +1,14 @@
 "use client";
 
-import { useOptimistic, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Rocket, Square } from "lucide-react";
+import { Plus, Rocket, Square } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { setTaskDoneAction, startPlanAction, stopPlanAction } from "./actions";
+import { Input } from "@/components/ui/input";
+import { addTaskAction, setTaskDoneAction, startPlanAction, stopPlanAction } from "./actions";
 
 export type TaskView = {
   id: string;
@@ -84,7 +85,8 @@ export function StopPlanButton() {
       variant="ghost"
       disabled={pending}
       onClick={() => {
-        if (!window.confirm("Arrêter l'Autopilot ? Vos actions cochées restent enregistrées.")) return;
+        if (!window.confirm("Arrêter l'Autopilot ? Vos actions cochées restent enregistrées."))
+          return;
         startTransition(async () => {
           const res = await stopPlanAction();
           if (!res.ok) return void toast.error(res.error);
@@ -94,6 +96,65 @@ export function StopPlanButton() {
       }}
     >
       <Square /> Arrêter l&apos;Autopilot
+    </Button>
+  );
+}
+
+/** Ajout d'une action libre au plan du jour. */
+export function AddTaskForm() {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  const [title, setTitle] = useState("");
+  return (
+    <form
+      className="flex flex-col gap-2 sm:flex-row"
+      data-testid="add-task"
+      onSubmit={(e) => {
+        e.preventDefault();
+        startTransition(async () => {
+          const res = await addTaskAction({ title });
+          if (!res.ok) return void toast.error(res.error);
+          toast.success(res.message ?? "Action ajoutée.");
+          setTitle("");
+          router.refresh();
+        });
+      }}
+    >
+      <Input
+        aria-label="Nouvelle action"
+        placeholder="Ajouter une action pour aujourd'hui…"
+        value={title}
+        maxLength={200}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      <Button type="submit" variant="secondary" disabled={pending || title.trim().length < 3}>
+        <Plus /> Ajouter
+      </Button>
+    </form>
+  );
+}
+
+/** Bouton « Ajouter à mon plan » sur une recommandation d'un outil. */
+export function AddToPlanButton({ title, detail }: { title: string; detail?: string }) {
+  const [pending, startTransition] = useTransition();
+  const [added, setAdded] = useState(false);
+  return (
+    <Button
+      type="button"
+      size="sm"
+      variant="ghost"
+      disabled={pending || added}
+      data-testid="add-to-plan"
+      onClick={() =>
+        startTransition(async () => {
+          const res = await addTaskAction({ title, detail });
+          if (!res.ok) return void toast.error(res.error);
+          setAdded(true);
+          toast.success("Ajoutée à votre plan d'action du jour.");
+        })
+      }
+    >
+      <Plus /> {added ? "Ajoutée au plan" : "Ajouter à mon plan"}
     </Button>
   );
 }

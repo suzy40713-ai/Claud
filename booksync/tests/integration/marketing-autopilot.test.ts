@@ -2,7 +2,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import { db, sql as pg } from "@/db/client";
 import { aiGeneration } from "@/db/schema";
 import { assistantContext } from "@/server/assistant/service";
-import { getActivePlan, setTaskDone, startPlan, stopPlan } from "@/server/marketing/autopilot";
+import { addTask, getActivePlan, setTaskDone, startPlan, stopPlan } from "@/server/marketing/autopilot";
 import { createProduct, deleteProduct } from "@/server/marketing/products";
 import { STRATEGY } from "../fixtures/marketing";
 import { makeOrg } from "./factory";
@@ -64,6 +64,19 @@ describe("Autopilot marketing", () => {
     await startPlan(ctx, strategyId);
     await deleteProduct(ctx, p.id);
     expect(await getActivePlan(ctx)).toBeNull();
+  });
+
+  it("ajoute des actions libres au jour courant, seulement avec un plan actif", async () => {
+    const ctx = await makeOrg({ plan: "starter" });
+    const { strategyId } = await setup(ctx);
+    await expect(addTask(ctx, { title: "Écrire à 5 clients" })).rejects.toThrow(/Lancez d'abord/);
+    await startPlan(ctx, strategyId);
+    await addTask(ctx, { title: "Écrire à 5 clients" });
+    await addTask(ctx, { title: "Afficher le prix", detail: "Issu de l'optimisation des ventes." });
+    const a = (await getActivePlan(ctx))!;
+    expect(a.today.map((t) => t.title).slice(-2)).toEqual(["Écrire à 5 clients", "Afficher le prix"]);
+    expect(a.progress.total).toBe(92);
+    await expect(addTask(ctx, { title: "x" })).rejects.toThrow();
   });
 
   it("isole les entreprises", async () => {

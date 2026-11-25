@@ -36,6 +36,7 @@ test("statistiques marketing : saisie réelle, indicateurs calculés, aucun chif
   await page.goto("/tableau-de-bord");
   await expect(page.getByTestId("marketing-home")).toContainText("Ventes ce mois-ci");
   await expect(page.getByTestId("marketing-home")).toContainText("Chiffre d'affaires : 59,80 €");
+  await expect(page.getByTestId("weekly-chart")).toContainText("59,80 €");
 
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth > window.innerWidth + 1,

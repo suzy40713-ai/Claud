@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import type { ProductInput } from "@/domain/marketing/product";
 import { requireOrg } from "@/server/auth/session";
-import { runAction } from "@/server/errors";
+import { runAction, UserError } from "@/server/errors";
+import { rateLimit } from "@/server/rate-limit";
 import {
   createProduct,
   createProductFromIdea,
@@ -42,6 +43,8 @@ export async function deleteProductAction(id: string) {
 export async function analyzeProductAction(id: string) {
   const ctx = await requireOrg();
   const res = await runAction(async () => {
+    if (!rateLimit(`tools:${ctx.userId}`, 10, 60_000))
+      throw new UserError("Trop de demandes d'affilée. Patientez une minute.");
     const r = await analyzeProduct(ctx, id);
     return { id: r.id };
   }, "Analyse terminée.");

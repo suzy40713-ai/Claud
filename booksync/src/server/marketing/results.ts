@@ -98,3 +98,20 @@ export async function hasAnySale(ctx: OrgContext) {
     .where(and(eq(marketingResult.organizationId, ctx.organization.id), gt(marketingResult.sales, 0)));
   return (row?.n ?? 0) > 0;
 }
+
+/** Ventes et chiffre d'affaires déclarés par semaine (8 dernières semaines), pour le graphique. */
+export async function weeklyResults(ctx: OrgContext, now = new Date()) {
+  const rows = await listResults(ctx, 56, now);
+  const today = localDateOf(now, ctx.organization.timezone);
+  const weeks = Array.from({ length: 8 }, (_, i) => {
+    const end = addDays(today, -7 * (7 - i));
+    return { start: addDays(end, -6), end, sales: 0, revenueCents: 0 };
+  });
+  for (const r of rows) {
+    const w = weeks.find((x) => r.date >= x.start && r.date <= x.end);
+    if (!w) continue;
+    w.sales += r.sales ?? 0;
+    w.revenueCents += r.revenueCents ?? 0;
+  }
+  return { weeks, hasData: rows.length > 0 };
+}

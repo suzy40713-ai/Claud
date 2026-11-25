@@ -13,7 +13,7 @@ import { PLAN_DAYS } from "@/domain/marketing/autopilot";
 import { formatInTz } from "@/lib/format";
 import { requirePermission } from "@/server/auth/session";
 import { getActivePlan } from "@/server/marketing/autopilot";
-import { StopPlanButton, TaskItem } from "./controls";
+import { AddTaskForm, StopPlanButton, TaskItem } from "./controls";
 
 export const metadata: Metadata = { title: "Plan d'action" };
 
@@ -70,8 +70,8 @@ async function Content() {
       </div>
       {progress.finished ? (
         <Alert variant="success">
-          Les 30 jours sont terminés. Faites le bilan dans vos statistiques, puis créez une
-          nouvelle stratégie à partir de ce que vous avez appris.
+          Les 30 jours sont terminés. Faites le bilan dans vos statistiques, puis créez une nouvelle
+          stratégie à partir de ce que vous avez appris.
         </Alert>
       ) : (
         <section className="grid gap-3">
@@ -83,6 +83,7 @@ async function Content() {
               <TaskItem key={t.id} task={view(t)} />
             ))}
           </ul>
+          <AddTaskForm />
         </section>
       )}
       {a.late.length ? (
@@ -139,7 +140,7 @@ export default function MarketingAutopilotPage() {
     <>
       <PageHeader
         title="Plan d'action"
-        description="Chaque jour, 3 actions marketing simples tirées de votre stratégie. Cochez-les au fur et à mesure."
+        description="Votre stratégie transformée en actions concrètes : 3 par jour, plus celles que vous ajoutez. Cochez-les au fur et à mesure."
       />
       <Suspense fallback={<Skeleton className="h-96" />}>
         <Content />

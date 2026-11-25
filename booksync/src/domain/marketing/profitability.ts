@@ -24,31 +24,31 @@ export function journey(s: {
   return [
     {
       id: "produit",
-      label: "Choisir ce que tu vends",
+      label: "Choisir ce que vous vendez",
       done: s.hasProduct,
       href: "/tableau-de-bord/trouver-une-idee",
     },
     {
       id: "analyse",
-      label: "Analyser ton produit",
+      label: "Analyser votre produit",
       done: s.hasAnalysis,
       href: "/tableau-de-bord/produits",
     },
     {
       id: "strategie",
-      label: "Créer ta stratégie 30 jours",
+      label: "Créer votre stratégie 30 jours",
       done: s.hasStrategy,
       href: "/tableau-de-bord/strategies",
     },
     {
       id: "autopilot",
-      label: "Lancer ton Autopilot",
+      label: "Lancer votre plan d'action",
       done: s.hasPlan,
       href: "/tableau-de-bord/strategies",
     },
     {
       id: "vente",
-      label: "Noter ta première vente",
+      label: "Noter votre première vente",
       done: s.hasSale,
       href: "/tableau-de-bord/resultats",
     },

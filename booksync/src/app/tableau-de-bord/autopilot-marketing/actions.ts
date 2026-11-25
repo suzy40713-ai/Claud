@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireOrg } from "@/server/auth/session";
 import { runAction } from "@/server/errors";
-import { setTaskDone, startPlan, stopPlan } from "@/server/marketing/autopilot";
+import { addTask, setTaskDone, startPlan, stopPlan } from "@/server/marketing/autopilot";
 
 export async function startPlanAction(strategyId: string) {
   const ctx = await requireOrg();
@@ -24,6 +24,15 @@ export async function setTaskDoneAction(taskId: string, done: boolean) {
 export async function stopPlanAction() {
   const ctx = await requireOrg();
   const res = await runAction(() => stopPlan(ctx), "Autopilot arrêté.");
+  revalidatePath("/tableau-de-bord", "layout");
+  return res;
+}
+
+export async function addTaskAction(input: { title: string; detail?: string; channel?: string }) {
+  const ctx = await requireOrg();
+  const res = await runAction(async () => {
+    await addTask(ctx, input);
+  }, "Action ajoutée à votre plan du jour.");
   revalidatePath("/tableau-de-bord", "layout");
   return res;
 }
