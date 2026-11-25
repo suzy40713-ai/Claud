@@ -6,6 +6,21 @@ import { z } from "zod";
  * Une variable manquante ou invalide fait échouer le démarrage avec un message clair,
  * plutôt qu'une erreur obscure en production.
  */
+/**
+ * Clé facultative : une valeur vide, trop courte ou mal collée est ignorée (avec un avertissement)
+ * au lieu de faire planter tout le site.
+ */
+const optionalSecret = z.preprocess((v) => {
+  if (typeof v !== "string") return undefined;
+  const t = v.trim();
+  if (!t) return undefined;
+  if (t.length < 16) {
+    console.warn("[env] clé d'IA ignorée : valeur trop courte, vérifiez-la dans Render");
+    return undefined;
+  }
+  return t;
+}, z.string().optional());
+
 export const env = createEnv({
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
@@ -50,12 +65,12 @@ export const env = createEnv({
      * modèles BookSync intégrés. Sans clé, BookSync utilise seulement ses modèles intégrés.
      * Ne jamais enregistrer de carte bancaire chez ces fournisseurs : aucun prélèvement possible.
      */
-    GROQ_API_KEY: z.string().min(10).optional(),
+    GROQ_API_KEY: optionalSecret,
     GROQ_MODEL: z.string().default("openai/gpt-oss-120b"),
     /** Appels Groq par jour, sous le quota gratuit (environ 1 000 par jour en 2026). */
     GROQ_DAILY_CAP: z.coerce.number().int().min(0).max(100000).default(800),
-    CLOUDFLARE_ACCOUNT_ID: z.string().min(10).optional(),
-    CLOUDFLARE_AI_TOKEN: z.string().min(10).optional(),
+    CLOUDFLARE_ACCOUNT_ID: optionalSecret,
+    CLOUDFLARE_AI_TOKEN: optionalSecret,
     CLOUDFLARE_AI_MODEL: z.string().default("@cf/meta/llama-3.3-70b-instruct-fp8-fast"),
     /** Appels Cloudflare par jour, sous les 10 000 « neurones » gratuits quotidiens. */
     CLOUDFLARE_DAILY_CAP: z.coerce.number().int().min(0).max(100000).default(60),
