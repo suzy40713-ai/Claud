@@ -18,7 +18,7 @@ async function Content() {
       ? "Questions du jour épuisées"
       : null;
   return (
-    <div className="grid gap-4">
+    <div className="grid min-w-0 gap-4">
       {!state.configured ? (
         <Alert data-testid="assistant-disabled">
           L&apos;assistant n&apos;est pas encore activé sur BookSync. Tous les autres outils

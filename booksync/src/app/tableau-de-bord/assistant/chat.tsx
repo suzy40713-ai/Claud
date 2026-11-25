@@ -25,6 +25,21 @@ const SUGGESTIONS = [
   "Que faire aujourd'hui pour vendre ?",
 ];
 
+/** Mise en forme simple et sûre des réponses : **gras** (aucun HTML interprété). */
+function RichText({ text }: { text: string }) {
+  return (
+    <>
+      {text.split(/(\*\*[^*\n]+\*\*)/g).map((part, i) =>
+        /^\*\*[^*\n]+\*\*$/.test(part) ? (
+          <strong key={i}>{part.slice(2, -2)}</strong>
+        ) : (
+          <span key={i}>{part.replace(/^#{1,4}\s+/gm, "")}</span>
+        ),
+      )}
+    </>
+  );
+}
+
 export function AssistantChat({
   initial,
   disabledReason,
@@ -70,7 +85,7 @@ export function AssistantChat({
   };
 
   return (
-    <div className="flex min-h-[60dvh] flex-col rounded-2xl border bg-card shadow-xs">
+    <div className="flex min-h-[60dvh] w-full min-w-0 flex-col rounded-2xl border bg-card shadow-xs">
       <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-5" aria-live="polite">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center py-8 text-center">
@@ -98,7 +113,7 @@ export function AssistantChat({
                   : "rounded-bl-md bg-muted",
               )}
             >
-              {m.content}
+              {m.role === "assistant" ? <RichText text={m.content} /> : m.content}
             </div>
           </div>
         ))}
@@ -114,7 +129,7 @@ export function AssistantChat({
 
       <div className="border-t p-3 sm:p-4">
         {!disabledReason ? (
-          <div className="mb-3 scrollbar-none flex gap-2 overflow-x-auto pb-1">
+          <div className="mb-3 scrollbar-none flex max-w-full min-w-0 gap-2 overflow-x-auto pb-1">
             {SUGGESTIONS.map((s) => (
               <button
                 key={s}
