@@ -13,6 +13,7 @@ const LINKS = [
   { href: "/", label: "Accueil" },
   { href: "/lancer-mon-activite", label: "Trouver quoi vendre" },
   { href: "/#academie", label: "Apprendre" },
+  { href: "/blog", label: "Blog" },
   { href: "/#tarifs", label: "Tarifs" },
   { href: "/tableau-de-bord", label: "Mon espace" },
 ];

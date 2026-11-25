@@ -816,3 +816,22 @@ export const aiProviderUsage = pgTable(
   },
   (t) => [primaryKey({ columns: [t.provider, t.day] })],
 );
+
+/**
+ * Articles du blog public écrits par l'agent SEO (IA gratuite). Globaux à BookSync :
+ * aucune donnée d'entreprise ni d'utilisateur.
+ */
+export const blogPost = pgTable(
+  "blog_post",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    slug: text().notNull().unique(),
+    keyword: text().notNull().unique(),
+    title: text().notNull(),
+    description: text().notNull(),
+    content: jsonb().notNull(),
+    model: text().notNull(),
+    publishedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("blog_post_published_idx").on(t.publishedAt)],
+);
