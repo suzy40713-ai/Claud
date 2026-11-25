@@ -54,7 +54,7 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
             </ul>
           </section>
           <section className="rounded-2xl border bg-card p-5">
-            <h2 className="font-semibold">Ton action maintenant</h2>
+            <h2 className="font-semibold">Votre action maintenant</h2>
             <Button asChild className="mt-3">
               <Link href={lesson.action.href as Route}>
                 {lesson.action.label} <ArrowRight />

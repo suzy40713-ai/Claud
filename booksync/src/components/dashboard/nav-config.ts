@@ -76,7 +76,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     href: "/tableau-de-bord/trouver-une-idee",
     label: "Trouver une idée",
-    hint: "Quoi vendre à partir de ce que tu sais faire",
+    hint: "Quoi vendre à partir de ce que vous savez faire",
     icon: "idea",
     group: "demarrer",
     permission: "marketing.manage",
@@ -92,7 +92,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     href: "/tableau-de-bord/produits",
     label: "Mes produits",
-    hint: "Ce que tu vends",
+    hint: "Ce que vous vendez",
     icon: "package",
     group: "marketing",
     permission: "marketing.manage",
@@ -166,7 +166,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     href: "/tableau-de-bord/resultats",
     label: "Mes résultats",
-    hint: "Tes ventes, tes dépenses, ta rentabilité",
+    hint: "Vos ventes, vos dépenses, votre rentabilité",
     icon: "chart",
     group: "progres",
     permission: "marketing.manage",
@@ -245,7 +245,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     href: "/tableau-de-bord/parametres",
     label: "Paramètres",
-    hint: "Ton projet et ton compte",
+    hint: "Votre projet et votre compte",
     icon: "settings",
     group: "compte",
   },

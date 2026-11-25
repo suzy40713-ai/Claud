@@ -34,29 +34,29 @@ async function Content({ searchParams }: { searchParams: Promise<Search> }) {
         </h1>
         <p className="mt-2 text-muted-foreground">
           {active
-            ? "Ton forfait est actif."
-            : "Paiement reçu : ton forfait s'active dans quelques secondes."}
+            ? "Votre forfait est actif."
+            : "Paiement reçu : votre forfait s'active dans quelques secondes."}
         </p>
       </div>
       <section className="rounded-2xl border bg-card p-6 shadow-xs">
         <h2 className="flex items-center gap-2 text-lg font-semibold">
-          <Target className="size-5 text-primary" /> Ton objectif ce mois-ci : rentabiliser tes{" "}
+          <Target className="size-5 text-primary" /> Votre objectif ce mois-ci : rentabiliser vos{" "}
           {price}
         </h2>
         <p className="mt-2 text-muted-foreground">
-          Ton abonnement est ton premier investissement de business. Le but : que tes ventes du
-          mois dépassent ce qu&apos;il te coûte. Ta jauge sur l&apos;accueil se remplit à chaque
-          vente que tu notes.
+          Votre abonnement est votre premier investissement de business. Le but : que vos ventes du
+          mois dépassent ce qu&apos;il vous coûte. Votre jauge sur l&apos;accueil se remplit à chaque
+          vente que vous notez.
         </p>
         <ol className="mt-4 grid list-decimal gap-2 pl-5">
-          <li>Crée ta stratégie 30 jours (2 minutes).</li>
-          <li>Lance l&apos;Autopilot et fais tes 3 actions du jour.</li>
-          <li>Lis une leçon de l&apos;Académie par jour.</li>
-          <li>Note chaque vente dans « Mes résultats ».</li>
+          <li>Créez votre stratégie 30 jours (2 minutes).</li>
+          <li>Lancez votre plan d&apos;action et faites vos 3 actions du jour.</li>
+          <li>Lisez une leçon de l&apos;Académie par jour.</li>
+          <li>Notez chaque vente dans « Mes résultats ».</li>
         </ol>
         <p className="mt-4 text-xs text-muted-foreground">
-          Aucun résultat n&apos;est garanti : tout dépend des actions que tu mènes. BookSync te
-          donne la méthode et les outils, à toi de jouer.
+          Aucun résultat n&apos;est garanti : tout dépend des actions que vous menez. BookSync vous
+          donne la méthode et les outils, à vous de jouer.
         </p>
       </section>
       <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">

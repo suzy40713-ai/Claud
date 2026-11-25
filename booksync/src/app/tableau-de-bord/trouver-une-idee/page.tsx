@@ -18,7 +18,7 @@ export default function FindIdeaPage(props: PageProps<"/tableau-de-bord/trouver-
     <>
       <PageHeader
         title="Trouver une idée"
-        description="Pas besoin de diplôme ni d'argent de départ : choisis ce que tu sais faire, BookSync te propose quoi vendre, à quel prix et à qui."
+        description="Pas besoin de diplôme ni d'argent de départ : choisissez ce que vous savez faire, BookSync vous propose quoi vendre, à quel prix et à qui."
       />
       <Suspense fallback={<Skeleton className="h-96" />}>
         <Gate searchParams={props.searchParams as Promise<{ idee?: string }>} />

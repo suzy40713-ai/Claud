@@ -41,7 +41,7 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "free",
     name: "Free",
     priceCents: 0,
-    tagline: "Pour trouver ton idée et faire tes premiers pas.",
+    tagline: "Pour trouver votre idée et faire vos premiers pas.",
     limits: {
       bookingsPerMonth: 5,
       members: 1,
@@ -68,7 +68,7 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "starter",
     name: "Starter",
     priceCents: 999,
-    tagline: "Pour passer à l'action et faire tes premières ventes.",
+    tagline: "Pour passer à l'action et faire vos premières ventes.",
     limits: {
       bookingsPerMonth: null,
       members: 2,
@@ -96,7 +96,7 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "pro",
     name: "Pro",
     priceCents: 2499,
-    tagline: "Pour accélérer quand tes premières ventes arrivent.",
+    tagline: "Pour accélérer quand vos premières ventes arrivent.",
     limits: {
       bookingsPerMonth: null,
       members: 10,
@@ -196,7 +196,7 @@ export const LIMIT_MESSAGES: Record<LimitKind, (plan: Plan) => string> = {
   customers: (p) =>
     `Votre forfait ${p.name} est limité à ${p.limits.customers} clients. Passez au forfait Starter pour des clients illimités.`,
   tools: (p) =>
-    `Ton forfait ${p.name} inclut ${p.limits.toolRunsPerMonth} propositions par mois, toutes utilisées. Passe au forfait Starter pour un accès illimité, ou attends le 1er du mois.`,
+    `Votre forfait ${p.name} inclut ${p.limits.toolRunsPerMonth} propositions par mois, toutes utilisées. Passez au forfait Starter pour un accès illimité, ou attendez le 1er du mois.`,
   products: (p) =>
     `Votre forfait ${p.name} est limité à ${p.limits.products} produit${p.limits.products > 1 ? "s" : ""}. Passez à un forfait supérieur pour en suivre davantage.`,
 };

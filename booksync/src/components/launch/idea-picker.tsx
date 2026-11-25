@@ -35,9 +35,9 @@ export function IdeaPicker({
     <div className="grid gap-6" data-testid="idea-finder">
       <section className="rounded-3xl border bg-card p-5 shadow-xs sm:p-6">
         <h2 className="flex items-center gap-2 text-lg font-semibold">
-          <Lightbulb className="size-5 text-primary" /> 1. Qu&apos;est-ce que tu sais déjà faire ?
+          <Lightbulb className="size-5 text-primary" /> 1. Qu&apos;est-ce que vous savez déjà faire ?
         </h2>
-        <ul className="mt-4 flex flex-wrap gap-2" aria-label="Ce que tu sais faire">
+        <ul className="mt-4 flex flex-wrap gap-2" aria-label="Ce que vous savez faire">
           {TALENTS.map((t) => (
             <li key={t.id}>
               <button
@@ -75,7 +75,7 @@ export function IdeaPicker({
 
       {idea ? (
         <section className="rounded-3xl border bg-card p-5 shadow-xs sm:p-6" data-testid="idea-card">
-          <p className="text-sm font-semibold text-primary">2. Ton idée</p>
+          <p className="text-sm font-semibold text-primary">2. Votre idée</p>
           <h2 className="mt-1 text-2xl font-semibold tracking-tight">{idea.title}</h2>
           <p className="mt-2 text-muted-foreground">{idea.why}</p>
           <p className="mt-4 text-sm">
@@ -85,7 +85,7 @@ export function IdeaPicker({
           <p className="mt-1 text-sm">
             <span className="font-semibold">À qui le vendre :</span> {idea.audience}
           </p>
-          <p className="mt-5 text-sm font-semibold">Tes 3 premières actions cette semaine</p>
+          <p className="mt-5 text-sm font-semibold">Vos 3 premières actions cette semaine</p>
           <ol className="mt-2 grid gap-2">
             {idea.firstSteps.map((s) => (
               <li key={s} className="flex gap-2 text-sm">
@@ -95,7 +95,7 @@ export function IdeaPicker({
           </ol>
           <p className="mt-4 text-xs text-muted-foreground">
             Les prix sont des points de départ à ajuster. Aucun revenu n&apos;est garanti : tout
-            dépend de ce que tu mets en place.
+            dépend de ce que vous mettez en place.
           </p>
           <div className="mt-5">
             {mode === "public" ? (
@@ -117,7 +117,7 @@ export function IdeaPicker({
                   startTransition(async () => {
                     const res = await createProductFromIdeaAction(idea.id);
                     if (!res.ok) return void toast.error(res.error);
-                    toast.success("C'est ton projet ! Prochaine étape : ta stratégie.");
+                    toast.success("C'est votre projet ! Prochaine étape : votre stratégie.");
                     router.push(`/tableau-de-bord/produits/${res.data.id}` as Route);
                   })
                 }

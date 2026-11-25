@@ -64,7 +64,7 @@ export async function createOrganization(
   name: string,
   stage: "idee" | "produit" = "produit",
 ) {
-  await page.getByLabel("Nom de ton projet").fill(name);
+  await page.getByLabel("Nom de votre projet").fill(name);
   await page.getByLabel(stage === "idee" ? /pas encore d'idée/ : /déjà quelque chose à vendre/).check();
   await page.getByRole("button", { name: "C'est parti" }).click();
   await expect(page).toHaveURL(

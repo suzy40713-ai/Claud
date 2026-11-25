@@ -95,7 +95,7 @@ export function CompanyForm({
           description={
             BOOKING_ENABLED
               ? "Le nom et l'adresse publique de votre page de réservation."
-              : "Le nom de ton projet."
+              : "Le nom de votre projet."
           }
         >
           <div className="grid gap-5">

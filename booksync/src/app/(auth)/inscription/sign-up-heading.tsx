@@ -6,8 +6,8 @@ import { AuthHeading } from "@/components/auth/auth-heading";
 export function SignUpHeading() {
   return (
     <AuthHeading
-      title="Crée ton compte"
-      description="Gratuit, sans carte bancaire. BookSync te guide pas à pas, de l'idée à ta première vente."
+      title="Créez votre compte"
+      description="Gratuit, sans carte bancaire. BookSync vous guide pas à pas, de l'idée à votre première vente."
     />
   );
 }

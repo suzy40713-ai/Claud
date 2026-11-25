@@ -19,7 +19,7 @@ test("débutant : idée trouvée sur le site, inscription, idée devenue produit
   await signUpAndVerify(page, { name: "Sam Diallo" });
   await page.goto("/onboarding?idee=montage");
   const name = `Projet Sam ${Date.now().toString(36)}`;
-  await page.getByLabel("Nom de ton projet").fill(name);
+  await page.getByLabel("Nom de votre projet").fill(name);
   await page.getByRole("button", { name: "C'est parti" }).click();
   await expect(page).toHaveURL(/\/tableau-de-bord\/trouver-une-idee\?idee=montage$/);
   await page.getByTestId("choose-idea").click();
@@ -65,7 +65,7 @@ test("débutant : idée trouvée sur le site, inscription, idée devenue produit
   // Page de bienvenue après achat.
   await page.goto("/tableau-de-bord/bienvenue?forfait=starter");
   await expect(page.getByTestId("welcome")).toContainText("Bienvenue dans Starter");
-  await expect(page.getByTestId("welcome")).toContainText("rentabiliser tes 9,99 €");
+  await expect(page.getByTestId("welcome")).toContainText("rentabiliser vos 9,99 €");
 
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth > window.innerWidth + 1,

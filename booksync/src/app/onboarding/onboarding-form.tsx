@@ -9,7 +9,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { createOrganizationAction, type OnboardingState } from "./actions";
 
 const STAGES = [
-  ["idee", "Je n'ai pas encore d'idée : aide-moi à trouver quoi vendre"],
+  ["idee", "Je n'ai pas encore d'idée : aidez-moi à trouver quoi vendre"],
   ["produit", "J'ai déjà quelque chose à vendre (produit, service, formation…)"],
 ] as const;
 
@@ -34,8 +34,8 @@ export function OnboardingForm({
       {formError ? <Alert variant="error">{formError}</Alert> : null}
       <Field
         id="name"
-        label="Nom de ton projet"
-        hint="Ton prénom suffit si tu n'as pas encore de nom. Tu pourras le changer."
+        label="Nom de votre projet"
+        hint="Votre prénom suffit si vous n'avez pas encore de nom. Vous pourrez le changer."
         error={fieldErrors.name}
       >
         <Input
@@ -49,7 +49,7 @@ export function OnboardingForm({
         />
       </Field>
       <fieldset className="grid gap-2">
-        <legend className="mb-1 text-sm font-medium">Où en es-tu ?</legend>
+        <legend className="mb-1 text-sm font-medium">Où en êtes-vous ?</legend>
         {STAGES.map(([v, label]) => (
           <label
             key={v}

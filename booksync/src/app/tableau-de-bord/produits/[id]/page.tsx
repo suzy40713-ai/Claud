@@ -97,7 +97,7 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
             </h2>
             <p className="text-sm text-muted-foreground">
               {usage.limit === null
-                ? "Incluse dans ton forfait"
+                ? "Incluse dans votre forfait"
                 : `${Math.min(usage.used, usage.limit)} / ${usage.limit} propositions utilisées ce mois-ci`}
               {latest
                 ? ` · dernière analyse le ${latest.createdAt.toLocaleDateString("fr-FR")}`

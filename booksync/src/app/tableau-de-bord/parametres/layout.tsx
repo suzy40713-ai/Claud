@@ -60,7 +60,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
     <>
       <PageHeader
         title="Paramètres"
-        description="Ton projet et ton compte."
+        description="Votre projet et votre compte."
       />
       <Suspense fallback={<div className="mb-6 h-10" />}>
         <Tabs />

@@ -24,9 +24,9 @@ async function Gate({
   return (
     <>
       <p className="text-sm font-medium text-primary">Bienvenue {firstName} 👋</p>
-      <h1 className="mt-2 text-2xl font-semibold tracking-tight">On commence ton projet</h1>
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight">On commence votre projet</h1>
       <p className="mt-2 mb-7 text-[15px] text-muted-foreground">
-        Deux questions, et BookSync te guide pas à pas vers ta première vente.
+        Deux questions, et BookSync vous guide pas à pas vers votre première vente.
       </p>
       <OnboardingForm initial={{ name: nom || undefined, stage: etape, idea: idee }} />
     </>
