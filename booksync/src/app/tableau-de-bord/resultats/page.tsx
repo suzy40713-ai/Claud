@@ -15,7 +15,7 @@ import { listProducts } from "@/server/marketing/products";
 import { copilotActivity, listResults } from "@/server/marketing/results";
 import { DeleteResultButton, ResultForm } from "./result-form";
 
-export const metadata: Metadata = { title: "Statistiques marketing" };
+export const metadata: Metadata = { title: "Mes résultats" };
 
 const PERIODS = [7, 30, 90] as const;
 const nb = (n: number | null) => (n === null ? "—" : n.toLocaleString("fr-FR"));
@@ -160,7 +160,7 @@ export default function ResultsPage(props: PageProps<"/tableau-de-bord/resultats
   return (
     <>
       <PageHeader
-        title="Statistiques marketing"
+        title="Mes résultats"
         description="Vos dépenses et vos ventes, saisies par vous. Aucun chiffre estimé ou inventé."
       />
       <Suspense fallback={<Skeleton className="h-96" />}>

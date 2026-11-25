@@ -1,5 +1,5 @@
 import "server-only";
-import { and, count, desc, eq, gte, isNotNull } from "drizzle-orm";
+import { and, count, desc, eq, gt, gte, isNotNull } from "drizzle-orm";
 import { db } from "@/db/client";
 import { aiGeneration, marketingResult, marketingTask } from "@/db/schema";
 import { addDays, localDateOf } from "@/domain/availability/engine";
@@ -69,4 +69,32 @@ export async function copilotActivity(ctx: OrgContext) {
     .from(marketingTask)
     .where(and(eq(marketingTask.organizationId, ctx.organization.id), isNotNull(marketingTask.doneAt)));
   return { generations: gen?.n ?? 0, tasksDone: tasks?.n ?? 0 };
+}
+
+/** Chiffre d'affaires et ventes déclarés depuis le 1er du mois (date locale de l'entreprise). */
+export async function monthResults(ctx: OrgContext, now = new Date()) {
+  assertCan(ctx.role, "marketing.manage");
+  const today = localDateOf(now, ctx.organization.timezone);
+  const rows = await db
+    .select({ revenueCents: marketingResult.revenueCents, sales: marketingResult.sales })
+    .from(marketingResult)
+    .where(
+      and(
+        eq(marketingResult.organizationId, ctx.organization.id),
+        gte(marketingResult.date, `${today.slice(0, 7)}-01`),
+      ),
+    );
+  return {
+    revenueCents: rows.reduce((s, r) => s + (r.revenueCents ?? 0), 0),
+    sales: rows.reduce((s, r) => s + (r.sales ?? 0), 0),
+  };
+}
+
+/** Au moins une vente déclarée depuis le début. */
+export async function hasAnySale(ctx: OrgContext) {
+  const [row] = await db
+    .select({ n: count() })
+    .from(marketingResult)
+    .where(and(eq(marketingResult.organizationId, ctx.organization.id), gt(marketingResult.sales, 0)));
+  return (row?.n ?? 0) > 0;
 }

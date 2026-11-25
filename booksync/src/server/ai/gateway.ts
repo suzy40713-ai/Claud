@@ -3,6 +3,7 @@ import { and, count, desc, eq, gte, lt, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { aiGeneration, assistantUsage } from "@/db/schema";
 import { monthStart } from "@/domain/ai/models";
+import { LIMIT_MESSAGES, PlanLimitError } from "@/domain/billing/plans";
 import { monthKey } from "@/domain/assistant/limits";
 import type { OrgContext } from "@/server/auth/session";
 
@@ -30,6 +31,22 @@ export async function aiSpendThisMonth(now: Date) {
     .from(assistantUsage)
     .where(eq(assistantUsage.month, monthKey(now)));
   return gen.cost + assistant.cost;
+}
+
+/** Propositions utilisées ce mois-ci par l'entreprise, et limite de son forfait (null = illimité). */
+export async function toolUsage(ctx: OrgContext, now = new Date()) {
+  const [row] = await db
+    .select({ n: count() })
+    .from(aiGeneration)
+    .where(and(eq(aiGeneration.organizationId, ctx.organization.id), monthRange(now)));
+  return { used: row?.n ?? 0, limit: ctx.plan.limits.toolRunsPerMonth };
+}
+
+/** Refuse une nouvelle proposition si le quota mensuel du forfait est atteint. */
+export async function assertToolQuota(ctx: OrgContext, now = new Date()) {
+  const { used, limit } = await toolUsage(ctx, now);
+  if (limit !== null && used >= limit)
+    throw new PlanLimitError("tools", LIMIT_MESSAGES.tools(ctx.plan));
 }
 
 /** Enregistre un résultat du copilote et renvoie son identifiant. */

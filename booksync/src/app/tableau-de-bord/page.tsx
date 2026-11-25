@@ -1,3 +1,4 @@
+import { BOOKING_ENABLED } from "@/lib/features";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
@@ -27,7 +28,8 @@ async function Content({ searchParams }: { searchParams: Promise<{ acces?: strin
   const ctx = await requireOrg();
   const marketing = can(ctx.role, "marketing.manage");
   // Module rendez-vous désactivé : accueil du copilote marketing.
-  if (!ctx.organization.bookingModule && marketing) return <MarketingHome ctx={ctx} />;
+  if ((!BOOKING_ENABLED || !ctx.organization.bookingModule) && marketing)
+    return <MarketingHome ctx={ctx} />;
   const tz = ctx.organization.timezone;
   const [o, usage, setup] = await Promise.all([
     getOverview(ctx),

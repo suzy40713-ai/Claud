@@ -28,16 +28,17 @@ const { startSubscription } = await import("@/server/billing/service");
 
 afterAll(() => pg.end());
 
-describe("1er mois offert", () => {
-  it("premier abonnement : 30 jours d'essai sur la page de paiement", async () => {
+describe("pas d'essai gratuit", () => {
+  it("premier abonnement : paiement dès l'abonnement, sans essai", async () => {
     const ctx = await makeOrg();
     const res = await startSubscription(ctx, "starter");
     expect(res).toEqual({ url: "https://checkout.stripe.com/c/pay/test" });
     expect(created.at(-1)).toMatchObject({
       mode: "subscription",
       line_items: [{ price: "price_starter", quantity: 1 }],
-      subscription_data: { trial_period_days: 30 },
     });
+    const sub = created.at(-1)!.subscription_data as Record<string, unknown>;
+    expect(sub.trial_period_days).toBeUndefined();
   });
 
   it("entreprise déjà abonnée par le passé : pas de nouvel essai", async () => {

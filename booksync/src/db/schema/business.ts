@@ -787,3 +787,17 @@ export const marketingResult = pgTable(
     ),
   ],
 );
+
+/** Académie : leçons terminées par un utilisateur, dans une entreprise. */
+export const lessonProgress = pgTable(
+  "lesson_progress",
+  {
+    organizationId: orgId(),
+    userId: uuid()
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    lessonId: text().notNull(),
+    completedAt: createdAt(),
+  },
+  (t) => [primaryKey({ columns: [t.organizationId, t.userId, t.lessonId] })],
+);

@@ -134,6 +134,13 @@
       "when": 1795473395849,
       "tag": "0018_marketing_results",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1795617304044,
+      "tag": "0019_academy",
+      "breakpoints": true
     }
   ]
 }

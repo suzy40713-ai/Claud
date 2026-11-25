@@ -94,7 +94,7 @@ export function strategyTemplate(p: ProductInfo, v: Values, seed = 0): Strategy 
         day: d,
         theme: d === 30 ? "Bilan du mois" : `Bilan de la semaine ${week}`,
         actions: [
-          { title: "Relever vos chiffres", detail: `Vues, messages, clics et ventes de la semaine, à noter dans « Statistiques marketing ».`, channel: "Préparation" },
+          { title: "Relever vos chiffres", detail: `Vues, messages, clics et ventes de la semaine, à noter dans « Mes résultats ».`, channel: "Préparation" },
           { title: "Repérer le contenu qui a le mieux marché", detail: "Notez son accroche et son sujet : vous le referez la semaine prochaine.", channel: main },
           {
             title: d === 30 ? "Préparer le mois suivant" : "Choisir le sujet principal de la semaine suivante",
@@ -152,7 +152,7 @@ export function strategyTemplate(p: ProductInfo, v: Values, seed = 0): Strategy 
     ],
     days,
     measure: [
-      { metric: goal.measure, how: "À noter chaque semaine dans « Statistiques marketing »." },
+      { metric: goal.measure, how: "À noter chaque semaine dans « Mes résultats »." },
       { metric: "Messages et commentaires reçus", how: "Compter ceux qui posent une vraie question sur le produit." },
       { metric: "Clics vers votre page", how: "Visibles dans les statistiques de votre profil ou de votre boutique." },
       { metric: "Contenu le plus vu", how: "Noter son accroche pour la réutiliser." },

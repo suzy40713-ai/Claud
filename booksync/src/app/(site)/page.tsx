@@ -1,18 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import type { Route } from "next";
 import {
   BarChart3,
-  CalendarCheck2,
   Check,
   Compass,
-  Gift,
+  GraduationCap,
   Lightbulb,
   LineChart,
   Megaphone,
   PenLine,
   Rocket,
-  ShieldCheck,
   Sparkles,
   Target,
   Wand2,
@@ -21,11 +18,13 @@ import { CopilotPreview } from "@/components/marketing/copilot-preview";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/seo/json-ld";
+import { ACADEMY, ALL_LESSONS } from "@/domain/academy/lessons";
 import { PLAN_ORDER, PLANS, formatPrice } from "@/domain/billing/plans";
+import { TALENTS } from "@/domain/launch/ideas";
 import { site } from "@/lib/site";
 
 const SEO_DESCRIPTION =
-  "BookSync, le copilote marketing des entrepreneurs, freelances et créateurs : trouvez quoi vendre, analysez votre produit, construisez votre stratégie, créez vos publicités et vos contenus. Gratuit pour commencer.";
+  "BookSync aide les débutants à gagner leurs premiers euros : trouver quoi vendre, apprendre le business leçon par leçon et savoir chaque jour quoi faire pour vendre. Gratuit pour commencer.";
 
 export const metadata: Metadata = {
   title: { absolute: `${site.name} — ${site.tagline}` },
@@ -56,141 +55,78 @@ const SOFTWARE_LD = {
   })),
 };
 
-const AUDIENCE = [
-  "Entrepreneurs",
-  "E-commerçants",
-  "Créateurs de contenu",
-  "Freelances",
-  "Indépendants",
-  "Produits physiques",
-  "Produits numériques",
-  "Petites entreprises",
-];
+const IDEA_COUNT = TALENTS.flatMap((t) => t.ideas).length;
 
 const STEPS = [
-  ["Présentez votre activité", "Ce que vous vendez, à qui, à quel prix. Deux minutes suffisent."],
-  [
-    "Ajoutez votre produit",
-    "Une description, des avantages, un lien : BookSync s'occupe du reste.",
-  ],
-  ["Recevez l'analyse", "Proposition de valeur, clients cibles, arguments, points faibles."],
-  ["Suivez votre plan", "Une stratégie sur 30 jours et, chaque jour, les actions à faire."],
-] as const;
-
-/** Outils du copilote, avec leur état réel de disponibilité. */
-const TOOLS: Array<{
-  icon: typeof Target;
-  title: string;
-  text: string;
-  href: string;
-}> = [
   {
     icon: Lightbulb,
-    title: "Trouver quoi vendre",
-    text: "Vous ne savez pas encore quoi proposer ? À partir de ce que vous savez faire, BookSync vous propose une idée, un nom, des prix et un plan sur 7 jours.",
-    href: "/lancer-mon-activite",
+    title: "Trouve quoi vendre",
+    text: `Choisis ce que tu sais déjà faire : BookSync te propose une idée parmi ${IDEA_COUNT}, avec un prix de départ et à qui la vendre.`,
   },
   {
-    icon: Target,
-    title: "Analyse de produit",
-    text: "Proposition de valeur, clients cibles, problème résolu, arguments de vente, risques et pistes d'amélioration. Les hypothèses sont toujours signalées comme telles.",
-    href: "/inscription",
-  },
-  {
-    icon: Compass,
-    title: "Stratégie marketing",
-    text: "Objectifs, positionnement, canaux, contenu, budget conseillé et calendrier de 30 jours, avec des actions concrètes.",
-    href: "/inscription",
-  },
-  {
-    icon: Megaphone,
-    title: "Créateur de publicités",
-    text: "TikTok, Instagram, Facebook et Google Ads : accroche, texte, appel à l'action, idée de visuel et variantes, dans 5 styles.",
-    href: "/inscription",
-  },
-  {
-    icon: PenLine,
-    title: "Contenus et scripts vidéo",
-    text: "Idées de vidéos, scripts (accroche, développement, produit, appel à l'action), carrousels, descriptions et calendrier de publication.",
-    href: "/inscription",
-  },
-  {
-    icon: LineChart,
-    title: "Sales Booster",
-    text: "Analyse de votre page de vente, descriptions améliorées, offres commerciales et idées de tests A/B.",
-    href: "/inscription",
+    icon: GraduationCap,
+    title: "Apprends le business",
+    text: `${ALL_LESSONS.length} leçons de 5 minutes : fixer ton prix, trouver tes premiers clients, vendre sans être lourd, te faire connaître.`,
   },
   {
     icon: Wand2,
-    title: "Autopilot",
-    text: "Chaque jour, les 3 prochaines actions pour promouvoir votre produit, à cocher, et la progression de votre plan sur 30 jours.",
-    href: "/inscription",
+    title: "Suis ton plan, chaque jour",
+    text: "Ta stratégie sur 30 jours devient 3 actions simples par jour. Tu coches, tu avances, tu ne te demandes plus quoi faire.",
   },
   {
-    icon: BarChart3,
-    title: "Tableau de bord",
-    text: "Produits, stratégies, publicités et contenus, budget, dépenses et résultats déclarés, retour sur investissement quand les données le permettent.",
-    href: "/inscription",
+    icon: Target,
+    title: "Vends et rentabilise",
+    text: "Note tes ventes : ta jauge montre quand ton abonnement est rentabilisé. Tout le reste, c'est pour toi.",
   },
-];
+] as const;
 
-/** Module de vente de services sur rendez-vous : déjà disponible. */
-const BOOKING = [
-  {
-    icon: CalendarCheck2,
-    title: "Page de réservation et agenda",
-    text: "Vos clients réservent seuls, 24 h/24, rappels automatiques, liste d'attente.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Paiement en ligne",
-    text: "Acompte ou séance payée à l'avance, versé directement sur votre compte Stripe.",
-  },
-  {
-    icon: Gift,
-    title: "Cartes cadeaux et avis",
-    text: "Vendez des cartes cadeaux en ligne et collectez des avis vérifiés.",
-  },
-];
+const TOOLS = [
+  { icon: Lightbulb, title: "Trouver une idée", text: "Quoi vendre, à quel prix, à qui, et tes 3 premières actions." },
+  { icon: GraduationCap, title: "Académie", text: "Le business expliqué simplement, avec une action après chaque leçon." },
+  { icon: Target, title: "Analyse de ton produit", text: "Points forts, points faibles, acheteurs possibles et objections." },
+  { icon: Compass, title: "Stratégie 30 jours", text: "Adaptée à ton temps, à ton budget et à tes réseaux." },
+  { icon: Wand2, title: "Autopilot", text: "3 actions par jour à cocher et ta progression sur 30 jours." },
+  { icon: Megaphone, title: "Publicités", text: "TikTok, Instagram, Facebook, Google Ads, dans 5 styles." },
+  { icon: PenLine, title: "Contenus", text: "Scripts vidéo, carrousels, légendes et hashtags prêts à publier." },
+  { icon: LineChart, title: "Sales Booster", text: "Ce qui freine tes ventes et quoi changer sur ta page." },
+  { icon: BarChart3, title: "Mes résultats", text: "Ventes, dépenses, coût par vente et rentabilité de ton abonnement." },
+] as const;
 
 const FAQ = [
   {
-    q: "À qui s'adresse BookSync ?",
-    a: "Aux entrepreneurs, e-commerçants, créateurs, freelances et petites entreprises qui vendent un produit (physique ou numérique) ou un service, et qui veulent trouver des clients sans agence ni gros budget.",
+    q: "Je n'y connais rien, c'est pour moi ?",
+    a: "Oui, BookSync est fait pour les débutants. Tu n'as besoin ni de diplôme, ni d'expérience, ni d'argent de départ. Tout est expliqué simplement, étape par étape.",
   },
   {
-    q: "BookSync garantit-il des ventes ?",
-    a: "Non. Personne ne peut garantir des ventes. BookSync vous aide à structurer votre marketing, à produire vos contenus et à suivre vos résultats ; les décisions et les résultats restent les vôtres.",
+    q: "Est-ce que BookSync garantit que je vais gagner de l'argent ?",
+    a: "Non, et personne d'honnête ne peut te le garantir. BookSync te donne une idée, une méthode et un plan d'action quotidien. Les résultats dépendent de ce que tu fais : plus tu suis ton Autopilot, plus tu te donnes de chances.",
   },
   {
-    q: "D'où viennent les analyses et les chiffres ?",
-    a: "Les analyses et propositions sont préparées par BookSync à partir des informations que vous donnez, avec des modèles conçus pour débutants (pas d'IA payante). BookSync n'invente pas de données de marché : une hypothèse est toujours présentée comme une hypothèse à vérifier. Les statistiques marketing utilisent uniquement les résultats que vous saisissez : aucune estimation n'est présentée comme un résultat.",
+    q: "Combien de temps faut-il par jour ?",
+    a: "Tu choisis : la stratégie s'adapte à ton temps disponible, dès 1 à 2 heures par semaine. Les 3 actions du jour prennent en général entre 15 et 45 minutes.",
   },
   {
-    q: "BookSync publie-t-il à ma place sur TikTok ou Instagram ?",
-    a: "Non, pas aujourd'hui : BookSync prépare vos publicités et vos contenus, que vous publiez vous-même. Aucune connexion à un réseau social n'est proposée sans être réellement disponible et testée.",
+    q: "Pourquoi payer si le forfait Free existe ?",
+    a: "Le forfait Free sert à trouver ton idée et à découvrir l'Académie. Starter débloque toute l'Académie débutant, des propositions illimitées et le suivi de ta rentabilité. Une seule vente à 10 € rembourse ton mois.",
   },
   {
-    q: "Puis-je toujours prendre des rendez-vous en ligne ?",
-    a: "Oui. La prise de rendez-vous, le paiement en ligne, les cartes cadeaux et les avis restent disponibles, sous forme d'un module pour ceux qui vendent des services.",
+    q: "Puis-je arrêter quand je veux ?",
+    a: "Oui. Sans engagement : tu résilies en un clic depuis ton espace, et ton forfait reste actif jusqu'à la fin du mois payé. Tes données sont conservées.",
   },
   {
-    q: "Puis-je commencer gratuitement ?",
-    a: "Oui, le forfait Free est gratuit sans limite de durée et sans carte bancaire. Les forfaits payants offrent le premier mois et sont sans engagement.",
-  },
-  {
-    q: "Où sont stockées mes données ?",
-    a: "Dans l'Union européenne. Chaque compte est isolé, et vous pouvez exporter ou supprimer vos données depuis vos paramètres.",
+    q: "BookSync publie-t-il à ma place sur les réseaux ?",
+    a: "Non. BookSync prépare tes contenus et tes publicités, et c'est toi qui les publies. Aucune connexion à un réseau social n'est proposée sans être réellement disponible.",
   },
 ];
 
 const pill = "rounded-full px-6";
 
-
 export default function LandingPage() {
+  const starter = PLANS.starter;
   return (
     <main className="overflow-x-clip">
       <JsonLd data={SOFTWARE_LD} />
+
       {/* Hero */}
       <section className="relative isolate">
         <div
@@ -201,36 +137,33 @@ export default function LandingPage() {
           <div className="animate-fade-up">
             <p className="text-sm font-semibold tracking-wide text-primary">
               <Sparkles className="mr-1 inline size-4 align-[-3px]" />
-              Le copilote marketing des entrepreneurs
+              Pour les débutants qui veulent gagner leurs premiers euros
             </p>
             <h1 className="mx-auto mt-4 max-w-4xl text-[2.6rem] leading-[1.04] font-semibold tracking-[-0.035em] text-balance sm:text-7xl">
-              De votre idée{" "}
+              De zéro{" "}
               <span className="bg-gradient-to-r from-primary to-[#7c5cff] bg-clip-text text-transparent">
-                à vos premières ventes.
+                à ta première vente.
               </span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-pretty text-muted-foreground sm:text-xl">
-              Présentez votre produit ou votre service : BookSync l&apos;analyse, construit votre
-              stratégie, prépare vos publicités et vos contenus, et vous dit chaque jour quoi faire.
+              Tu ne sais pas quoi vendre ni par où commencer ? BookSync trouve ton idée,
+              t&apos;apprend le business et te dit chaque jour quoi faire. Toi, tu n&apos;as plus
+              qu&apos;à suivre.
             </p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button asChild size="lg" className={pill}>
-                <Link href="/inscription?pro=1">
+                <Link href="/inscription">
                   <Rocket /> Commencer gratuitement
                 </Link>
               </Button>
               <Button asChild size="lg" variant="secondary" className={pill}>
                 <Link href="/lancer-mon-activite">
-                  <Lightbulb /> Je ne sais pas quoi vendre
+                  <Lightbulb /> Trouver mon idée en 2 minutes
                 </Link>
               </Button>
             </div>
             <ul className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-              {[
-                "Gratuit pour commencer",
-                "Sans carte bancaire",
-                "Aucune vente garantie, aucun chiffre inventé",
-              ].map((t) => (
+              {["Sans diplôme", "Sans argent de départ", "Sans montrer ton visage"].map((t) => (
                 <li key={t} className="flex items-center gap-1.5">
                   <Check className="size-4 text-success" /> {t}
                 </li>
@@ -243,33 +176,24 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Public */}
-      <section className="border-y">
-        <div className="mx-auto w-full max-w-5xl px-4 py-10 text-center sm:px-6">
-          <p className="text-sm font-medium text-muted-foreground">
-            Pour tous ceux qui ont quelque chose à vendre
-          </p>
-          <ul className="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[15px] font-medium text-foreground/80">
-            {AUDIENCE.map((a) => (
-              <li key={a}>{a}</li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
       {/* Comment ça marche */}
       <section id="avantages" className="mx-auto w-full max-w-5xl scroll-mt-20 px-4 py-24 sm:px-6">
-        <h2 className="mx-auto max-w-3xl text-center text-4xl leading-[1.08] font-semibold tracking-[-0.03em] text-balance sm:text-6xl">
-          Un système de travail, pas juste du texte.
-        </h2>
-        <ol className="mt-16 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          {STEPS.map(([t, d], i) => (
-            <li key={t}>
-              <span className="bg-gradient-to-b from-primary to-[#7c5cff] bg-clip-text text-5xl font-semibold tracking-tighter text-transparent">
-                {i + 1}
-              </span>
-              <h3 className="mt-3 text-lg font-semibold tracking-tight">{t}</h3>
-              <p className="mt-2 text-[15px] text-muted-foreground">{d}</p>
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="text-4xl leading-[1.08] font-semibold tracking-[-0.03em] text-balance sm:text-6xl">
+            4 étapes. Zéro prise de tête.
+          </h2>
+        </div>
+        <ol className="mt-14 grid gap-4 sm:grid-cols-2" data-testid="steps">
+          {STEPS.map(({ icon: Icon, title, text }, i) => (
+            <li key={title} className="rounded-3xl border bg-card p-7">
+              <p className="flex items-center gap-3">
+                <span className="flex size-9 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+                  {i + 1}
+                </span>
+                <Icon className="size-6 text-primary" strokeWidth={1.6} />
+              </p>
+              <h3 className="mt-5 text-xl font-semibold tracking-tight">{title}</h3>
+              <p className="mt-2 text-[15px] text-muted-foreground">{text}</p>
             </li>
           ))}
         </ol>
@@ -280,14 +204,14 @@ export default function LandingPage() {
         <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-4xl leading-[1.08] font-semibold tracking-[-0.03em] text-balance sm:text-6xl">
-              Tout votre marketing au même endroit.
+              Tout ce qu&apos;il faut pour vendre, au même endroit.
             </h2>
             <p className="mt-5 text-lg text-muted-foreground">
-              Tous les outils sont disponibles, dès le forfait gratuit.
+              Tous les outils sont disponibles dès aujourd&apos;hui.
             </p>
           </div>
           <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="tools">
-            {TOOLS.map(({ icon: Icon, title, text, href }) => (
+            {TOOLS.map(({ icon: Icon, title, text }) => (
               <li key={title} className="flex flex-col rounded-3xl bg-card p-7">
                 <div className="flex items-start justify-between gap-3">
                   <Icon className="size-8 text-primary" strokeWidth={1.6} />
@@ -295,52 +219,75 @@ export default function LandingPage() {
                 </div>
                 <h3 className="mt-6 text-xl font-semibold tracking-tight">{title}</h3>
                 <p className="mt-2 text-[15px] text-muted-foreground">{text}</p>
-                <Link
-                  href={href as Route}
-                  className="mt-4 text-sm font-semibold text-primary hover:underline"
-                >
-                  Essayer maintenant →
-                </Link>
               </li>
             ))}
           </ul>
         </div>
       </section>
 
-      {/* Module rendez-vous */}
-      <section id="pourquoi" className="mx-auto w-full max-w-5xl scroll-mt-20 px-4 py-24 sm:px-6">
+      {/* Académie */}
+      <section id="academie" className="mx-auto w-full max-w-5xl scroll-mt-20 px-4 py-24 sm:px-6">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-semibold tracking-wide text-primary">
-            Module rendez-vous · disponible
-          </p>
-          <h2 className="mt-3 text-4xl leading-[1.08] font-semibold tracking-[-0.03em] text-balance sm:text-5xl">
-            Vous vendez des services ? Encaissez-les en ligne.
+          <p className="text-sm font-semibold tracking-wide text-primary">Académie BookSync</p>
+          <h2 className="mt-3 text-4xl leading-[1.08] font-semibold tracking-[-0.03em] text-balance sm:text-6xl">
+            Apprends le business en 5 minutes par jour.
           </h2>
-          <p className="mt-5 text-lg text-muted-foreground">
-            Coachs, freelances, professeurs, salons : une page où vos clients réservent et paient,
-            sans commission BookSync.
-          </p>
         </div>
-        <ul className="mt-14 grid gap-x-10 gap-y-12 sm:grid-cols-3">
-          {BOOKING.map(({ icon: Icon, title, text }) => (
-            <li key={title} data-testid="usp">
-              <Icon className="size-7 text-primary" strokeWidth={1.6} />
-              <h3 className="mt-4 text-lg font-semibold tracking-tight">{title}</h3>
-              <p className="mt-1.5 text-[15px] text-muted-foreground">{text}</p>
+        <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="academy-modules">
+          {ACADEMY.map((m) => (
+            <li key={m.id} className="rounded-3xl border bg-card p-6">
+              <h3 className="font-semibold">{m.title}</h3>
+              <ul className="mt-3 grid gap-1.5 text-sm text-muted-foreground">
+                {m.lessons.map((l) => (
+                  <li key={l.id} className="flex gap-2">
+                    <Check className="mt-0.5 size-4 shrink-0 text-primary" /> {l.title}
+                  </li>
+                ))}
+              </ul>
             </li>
           ))}
         </ul>
       </section>
 
+      {/* Offre */}
+      <section className="px-4 pb-24 sm:px-6" data-testid="offer">
+        <div className="mx-auto grid w-full max-w-5xl gap-8 rounded-[2.5rem] border bg-card p-8 sm:p-12 md:grid-cols-2 md:items-center">
+          <div>
+            <p className="text-sm font-semibold tracking-wide text-primary">L&apos;offre Starter</p>
+            <h2 className="mt-3 text-3xl leading-tight font-semibold tracking-tight sm:text-4xl">
+              Tout BookSync pour {formatPrice(starter.priceCents)} par mois.
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Moins qu&apos;un repas à emporter. Une seule vente à 10 € et ton mois est
+              rentabilisé : la jauge de ton accueil te le montre.
+            </p>
+            <Button asChild size="lg" className={`mt-6 ${pill}`}>
+              <Link href="/inscription">Commencer maintenant</Link>
+            </Button>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Sans engagement, résiliable en un clic.
+            </p>
+          </div>
+          <ul className="grid gap-3 text-[15px]">
+            {starter.highlights.map((h) => (
+              <li key={h} className="flex gap-2.5">
+                <Check className="mt-0.5 size-5 shrink-0 text-primary" /> {h}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       {/* Tarifs */}
       <section id="tarifs" className="scroll-mt-20 bg-subtle py-24">
-        <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
           <div className="mx-auto max-w-3xl text-center">
-            <h2 className="text-4xl leading-[1.08] font-semibold tracking-[-0.03em] sm:text-6xl">
+            <h2 className="text-4xl leading-[1.08] font-semibold tracking-[-0.03em] text-balance sm:text-6xl">
               Des tarifs simples.
             </h2>
             <p className="mt-5 text-lg text-muted-foreground">
-              1er mois offert sur les forfaits payants. Sans engagement, prix TTC par mois.
+              Commence gratuitement, passe à Starter quand tu es prêt(e). Sans engagement, prix TTC
+              par mois.
             </p>
           </div>
           <div className="mt-14 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -366,11 +313,6 @@ export default function LandingPage() {
                       /mois
                     </span>
                   </p>
-                  {p.priceCents ? (
-                    <p className="mt-2 text-[13px] font-medium text-primary">
-                      1er mois offert · sans engagement
-                    </p>
-                  ) : null}
                   <ul className="mt-8 grid flex-1 gap-3 text-[15px]">
                     {p.highlights.map((h) => (
                       <li key={h} className="flex gap-2.5">
@@ -385,7 +327,7 @@ export default function LandingPage() {
                     variant={featured ? "primary" : "secondary"}
                   >
                     <Link href="/inscription">
-                      {id === "free" ? "Commencer gratuitement" : `Essayer ${p.name}`}
+                      {id === "free" ? "Commencer gratuitement" : `Choisir ${p.name}`}
                     </Link>
                   </Button>
                 </div>
@@ -403,13 +345,8 @@ export default function LandingPage() {
         <div className="mt-12 divide-y border-y">
           {FAQ.map((f) => (
             <details key={f.q} className="group py-5">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[17px] font-medium">
-                {f.q}
-                <span className="text-2xl leading-none font-light text-muted-foreground transition-transform group-open:rotate-45">
-                  +
-                </span>
-              </summary>
-              <p className="mt-3 text-[15px] text-muted-foreground">{f.a}</p>
+              <summary className="cursor-pointer list-none text-lg font-medium">{f.q}</summary>
+              <p className="mt-3 text-muted-foreground">{f.a}</p>
             </details>
           ))}
         </div>
@@ -421,7 +358,7 @@ export default function LandingPage() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/booky.svg" alt="Booky, la mascotte BookSync" width={120} height={132} />
           <h2 className="mt-6 max-w-2xl text-4xl leading-[1.08] font-semibold tracking-[-0.03em] text-balance sm:text-6xl">
-            Votre première vente commence aujourd&apos;hui.
+            Ta première vente commence aujourd&apos;hui.
           </h2>
           <p className="mt-5 max-w-lg text-lg text-white/60">
             Gratuit pour commencer. Sans carte bancaire. En français, de A à Z.
@@ -431,7 +368,7 @@ export default function LandingPage() {
             size="lg"
             className={`mt-10 bg-white text-navy hover:bg-white/90 ${pill}`}
           >
-            <Link href="/inscription?pro=1">Commencer gratuitement</Link>
+            <Link href="/inscription">Commencer gratuitement</Link>
           </Button>
         </div>
       </section>

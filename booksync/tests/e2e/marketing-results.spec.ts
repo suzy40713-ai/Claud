@@ -1,20 +1,16 @@
 import { expect, test } from "@playwright/test";
-import { signUpAndVerify } from "./helpers";
+import { createOrganization, signUpAndVerify } from "./helpers";
 
 test("statistiques marketing : saisie réelle, indicateurs calculés, aucun chiffre inventé", async ({
   page,
 }) => {
   test.setTimeout(90_000);
   await signUpAndVerify(page, { name: "Inès Roux" });
-  await page.getByLabel("Nom de l'entreprise").fill(`Studio ${Date.now().toString(36)}`);
-  await page.getByLabel("Votre activité").selectOption("ecommerce");
-  await page.getByLabel(/Non, je vends des produits/).check();
-  await expect(page.getByLabel("Votre activité")).toHaveValue("ecommerce");
-  await page.getByRole("button", { name: "Créer mon entreprise" }).click();
+  await createOrganization(page, `Studio ${Date.now().toString(36)}`);
   await expect(page).toHaveURL(/produits\/nouveau/);
 
   await page.goto("/tableau-de-bord/resultats");
-  await expect(page.getByRole("heading", { name: "Statistiques marketing" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Mes résultats" })).toBeVisible();
   const summary = page.getByTestId("results-summary");
   await expect(summary).toContainText("Aucun résultat saisi");
   await expect(summary).toContainText("Il faut une dépense et des ventes");
@@ -38,8 +34,8 @@ test("statistiques marketing : saisie réelle, indicateurs calculés, aucun chif
   await expect(page.getByText(/nombre entier attendu/)).toBeVisible();
 
   await page.goto("/tableau-de-bord");
-  await expect(page.getByTestId("marketing-home")).toContainText("Ventes déclarées (30 j)");
-  await expect(page.getByTestId("marketing-home")).toContainText("Dépense : 20,00 €");
+  await expect(page.getByTestId("marketing-home")).toContainText("Ventes ce mois-ci");
+  await expect(page.getByTestId("marketing-home")).toContainText("Chiffre d'affaires : 59,80 €");
 
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth > window.innerWidth + 1,

@@ -1,3 +1,5 @@
+import { BOOKING_ENABLED } from "@/lib/features";
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CalendarCheck2, Check, Clapperboard, MapPin, MessageCircle } from "lucide-react";
@@ -63,6 +65,7 @@ const STEPS = [
 ];
 
 export default function PackPage() {
+  if (!BOOKING_ENABLED) notFound();
   const mail = `mailto:${PUBLISHER.email}?subject=${encodeURIComponent("Pack visibilité salon")}`;
   return (
     <main className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-16">

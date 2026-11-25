@@ -11,10 +11,10 @@ import { cn } from "@/lib/utils";
 
 const LINKS = [
   { href: "/", label: "Accueil" },
-  { href: "/professionnels", label: "Trouver un professionnel" },
-  { href: "/lancer-mon-activite", label: "Lance ton activité" },
-  { href: "/mon-espace", label: "Mes rendez-vous" },
-  { href: "/tableau-de-bord", label: "Espace professionnel" },
+  { href: "/lancer-mon-activite", label: "Trouver quoi vendre" },
+  { href: "/#academie", label: "Apprendre" },
+  { href: "/#tarifs", label: "Tarifs" },
+  { href: "/tableau-de-bord", label: "Mon espace" },
 ];
 
 export function SiteHeader() {
@@ -42,7 +42,7 @@ export function SiteHeader() {
             <Link href="/connexion">Connexion</Link>
           </Button>
           <Button asChild size="sm">
-            <Link href="/inscription?pro=1">Commencer gratuitement</Link>
+            <Link href="/inscription">Commencer gratuitement</Link>
           </Button>
         </div>
         <div className="flex items-center gap-1 lg:hidden">
@@ -73,12 +73,7 @@ export function SiteHeader() {
         </nav>
         <div className="grid gap-2">
           <Button asChild size="lg">
-            <Link href="/professionnels" onClick={() => setOpen(false)}>
-              Je cherche un professionnel
-            </Link>
-          </Button>
-          <Button asChild size="lg" variant="secondary">
-            <Link href="/inscription?pro=1" onClick={() => setOpen(false)}>
+            <Link href="/inscription" onClick={() => setOpen(false)}>
               Commencer gratuitement
             </Link>
           </Button>

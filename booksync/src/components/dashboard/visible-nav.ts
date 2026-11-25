@@ -1,6 +1,7 @@
 import "server-only";
 import { can, type Role } from "@/domain/permissions";
 import { env } from "@/lib/env";
+import { BOOKING_ENABLED } from "@/lib/features";
 import { NAV_ITEMS } from "./nav-config";
 
 /**
@@ -9,7 +10,7 @@ import { NAV_ITEMS } from "./nav-config";
  */
 export function visibleNavItems(role: Role, opts: { bookingModule?: boolean } = {}) {
   const assistant = Boolean(env.ANTHROPIC_API_KEY);
-  const booking = opts.bookingModule ?? true;
+  const booking = BOOKING_ENABLED && (opts.bookingModule ?? true);
   return NAV_ITEMS.filter(
     (i) =>
       (!i.permission || can(role, i.permission)) &&

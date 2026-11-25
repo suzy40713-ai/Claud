@@ -107,7 +107,7 @@ export async function startSubscription(
   }
 
   const customer = await ensureCustomer(stripe, ctx);
-  // 1er mois offert : premier abonnement uniquement.
+  // Essai gratuit seulement si TRIAL_DAYS > 0 (désactivé) et premier abonnement uniquement.
   const trialDays = trialDaysFor(ctx.organization.subscriptionStatus);
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
@@ -123,7 +123,7 @@ export async function startSubscription(
     },
     metadata: { organizationId: ctx.organization.id },
     success_url: appUrl(
-      "/tableau-de-bord/abonnement?paiement=succes&session={CHECKOUT_SESSION_ID}",
+      `/tableau-de-bord/bienvenue?forfait=${plan}&session={CHECKOUT_SESSION_ID}`,
     ),
     cancel_url: appUrl("/tableau-de-bord/abonnement?paiement=annule"),
   });

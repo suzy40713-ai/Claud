@@ -1,29 +1,29 @@
 import type { Metadata } from "next";
-import { LaunchTool } from "./launch-tool";
+import { IdeaPicker } from "@/components/launch/idea-picker";
 
 export const metadata: Metadata = {
-  title: "Lance ton activité sans savoir quoi vendre : idée, nom, prix et plan en 2 minutes",
+  title: "Quoi vendre quand on débute ? Trouve ton idée en 2 minutes",
   description:
-    "Ongles, tresses, cils, coaching, cours ou freelance en ligne : trouve le nom de ton activité, tes prix de départ, ta bio Instagram et ton plan de lancement sur 7 jours. Gratuit.",
+    "Aide numérique, montage vidéo, modèles Canva, revente Vinted, cours en visio… Trouve quoi vendre à partir de ce que tu sais déjà faire, avec un prix de départ et tes 3 premières actions. Gratuit.",
   alternates: { canonical: "/lancer-mon-activite" },
 };
 
 export default function LaunchPage() {
   return (
     <main className="overflow-x-clip">
-      <section className="mx-auto w-full max-w-5xl px-4 pt-14 pb-10 text-center sm:px-6 sm:pt-20">
+      <section className="mx-auto w-full max-w-4xl px-4 pt-14 pb-10 text-center sm:px-6 sm:pt-20">
         <p className="text-sm font-semibold tracking-wide text-primary">Gratuit · 2 minutes</p>
         <h1 className="mx-auto mt-3 max-w-3xl text-4xl leading-[1.05] font-semibold tracking-[-0.03em] text-balance sm:text-6xl">
-          Lance ton activité.
+          Trouve quoi vendre.
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg text-pretty text-muted-foreground">
-          Tu ne sais pas encore quoi proposer ? On t&apos;aide à trouver une idée à partir de ce que
-          tu sais déjà faire, puis on te prépare ton nom, tes prix, ta bio et ton plan pour trouver
-          tes premiers clients.
+          Tu veux gagner tes premiers euros mais tu ne sais pas par où commencer ? Choisis ce que
+          tu sais déjà faire : on te propose une idée, un prix de départ et tes 3 premières
+          actions.
         </p>
       </section>
-      <section className="mx-auto w-full max-w-5xl px-4 pb-24 sm:px-6">
-        <LaunchTool />
+      <section className="mx-auto w-full max-w-4xl px-4 pb-24 sm:px-6">
+        <IdeaPicker mode="public" />
       </section>
     </main>
   );

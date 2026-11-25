@@ -27,6 +27,8 @@ export type Plan = {
     customers: number | null;
     /** Produits suivis par le copilote marketing. */
     products: number;
+    /** Propositions par mois (analyses, stratégies, publicités, contenus, Sales Booster). */
+    toolRunsPerMonth: number | null;
   };
   features: PlanFeatures;
   highlights: string[];
@@ -37,12 +39,13 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "free",
     name: "Free",
     priceCents: 0,
-    tagline: "Pour découvrir BookSync.",
+    tagline: "Pour trouver ton idée et faire tes premiers pas.",
     limits: {
       bookingsPerMonth: 5,
       members: 1,
       customers: 20,
       products: 1,
+      toolRunsPerMonth: 3,
     },
     features: {
       emailNotifications: false,
@@ -52,22 +55,23 @@ export const PLANS: Record<PlanId, Plan> = {
       onlineMeetings: false,
     },
     highlights: [
-      "1 produit suivi par le copilote",
-      "Analyse, stratégie 30 jours, publicités, contenus et Sales Booster illimités",
-      "Autopilot marketing et statistiques",
-      "Module rendez-vous : 5 réservations par mois, 20 clients",
+      "Trouver une idée de business",
+      "Les 3 premières leçons de l'Académie",
+      "3 propositions par mois (analyse, stratégie, pub, contenus)",
+      "1 produit",
     ],
   },
   starter: {
     id: "starter",
     name: "Starter",
     priceCents: 999,
-    tagline: "Pour les indépendants qui se lancent.",
+    tagline: "Pour passer à l'action et faire tes premières ventes.",
     limits: {
       bookingsPerMonth: null,
       members: 2,
       customers: null,
       products: 10,
+      toolRunsPerMonth: null,
     },
     features: {
       emailNotifications: true,
@@ -77,24 +81,24 @@ export const PLANS: Record<PlanId, Plan> = {
       onlineMeetings: true,
     },
     highlights: [
-      "10 produits suivis",
-      "Tous les outils marketing, sans limite",
-      "Module rendez-vous : réservations et clients illimités",
-      "Confirmations et rappels automatiques, visio",
-      "Visibilité dans l'annuaire BookSync",
-      "2 membres",
+      "L'Académie débutant complète",
+      "Stratégie 30 jours et Autopilot : 3 actions par jour",
+      "Publicités, contenus et Sales Booster illimités",
+      "Objectif « rentabiliser mon abonnement » suivi chaque mois",
+      "10 produits",
     ],
   },
   pro: {
     id: "pro",
     name: "Pro",
     priceCents: 2499,
-    tagline: "Pour les équipes qui veulent tout automatiser.",
+    tagline: "Pour accélérer quand tes premières ventes arrivent.",
     limits: {
       bookingsPerMonth: null,
       members: 10,
       customers: null,
       products: 50,
+      toolRunsPerMonth: null,
     },
     features: {
       emailNotifications: true,
@@ -104,23 +108,23 @@ export const PLANS: Record<PlanId, Plan> = {
       onlineMeetings: true,
     },
     highlights: [
-      "50 produits suivis",
-      "Tout le forfait Starter, jusqu'à 10 membres",
-      "Liste d'attente intelligente",
-      "Statistiques avancées et recommandations",
-      "Résumé quotidien par email",
+      "Tout le forfait Starter",
+      "Les modules avancés de l'Académie (publicité payante, augmenter ses prix, fidéliser)",
+      "50 produits",
+      "Jusqu'à 10 membres",
     ],
   },
   business: {
     id: "business",
     name: "Business",
     priceCents: 4999,
-    tagline: "Pour les entreprises qui vendent beaucoup de produits.",
+    tagline: "Pour ceux qui gèrent plusieurs projets en même temps.",
     limits: {
       bookingsPerMonth: null,
       members: 25,
       customers: null,
       products: 200,
+      toolRunsPerMonth: null,
     },
     features: {
       emailNotifications: true,
@@ -130,9 +134,9 @@ export const PLANS: Record<PlanId, Plan> = {
       onlineMeetings: true,
     },
     highlights: [
-      "200 produits suivis",
-      "Tout le forfait Pro, jusqu'à 25 membres",
-      "Pour les catalogues de nombreux produits",
+      "Tout le forfait Pro",
+      "200 produits",
+      "Jusqu'à 25 membres",
     ],
   },
 };
@@ -144,8 +148,11 @@ export function planAtLeast(plan: PlanId, min: PlanId) {
   return PLAN_ORDER.indexOf(plan) >= PLAN_ORDER.indexOf(min);
 }
 
-/** Essai gratuit offert au premier abonnement payant (carte enregistrée, aucun prélèvement). */
-export const TRIAL_DAYS = 30;
+/**
+ * Pas d'essai gratuit sur les forfaits payants : le forfait Free sert de découverte, et le
+ * premier paiement a lieu dès l'abonnement. Mettre une valeur > 0 pour réactiver un essai.
+ */
+export const TRIAL_DAYS = 0;
 
 /**
  * Jours d'essai pour un nouvel abonnement : uniquement si l'entreprise n'a JAMAIS eu d'abonnement
@@ -169,7 +176,7 @@ export function effectivePlan(plan: string, subscriptionStatus: string | null | 
   return ok ? getPlan(plan) : PLANS.free;
 }
 
-export type LimitKind = "bookings" | "members" | "customers" | "products";
+export type LimitKind = "bookings" | "members" | "customers" | "products" | "tools";
 
 export function hasRoom(limit: number | null, current: number, adding = 1): boolean {
   return limit === null || current + adding <= limit;
@@ -182,6 +189,8 @@ export const LIMIT_MESSAGES: Record<LimitKind, (plan: Plan) => string> = {
     `Votre forfait ${p.name} est limité à ${p.limits.members} membre${p.limits.members > 1 ? "s" : ""} (vous compris, invitations en attente incluses). Passez à un forfait supérieur pour agrandir votre équipe.`,
   customers: (p) =>
     `Votre forfait ${p.name} est limité à ${p.limits.customers} clients. Passez au forfait Starter pour des clients illimités.`,
+  tools: (p) =>
+    `Ton forfait ${p.name} inclut ${p.limits.toolRunsPerMonth} propositions par mois, toutes utilisées. Passe au forfait Starter pour un accès illimité, ou attends le 1er du mois.`,
   products: (p) =>
     `Votre forfait ${p.name} est limité à ${p.limits.products} produit${p.limits.products > 1 ? "s" : ""}. Passez à un forfait supérieur pour en suivre davantage.`,
 };

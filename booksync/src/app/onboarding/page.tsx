@@ -2,12 +2,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { Logo } from "@/components/brand/logo";
-import { ACTIVITIES } from "@/domain/activities";
-import { env } from "@/lib/env";
 import { listMemberships, requireSession } from "@/server/auth/session";
 import { OnboardingForm } from "./onboarding-form";
 
-export const metadata: Metadata = { title: "Créer votre entreprise" };
+export const metadata: Metadata = { title: "Commencer mon projet" };
 
 async function Gate({
   searchParams,
@@ -21,22 +19,16 @@ async function Gate({
   const firstName = session.user.name.split(/\s+/)[0];
   const sp = await searchParams;
   const nom = typeof sp.nom === "string" ? sp.nom.trim().slice(0, 60) : "";
-  const activite = typeof sp.activite === "string" ? sp.activite : "";
+  const etape = sp.etape === "produit" ? "produit" : undefined;
+  const idee = typeof sp.idee === "string" ? sp.idee : undefined;
   return (
     <>
       <p className="text-sm font-medium text-primary">Bienvenue {firstName} 👋</p>
-      <h1 className="mt-2 text-2xl font-semibold tracking-tight">Présentez votre entreprise</h1>
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight">On commence ton projet</h1>
       <p className="mt-2 mb-7 text-[15px] text-muted-foreground">
-        Ces informations apparaîtront sur votre page de réservation. Vous pourrez les modifier plus
-        tard.
+        Deux questions, et BookSync te guide pas à pas vers ta première vente.
       </p>
-      <OnboardingForm
-        publicBaseUrl={env.NEXT_PUBLIC_APP_URL.replace(/^https?:\/\//, "")}
-        initial={{
-          name: nom || undefined,
-          activity: ACTIVITIES.some((a) => a.value === activite) ? activite : undefined,
-        }}
-      />
+      <OnboardingForm initial={{ name: nom || undefined, stage: etape, idea: idee }} />
     </>
   );
 }

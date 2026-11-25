@@ -8,6 +8,7 @@ import { TOOLS, type ToolKind } from "@/domain/marketing/tools";
 import type { OrgContext } from "@/server/auth/session";
 import { listProducts } from "@/server/marketing/products";
 import { toolHistory } from "@/server/marketing/tools";
+import { toolUsage } from "@/server/ai/gateway";
 import { ToolForm } from "./tool-form";
 
 /** Page d'un outil du copilote : choix, génération, historique. */
@@ -23,10 +24,15 @@ export async function ToolLanding({
   productId?: string;
 }) {
   const tool = TOOLS[kind];
-  const [products, history] = await Promise.all([listProducts(ctx), toolHistory(ctx, kind)]);
+  const [products, history, usage] = await Promise.all([
+    listProducts(ctx),
+    toolHistory(ctx, kind),
+    toolUsage(ctx),
+  ]);
   const names = new Map(products.map((p) => [p.id, p.name]));
   return (
     <div className="grid gap-6">
+      {usage.limit !== null ? <QuotaNote used={usage.used} limit={usage.limit} /> : null}
       {products.length === 0 ? (
         <EmptyState
           icon={<Package />}
@@ -78,6 +84,21 @@ export async function ToolLanding({
         </section>
       ) : null}
     </div>
+  );
+}
+
+/** Propositions restantes ce mois-ci (forfait gratuit). */
+export function QuotaNote({ used, limit }: { used: number; limit: number }) {
+  return (
+    <p
+      className="flex flex-wrap items-center gap-x-2 text-sm text-muted-foreground"
+      data-testid="tool-quota"
+    >
+      {Math.min(used, limit)} / {limit} propositions utilisées ce mois-ci (forfait gratuit).
+      <Link href="/tableau-de-bord/abonnement" className="font-medium text-primary hover:underline">
+        Illimité avec Starter
+      </Link>
+    </p>
   );
 }
 

@@ -3,6 +3,7 @@ import { and, count, desc, eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { organization, product } from "@/db/schema";
 import { hasRoom, LIMIT_MESSAGES, PlanLimitError } from "@/domain/billing/plans";
+import { findIdea, ideaToProduct } from "@/domain/launch/ideas";
 import { productSchema, type ProductInput } from "@/domain/marketing/product";
 import { assertCan } from "@/domain/permissions";
 import type { OrgContext } from "@/server/auth/session";
@@ -90,4 +91,11 @@ export async function setBookingModule(ctx: OrgContext, enabled: boolean) {
     .update(organization)
     .set({ bookingModule: enabled })
     .where(eq(organization.id, ctx.organization.id));
+}
+
+/** Transforme une idée de « Trouver une idée » en premier produit (fiche pré-remplie). */
+export async function createProductFromIdea(ctx: OrgContext, ideaId: string) {
+  const idea = findIdea(ideaId);
+  if (!idea) throw new UserError("Idée introuvable.");
+  return createProduct(ctx, ideaToProduct(idea));
 }

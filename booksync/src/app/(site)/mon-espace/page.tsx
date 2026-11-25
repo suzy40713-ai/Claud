@@ -1,3 +1,4 @@
+import { BOOKING_ENABLED } from "@/lib/features";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
@@ -188,6 +189,7 @@ async function Content() {
 }
 
 export default function MySpacePage() {
+  if (!BOOKING_ENABLED) redirect("/tableau-de-bord");
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
       <Suspense fallback={<Skeleton className="h-96" />}>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ScanSearch } from "lucide-react";
 import { toast } from "sonner";
@@ -18,7 +19,14 @@ export function AnalyzeButton({ id, again }: { id: string; again: boolean }) {
       onClick={() =>
         startTransition(async () => {
           const res = await analyzeProductAction(id);
-          if (!res.ok) return void toast.error(res.error);
+          if (!res.ok)
+            return void toast.error(res.error, {
+              action: res.limit ? (
+                <Link href="/tableau-de-bord/abonnement" className="font-medium underline">
+                  Voir les forfaits
+                </Link>
+              ) : undefined,
+            });
           toast.success("Analyse terminée.");
           router.refresh();
         })

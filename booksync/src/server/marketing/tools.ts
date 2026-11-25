@@ -5,7 +5,13 @@ import { parseToolOptions } from "@/domain/marketing/tools/options";
 import { assertCan } from "@/domain/permissions";
 import type { OrgContext } from "@/server/auth/session";
 import { UserError } from "@/server/errors";
-import { generationCount, getGeneration, listGenerations, saveGeneration } from "@/server/ai/gateway";
+import {
+  assertToolQuota,
+  generationCount,
+  getGeneration,
+  listGenerations,
+  saveGeneration,
+}  from "@/server/ai/gateway";
 import { runTemplate } from "@/domain/marketing/templates";
 import { getProduct } from "./products";
 
@@ -16,6 +22,7 @@ export async function runTool(ctx: OrgContext, kind: ToolKind, productId: string
   const p = await getProduct(ctx, productId);
   if (!p) throw new UserError("Choisissez un de vos produits.", { productId: "Produit introuvable." });
   const { values, labelled } = parseToolOptions(tool.options, rawOptions);
+  await assertToolQuota(ctx);
   const seed = await generationCount(ctx, kind, p.id);
   const output = tool.schema.parse(runTemplate(kind, p, values, seed)) as object;
   const problem = (tool as { check?: (o: unknown) => string | null }).check?.(output);

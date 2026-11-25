@@ -12,13 +12,10 @@ describe("cn", () => {
 
 import { trialDaysFor, TRIAL_DAYS } from "@/domain/billing/plans";
 
-describe("1er mois offert", () => {
-  it("30 jours d'essai pour un premier abonnement uniquement", () => {
-    expect(TRIAL_DAYS).toBe(30);
-    expect(trialDaysFor(null)).toBe(30);
-    expect(trialDaysFor(undefined)).toBe(30);
-    // Déjà abonné, ou abonnement résilié : pas de nouvel essai.
-    for (const s of ["active", "trialing", "canceled", "past_due", "incomplete_expired"])
+describe("pas d'essai gratuit", () => {
+  it("aucun jour d'essai, premier abonnement compris", () => {
+    expect(TRIAL_DAYS).toBe(0);
+    for (const s of [null, undefined, "active", "trialing", "canceled", "past_due"])
       expect(trialDaysFor(s)).toBe(0);
   });
 });

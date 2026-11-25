@@ -1,15 +1,12 @@
 import { expect, test } from "@playwright/test";
-import { signUpAndVerify } from "./helpers";
+import { createOrganization, signUpAndVerify, sql } from "./helpers";
 
 /** Outils marketing gratuits (sans IA) : parcours réel, de la fiche produit à l'Autopilot. */
 test("copilote : stratégie, Autopilot, publicités, contenus et Sales Booster", async ({ page }) => {
   test.setTimeout(150_000);
   await signUpAndVerify(page, { name: "Nora Petit" });
-  await page.getByLabel("Nom de l'entreprise").fill(`Atelier ${Date.now().toString(36)}`);
-  await page.getByLabel("Votre activité").selectOption("ecommerce");
-  await page.getByLabel(/Non, je vends des produits/).check();
-  await expect(page.getByLabel("Votre activité")).toHaveValue("ecommerce");
-  await page.getByRole("button", { name: "Créer mon entreprise" }).click();
+  const orgName = `Atelier ${Date.now().toString(36)}`;
+  await createOrganization(page, orgName);
   await expect(page).toHaveURL(/produits\/nouveau/);
   await page.getByLabel("Nom du produit ou du service").fill("Bougies Lumi");
   await page
@@ -20,6 +17,8 @@ test("copilote : stratégie, Autopilot, publicités, contenus et Sales Booster",
   await page.getByRole("button", { name: "Ajouter le produit" }).click();
   await expect(page.getByTestId("product-name")).toHaveText("Bougies Lumi");
   const productId = page.url().split("/").pop()!;
+  // Forfait Starter : propositions illimitées (Free : 3 par mois).
+  await sql`update organization set plan = 'starter', subscription_status = 'active' where name = ${orgName}`;
   await expect(
     page.getByTestId("product-tools").getByRole("link", { name: "Stratégie 30 jours" }),
   ).toHaveAttribute("href", `/tableau-de-bord/strategies?produit=${productId}`);

@@ -1,15 +1,28 @@
 "use server";
 
+import { randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { SLUG_ERROR_MESSAGES, validateSlug } from "@/domain/organization/slug";
+import type { Route } from "next";
+import { findIdea } from "@/domain/launch/ideas";
+import { slugify, validateSlug } from "@/domain/organization/slug";
 import { runAction, type ActionResult } from "@/server/errors";
 import { ACTIVE_ORG_COOKIE, getSession } from "@/server/auth/session";
 import { createOrganization, isSlugTaken } from "@/server/organizations/service";
 
 export type OnboardingState = ActionResult<undefined> & {
-  values?: { name: string; slug: string; timezone: string; activity: string; booking: string };
+  values?: { name: string; stage: string };
 };
+
+/** Identifiant interne unique (le projet n'a plus de page publique). */
+async function uniqueSlug(name: string) {
+  const base = (slugify(name) || "projet").slice(0, 40).replace(/-+$/, "");
+  for (let i = 0; i < 5; i++) {
+    const candidate = i === 0 && base.length >= 3 ? base : `${base}-${randomBytes(3).toString("hex")}`;
+    if (!validateSlug(candidate) && !(await isSlugTaken(candidate))) return candidate;
+  }
+  return `projet-${randomBytes(6).toString("hex")}`;
+}
 
 export async function createOrganizationAction(_prev: OnboardingState | null, formData: FormData) {
   const session = await getSession();
@@ -17,13 +30,17 @@ export async function createOrganizationAction(_prev: OnboardingState | null, fo
   if (!session.user.termsAcceptedAt) redirect("/accepter-conditions");
   const values = {
     name: String(formData.get("name") ?? ""),
-    slug: String(formData.get("slug") ?? ""),
-    timezone: String(formData.get("timezone") ?? ""),
-    activity: String(formData.get("activity") ?? ""),
-    booking: formData.get("booking") === "0" ? "0" : "1",
+    stage: formData.get("stage") === "produit" ? "produit" : "idee",
   };
-  const result = await runAction(() =>
-    createOrganization(session.user, { ...values, bookingModule: values.booking === "1" }),
+  const idea = String(formData.get("idee") ?? "");
+  const result = await runAction(async () =>
+    createOrganization(session.user, {
+      name: values.name,
+      slug: await uniqueSlug(values.name),
+      timezone: "Europe/Paris",
+      activity: "autre",
+      bookingModule: false,
+    }),
   );
   if (!result.ok) return { ...result, values } satisfies OnboardingState;
   (await cookies()).set(ACTIVE_ORG_COOKIE, result.data.id, {
@@ -33,20 +50,10 @@ export async function createOrganizationAction(_prev: OnboardingState | null, fo
     path: "/",
     maxAge: 60 * 60 * 24 * 365,
   });
-  // Vente de services sur rendez-vous : installation de l'agenda ; sinon, premier produit.
+  if (values.stage === "produit") redirect("/tableau-de-bord/produits/nouveau?premier=1");
   redirect(
-    values.booking === "1"
-      ? "/tableau-de-bord/demarrage"
-      : "/tableau-de-bord/produits/nouveau?premier=1",
+    (findIdea(idea)
+      ? `/tableau-de-bord/trouver-une-idee?idee=${idea}`
+      : "/tableau-de-bord/trouver-une-idee") as Route,
   );
-}
-
-/** Vérification en direct de la disponibilité d'une adresse. */
-export async function checkSlugAvailability(slug: string): Promise<string | null> {
-  const session = await getSession();
-  if (!session) return null;
-  const normalized = slug.trim().toLowerCase();
-  const error = validateSlug(normalized);
-  if (error) return SLUG_ERROR_MESSAGES[error];
-  return (await isSlugTaken(normalized)) ? SLUG_ERROR_MESSAGES.taken : null;
 }

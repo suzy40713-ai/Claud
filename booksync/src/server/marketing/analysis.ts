@@ -4,7 +4,7 @@ import { analysisTemplate } from "@/domain/marketing/templates";
 import { assertCan } from "@/domain/permissions";
 import type { OrgContext } from "@/server/auth/session";
 import { UserError } from "@/server/errors";
-import { latestGeneration, saveGeneration } from "@/server/ai/gateway";
+import { assertToolQuota, latestGeneration, saveGeneration }  from "@/server/ai/gateway";
 import { getProduct } from "./products";
 
 export const ANALYSIS_KIND = "product_analysis";
@@ -14,6 +14,7 @@ export async function analyzeProduct(ctx: OrgContext, productId: string) {
   assertCan(ctx.role, "marketing.manage");
   const p = await getProduct(ctx, productId);
   if (!p) throw new UserError("Produit introuvable.");
+  await assertToolQuota(ctx);
   const output = productAnalysisSchema.parse(analysisTemplate(p));
   const id = await saveGeneration(ctx, {
     kind: ANALYSIS_KIND,

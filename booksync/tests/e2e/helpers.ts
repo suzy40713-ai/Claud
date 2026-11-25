@@ -42,7 +42,7 @@ export async function signUp(
 ) {
   await page.goto(pro ? "/inscription?pro=1" : "/inscription");
   await page.getByLabel("Nom complet").fill(name);
-  await page.getByLabel(pro ? "Email professionnel" : "Email", { exact: true }).fill(email);
+  await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Mot de passe", { exact: true }).fill(password);
   await page.getByRole("checkbox", { name: /J'accepte les conditions générales/ }).check();
   await page.getByRole("button", { name: "Créer mon compte" }).click();
@@ -58,21 +58,22 @@ export async function signUpAndVerify(page: Page, opts?: Parameters<typeof signU
   return user;
 }
 
+/** Création du projet (onboarding) : « idee » mène à Trouver une idée, « produit » au 1er produit. */
 export async function createOrganization(
   page: Page,
   name: string,
-  slug?: string,
-  activity = "coiffure",
+  stage: "idee" | "produit" = "produit",
 ) {
-  await page.getByLabel("Nom de l'entreprise").fill(name);
-  await page.getByLabel("Votre activité").selectOption(activity);
-  if (slug) await page.getByLabel("Adresse de votre page de réservation").fill(slug);
-  await page.getByRole("button", { name: "Créer mon entreprise" }).click();
-  await expect(page).toHaveURL(/\/tableau-de-bord\/demarrage$/);
+  await page.getByLabel("Nom de ton projet").fill(name);
+  await page.getByLabel(stage === "idee" ? /pas encore d'idée/ : /déjà quelque chose à vendre/).check();
+  await page.getByRole("button", { name: "C'est parti" }).click();
+  await expect(page).toHaveURL(
+    stage === "idee" ? /\/tableau-de-bord\/trouver-une-idee$/ : /\/tableau-de-bord\/produits\/nouveau/,
+  );
 }
 
 /** Passe une entreprise au forfait indiqué (préparation de test, équivalent d'un webhook Stripe). */
-export async function setPlan(slug: string, plan: "free" | "starter" | "pro") {
+export async function setPlan(slug: string, plan: "free" | "starter" | "pro" | "business") {
   await sql`update organization set plan = ${plan}, subscription_status = ${plan === "free" ? null : "active"} where slug = ${slug}`;
 }
 

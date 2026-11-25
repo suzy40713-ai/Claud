@@ -1,16 +1,12 @@
 import { expect, test } from "@playwright/test";
-import { signUpAndVerify } from "./helpers";
+import { createOrganization, signUpAndVerify } from "./helpers";
 
 test("copilote : inscription sans rendez-vous, premier produit, fiche, modification, suppression", async ({
   page,
 }) => {
   test.setTimeout(90_000);
   await signUpAndVerify(page, { name: "Léa Martin" });
-  await page.getByLabel("Nom de l'entreprise").fill(`Lumi ${Date.now().toString(36)}`);
-  await page.getByLabel("Votre activité").selectOption("ecommerce");
-  await page.getByLabel(/Non, je vends des produits/).check();
-  await page.getByRole("button", { name: "Créer mon entreprise" }).click();
-  await expect(page).toHaveURL(/\/tableau-de-bord\/produits\/nouveau\?premier=1$/);
+  await createOrganization(page, `Lumi ${Date.now().toString(36)}`);
   await expect(page.getByText(/Dernière étape/)).toBeVisible();
 
   // Validation côté serveur : description trop courte.
@@ -37,8 +33,9 @@ test("copilote : inscription sans rendez-vous, premier produit, fiche, modificat
 
   // Module rendez-vous désactivé : accueil marketing, pas de calendrier dans le menu.
   await page.goto("/tableau-de-bord");
-  await expect(page.getByTestId("marketing-home")).toContainText("Bougies Lumi");
+  await expect(page.getByTestId("journey")).toContainText("Créer ta stratégie 30 jours");
   await expect(page.getByTestId("marketing-home")).toContainText("1 / 1");
+  await expect(page.getByTestId("first-sale-goal")).toBeVisible();
   await expect(page.getByRole("link", { name: "Calendrier" })).toHaveCount(0);
 
   // Forfait Free : 1 produit maximum, l'ajout propose de changer de forfait.
@@ -56,10 +53,9 @@ test("copilote : inscription sans rendez-vous, premier produit, fiche, modificat
   await expect(page).toHaveURL(/\/tableau-de-bord\/produits$/);
   await expect(page.getByText("Ajoutez votre premier produit")).toBeVisible();
 
-  // Réactivation du module rendez-vous depuis les paramètres.
+  // Le module rendez-vous n'existe plus : ses pages renvoient à l'accueil.
   await page.goto("/tableau-de-bord/parametres/modules");
-  await page.getByRole("switch", { name: "Module rendez-vous" }).click();
-  await expect(page.getByText("Module rendez-vous activé.")).toBeVisible();
-  await page.goto("/tableau-de-bord");
-  await expect(page.getByTestId("marketing-strip")).toBeVisible();
+  await expect(page).toHaveURL(/\/tableau-de-bord$/);
+  await page.goto("/tableau-de-bord/calendrier");
+  await expect(page).toHaveURL(/\/tableau-de-bord$/);
 });

@@ -4,7 +4,12 @@ import { revalidatePath } from "next/cache";
 import type { ProductInput } from "@/domain/marketing/product";
 import { requireOrg } from "@/server/auth/session";
 import { runAction } from "@/server/errors";
-import { createProduct, deleteProduct, updateProduct } from "@/server/marketing/products";
+import {
+  createProduct,
+  createProductFromIdea,
+  deleteProduct,
+  updateProduct,
+} from "@/server/marketing/products";
 import { analyzeProduct } from "@/server/marketing/analysis";
 
 export async function createProductAction(input: ProductInput) {
@@ -42,5 +47,15 @@ export async function analyzeProductAction(id: string) {
   }, "Analyse terminée.");
   revalidatePath(`/tableau-de-bord/produits/${id}`);
   revalidatePath("/tableau-de-bord/analyse-produit");
+  return res;
+}
+
+export async function createProductFromIdeaAction(ideaId: string) {
+  const ctx = await requireOrg();
+  const res = await runAction(
+    async () => ({ id: (await createProductFromIdea(ctx, ideaId)).id }),
+    "Idée enregistrée comme produit.",
+  );
+  revalidatePath("/tableau-de-bord", "layout");
   return res;
 }

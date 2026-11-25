@@ -91,7 +91,7 @@ export function adTemplate(p: ProductInfo, v: Values, seed = 0): AdOutput {
       "Centres d'intérêt liés à votre domaine (hypothèse à tester).",
       "Personnes qui ont déjà interagi avec votre compte (si la plateforme le propose).",
     ],
-    testPlan: "Testez les 3 variantes en même temps avec un petit budget (2 à 5 € par jour chacune) pendant 3 à 4 jours. Gardez celle qui a le plus de clics pour le moins cher, arrêtez les autres. Notez les résultats dans « Statistiques marketing ». Aucun résultat n'est garanti.",
+    testPlan: "Testez les 3 variantes en même temps avec un petit budget (2 à 5 € par jour chacune) pendant 3 à 4 jours. Gardez celle qui a le plus de clics pour le moins cher, arrêtez les autres. Notez les résultats dans « Mes résultats ». Aucun résultat n'est garanti.",
     rules: [
       "Pas de promesse de résultat garanti ni d'allégation santé non prouvée.",
       "Une offre affichée doit être réelle et ses conditions claires.",

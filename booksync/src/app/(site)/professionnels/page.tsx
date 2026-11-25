@@ -1,3 +1,5 @@
+import { BOOKING_ENABLED } from "@/lib/features";
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
@@ -242,6 +244,7 @@ async function Results({ searchParams }: { searchParams: Promise<Params> }) {
 }
 
 export default function DirectoryPage(props: PageProps<"/professionnels">) {
+  if (!BOOKING_ENABLED) notFound();
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
       <div className="mb-6">

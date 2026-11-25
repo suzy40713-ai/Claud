@@ -15,6 +15,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 import { authErrorMessage } from "@/lib/auth-errors";
 import { PASSWORD_RULE, validateSignUp, type SignUpErrors } from "@/lib/validation/auth";
+import { BOOKING_ENABLED } from "@/lib/features";
 
 export function SignUpForm() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export function SignUpForm() {
   const pro = params.get("pro") === "1";
   const redirection = safeRedirect(
     params.get("redirection"),
-    pro ? "/onboarding" : "/verifier-email/confirme",
+    pro || !BOOKING_ENABLED ? "/onboarding" : "/verifier-email/confirme",
   );
   const [terms, setTerms] = useState(false);
   const [termsError, setTermsError] = useState<string | null>(null);
@@ -57,7 +58,7 @@ export function SignUpForm() {
       }
       // Confirmation d'email désactivée côté serveur : le compte est déjà connecté.
       if (data?.token) {
-        const next = params.get("redirection") ? redirection : pro ? "/onboarding" : "/mon-espace";
+        const next = params.get("redirection") ? redirection : pro || !BOOKING_ENABLED ? "/onboarding" : "/mon-espace";
         router.push(next as Route);
         router.refresh();
         return;
@@ -72,7 +73,7 @@ export function SignUpForm() {
       <Field id="name" label="Nom complet" error={errors.name}>
         <Input id="name" name="name" autoComplete="name" placeholder="Camille Martin" required />
       </Field>
-      <Field id="email" label={pro ? "Email professionnel" : "Email"} error={errors.email}>
+      <Field id="email" label="Email" error={errors.email}>
         <Input
           id="email"
           name="email"

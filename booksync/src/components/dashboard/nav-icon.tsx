@@ -13,6 +13,7 @@ import {
   Megaphone,
   Clapperboard,
   Rocket,
+  GraduationCap,
   Lightbulb,
   ListChecks,
   Scissors,
@@ -47,6 +48,8 @@ const ICONS = {
   megaphone: Megaphone,
   content: Clapperboard,
   booster: Rocket,
+  idea: Lightbulb,
+  academy: GraduationCap,
 } as const;
 
 export function NavIcon({ name, className }: { name: NavItem["icon"]; className?: string }) {

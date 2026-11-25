@@ -4,17 +4,23 @@ test.describe("site public", () => {
   test("la page d'accueil commerciale est complète et en français", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("html")).toHaveAttribute("lang", "fr");
-    await expect(page).toHaveTitle(/^BookSync — De votre idée à vos premières ventes/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("De votre idée");
+    await expect(page).toHaveTitle(/^BookSync — De zéro à ta première vente/);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("De zéro");
     // Statut honnête de chaque outil : disponible ou en déploiement.
     await expect(page.getByTestId("tools")).toContainText("Disponible");
     await expect(page.getByTestId("tools")).not.toContainText("En déploiement");
-    for (const id of ["fonctionnalites", "avantages", "tarifs", "faq"])
+    for (const id of ["fonctionnalites", "avantages", "academie", "tarifs", "faq"])
       await expect(page.locator(`#${id}`)).toBeAttached();
     await expect(page.locator("#tarifs")).toContainText("9,99 €");
     await expect(page.locator("#tarifs")).toContainText("24,99 €");
+    await expect(page.locator("#tarifs")).toContainText("49,99 €");
+    // Plus de mois offert, plus de réservation, aucune promesse de revenu.
+    const body = page.locator("main");
+    await expect(body).not.toContainText("mois offert");
+    await expect(body).not.toContainText("réservation");
+    await expect(page.getByTestId("offer")).toContainText("Une seule vente à 10 €");
     await page.getByRole("link", { name: "Commencer gratuitement" }).first().click();
-    await expect(page).toHaveURL(/\/inscription(\?pro=1)?$/);
+    await expect(page).toHaveURL(/\/inscription$/);
   });
 
   test("les pages légales sont accessibles depuis le pied de page", async ({ page }) => {
@@ -79,20 +85,11 @@ test.describe("site public", () => {
   });
 });
 
-test("pack visibilité : page de vente accessible depuis le pied de page", async ({ page }) => {
-  await page.goto("/");
-  await page.getByRole("contentinfo").getByRole("link", { name: "Pack visibilité salon" }).click();
-  await expect(page).toHaveURL(/\/pack-visibilite$/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Pack visibilité salon");
-  await expect(page.getByTestId("pack-price")).toContainText("99 €");
-  await expect(page.getByText(/remboursé intégralement/)).toBeVisible();
-  // Captures du site : 4 écrans d'exemple, images chargées.
-  const shots = page.getByTestId("pack-screens").getByRole("img");
-  await expect(shots).toHaveCount(4);
-  for (const img of await shots.all()) {
-    await img.scrollIntoViewIfNeeded();
-    await expect
-      .poll(() => img.evaluate((i: HTMLImageElement) => i.naturalWidth))
-      .toBeGreaterThan(0);
+test("réservation retirée : pages publiques et privées inaccessibles", async ({ page }) => {
+  for (const path of ["/professionnels", "/pack-visibilite", "/rdv/abc", "/un-salon-quelconque"]) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { name: "Page introuvable" })).toBeVisible();
   }
+  await page.goto("/");
+  await expect(page.getByRole("contentinfo")).not.toContainText("Pack visibilité");
 });

@@ -27,10 +27,18 @@ const CASES: Array<[ToolKind, Record<string, unknown>]> = [
 ];
 
 describe("copilote gratuit (sans IA)", () => {
-  it("analyse un produit gratuitement, sans limite, coût 0", async () => {
+  it("Free : 3 propositions par mois, puis forfait supérieur", async () => {
     const ctx = await makeOrg();
     const p = await createProduct(ctx, input);
-    for (let i = 0; i < 12; i++) await analyzeProduct(ctx, p.id); // au-delà de l'ancien quota Free
+    for (let i = 0; i < 3; i++) await analyzeProduct(ctx, p.id);
+    await expect(analyzeProduct(ctx, p.id)).rejects.toThrow(/3 propositions par mois/);
+    await expect(runTool(ctx, "ad", p.id, CASES[1][1])).rejects.toThrow(/Starter/);
+  });
+
+  it("Starter : analyse sans limite, coût 0", async () => {
+    const ctx = await makeOrg({ plan: "starter" });
+    const p = await createProduct(ctx, input);
+    for (let i = 0; i < 5; i++) await analyzeProduct(ctx, p.id);
     const r = await analyzeProduct(ctx, p.id);
     expect(r.output.strengths[0].text).toContain("cire végétale");
     const [row] = await db.select().from(aiGeneration).where(eq(aiGeneration.id, r.id));

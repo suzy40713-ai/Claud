@@ -24,22 +24,13 @@ test.describe("inscription et entreprise", () => {
     await expect(page).toHaveURL(/\/onboarding$/);
     await expect(page.getByText("Bienvenue Camille")).toBeVisible();
 
-    // L'adresse publique est suggérée à partir du nom (accents supprimés).
+    // Création du projet : deux questions, puis « Trouver une idée ».
     const suffix = Date.now().toString(36);
-    await page.getByLabel("Nom de l'entreprise").fill(`Clinique Vétérinaire Éloïse ${suffix}`);
-    await page.getByLabel("Votre activité").selectOption("autre");
-    await expect(page.getByLabel("Adresse de votre page de réservation")).toHaveValue(
-      `clinique-veterinaire-eloise-${suffix}`,
-    );
-    await page.getByRole("button", { name: "Créer mon entreprise" }).click();
-
-    // Direction l'assistant d'installation, puis la vue générale.
-    await expect(page).toHaveURL(/\/tableau-de-bord\/demarrage$/);
-    await expect(page.getByRole("heading", { name: /Bienvenue sur BookSync/ })).toBeVisible();
+    await createOrganization(page, `Projet Éloïse ${suffix}`, "idee");
+    await expect(page.getByTestId("idea-finder")).toBeVisible();
     await page.goto("/tableau-de-bord");
     await expect(page.getByRole("heading", { name: "Bonjour Camille" })).toBeVisible();
-    await expect(page.getByTestId("org-name")).toHaveText(`Clinique Vétérinaire Éloïse ${suffix}`);
-    await expect(page.getByText(`/clinique-veterinaire-eloise-${suffix}`)).toBeVisible();
+    await expect(page.getByTestId("journey")).toContainText("Choisir ce que tu vends");
 
     // L'entreprise et l'appartenance sont bien en base.
     const [row] = await sql<{ role: string; timezone: string }[]>`
@@ -58,22 +49,22 @@ test.describe("inscription et entreprise", () => {
     // Reconnexion : l'entreprise est réactivée automatiquement.
     await signIn(page, user.email);
     await expect(page).toHaveURL(/\/tableau-de-bord$/);
-    await expect(page.getByTestId("org-name")).toHaveText(`Clinique Vétérinaire Éloïse ${suffix}`);
+    await expect(page.getByRole("heading", { name: "Bonjour Camille" })).toBeVisible();
   });
 
   test("les erreurs de saisie sont affichées en français", async ({ page }) => {
-    await page.goto("/inscription?pro=1");
+    await page.goto("/inscription");
     await page.getByRole("button", { name: "Créer mon compte" }).click();
     await expect(page.getByText("Indiquez votre nom (2 caractères minimum).")).toBeVisible();
     await expect(page.getByText("Indiquez votre adresse email.")).toBeVisible();
-    await page.getByLabel("Email professionnel").fill("pas-un-email");
+    await page.getByLabel("Email", { exact: true }).fill("pas-un-email");
     await page.getByLabel("Mot de passe", { exact: true }).fill("court");
     await page.getByRole("button", { name: "Créer mon compte" }).click();
     await expect(page.getByText("Adresse email invalide.")).toBeVisible();
     await expect(
       page.getByText("Le mot de passe doit contenir au moins 10 caractères."),
     ).toBeVisible();
-    await expect(page.getByLabel("Email professionnel")).toHaveAttribute("aria-invalid", "true");
+    await expect(page.getByLabel("Email", { exact: true })).toHaveAttribute("aria-invalid", "true");
     await expect(
       page.getByText("Vous devez accepter les conditions générales pour créer un compte."),
     ).toBeVisible();
@@ -102,30 +93,16 @@ test.describe("inscription et entreprise", () => {
     await expect(page.getByText("Email ou mot de passe incorrect.")).toBeVisible();
   });
 
-  test("l'adresse publique doit être disponible et non réservée", async ({ page }) => {
-    const first = await signUpAndVerify(page);
-    const slug = `cabinet-${Date.now().toString(36)}`;
-    await createOrganization(page, "Cabinet Un", slug);
-    expect(first.email).toBeTruthy();
-
+  test("deux projets du même nom ont chacun leur identifiant interne", async ({ page }) => {
+    const name = `Projet ${Date.now().toString(36)}`;
+    await signUpAndVerify(page);
+    await createOrganization(page, name);
     await page.context().clearCookies();
     await signUpAndVerify(page);
-    const slugInput = page.getByLabel("Adresse de votre page de réservation");
-    await page.getByLabel("Nom de l'entreprise").fill("Cabinet Deux");
-    await slugInput.fill(slug);
-    await expect(
-      page.getByText("Cette adresse est déjà utilisée par une autre entreprise."),
-    ).toBeVisible();
-    await slugInput.fill("connexion");
-    await expect(
-      page.getByText("Cette adresse est réservée. Choisissez-en une autre."),
-    ).toBeVisible();
-    // Même en forçant l'envoi, le serveur refuse.
-    await page.getByRole("button", { name: "Créer mon entreprise" }).click();
-    await expect(page).toHaveURL(/\/onboarding$/);
-    await expect(
-      page.getByText("Cette adresse est réservée. Choisissez-en une autre."),
-    ).toBeVisible();
+    await createOrganization(page, name);
+    const rows = await sql<{ slug: string }[]>`select slug from organization where name = ${name}`;
+    expect(rows).toHaveLength(2);
+    expect(new Set(rows.map((r) => r.slug)).size).toBe(2);
   });
 });
 
@@ -156,7 +133,7 @@ test.describe("connexion", () => {
     page,
   }) => {
     const user = await signUpAndVerify(page);
-    await createOrganization(page, "Studio Redirection", `studio-${Date.now().toString(36)}`);
+    await createOrganization(page, "Studio Redirection");
     await page.context().clearCookies();
 
     await page.goto("/onboarding");
@@ -173,7 +150,7 @@ test.describe("connexion", () => {
 
   test("une redirection externe est ignorée", async ({ page }) => {
     const user = await signUpAndVerify(page);
-    await createOrganization(page, "Studio Sécurité", `secu-${Date.now().toString(36)}`);
+    await createOrganization(page, "Studio Sécurité");
     await page.context().clearCookies();
     await page.goto("/connexion?redirection=//evil.example.com");
     await page.getByLabel("Email").fill(user.email);
@@ -188,7 +165,7 @@ test.describe("mot de passe oublié", () => {
     page,
   }) => {
     const user = await signUpAndVerify(page);
-    await createOrganization(page, "Atelier Reset", `atelier-${Date.now().toString(36)}`);
+    await createOrganization(page, "Atelier Reset");
     await page.context().clearCookies();
 
     const before = new Date();

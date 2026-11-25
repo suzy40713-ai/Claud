@@ -16,6 +16,7 @@ import { AnalyzeButton } from "./analyze-button";
 import { Alert } from "@/components/ui/alert";
 import { ProductAnalysisView } from "@/components/marketing/product-analysis";
 import { latestAnalysis } from "@/server/marketing/analysis";
+import { toolUsage } from "@/server/ai/gateway";
 
 export const metadata: Metadata = { title: "Produit" };
 
@@ -24,7 +25,7 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
   const ctx = await requirePermission("marketing.manage");
   const p = await getProduct(ctx, id);
   if (!p) notFound();
-  const latest = await latestAnalysis(ctx, p.id);
+  const [latest, usage] = await Promise.all([latestAnalysis(ctx, p.id), toolUsage(ctx)]);
   const rows: Array<[string, string | null]> = [
     ["Description", p.description],
     ["Avantages", p.benefits],
@@ -92,7 +93,9 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
               Analyse du produit
             </h2>
             <p className="text-sm text-muted-foreground">
-              Gratuite et illimitée
+              {usage.limit === null
+                ? "Incluse dans ton forfait"
+                : `${Math.min(usage.used, usage.limit)} / ${usage.limit} propositions utilisées ce mois-ci`}
               {latest
                 ? ` · dernière analyse le ${latest.createdAt.toLocaleDateString("fr-FR")}`
                 : ""}

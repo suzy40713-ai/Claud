@@ -25,7 +25,9 @@ export type NavItem = {
     | "strategy"
     | "megaphone"
     | "content"
-    | "booster";
+    | "booster"
+    | "idea"
+    | "academy";
   /** Une phrase qui explique à quoi sert la page (menu mobile). */
   hint: string;
   group: NavGroup;
@@ -38,12 +40,23 @@ export type NavItem = {
   mobile?: boolean;
 };
 
-export type NavGroup = "accueil" | "marketing" | "rdv" | "clients" | "salon" | "suivi" | "compte";
+export type NavGroup =
+  | "accueil"
+  | "demarrer"
+  | "marketing"
+  | "progres"
+  | "rdv"
+  | "clients"
+  | "salon"
+  | "suivi"
+  | "compte";
 
 /** Sections du menu, dans l'ordre d'affichage (titre vide = pas de titre). */
 export const NAV_GROUPS: Array<{ id: NavGroup; title: string }> = [
   { id: "accueil", title: "" },
-  { id: "marketing", title: "Marketing" },
+  { id: "demarrer", title: "Démarrer" },
+  { id: "marketing", title: "Vendre" },
+  { id: "progres", title: "Avancer" },
   { id: "rdv", title: "Module rendez-vous" },
   { id: "clients", title: "Clients et ventes" },
   { id: "salon", title: "Mon activité" },
@@ -54,19 +67,36 @@ export const NAV_GROUPS: Array<{ id: NavGroup; title: string }> = [
 export const NAV_ITEMS: NavItem[] = [
   {
     href: "/tableau-de-bord",
-    label: "Vue générale",
-    hint: "Votre journée en un coup d'œil",
+    label: "Accueil",
+    hint: "Ta progression et ta prochaine action",
     icon: "home",
     group: "accueil",
     mobile: true,
   },
   {
+    href: "/tableau-de-bord/trouver-une-idee",
+    label: "Trouver une idée",
+    hint: "Quoi vendre à partir de ce que tu sais faire",
+    icon: "idea",
+    group: "demarrer",
+    permission: "marketing.manage",
+  },
+  {
+    href: "/tableau-de-bord/academie",
+    label: "Académie",
+    hint: "Apprendre le business, leçon par leçon",
+    icon: "academy",
+    group: "demarrer",
+    mobile: true,
+  },
+  {
     href: "/tableau-de-bord/produits",
     label: "Mes produits",
-    hint: "Ce que vous vendez, base de vos analyses",
+    hint: "Ce que tu vends",
     icon: "package",
     group: "marketing",
     permission: "marketing.manage",
+    mobile: true,
   },
   {
     href: "/tableau-de-bord/analyse-produit",
@@ -111,17 +141,18 @@ export const NAV_ITEMS: NavItem[] = [
   {
     href: "/tableau-de-bord/autopilot-marketing",
     label: "Autopilot",
-    hint: "Vos 3 actions marketing du jour",
+    hint: "Tes 3 actions du jour",
     icon: "autopilot",
-    group: "marketing",
+    group: "progres",
+    mobile: true,
     permission: "marketing.manage",
   },
   {
     href: "/tableau-de-bord/resultats",
-    label: "Statistiques marketing",
-    hint: "Dépenses, ventes et retour sur dépense",
+    label: "Mes résultats",
+    hint: "Tes ventes, tes dépenses, ta rentabilité",
     icon: "chart",
-    group: "marketing",
+    group: "progres",
     permission: "marketing.manage",
   },
   {
@@ -131,7 +162,6 @@ export const NAV_ITEMS: NavItem[] = [
     hint: "Votre agenda jour par jour",
     icon: "calendar",
     group: "rdv",
-    mobile: true,
   },
   {
     href: "/tableau-de-bord/reservations",
@@ -140,7 +170,6 @@ export const NAV_ITEMS: NavItem[] = [
     hint: "Liste de tous les rendez-vous",
     icon: "list",
     group: "rdv",
-    mobile: true,
   },
   {
     href: "/tableau-de-bord/liste-attente",
@@ -190,6 +219,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/tableau-de-bord/equipe",
+    bookingModule: true,
     label: "Employés",
     hint: "Votre équipe et ses horaires",
     icon: "team",
@@ -199,9 +229,9 @@ export const NAV_ITEMS: NavItem[] = [
   {
     href: "/tableau-de-bord/parametres",
     label: "Paramètres",
-    hint: "Horaires, page de réservation, acompte",
+    hint: "Ton projet et ton compte",
     icon: "settings",
-    group: "salon",
+    group: "compte",
   },
   {
     href: "/tableau-de-bord/statistiques",

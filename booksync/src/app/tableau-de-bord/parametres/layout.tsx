@@ -1,43 +1,56 @@
 import { Suspense } from "react";
 import { PageHeader } from "@/components/ui/page-header";
 import { can } from "@/domain/permissions";
+import { BOOKING_ENABLED } from "@/lib/features";
 import { requireOrg } from "@/server/auth/session";
 import { SettingsTabs } from "./settings-tabs";
 
 export const SETTINGS_TABS = [
   {
     href: "/tableau-de-bord/parametres/entreprise",
-    label: "Entreprise",
+    label: "Mon projet",
     permission: "organization.update",
+    booking: false,
   },
   {
     href: "/tableau-de-bord/parametres/modules",
+    booking: true,
     label: "Modules",
     permission: "organization.update",
   },
   {
     href: "/tableau-de-bord/parametres/reservation",
+    booking: true,
     label: "Réservation en ligne",
     permission: "organization.update",
   },
   {
     href: "/tableau-de-bord/parametres/paiements",
+    booking: true,
     label: "Acompte et paiements",
     permission: "billing.manage",
   },
   {
     href: "/tableau-de-bord/parametres/horaires",
+    booking: true,
     label: "Horaires et fermetures",
     permission: "closures.manage",
   },
-  { href: "/tableau-de-bord/parametres/compte", label: "Mon compte", permission: null },
+  {
+    href: "/tableau-de-bord/parametres/compte",
+    label: "Mon compte",
+    permission: null,
+    booking: false,
+  },
 ] as const;
 
 async function Tabs() {
   const ctx = await requireOrg();
   return (
     <SettingsTabs
-      tabs={SETTINGS_TABS.filter((t) => !t.permission || can(ctx.role, t.permission))}
+      tabs={SETTINGS_TABS.filter(
+        (t) => (BOOKING_ENABLED || !t.booking) && (!t.permission || can(ctx.role, t.permission)),
+      )}
     />
   );
 }
@@ -47,7 +60,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
     <>
       <PageHeader
         title="Paramètres"
-        description="Votre entreprise, votre page de réservation et votre compte."
+        description="Ton projet et ton compte."
       />
       <Suspense fallback={<div className="mb-6 h-10" />}>
         <Tabs />

@@ -7,10 +7,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { PLAN_ORDER, PLANS, trialDaysFor } from "@/domain/billing/plans";
 import { formatCents, formatInTz } from "@/lib/format";
 import { requirePermission } from "@/server/auth/session";
-import { getMonthlyUsage } from "@/server/booking/book";
+import { countProducts } from "@/server/marketing/products";
 import { confirmCheckout, listInvoices } from "@/server/billing/service";
 import { isBillingConfigured } from "@/server/billing/stripe";
-import { countSeats } from "@/server/team/service";
 import { BillingActions, PlanButton } from "./billing-actions";
 
 export const metadata: Metadata = { title: "Abonnement" };
@@ -45,10 +44,9 @@ async function Content({
     ctx = await requirePermission("billing.manage");
   }
   const tz = ctx.organization.timezone;
-  const [invoices, usage, seats] = await Promise.all([
+  const [invoices, products] = await Promise.all([
     listInvoices(ctx),
-    getMonthlyUsage(ctx.organization.id, tz),
-    countSeats(ctx.organization.id),
+    countProducts(ctx.organization.id),
   ]);
   const o = ctx.organization;
   const configured = isBillingConfigured();
@@ -106,10 +104,10 @@ async function Content({
               : ""}
           </p>
           <p className="mt-2 text-[13px] text-muted-foreground">
-            Ce mois-ci : {usage} réservation{usage > 1 ? "s" : ""}
-            {current.limits.bookingsPerMonth
-              ? ` sur ${current.limits.bookingsPerMonth}`
-              : ""} · {seats.used} membre{seats.used > 1 ? "s" : ""} sur {current.limits.members}
+            {products} produit{products > 1 ? "s" : ""} sur {current.limits.products}
+            {current.limits.toolRunsPerMonth !== null
+              ? ` · ${current.limits.toolRunsPerMonth} propositions par mois`
+              : " · propositions illimitées"}
           </p>
         </div>
         {configured ? (

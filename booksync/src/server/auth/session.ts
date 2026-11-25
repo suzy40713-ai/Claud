@@ -8,6 +8,7 @@ import { member, organization, staff } from "@/db/schema";
 import { effectivePlan, type Plan } from "@/domain/billing/plans";
 import { can, ForbiddenError, type Permission, type Role } from "@/domain/permissions";
 import { auth } from "./auth";
+import { BOOKING_ENABLED } from "@/lib/features";
 
 export const ACTIVE_ORG_COOKIE = "booksync-org";
 
@@ -65,7 +66,7 @@ export const requireOrg = cache(async (): Promise<OrgContext> => {
   const session = await requireSession();
   if (!session.user.termsAcceptedAt) redirect("/accepter-conditions");
   const memberships = await listMemberships(session.user.id);
-  if (memberships.length === 0) redirect("/mon-espace");
+  if (memberships.length === 0) redirect(BOOKING_ENABLED ? "/mon-espace" : "/onboarding");
   const preferred = (await cookies()).get(ACTIVE_ORG_COOKIE)?.value;
   const active = memberships.find((m) => m.organizationId === preferred) ?? memberships[0];
   return loadOrgContext(session.user, active, memberships);
@@ -119,6 +120,8 @@ export async function redirectIfAuthenticated() {
 export async function redirectToHome(userId: string, needsTerms = false): Promise<never> {
   if (needsTerms) redirect("/accepter-conditions");
   const memberships = await listMemberships(userId);
-  // Professionnel → tableau de bord ; particulier (aucun établissement) → son espace.
-  redirect(memberships.length > 0 ? "/tableau-de-bord" : "/mon-espace");
+  // Projet créé → tableau de bord ; sinon, création du projet.
+  redirect(
+    memberships.length > 0 ? "/tableau-de-bord" : BOOKING_ENABLED ? "/mon-espace" : "/onboarding",
+  );
 }
