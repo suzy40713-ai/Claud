@@ -17,6 +17,7 @@ import { Alert } from "@/components/ui/alert";
 import { ProductAnalysisView } from "@/components/marketing/product-analysis";
 import { latestAnalysis } from "@/server/marketing/analysis";
 import { toolUsage } from "@/server/ai/gateway";
+import { originLabel } from "@/server/ai/produce";
 
 export const metadata: Metadata = { title: "Produit" };
 
@@ -104,9 +105,10 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
           <AnalyzeButton id={p.id} again={Boolean(latest)} />
         </div>
         <Alert>
-          L&apos;analyse est préparée automatiquement à partir des informations ci-dessus (sans
-          IA). Les points marqués « Hypothèse à vérifier » ne sont pas des données de marché :
-          testez-les auprès de vrais clients. Aucun résultat de vente n&apos;est garanti.
+          {latest ? <strong>{originLabel(latest.model)}. </strong> : null}
+          L&apos;analyse s&apos;appuie sur les informations ci-dessus. Les points marqués
+          « Hypothèse à vérifier » ne sont pas des données de marché : testez-les auprès de vrais
+          clients. Aucun résultat de vente n&apos;est garanti.
         </Alert>
         {latest ? (
           <ProductAnalysisView analysis={latest.analysis} />

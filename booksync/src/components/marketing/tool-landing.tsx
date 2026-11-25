@@ -9,6 +9,7 @@ import type { OrgContext } from "@/server/auth/session";
 import { listProducts } from "@/server/marketing/products";
 import { toolHistory } from "@/server/marketing/tools";
 import { toolUsage } from "@/server/ai/gateway";
+import { originLabel } from "@/server/ai/produce";
 import { ToolForm } from "./tool-form";
 
 /** Page d'un outil du copilote : choix, génération, historique. */
@@ -102,14 +103,13 @@ export function QuotaNote({ used, limit }: { used: number; limit: number }) {
   );
 }
 
-/** Rappel affiché sous chaque résultat généré. */
-export function AiDisclaimer() {
+/** Rappel affiché sous chaque résultat : origine (IA gratuite ou modèle) et précautions. */
+export function AiDisclaimer({ model }: { model: string }) {
   return (
-    <Alert>
-      Proposition préparée automatiquement à partir de votre fiche produit (modèles BookSync,
-      sans IA) : relisez-la et adaptez-la à votre style avant de l&apos;utiliser. Les hypothèses
-      doivent être vérifiées et aucun résultat (vues, ventes, chiffre d&apos;affaires) n&apos;est
-      garanti.
+    <Alert data-testid="result-origin">
+      <strong>{originLabel(model)}.</strong> Proposition préparée à partir de vos informations :
+      relisez-la et adaptez-la avant de l&apos;utiliser. Les hypothèses doivent être vérifiées et
+      aucun résultat (vues, ventes, chiffre d&apos;affaires) n&apos;est garanti.
     </Alert>
   );
 }

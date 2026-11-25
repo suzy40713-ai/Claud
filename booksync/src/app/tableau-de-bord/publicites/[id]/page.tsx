@@ -36,7 +36,7 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
         </p>
       </div>
       <ToolChoices choix={r.input.choix} />
-      <AiDisclaimer />
+      <AiDisclaimer model={r.model} />
       <AdView ad={r.output} google={String(r.input.choix?.["Plateforme"] ?? "").startsWith("Google")} />
       {product ? (
         <div>

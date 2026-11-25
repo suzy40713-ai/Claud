@@ -4,7 +4,7 @@ import { BOOKING_ENABLED } from "@/lib/features";
 
 /** Pages du tableau de bord propres à la réservation (désactivées avec BOOKING_ENABLED). */
 const BOOKING_PAGES =
-  /^\/tableau-de-bord\/(calendrier|reservations|liste-attente|clients|avis|cartes-cadeaux|services|statistiques|analyses|autopilot|notifications|equipe|demarrage|assistant|parametres\/(horaires|reservation|paiements|notifications|modules))(\/|$)/;
+  /^\/tableau-de-bord\/(calendrier|reservations|liste-attente|clients|avis|cartes-cadeaux|services|statistiques|analyses|autopilot|notifications|equipe|demarrage|parametres\/(horaires|reservation|paiements|notifications|modules))(\/|$)/;
 
 /**
  * Vérification optimiste : sans cookie de session, les pages privées redirigent vers la connexion.

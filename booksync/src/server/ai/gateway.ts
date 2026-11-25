@@ -1,16 +1,15 @@
 import "server-only";
-import { and, count, desc, eq, gte, lt, sql } from "drizzle-orm";
+import { and, count, desc, eq, gte, lt, ne } from "drizzle-orm";
 import { db } from "@/db/client";
-import { aiGeneration, assistantUsage } from "@/db/schema";
+import { aiGeneration } from "@/db/schema";
 import { monthStart } from "@/domain/ai/models";
 import { LIMIT_MESSAGES, PlanLimitError } from "@/domain/billing/plans";
-import { monthKey } from "@/domain/assistant/limits";
 import type { OrgContext } from "@/server/auth/session";
 
 /**
  * Historique des résultats du copilote (analyses, stratégies, publicités, contenus…).
- * Les outils du copilote utilisent des modèles gratuits : aucun appel à une IA payante,
- * coût enregistré à 0.
+ * Les résultats viennent de l'IA gratuite (Groq, Cloudflare) ou des modèles BookSync intégrés :
+ * aucun service payant, coût toujours nul.
  */
 export const TEMPLATE_MODEL = "modele-gratuit";
 
@@ -20,17 +19,20 @@ function monthRange(now: Date) {
   return and(gte(aiGeneration.createdAt, since), lt(aiGeneration.createdAt, until));
 }
 
-/** Dépense IA du mois (assistant optionnel, désactivé sans clé), en millionièmes de $. */
-export async function aiSpendThisMonth(now: Date) {
-  const [gen] = await db
-    .select({ cost: sql<number>`coalesce(sum(${aiGeneration.costMicroUsd}), 0)`.mapWith(Number) })
+/** Résultats produits par l'IA aujourd'hui (UTC) pour l'entreprise : partage équitable du quota gratuit. */
+export async function aiRunsToday(ctx: OrgContext, now = new Date()) {
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const [row] = await db
+    .select({ n: count() })
     .from(aiGeneration)
-    .where(monthRange(now));
-  const [assistant] = await db
-    .select({ cost: sql<number>`coalesce(sum(${assistantUsage.costMicroUsd}), 0)`.mapWith(Number) })
-    .from(assistantUsage)
-    .where(eq(assistantUsage.month, monthKey(now)));
-  return gen.cost + assistant.cost;
+    .where(
+      and(
+        eq(aiGeneration.organizationId, ctx.organization.id),
+        gte(aiGeneration.createdAt, start),
+        ne(aiGeneration.model, TEMPLATE_MODEL),
+      ),
+    );
+  return row?.n ?? 0;
 }
 
 /** Propositions utilisées ce mois-ci par l'entreprise, et limite de son forfait (null = illimité). */
@@ -52,7 +54,13 @@ export async function assertToolQuota(ctx: OrgContext, now = new Date()) {
 /** Enregistre un résultat du copilote et renvoie son identifiant. */
 export async function saveGeneration(
   ctx: OrgContext,
-  g: { kind: string; productId: string | null; input: Record<string, unknown>; output: object },
+  g: {
+    kind: string;
+    productId: string | null;
+    input: Record<string, unknown>;
+    output: object;
+    model?: string;
+  },
 ) {
   const [row] = await db
     .insert(aiGeneration)
@@ -61,7 +69,7 @@ export async function saveGeneration(
       userId: ctx.userId,
       productId: g.productId,
       kind: g.kind,
-      model: TEMPLATE_MODEL,
+      model: g.model ?? TEMPLATE_MODEL,
       inputHash: "",
       input: g.input,
       output: g.output,

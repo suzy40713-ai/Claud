@@ -1,7 +1,7 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { db, sql as pg } from "@/db/client";
 import { aiGeneration } from "@/db/schema";
-import { runTool as runAssistantTool } from "@/server/assistant/tools";
+import { assistantContext } from "@/server/assistant/service";
 import { getActivePlan, setTaskDone, startPlan, stopPlan } from "@/server/marketing/autopilot";
 import { createProduct, deleteProduct } from "@/server/marketing/products";
 import { STRATEGY } from "../fixtures/marketing";
@@ -77,15 +77,14 @@ describe("Autopilot marketing", () => {
     expect(await getActivePlan(b)).toBeNull();
   });
 
-  it("l'assistant lit les produits et l'Autopilot (sans données inventées)", async () => {
+  it("l'assistant reçoit les produits et l'Autopilot (sans données inventées)", async () => {
     const ctx = await makeOrg({ plan: "pro" });
     const { strategyId } = await setup(ctx);
     await startPlan(ctx, strategyId);
-    const r = await runAssistantTool(ctx, "copilote_marketing", {});
-    expect(r.isError).toBe(false);
-    expect(r.result).toMatchObject({
-      produits: [{ nom: "Bougies Lumi", prix_euros: 24.9, derniere_analyse: null }],
+    expect(await assistantContext(ctx)).toMatchObject({
+      produits: [{ nom: "Bougies Lumi", prix_euros: 24.9, analyse: null }],
       autopilot: { produit: "Bougies Lumi", jour: 1, actions_faites: 0, actions_total: 90 },
+      resultats_du_mois: { ventes_declarees: 0, chiffre_affaires_declare_euros: 0 },
     });
   });
 });

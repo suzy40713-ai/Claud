@@ -29,6 +29,8 @@ export type Plan = {
     products: number;
     /** Propositions par mois (analyses, stratégies, publicités, contenus, Sales Booster). */
     toolRunsPerMonth: number | null;
+    /** Résultats rédigés par l'IA gratuite par jour ; au-delà, modèles BookSync (illimités). */
+    aiRunsPerDay: number;
   };
   features: PlanFeatures;
   highlights: string[];
@@ -46,6 +48,7 @@ export const PLANS: Record<PlanId, Plan> = {
       customers: 20,
       products: 1,
       toolRunsPerMonth: 3,
+      aiRunsPerDay: 3,
     },
     features: {
       emailNotifications: false,
@@ -72,6 +75,7 @@ export const PLANS: Record<PlanId, Plan> = {
       customers: null,
       products: 10,
       toolRunsPerMonth: null,
+      aiRunsPerDay: 15,
     },
     features: {
       emailNotifications: true,
@@ -99,6 +103,7 @@ export const PLANS: Record<PlanId, Plan> = {
       customers: null,
       products: 50,
       toolRunsPerMonth: null,
+      aiRunsPerDay: 30,
     },
     features: {
       emailNotifications: true,
@@ -125,6 +130,7 @@ export const PLANS: Record<PlanId, Plan> = {
       customers: null,
       products: 200,
       toolRunsPerMonth: null,
+      aiRunsPerDay: 60,
     },
     features: {
       emailNotifications: true,

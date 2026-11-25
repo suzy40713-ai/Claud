@@ -63,6 +63,14 @@ services:
         generateValue: true
       - key: AUTH_RATE_LIMIT
         value: "on"
+      # IA gratuite (aucun frais, jamais de carte bancaire chez ces fournisseurs).
+      # Sans clé : BookSync utilise ses modèles intégrés.
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CLOUDFLARE_ACCOUNT_ID
+        sync: false
+      - key: CLOUDFLARE_AI_TOKEN
+        sync: false
       # Emails transactionnels (Resend). Sans clé : journalisés, non envoyés.
       - key: RESEND_API_KEY
         sync: false

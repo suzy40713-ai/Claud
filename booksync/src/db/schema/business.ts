@@ -801,3 +801,18 @@ export const lessonProgress = pgTable(
   },
   (t) => [primaryKey({ columns: [t.organizationId, t.userId, t.lessonId] })],
 );
+
+/**
+ * Appels aux fournisseurs d'IA gratuits, par jour (UTC), pour rester sous leurs quotas gratuits.
+ * Global à BookSync (aucune donnée d'entreprise).
+ */
+export const aiProviderUsage = pgTable(
+  "ai_provider_usage",
+  {
+    provider: text().notNull(),
+    day: date({ mode: "string" }).notNull(),
+    calls: integer().notNull().default(0),
+    failures: integer().notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.provider, t.day] })],
+);

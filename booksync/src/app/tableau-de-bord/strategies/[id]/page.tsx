@@ -53,7 +53,7 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
           </div>
         )
       ) : null}
-      <AiDisclaimer />
+      <AiDisclaimer model={r.model} />
       <StrategyView s={r.output} />
       {product ? (
         <div>

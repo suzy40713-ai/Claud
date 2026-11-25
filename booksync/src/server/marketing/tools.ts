@@ -5,35 +5,43 @@ import { parseToolOptions } from "@/domain/marketing/tools/options";
 import { assertCan } from "@/domain/permissions";
 import type { OrgContext } from "@/server/auth/session";
 import { UserError } from "@/server/errors";
-import {
-  assertToolQuota,
-  generationCount,
-  getGeneration,
-  listGenerations,
-  saveGeneration,
-}  from "@/server/ai/gateway";
+import type { z } from "zod";
+import { TOOL_PROMPTS } from "@/domain/marketing/prompts";
+import type { AiDeps } from "@/server/ai/engine";
+import { generationCount, getGeneration, listGenerations } from "@/server/ai/gateway";
+import { produce } from "@/server/ai/produce";
 import { runTemplate } from "@/domain/marketing/templates";
 import { getProduct } from "./products";
 
-/** Lance un outil du copilote (stratégie, publicité, contenus, Sales Booster) : modèles gratuits, sans IA. */
-export async function runTool(ctx: OrgContext, kind: ToolKind, productId: string, rawOptions: unknown) {
+/** Lance un outil du copilote : IA gratuite si disponible, sinon modèle BookSync. */
+export async function runTool(
+  ctx: OrgContext,
+  kind: ToolKind,
+  productId: string,
+  rawOptions: unknown,
+  deps?: AiDeps,
+) {
   assertCan(ctx.role, "marketing.manage");
   const tool = TOOLS[kind];
   const p = await getProduct(ctx, productId);
   if (!p) throw new UserError("Choisissez un de vos produits.", { productId: "Produit introuvable." });
   const { values, labelled } = parseToolOptions(tool.options, rawOptions);
-  await assertToolQuota(ctx);
   const seed = await generationCount(ctx, kind, p.id);
-  const output = tool.schema.parse(runTemplate(kind, p, values, seed)) as object;
-  const problem = (tool as { check?: (o: unknown) => string | null }).check?.(output);
-  if (problem) throw new Error(`Modèle ${kind} incomplet : ${problem}`);
-  const id = await saveGeneration(ctx, {
-    kind,
-    productId: p.id,
-    input: { produit: productPayload(p), choix: labelled },
-    output,
-  });
-  return { id, output, options: values };
+  const r = await produce(
+    ctx,
+    {
+      kind,
+      productId: p.id,
+      schema: tool.schema as z.ZodType,
+      instructions: TOOL_PROMPTS[kind],
+      payload: { produit: productPayload(p), choix: labelled },
+      template: () => runTemplate(kind, p, values, seed),
+      check: (tool as { check?: (o: unknown) => string | null }).check,
+      maxTokens: kind === "strategy" ? 12000 : 5000,
+    },
+    deps,
+  );
+  return { ...r, options: values };
 }
 
 /** Résultat d'un outil, validé : null s'il n'existe pas, appartient à une autre entreprise ou est invalide. */
@@ -47,6 +55,7 @@ export async function getToolResult<K extends ToolKind>(ctx: OrgContext, kind: K
     id: row.id,
     productId: row.productId,
     createdAt: row.createdAt,
+    model: row.model,
     input: row.input as { choix?: Record<string, string | string[]> },
     output: parsed.data as import("zod").infer<(typeof TOOLS)[K]["schema"]>,
   };

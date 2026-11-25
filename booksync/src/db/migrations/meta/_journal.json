@@ -141,6 +141,13 @@
       "when": 1795617304044,
       "tag": "0019_academy",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1795618756236,
+      "tag": "0020_ai_provider_usage",
+      "breakpoints": true
     }
   ]
 }

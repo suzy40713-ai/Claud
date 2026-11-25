@@ -46,13 +46,19 @@ export const env = createEnv({
     /** Secret partagé avec le planificateur (Supabase pg_cron) pour /api/cron/*. */
     CRON_SECRET: z.string().min(24).optional(),
     /**
-     * Assistant BookSync AI (Claude Haiku, service payant à l'usage). Absente : assistant désactivé,
-     * aucune dépense possible. Ne l'ajouter qu'avec l'accord du propriétaire du compte Anthropic.
+     * IA gratuite (aucun frais) : Groq en premier, Cloudflare Workers AI en secours, puis les
+     * modèles BookSync intégrés. Sans clé, BookSync utilise seulement ses modèles intégrés.
+     * Ne jamais enregistrer de carte bancaire chez ces fournisseurs : aucun prélèvement possible.
      */
-    ANTHROPIC_API_KEY: z.string().startsWith("sk-ant-").optional(),
-    /** Modèles du copilote (niveau rapide / puissant). Par défaut : Claude Haiku 5.5 pour les deux. */
-    /** Plafond de dépense mensuel de l'assistant, toutes entreprises confondues, en dollars. */
-    ASSISTANT_MONTHLY_BUDGET_USD: z.coerce.number().min(0).max(1000).default(5),
+    GROQ_API_KEY: z.string().min(10).optional(),
+    GROQ_MODEL: z.string().default("openai/gpt-oss-120b"),
+    /** Appels Groq par jour, sous le quota gratuit (environ 1 000 par jour en 2026). */
+    GROQ_DAILY_CAP: z.coerce.number().int().min(0).max(100000).default(800),
+    CLOUDFLARE_ACCOUNT_ID: z.string().min(10).optional(),
+    CLOUDFLARE_AI_TOKEN: z.string().min(10).optional(),
+    CLOUDFLARE_AI_MODEL: z.string().default("@cf/meta/llama-3.3-70b-instruct-fp8-fast"),
+    /** Appels Cloudflare par jour, sous les 10 000 « neurones » gratuits quotidiens. */
+    CLOUDFLARE_DAILY_CAP: z.coerce.number().int().min(0).max(100000).default(60),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
@@ -75,8 +81,13 @@ export const env = createEnv({
     STRIPE_PRICE_PRO: process.env.STRIPE_PRICE_PRO,
     STRIPE_PRICE_BUSINESS: process.env.STRIPE_PRICE_BUSINESS,
     CRON_SECRET: process.env.CRON_SECRET,
-    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
-    ASSISTANT_MONTHLY_BUDGET_USD: process.env.ASSISTANT_MONTHLY_BUDGET_USD,
+    GROQ_API_KEY: process.env.GROQ_API_KEY,
+    GROQ_MODEL: process.env.GROQ_MODEL,
+    GROQ_DAILY_CAP: process.env.GROQ_DAILY_CAP,
+    CLOUDFLARE_ACCOUNT_ID: process.env.CLOUDFLARE_ACCOUNT_ID,
+    CLOUDFLARE_AI_TOKEN: process.env.CLOUDFLARE_AI_TOKEN,
+    CLOUDFLARE_AI_MODEL: process.env.CLOUDFLARE_AI_MODEL,
+    CLOUDFLARE_DAILY_CAP: process.env.CLOUDFLARE_DAILY_CAP,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   },
   // Permet le build Docker sans secrets (ils sont injectés à l'exécution par Render).
