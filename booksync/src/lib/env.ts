@@ -46,8 +46,7 @@ export const env = createEnv({
      */
     EMAIL_VERIFICATION: z
       .enum(["on", "souple", "off"])
-      .default("on")
-      .transform((v) => ({ required: v === "on", send: v !== "off" })),
+      .default("on"),
     /** Clé Resend. Absente : les emails sont journalisés en base sans être envoyés (développement). */
     RESEND_API_KEY: z.string().startsWith("re_").optional(),
     EMAIL_FROM: z.string().min(3).default("BookSync <onboarding@resend.dev>"),

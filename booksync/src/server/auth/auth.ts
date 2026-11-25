@@ -18,6 +18,10 @@ import {
 export { TERMS_VERSION };
 export const PASSWORD_MIN_LENGTH = PASSWORD_MIN;
 
+// Valeur brute aussi pendant la construction (validation des variables désactivée) : "on" par défaut.
+const emailMode = env.EMAIL_VERIFICATION ?? "on";
+const verification = { required: emailMode === "on", send: emailMode !== "off" };
+
 export const auth = betterAuth({
   appName: "BookSync",
   baseURL: env.NEXT_PUBLIC_APP_URL,
@@ -33,7 +37,7 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: env.EMAIL_VERIFICATION.required,
+    requireEmailVerification: verification.required,
     minPasswordLength: PASSWORD_MIN_LENGTH,
     maxPasswordLength: 128,
     resetPasswordTokenExpiresIn: 60 * 60,
@@ -55,8 +59,8 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
-    sendOnSignUp: env.EMAIL_VERIFICATION.send,
-    sendOnSignIn: env.EMAIL_VERIFICATION.required,
+    sendOnSignUp: verification.send,
+    sendOnSignIn: verification.required,
     autoSignInAfterVerification: true,
     expiresIn: 60 * 60 * 24,
     async sendVerificationEmail({ user, url }) {
