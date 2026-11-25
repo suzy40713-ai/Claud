@@ -835,3 +835,42 @@ export const blogPost = pgTable(
   },
   (t) => [index("blog_post_published_idx").on(t.publishedAt)],
 );
+
+/**
+ * Visiteurs qui ont demandé à recevoir leur plan par email (consentement explicite) et suivi de
+ * leur série d'emails de conseils. Désinscription possible à tout moment.
+ */
+export const lead = pgTable(
+  "lead",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    email: text().notNull().unique(),
+    ideaId: text(),
+    source: text().notNull(),
+    consentAt: timestamp({ withTimezone: true }).notNull(),
+    /** Prochain email de la série à envoyer (0 = plan, déjà envoyé à l'inscription). */
+    step: integer().notNull().default(0),
+    nextSendAt: timestamp({ withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("lead_next_send_idx").on(t.nextSendAt)],
+);
+
+/** Adresses qui ne veulent plus recevoir de conseils ni de relances (désinscription). */
+export const emailOptout = pgTable("email_optout", {
+  email: text().primaryKey(),
+  createdAt: createdAt(),
+});
+
+/** Relances déjà envoyées à un inscrit (une seule fois par type). */
+export const userNudge = pgTable(
+  "user_nudge",
+  {
+    userId: uuid()
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    kind: text().notNull(),
+    sentAt: createdAt(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.kind] })],
+);
