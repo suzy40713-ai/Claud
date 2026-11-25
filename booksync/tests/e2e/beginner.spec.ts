@@ -10,6 +10,10 @@ test("débutant : idée trouvée sur le site, inscription, idée devenue produit
   await page.getByRole("button", { name: /Je sais monter des vidéos/ }).click();
   await expect(page.getByTestId("idea-card")).toContainText("Montage de vidéos courtes");
   await expect(page.getByTestId("idea-card")).toContainText("Aucun revenu n'est garanti");
+  await expect(page.getByTestId("share-idea")).toBeVisible();
+  // Lien partagé : l'idée s'affiche directement.
+  await page.goto("/lancer-mon-activite?idee=montage");
+  await expect(page.getByTestId("idea-card")).toContainText("Montage de vidéos courtes");
   await expect(page.getByRole("link", { name: "Commencer avec cette idée" })).toHaveAttribute(
     "href",
     /\/inscription\?redirection=%2Fonboarding%3Fidee%3Dmontage/,

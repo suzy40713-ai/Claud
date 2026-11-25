@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Route } from "next";
-import { ArrowRight, CheckCircle2, Lightbulb } from "lucide-react";
+import { ArrowRight, CheckCircle2, Lightbulb, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { findIdea, TALENTS } from "@/domain/launch/ideas";
@@ -28,6 +28,16 @@ export function IdeaPicker({
   const [talentId, setTalentId] = useState<string | null>(initialTalent?.id ?? null);
   const [ideaId, setIdeaId] = useState<string | null>(initialTalent ? initialIdeaId! : null);
   const [pending, startTransition] = useTransition();
+  // Lien partagé (/lancer-mon-activite?idee=…) : l'idée partagée s'affiche directement.
+  useEffect(() => {
+    if (mode !== "public" || initialIdeaId) return;
+    const shared = new URLSearchParams(window.location.search).get("idee");
+    const t = shared ? TALENTS.find((x) => x.ideas.some((i) => i.id === shared)) : undefined;
+    if (!t || !shared) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- lecture de l'adresse après le chargement de la page statique
+    setTalentId(t.id);
+    setIdeaId(shared);
+  }, [mode, initialIdeaId]);
   const talent = TALENTS.find((t) => t.id === talentId) ?? null;
   const idea = ideaId ? findIdea(ideaId) : null;
 
@@ -35,7 +45,8 @@ export function IdeaPicker({
     <div className="grid gap-6" data-testid="idea-finder">
       <section className="rounded-3xl border bg-card p-5 shadow-xs sm:p-6">
         <h2 className="flex items-center gap-2 text-lg font-semibold">
-          <Lightbulb className="size-5 text-primary" /> 1. Qu&apos;est-ce que vous savez déjà faire ?
+          <Lightbulb className="size-5 text-primary" /> 1. Qu&apos;est-ce que vous savez déjà faire
+          ?
         </h2>
         <ul className="mt-4 flex flex-wrap gap-2" aria-label="Ce que vous savez faire">
           {TALENTS.map((t) => (
@@ -74,7 +85,10 @@ export function IdeaPicker({
       </section>
 
       {idea ? (
-        <section className="rounded-3xl border bg-card p-5 shadow-xs sm:p-6" data-testid="idea-card">
+        <section
+          className="rounded-3xl border bg-card p-5 shadow-xs sm:p-6"
+          data-testid="idea-card"
+        >
           <p className="text-sm font-semibold text-primary">2. Votre idée</p>
           <h2 className="mt-1 text-2xl font-semibold tracking-tight">{idea.title}</h2>
           <p className="mt-2 text-muted-foreground">{idea.why}</p>
@@ -97,17 +111,20 @@ export function IdeaPicker({
             Les prix sont des points de départ à ajuster. Aucun revenu n&apos;est garanti : tout
             dépend de ce que vous mettez en place.
           </p>
-          <div className="mt-5">
+          <div className="mt-5 flex flex-wrap gap-3">
             {mode === "public" ? (
-              <Button asChild size="lg" className="rounded-full">
-                <Link
-                  href={
-                    `/inscription?redirection=${encodeURIComponent(`/onboarding?idee=${idea.id}`)}` as Route
-                  }
-                >
-                  Commencer avec cette idée <ArrowRight />
-                </Link>
-              </Button>
+              <>
+                <Button asChild size="lg" className="rounded-full">
+                  <Link
+                    href={
+                      `/inscription?redirection=${encodeURIComponent(`/onboarding?idee=${idea.id}`)}` as Route
+                    }
+                  >
+                    Commencer avec cette idée <ArrowRight />
+                  </Link>
+                </Button>
+                <ShareIdea ideaId={idea.id} title={idea.title} />
+              </>
             ) : (
               <Button
                 size="lg"
@@ -129,5 +146,39 @@ export function IdeaPicker({
         </section>
       ) : null}
     </div>
+  );
+}
+
+/** Partage de l'idée (lien direct vers cette idée) : partage natif du téléphone, sinon copie du lien. */
+function ShareIdea({ ideaId, title }: { ideaId: string; title: string }) {
+  async function share() {
+    const url = `${window.location.origin}/lancer-mon-activite?idee=${ideaId}`;
+    const text = `Mon idée pour gagner mes premiers euros : ${title}. Trouve la tienne en 2 minutes 👇`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "Mon idée de business", text, url });
+        return;
+      } catch (error) {
+        if ((error as Error).name === "AbortError") return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      toast.success("Lien copié : collez-le dans un message.");
+    } catch {
+      toast.error("Copie impossible. Lien : " + url);
+    }
+  }
+  return (
+    <Button
+      type="button"
+      variant="secondary"
+      size="lg"
+      className="rounded-full"
+      onClick={share}
+      data-testid="share-idea"
+    >
+      <Share2 /> Partager mon idée
+    </Button>
   );
 }

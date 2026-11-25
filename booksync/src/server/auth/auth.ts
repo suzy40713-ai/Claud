@@ -26,11 +26,14 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg", schema }),
   advanced: {
     cookiePrefix: "booksync",
+    // Render est derrière Cloudflare : l'adresse du visiteur arrive dans True-Client-IP /
+    // CF-Connecting-IP. Sans elle, tous les visiteurs partageraient la même limite de tentatives.
+    ipAddress: { ipAddressHeaders: ["true-client-ip", "cf-connecting-ip", "x-forwarded-for"] },
     database: { generateId: "uuid" },
   },
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: env.EMAIL_VERIFICATION,
+    requireEmailVerification: env.EMAIL_VERIFICATION.required,
     minPasswordLength: PASSWORD_MIN_LENGTH,
     maxPasswordLength: 128,
     resetPasswordTokenExpiresIn: 60 * 60,
@@ -52,8 +55,8 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
-    sendOnSignUp: env.EMAIL_VERIFICATION,
-    sendOnSignIn: env.EMAIL_VERIFICATION,
+    sendOnSignUp: env.EMAIL_VERIFICATION.send,
+    sendOnSignIn: env.EMAIL_VERIFICATION.required,
     autoSignInAfterVerification: true,
     expiresIn: 60 * 60 * 24,
     async sendVerificationEmail({ user, url }) {

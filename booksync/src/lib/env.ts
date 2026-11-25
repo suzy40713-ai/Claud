@@ -38,13 +38,16 @@ export const env = createEnv({
       .default("on")
       .transform((v) => v === "on"),
     /**
-     * Confirmation de l'email obligatoire avant d'utiliser le compte. À n'éteindre que
-     * tant que l'envoi d'emails n'est pas opérationnel (domaine non vérifié chez Resend).
+     * Confirmation de l'email :
+     * - on : obligatoire avant d'utiliser le compte ;
+     * - souple : l'email de confirmation est envoyé, mais le compte est utilisable tout de suite
+     *   (aucun visiteur bloqué si l'email arrive en retard ou dans les spams) ;
+     * - off : aucun email de confirmation (envoi d'emails non opérationnel).
      */
     EMAIL_VERIFICATION: z
-      .enum(["on", "off"])
+      .enum(["on", "souple", "off"])
       .default("on")
-      .transform((v) => v === "on"),
+      .transform((v) => ({ required: v === "on", send: v !== "off" })),
     /** Clé Resend. Absente : les emails sont journalisés en base sans être envoyés (développement). */
     RESEND_API_KEY: z.string().startsWith("re_").optional(),
     EMAIL_FROM: z.string().min(3).default("BookSync <onboarding@resend.dev>"),
