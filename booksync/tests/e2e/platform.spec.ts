@@ -64,6 +64,11 @@ test("plateforme : un particulier trouve un professionnel, réserve et retrouve 
   await expect(v.getByTestId("my-appointment").filter({ hasText: `Barber ${tag}` })).toBeVisible();
   await page.goto("/tableau-de-bord/reservations");
   await expect(page.getByText("Hugo Martin").first()).toBeVisible();
+
+  // 5. Le particulier peut se déconnecter depuis son espace (mauvaise adresse, autre compte…).
+  await expect(v.getByTestId("my-account")).toContainText(client.email);
+  await v.getByTestId("my-account").getByRole("button", { name: "Se déconnecter" }).click();
+  await expect(v).toHaveURL(/\/connexion$/);
   await visitor.close();
   void uniqueEmail;
 });

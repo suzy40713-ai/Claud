@@ -9,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { capitalize, formatCents, formatDateLong, formatInTz, formatTime } from "@/lib/format";
 import { listMemberships, requireSession } from "@/server/auth/session";
 import { listMyAppointments, type MyAppointment } from "@/server/customer-space";
+import { DeleteAccount } from "@/app/tableau-de-bord/parametres/compte/account-forms";
+import { SignOutButton } from "@/app/tableau-de-bord/menu/sign-out-button";
 
 export const metadata: Metadata = {
   title: "Mes rendez-vous",
@@ -163,6 +165,19 @@ async function Content() {
             <ArrowRight />
           </Link>
         </Button>
+      </section>
+      <section className="grid gap-4 rounded-2xl border bg-card p-5" data-testid="my-account">
+        <div>
+          <p className="font-semibold">Mon compte</p>
+          <p className="text-sm text-muted-foreground">
+            Connecté avec {session.user.email}. Ce n&apos;est pas la bonne adresse ?
+            Déconnectez-vous ou supprimez ce compte, puis inscrivez-vous à nouveau.
+          </p>
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+          <SignOutButton size="md" className="sm:w-auto" />
+          <DeleteAccount ownedOrganizations={memberships.filter((m) => m.role === "owner").map((m) => m.organizationName)} />
+        </div>
       </section>
       <p className="text-xs text-muted-foreground">
         <CalendarX2 className="mr-1 inline size-3.5" />

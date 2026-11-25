@@ -7,14 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 
-export function SignOutButton() {
+export function SignOutButton({ className = "w-full text-destructive", size = "lg" }: { className?: string; size?: "sm" | "md" | "lg" } = {}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   return (
     <Button
       variant="secondary"
-      size="lg"
-      className="w-full text-destructive"
+      size={size}
+      className={className}
       disabled={pending}
       onClick={() =>
         startTransition(async () => {

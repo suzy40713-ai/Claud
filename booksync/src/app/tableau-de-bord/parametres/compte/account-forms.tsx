@@ -153,7 +153,7 @@ function PasswordForm() {
   );
 }
 
-function DeleteAccount({ ownedOrganizations }: { ownedOrganizations: string[] }) {
+export function DeleteAccount({ ownedOrganizations }: { ownedOrganizations: string[] }) {
   const router = useRouter();
   const [confirmation, setConfirmation] = useState("");
   const [error, setError] = useState<string | null>(null);
