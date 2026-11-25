@@ -7,6 +7,10 @@ import type { Strategy } from "@/domain/marketing/tools/strategy";
 export const STRATEGY: Strategy = {
   summary: "Montrer la fabrication des bougies sur TikTok pour créer la confiance.",
   positioning: "Des bougies faites main, en petites séries.",
+  objectives: ["Faire 5 ventes", "Publier 20 vidéos", "Parler à 50 personnes"],
+  launch: ["Préparer le profil", "Prévenir l'entourage", "Publier", "Faire le bilan"],
+  budget: { total: "0 €", split: ["Tout gratuit"] },
+  firstClients: ["Écrire à 30 proches", "Répondre vite", "Prix de lancement", "Groupes Facebook"],
   pillars: [{ title: "Coulisses", description: "La fabrication en vidéo." }],
   channels: [{ channel: "TikTok", role: "Découverte", frequency: "4 fois par semaine" }],
   weeks: [1, 2, 3, 4].map((week) => ({ week, focus: `Priorité de la semaine ${week}` })),
@@ -64,4 +68,22 @@ export const SALES: SalesOutput = {
   abTests: [{ element: "Bouton", versionA: "Acheter", versionB: "Je la veux", measure: "Clics" }],
   trust: ["Photo de l'atelier, si elle existe."],
   upsell: ["Lot de 3 bougies."],
+};
+
+export const CUSTOMERS = {
+  personas: [
+    {
+      name: "Amoureux de déco cosy",
+      description: "Aiment les intérieurs chaleureux.",
+      needs: ["Créer une ambiance"],
+      problems: ["Bougies industrielles qui sentent le chimique"],
+      motivations: ["Se faire plaisir"],
+      interests: ["Décoration", "Fait main"],
+      arguments: ["Cire végétale"],
+      channels: [{ platform: "Pinterest", how: "Épingles d'ambiance" }],
+      basis: "fourni" as const,
+    },
+  ],
+  toVerify: ["Prix acceptable ?"],
+  firstSteps: ["Écrire à 10 personnes"],
 };

@@ -12,7 +12,7 @@ import { requirePermission } from "@/server/auth/session";
 import { getProduct } from "@/server/marketing/products";
 import { getToolResult } from "@/server/marketing/tools";
 
-export const metadata: Metadata = { title: "Contenus" };
+export const metadata: Metadata = { title: "Création de contenu" };
 
 async function Content({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

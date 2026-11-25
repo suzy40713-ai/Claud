@@ -1,5 +1,10 @@
 import { Badge } from "@/components/ui/badge";
-import { BASIS_LABELS, type Basis, type ProductAnalysis } from "@/domain/marketing/analysis";
+import {
+  BASIS_LABELS,
+  POTENTIAL_LABELS,
+  type Basis,
+  type ProductAnalysis,
+} from "@/domain/marketing/analysis";
 
 function BasisBadge({ basis }: { basis: Basis }) {
   return (
@@ -27,6 +32,27 @@ export function ProductAnalysisView({ analysis }: { analysis: ProductAnalysis })
       <Section title="En résumé">
         <p>{analysis.summary}</p>
         <p className="mt-3 font-medium">Positionnement proposé : {analysis.positioning}</p>
+      </Section>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Section title="Présentation commerciale">
+          <p>{analysis.pitch}</p>
+        </Section>
+        <Section title="Potentiel commercial (estimation)">
+          <p className="font-semibold">
+            {POTENTIAL_LABELS[analysis.potential.level]}
+            <Badge variant="warning" className="ml-1.5 align-middle">
+              Hypothèse à vérifier
+            </Badge>
+          </p>
+          <p className="mt-1">{analysis.potential.reasoning}</p>
+        </Section>
+      </div>
+      <Section title="Arguments pour convaincre">
+        <ul className="grid list-disc gap-1 pl-5">
+          {analysis.sellingArguments.map((a, i) => (
+            <li key={i}>{a}</li>
+          ))}
+        </ul>
       </Section>
       <div className="grid gap-4 md:grid-cols-2">
         <Section title="Points forts">
@@ -98,6 +124,13 @@ export function ProductAnalysisView({ analysis }: { analysis: ProductAnalysis })
           </ul>
         </Section>
       </div>
+      <Section title="Recommandations d'amélioration">
+        <ul className="grid list-disc gap-1 pl-5">
+          {analysis.improvements.map((a, i) => (
+            <li key={i}>{a}</li>
+          ))}
+        </ul>
+      </Section>
       <Section title="À vérifier auprès de vrais clients">
         <ul className="list-disc pl-5">
           {analysis.toVerify.map((q, i) => (

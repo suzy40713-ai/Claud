@@ -20,7 +20,7 @@ Si une adresse de page est indiquée, tu ne l'as pas consultée : ne prétends p
 Construis une stratégie réaliste pour une personne seule, adaptée au temps, au budget et aux canaux choisis.
 Exactement 30 jours numérotés de 1 à 30, 3 actions concrètes par jour ; les jours 7, 14, 21 et 28 contiennent un bilan.
 Si le budget est nul, aucune action payante. Sinon, la publicité payante n'arrive qu'après des tests gratuits.
-Les indicateurs à suivre n'ont pas d'objectif chiffré promis.`,
+Les indicateurs à suivre n'ont pas d'objectif chiffré promis. Le budget indicatif ne dépasse jamais le budget choisi.`,
   ad: `Outil : créateur de publicités.
 Écris 3 variantes pour la plateforme et le style choisis.
 Google Ads : titres de 30 caractères maximum, descriptions de 90 caractères maximum, pas de script, 10 mots-clés.
@@ -33,6 +33,13 @@ Contenus réalisables seul, au téléphone, sans obligation de montrer son visag
 Propose des améliorations concrètes pour transformer plus de visiteurs en acheteurs, et explique pourquoi chacune pourrait aider.
 Si un texte de page est fourni, appuie-toi dessus ; tu n'as pas visité le site.
 Les éléments de confiance ne s'ajoutent que s'ils sont réels.`,
+  customers: `Outil : recherche de clients.
+Décris 3 profils de clients idéaux pour ce produit (marché et type d'acheteurs choisis) : besoins, problèmes, motivations d'achat, centres d'intérêt utiles au ciblage, arguments adaptés et plateformes où les atteindre.
+Le profil indiqué par l'utilisateur est « fourni » ; les autres sont des « hypothese ». Aucune statistique, aucune taille de marché.`,
+  competitors: `Outil : analyse de la concurrence.
+Analyse uniquement les pages fournies (titre, description, titres, prix trouvés, texte) et les notes de l'utilisateur.
+Prix : recopie seulement ceux présents dans les données ; sinon liste vide. N'invente ni chiffre d'affaires, ni trafic, ni avis.
+Une page marquée illisible reste dans la liste avec basis « hypothese ». Propose des façons concrètes de se différencier.`,
 };
 
 /** Message utilisateur : les données, clairement séparées des consignes. */

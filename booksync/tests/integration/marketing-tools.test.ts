@@ -24,7 +24,30 @@ const CASES: Array<[ToolKind, Record<string, unknown>]> = [
   ["ad", { platform: "google", style: "demo", offer: "Livraison offerte dès 30 €" }],
   ["content", { platform: "tiktok", format: "carousel", goal: "confiance" }],
   ["sales", { problem: "pas-de-ventes", pageText: "Bougie Lumi. Ajouter au panier." }],
+  ["customers", { market: "france", buyer: "particuliers" }],
+  ["competitors", { urls: "", notes: "Ils vendent cher." }],
 ];
+
+describe("concurrence : lecture sûre des pages publiques", () => {
+  it("lit la page du concurrent, refuse les adresses internes", async () => {
+    const ctx = await makeOrg({ plan: "starter" });
+    const p = await createProduct(ctx, input);
+    const html = `<title>Nova</title><meta name="description" content="Bougies bio"><h1>Coffret</h1><p>Prix 39 €</p>`;
+    const fetchImpl = (async () =>
+      new Response(html, { status: 200, headers: { "content-type": "text/html" } })) as unknown as typeof fetch;
+    const resolve = async (host: string) => (host === "interne.fr" ? ["10.0.0.5"] : ["93.184.216.34"]);
+    const r = await runTool(
+      ctx,
+      "competitors",
+      p.id,
+      { urls: "https://nova.fr\nhttps://interne.fr", notes: "" },
+      { providers: [], web: { fetch: fetchImpl, resolve } },
+    );
+    const out = r.output as { competitors: Array<{ name: string; prices: string[]; basis: string }> };
+    expect(out.competitors[0]).toMatchObject({ name: "Nova", prices: ["39 €"], basis: "fourni" });
+    expect(out.competitors[1]).toMatchObject({ name: "interne.fr", basis: "hypothese", prices: [] });
+  });
+});
 
 describe("copilote gratuit (sans IA)", () => {
   it("Free : 3 propositions par mois, puis forfait supérieur", async () => {

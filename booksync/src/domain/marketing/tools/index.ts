@@ -1,12 +1,14 @@
 /** Registre des outils du copilote : un outil = des choix et un format de résultat. */
 import type { z } from "zod";
 import { AD_OPTIONS, adSchema } from "./ad";
+import { COMPETITORS_OPTIONS, competitorsSchema } from "./competitors";
 import { CONTENT_OPTIONS, contentSchema } from "./content";
+import { CUSTOMERS_OPTIONS, customersSchema } from "./customers";
 import type { ToolOption } from "./options";
 import { SALES_OPTIONS, salesSchema } from "./sales";
 import { checkStrategy, STRATEGY_OPTIONS, strategySchema } from "./strategy";
 
-export type ToolKind = "strategy" | "ad" | "content" | "sales";
+export type ToolKind = "strategy" | "ad" | "content" | "sales" | "customers" | "competitors";
 
 type Def<S extends z.ZodType> = {
   kind: ToolKind;
@@ -39,17 +41,31 @@ export const TOOLS = {
   }),
   content: def({
     kind: "content",
-    title: "Contenus",
+    title: "Création de contenu",
     section: "/tableau-de-bord/contenus",
     options: CONTENT_OPTIONS,
     schema: contentSchema,
   }),
   sales: def({
     kind: "sales",
-    title: "Sales Booster",
+    title: "Optimisation des ventes",
     section: "/tableau-de-bord/sales-booster",
     options: SALES_OPTIONS,
     schema: salesSchema,
+  }),
+  customers: def({
+    kind: "customers",
+    title: "Recherche de clients",
+    section: "/tableau-de-bord/clients-cibles",
+    options: CUSTOMERS_OPTIONS,
+    schema: customersSchema,
+  }),
+  competitors: def({
+    kind: "competitors",
+    title: "Concurrence",
+    section: "/tableau-de-bord/concurrence",
+    options: COMPETITORS_OPTIONS,
+    schema: competitorsSchema,
   }),
 } as const;
 

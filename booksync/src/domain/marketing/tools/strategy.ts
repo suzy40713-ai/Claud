@@ -58,6 +58,14 @@ const action = z.object({
 export const strategySchema = z.object({
   summary: z.string().describe("La stratégie en 2 ou 3 phrases."),
   positioning: z.string(),
+  objectives: z
+    .array(z.string())
+    .describe("3 objectifs concrets et mesurables par l'utilisateur (sans promesse de résultat)."),
+  launch: z.array(z.string()).describe("4 à 6 étapes de la stratégie de lancement."),
+  budget: z
+    .object({ total: z.string(), split: z.array(z.string()) })
+    .describe("Budget indicatif mensuel respectant le budget choisi, et sa répartition."),
+  firstClients: z.array(z.string()).describe("4 conseils concrets pour trouver les premiers clients."),
   pillars: z
     .array(z.object({ title: z.string(), description: z.string() }))
     .describe("3 thèmes de contenu récurrents."),

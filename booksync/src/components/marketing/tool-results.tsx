@@ -2,7 +2,9 @@ import { Badge } from "@/components/ui/badge";
 import { CopyButton } from "@/components/ui/copy-button";
 import { BASIS_LABELS } from "@/domain/marketing/analysis";
 import { GOOGLE_LIMITS, type AdOutput } from "@/domain/marketing/tools/ad";
+import type { CompetitorsOutput } from "@/domain/marketing/tools/competitors";
 import type { ContentOutput } from "@/domain/marketing/tools/content";
+import type { CustomersOutput } from "@/domain/marketing/tools/customers";
 import type { SalesOutput } from "@/domain/marketing/tools/sales";
 import type { Strategy } from "@/domain/marketing/tools/strategy";
 
@@ -36,6 +38,37 @@ export function StrategyView({ s }: { s: Strategy }) {
         <p>{s.summary}</p>
         <p className="mt-3 font-medium">Positionnement : {s.positioning}</p>
       </Card>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card title="Objectifs">
+          <ul className="list-disc pl-5">
+            {s.objectives.map((o, i) => (
+              <li key={i}>{o}</li>
+            ))}
+          </ul>
+        </Card>
+        <Card title="Budget indicatif">
+          <p className="font-medium">{s.budget.total}</p>
+          <ul className="mt-2 list-disc pl-5 text-sm">
+            {s.budget.split.map((o, i) => (
+              <li key={i}>{o}</li>
+            ))}
+          </ul>
+        </Card>
+        <Card title="Stratégie de lancement">
+          <ol className="list-decimal pl-5">
+            {s.launch.map((o, i) => (
+              <li key={i}>{o}</li>
+            ))}
+          </ol>
+        </Card>
+        <Card title="Trouver vos premiers clients">
+          <ul className="list-disc pl-5">
+            {s.firstClients.map((o, i) => (
+              <li key={i}>{o}</li>
+            ))}
+          </ul>
+        </Card>
+      </div>
       <div className="grid gap-4 md:grid-cols-2">
         <Card title="Thèmes de contenu">
           <ul className="grid gap-2">
@@ -314,6 +347,148 @@ export function SalesView({ s }: { s: SalesOutput }) {
           </ul>
         </Card>
       </div>
+    </div>
+  );
+}
+
+export function CustomersView({ c }: { c: CustomersOutput }) {
+  return (
+    <div className="grid gap-4" data-testid="customers-view">
+      {c.personas.map((p, i) => (
+        <Card
+          key={i}
+          title={p.name}
+          aside={
+            <Badge variant={p.basis === "fourni" ? "primary" : "warning"}>
+              {BASIS_LABELS[p.basis]}
+            </Badge>
+          }
+        >
+          <p>{p.description}</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {(
+              [
+                ["Besoins", p.needs],
+                ["Problèmes", p.problems],
+                ["Motivations d'achat", p.motivations],
+                ["Arguments adaptés", p.arguments],
+              ] as const
+            ).map(([label, list]) => (
+              <div key={label}>
+                <p className="text-sm font-semibold">{label}</p>
+                <ul className="list-disc pl-5 text-sm">
+                  {list.map((x, j) => (
+                    <li key={j}>{x}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-sm">
+            <span className="font-semibold">Centres d&apos;intérêt :</span> {p.interests.join(" · ")}
+          </p>
+          <ul className="mt-2 grid gap-1 text-sm">
+            {p.channels.map((ch, j) => (
+              <li key={j}>
+                <Badge variant="outline" className="mr-1.5">
+                  {ch.platform}
+                </Badge>
+                {ch.how}
+              </li>
+            ))}
+          </ul>
+        </Card>
+      ))}
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card title="À vérifier auprès de vrais clients">
+          <ul className="list-disc pl-5">
+            {c.toVerify.map((t, i) => (
+              <li key={i}>{t}</li>
+            ))}
+          </ul>
+        </Card>
+        <Card title="Cette semaine">
+          <ol className="list-decimal pl-5">
+            {c.firstSteps.map((t, i) => (
+              <li key={i}>{t}</li>
+            ))}
+          </ol>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+export function CompetitorsView({ c }: { c: CompetitorsOutput }) {
+  return (
+    <div className="grid gap-4" data-testid="competitors-view">
+      {c.competitors.length === 0 ? (
+        <Card title="Concurrents">
+          <p className="text-muted-foreground">
+            Aucune adresse fournie : ajoutez le site de 1 à 3 concurrents pour une analyse
+            détaillée.
+          </p>
+        </Card>
+      ) : null}
+      {c.competitors.map((x, i) => (
+        <Card
+          key={i}
+          title={x.name}
+          aside={
+            <Badge variant={x.basis === "fourni" ? "primary" : "warning"}>
+              {x.basis === "fourni" ? "D'après leur page" : "Hypothèse à vérifier"}
+            </Badge>
+          }
+        >
+          {x.url ? <p className="truncate text-sm text-muted-foreground">{x.url}</p> : null}
+          <p className="mt-2">
+            <span className="font-semibold">Positionnement :</span> {x.positioning}
+          </p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {(
+              [
+                ["Offres", x.offers],
+                ["Prix trouvés", x.prices],
+                ["Arguments", x.arguments],
+                ["Points forts", x.strengths],
+                ["Points faibles", x.weaknesses],
+              ] as const
+            ).map(([label, list]) =>
+              list.length ? (
+                <div key={label}>
+                  <p className="text-sm font-semibold">{label}</p>
+                  <ul className="list-disc pl-5 text-sm">
+                    {list.map((y, j) => (
+                      <li key={j}>{y}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : label === "Prix trouvés" ? (
+                <p key={label} className="text-sm text-muted-foreground">
+                  Aucun prix trouvé sur la page.
+                </p>
+              ) : null,
+            )}
+          </div>
+        </Card>
+      ))}
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card title="Comment vous différencier">
+          <ul className="list-disc pl-5">
+            {c.differentiation.map((t, i) => (
+              <li key={i}>{t}</li>
+            ))}
+          </ul>
+        </Card>
+        <Card title="Opportunités">
+          <ul className="list-disc pl-5">
+            {c.opportunities.map((t, i) => (
+              <li key={i}>{t}</li>
+            ))}
+          </ul>
+        </Card>
+      </div>
+      <p className="text-sm text-muted-foreground">{c.limits}</p>
     </div>
   );
 }

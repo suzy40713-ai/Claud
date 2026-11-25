@@ -3,6 +3,9 @@ import Link from "next/link";
 import {
   BarChart3,
   Check,
+  MessageCircle,
+  Search,
+  Users,
   Compass,
   GraduationCap,
   Lightbulb,
@@ -18,13 +21,14 @@ import { CopilotPreview } from "@/components/marketing/copilot-preview";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/seo/json-ld";
-import { ACADEMY, ALL_LESSONS } from "@/domain/academy/lessons";
+import { ACADEMY } from "@/domain/academy/lessons";
 import { PLAN_ORDER, PLANS, formatPrice } from "@/domain/billing/plans";
 import { TALENTS } from "@/domain/launch/ideas";
 import { site } from "@/lib/site";
+import { isAiAvailable } from "@/server/ai/engine";
 
 const SEO_DESCRIPTION =
-  "BookSync aide les débutants à gagner leurs premiers euros : trouver quoi vendre, apprendre le business leçon par leçon et savoir chaque jour quoi faire pour vendre. Gratuit pour commencer.";
+  "BookSync transforme votre produit en stratégie marketing complète grâce à l'intelligence artificielle : analyse, clients cibles, concurrence, publicités, contenus et plan d'action sur 30 jours. Gratuit pour commencer.";
 
 export const metadata: Metadata = {
   title: { absolute: `${site.name} — ${site.tagline}` },
@@ -60,62 +64,114 @@ const IDEA_COUNT = TALENTS.flatMap((t) => t.ideas).length;
 const STEPS = [
   {
     icon: Lightbulb,
-    title: "Trouve quoi vendre",
-    text: `Choisis ce que tu sais déjà faire : BookSync te propose une idée parmi ${IDEA_COUNT}, avec un prix de départ et à qui la vendre.`,
-  },
-  {
-    icon: GraduationCap,
-    title: "Apprends le business",
-    text: `${ALL_LESSONS.length} leçons de 5 minutes : fixer ton prix, trouver tes premiers clients, vendre sans être lourd, te faire connaître.`,
-  },
-  {
-    icon: Wand2,
-    title: "Suis ton plan, chaque jour",
-    text: "Ta stratégie sur 30 jours devient 3 actions simples par jour. Tu coches, tu avances, tu ne te demandes plus quoi faire.",
+    title: "Ajoutez votre produit",
+    text: `Nom, description, prix, avantages, public visé. Pas encore d'idée ? BookSync vous en propose une parmi ${IDEA_COUNT}.`,
   },
   {
     icon: Target,
-    title: "Vends et rentabilise",
-    text: "Note tes ventes : ta jauge montre quand ton abonnement est rentabilisé. Tout le reste, c'est pour toi.",
+    title: "Recevez l'analyse",
+    text: "Points forts, points faibles, positionnement, clients idéaux et concurrence : tout ce qu'il faut savoir avant de vendre.",
+  },
+  {
+    icon: Compass,
+    title: "Obtenez votre stratégie",
+    text: "Une stratégie sur 30 jours, des publicités et des contenus prêts à utiliser, adaptés à votre budget.",
+  },
+  {
+    icon: Wand2,
+    title: "Suivez votre plan d'action",
+    text: "Chaque jour, 3 actions concrètes à cocher. Notez vos ventes et suivez la rentabilité de votre abonnement.",
   },
 ] as const;
 
 const TOOLS = [
-  { icon: Lightbulb, title: "Trouver une idée", text: "Quoi vendre, à quel prix, à qui, et tes 3 premières actions." },
-  { icon: GraduationCap, title: "Académie", text: "Le business expliqué simplement, avec une action après chaque leçon." },
-  { icon: Target, title: "Analyse de ton produit", text: "Points forts, points faibles, acheteurs possibles et objections." },
-  { icon: Compass, title: "Stratégie 30 jours", text: "Adaptée à ton temps, à ton budget et à tes réseaux." },
-  { icon: Wand2, title: "Autopilot", text: "3 actions par jour à cocher et ta progression sur 30 jours." },
-  { icon: Megaphone, title: "Publicités", text: "TikTok, Instagram, Facebook, Google Ads, dans 5 styles." },
-  { icon: PenLine, title: "Contenus", text: "Scripts vidéo, carrousels, légendes et hashtags prêts à publier." },
-  { icon: LineChart, title: "Sales Booster", text: "Ce qui freine tes ventes et quoi changer sur ta page." },
-  { icon: BarChart3, title: "Mes résultats", text: "Ventes, dépenses, coût par vente et rentabilité de ton abonnement." },
+  {
+    icon: Target,
+    title: "Analyse IA",
+    text: "Présentation commerciale, forces, faiblesses, positionnement et potentiel estimé.",
+  },
+  {
+    icon: Users,
+    title: "Recherche de clients",
+    text: "Profils de clients idéaux, besoins, motivations et où les trouver.",
+  },
+  {
+    icon: Search,
+    title: "Concurrence",
+    text: "Positionnement, offres et prix publics de vos concurrents, et comment vous différencier.",
+  },
+  {
+    icon: Compass,
+    title: "Stratégie marketing",
+    text: "Objectifs, canaux, lancement, budget indicatif et calendrier sur 30 jours.",
+  },
+  {
+    icon: Megaphone,
+    title: "Publicités",
+    text: "TikTok, Instagram, Facebook et Google Ads : variantes prêtes à copier.",
+  },
+  {
+    icon: PenLine,
+    title: "Création de contenu",
+    text: "Scripts vidéo, carrousels, publications et calendrier éditorial.",
+  },
+  {
+    icon: LineChart,
+    title: "Optimisation des ventes",
+    text: "Fiche produit, offre, page de vente et appels à l'action améliorés.",
+  },
+  {
+    icon: MessageCircle,
+    title: "Assistant IA",
+    needsAi: true,
+    text: "Vos questions de marketing, avec les informations de vos produits.",
+  },
+  {
+    icon: Wand2,
+    title: "Plan d'action",
+    text: "Votre stratégie transformée en 3 tâches par jour, à cocher.",
+  },
+  {
+    icon: GraduationCap,
+    title: "Académie",
+    text: "Le business expliqué simplement, leçon par leçon.",
+  },
+  {
+    icon: BarChart3,
+    title: "Résultats",
+    text: "Ventes, dépenses et rentabilité, uniquement avec vos vrais chiffres.",
+  },
+  {
+    icon: Lightbulb,
+    title: "Trouver une idée",
+    text: "Pas encore de produit ? Une idée à partir de ce que vous savez faire.",
+  },
 ] as const;
 
 const FAQ = [
   {
-    q: "Je n'y connais rien, c'est pour moi ?",
-    a: "Oui, BookSync est fait pour les débutants. Tu n'as besoin ni de diplôme, ni d'expérience, ni d'argent de départ. Tout est expliqué simplement, étape par étape.",
+    q: "BookSync utilise-t-il vraiment l'intelligence artificielle ?",
+    a: "Oui : les analyses, stratégies, publicités et contenus sont rédigés par des modèles d'IA gratuits (offres gratuites de Groq et Cloudflare). Si leur quota du jour est atteint, BookSync utilise ses propres modèles intégrés, et l'indique sous chaque résultat.",
   },
   {
-    q: "Est-ce que BookSync garantit que je vais gagner de l'argent ?",
-    a: "Non, et personne d'honnête ne peut te le garantir. BookSync te donne une idée, une méthode et un plan d'action quotidien. Les résultats dépendent de ce que tu fais : plus tu suis ton Autopilot, plus tu te donnes de chances.",
+    q: "BookSync garantit-il des ventes ?",
+    a: "Non, et personne d'honnête ne peut le garantir. BookSync vous donne une analyse, une stratégie et un plan d'action quotidien. Les résultats dépendent de ce que vous mettez en place.",
   },
   {
-    q: "Combien de temps faut-il par jour ?",
-    a: "Tu choisis : la stratégie s'adapte à ton temps disponible, dès 1 à 2 heures par semaine. Les 3 actions du jour prennent en général entre 15 et 45 minutes.",
+    q: "D'où viennent les analyses et les chiffres ?",
+    a: "Des informations que vous donnez et des pages publiques que vous indiquez (concurrents). BookSync n'invente aucune donnée de marché : une hypothèse est toujours signalée comme telle. Les statistiques n'utilisent que les résultats que vous saisissez.",
   },
   {
-    q: "Pourquoi payer si le forfait Free existe ?",
-    a: "Le forfait Free sert à trouver ton idée et à découvrir l'Académie. Starter débloque toute l'Académie débutant, des propositions illimitées et le suivi de ta rentabilité. Une seule vente à 10 € rembourse ton mois.",
+    q: "BookSync publie-t-il mes publicités ?",
+    a: "Non. BookSync prépare vos publicités et vos contenus, prêts à copier ; vous les publiez vous-même. Aucune connexion à TikTok, Instagram, Facebook ou Google Ads n'est proposée sans être réellement disponible.",
+  },
+  {
+    q: "Je débute, est-ce pour moi ?",
+    a: "Oui. Sans diplôme ni expérience : l'Académie explique les bases, et le plan d'action vous dit quoi faire chaque jour.",
   },
   {
     q: "Puis-je arrêter quand je veux ?",
-    a: "Oui. Sans engagement : tu résilies en un clic depuis ton espace, et ton forfait reste actif jusqu'à la fin du mois payé. Tes données sont conservées.",
-  },
-  {
-    q: "BookSync publie-t-il à ma place sur les réseaux ?",
-    a: "Non. BookSync prépare tes contenus et tes publicités, et c'est toi qui les publies. Aucune connexion à un réseau social n'est proposée sans être réellement disponible.",
+    a: "Oui. Sans engagement : vous résiliez en un clic depuis votre espace, et votre forfait reste actif jusqu'à la fin du mois payé.",
   },
 ];
 
@@ -123,6 +179,7 @@ const pill = "rounded-full px-6";
 
 export default function LandingPage() {
   const starter = PLANS.starter;
+  const aiLive = isAiAvailable();
   return (
     <main className="overflow-x-clip">
       <JsonLd data={SOFTWARE_LD} />
@@ -137,18 +194,17 @@ export default function LandingPage() {
           <div className="animate-fade-up">
             <p className="text-sm font-semibold tracking-wide text-primary">
               <Sparkles className="mr-1 inline size-4 align-[-3px]" />
-              Pour les débutants qui veulent gagner leurs premiers euros
+              Votre copilote marketing propulsé par l&apos;IA
             </p>
             <h1 className="mx-auto mt-4 max-w-4xl text-[2.6rem] leading-[1.04] font-semibold tracking-[-0.035em] text-balance sm:text-7xl">
-              De zéro{" "}
+              De votre idée{" "}
               <span className="bg-gradient-to-r from-primary to-[#7c5cff] bg-clip-text text-transparent">
-                à ta première vente.
+                à vos premières ventes.
               </span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-pretty text-muted-foreground sm:text-xl">
-              Tu ne sais pas quoi vendre ni par où commencer ? BookSync trouve ton idée,
-              t&apos;apprend le business et te dit chaque jour quoi faire. Toi, tu n&apos;as plus
-              qu&apos;à suivre.
+              BookSync transforme votre produit en stratégie marketing complète : analyse, clients
+              cibles, concurrence, publicités, contenus et un plan d&apos;action sur 30 jours.
             </p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button asChild size="lg" className={pill}>
@@ -158,12 +214,16 @@ export default function LandingPage() {
               </Button>
               <Button asChild size="lg" variant="secondary" className={pill}>
                 <Link href="/lancer-mon-activite">
-                  <Lightbulb /> Trouver mon idée en 2 minutes
+                  <Lightbulb /> Je n&apos;ai pas encore d&apos;idée
                 </Link>
               </Button>
             </div>
             <ul className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-              {["Sans diplôme", "Sans argent de départ", "Sans montrer ton visage"].map((t) => (
+              {[
+                "Gratuit pour commencer",
+                "Sans carte bancaire",
+                "Aucune vente garantie, aucun chiffre inventé",
+              ].map((t) => (
                 <li key={t} className="flex items-center gap-1.5">
                   <Check className="size-4 text-success" /> {t}
                 </li>
@@ -180,7 +240,7 @@ export default function LandingPage() {
       <section id="avantages" className="mx-auto w-full max-w-5xl scroll-mt-20 px-4 py-24 sm:px-6">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-4xl leading-[1.08] font-semibold tracking-[-0.03em] text-balance sm:text-6xl">
-            4 étapes. Zéro prise de tête.
+            De votre produit à votre plan d&apos;action.
           </h2>
         </div>
         <ol className="mt-14 grid gap-4 sm:grid-cols-2" data-testid="steps">
@@ -211,11 +271,15 @@ export default function LandingPage() {
             </p>
           </div>
           <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="tools">
-            {TOOLS.map(({ icon: Icon, title, text }) => (
+            {TOOLS.map(({ icon: Icon, title, text, ...rest }) => (
               <li key={title} className="flex flex-col rounded-3xl bg-card p-7">
                 <div className="flex items-start justify-between gap-3">
                   <Icon className="size-8 text-primary" strokeWidth={1.6} />
-                  <Badge variant="success">Disponible</Badge>
+                  {"needsAi" in rest && !aiLive ? (
+                    <Badge variant="neutral">Bientôt</Badge>
+                  ) : (
+                    <Badge variant="success">Disponible</Badge>
+                  )}
                 </div>
                 <h3 className="mt-6 text-xl font-semibold tracking-tight">{title}</h3>
                 <p className="mt-2 text-[15px] text-muted-foreground">{text}</p>
@@ -230,10 +294,13 @@ export default function LandingPage() {
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-sm font-semibold tracking-wide text-primary">Académie BookSync</p>
           <h2 className="mt-3 text-4xl leading-[1.08] font-semibold tracking-[-0.03em] text-balance sm:text-6xl">
-            Apprends le business en 5 minutes par jour.
+            Apprenez le business en 5 minutes par jour.
           </h2>
         </div>
-        <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="academy-modules">
+        <ul
+          className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          data-testid="academy-modules"
+        >
           {ACADEMY.map((m) => (
             <li key={m.id} className="rounded-3xl border bg-card p-6">
               <h3 className="font-semibold">{m.title}</h3>
@@ -258,8 +325,8 @@ export default function LandingPage() {
               Tout BookSync pour {formatPrice(starter.priceCents)} par mois.
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Moins qu&apos;un repas à emporter. Une seule vente à 10 € et ton mois est
-              rentabilisé : la jauge de ton accueil te le montre.
+              Moins qu&apos;un repas à emporter. Une seule vente à 10 € et votre mois est
+              rentabilisé : la jauge de votre tableau de bord vous le montre.
             </p>
             <Button asChild size="lg" className={`mt-6 ${pill}`}>
               <Link href="/inscription">Commencer maintenant</Link>
@@ -286,8 +353,8 @@ export default function LandingPage() {
               Des tarifs simples.
             </h2>
             <p className="mt-5 text-lg text-muted-foreground">
-              Commence gratuitement, passe à Starter quand tu es prêt(e). Sans engagement, prix TTC
-              par mois.
+              Commencez gratuitement, passez à Starter quand vous êtes prêt. Sans engagement, prix
+              TTC par mois.
             </p>
           </div>
           <div className="mt-14 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -358,7 +425,7 @@ export default function LandingPage() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/booky.svg" alt="Booky, la mascotte BookSync" width={120} height={132} />
           <h2 className="mt-6 max-w-2xl text-4xl leading-[1.08] font-semibold tracking-[-0.03em] text-balance sm:text-6xl">
-            Ta première vente commence aujourd&apos;hui.
+            Votre première vente commence aujourd&apos;hui.
           </h2>
           <p className="mt-5 max-w-lg text-lg text-white/60">
             Gratuit pour commencer. Sans carte bancaire. En français, de A à Z.

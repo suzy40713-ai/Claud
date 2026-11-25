@@ -86,8 +86,8 @@ export const PLANS: Record<PlanId, Plan> = {
     },
     highlights: [
       "L'Académie débutant complète",
-      "Stratégie 30 jours et Autopilot : 3 actions par jour",
-      "Publicités, contenus et Sales Booster illimités",
+      "Stratégie 30 jours et plan d'action : 3 actions par jour",
+      "Publicités, contenus et optimisation des ventes illimités",
       "Objectif « rentabiliser mon abonnement » suivi chaque mois",
       "10 produits",
     ],

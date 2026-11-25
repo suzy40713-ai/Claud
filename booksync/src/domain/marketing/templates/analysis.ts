@@ -82,7 +82,29 @@ export function analysisTemplate(p: ProductInfo): ProductAnalysis {
     },
   ];
 
+  const filled = [benefits.length > 0, Boolean(audience), Boolean(price), Boolean(p.url)].filter(Boolean).length;
   return {
+    pitch: `${p.name}, ${audience ? `le ${noun(p)} pensé pour ${lowerFirst(audience)}` : `un ${noun(p)}`}. ${desc}.${benefits.length ? ` ${benefits.slice(0, 2).map((b) => b.charAt(0).toUpperCase() + b.slice(1)).join(", ")}.` : ""}${price ? ` Disponible pour ${price}.` : ""}`,
+    potential: {
+      level: filled >= 3 ? "moyen" : "faible",
+      reasoning:
+        filled >= 3
+          ? "Votre fiche est complète (avantages, public, prix) : c'est une bonne base pour vendre. Le vrai potentiel se mesurera avec vos premiers retours clients."
+          : "Il manque encore des éléments clés dans votre fiche (avantages, public visé, prix ou page de vente). Complétez-les avant d'estimer le potentiel.",
+    },
+    sellingArguments: [
+      ...benefits.slice(0, 3).map((b) => `${b.charAt(0).toUpperCase()}${b.slice(1)}`),
+      price ? `Un prix clair : ${price}` : "Un prix simple et affiché",
+      "Une personne réelle derrière le produit, joignable facilement",
+    ].slice(0, 4),
+    improvements: [
+      ...(!benefits.length ? ["Lister 3 avantages concrets pour le client"] : []),
+      ...(!audience ? ["Préciser le client idéal en une phrase"] : []),
+      ...(!price ? ["Afficher un prix"] : []),
+      ...(!p.url ? ["Créer une page de vente simple (même une page Instagram ou Etsy)"] : []),
+      "Ajouter des preuves dès les premières ventes : avis, photos, démonstration",
+      "Tester l'offre auprès de 5 personnes du public visé avant d'investir",
+    ].slice(0, 5),
     summary: `${p.name} (${noun(p)}) : ${desc}.${audience ? ` Public visé : ${lowerFirst(audience)}.` : " Le public visé reste à préciser."}`,
     strengths: strengths.slice(0, 5),
     weaknesses: weaknesses.slice(0, 4),

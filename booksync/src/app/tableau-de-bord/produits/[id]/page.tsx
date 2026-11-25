@@ -73,13 +73,15 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
           </div>
         ))}
       </dl>
-      <nav aria-label="Outils marketing" className="grid gap-2 sm:grid-cols-4" data-testid="product-tools">
+      <nav aria-label="Outils marketing" className="grid gap-2 sm:grid-cols-3" data-testid="product-tools">
         {(
           [
+            ["clients-cibles", "Clients idéaux"],
+            ["concurrence", "Concurrence"],
             ["strategies", "Stratégie 30 jours"],
             ["publicites", "Publicités"],
             ["contenus", "Contenus"],
-            ["sales-booster", "Sales Booster"],
+            ["sales-booster", "Optimiser les ventes"],
           ] as const
         ).map(([slug, label]) => (
           <Button key={slug} asChild variant="secondary">
@@ -91,7 +93,7 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 id="analyse-titre" className="text-lg font-semibold">
-              Analyse du produit
+              Analyse IA
             </h2>
             <p className="text-sm text-muted-foreground">
               {usage.limit === null

@@ -4,8 +4,8 @@ test.describe("site public", () => {
   test("la page d'accueil commerciale est complète et en français", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("html")).toHaveAttribute("lang", "fr");
-    await expect(page).toHaveTitle(/^BookSync — De zéro à ta première vente/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("De zéro");
+    await expect(page).toHaveTitle(/^BookSync — De votre idée à vos premières ventes/);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("De votre idée");
     // Statut honnête de chaque outil : disponible ou en déploiement.
     await expect(page.getByTestId("tools")).toContainText("Disponible");
     await expect(page.getByTestId("tools")).not.toContainText("En déploiement");

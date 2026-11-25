@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ToolLanding } from "@/components/marketing/tool-landing";
 import { requirePermission } from "@/server/auth/session";
 
-export const metadata: Metadata = { title: "Contenus" };
+export const metadata: Metadata = { title: "Création de contenu" };
 
 async function Content({ searchParams }: { searchParams: Promise<{ produit?: string }> }) {
   const ctx = await requirePermission("marketing.manage");
@@ -24,7 +24,7 @@ export default function Page(props: PageProps<"/tableau-de-bord/contenus">) {
   return (
     <>
       <PageHeader
-        title="Contenus"
+        title="Création de contenu"
         description="Des scripts vidéo, carrousels et posts prêts à publier, avec légendes et hashtags."
       />
       <Suspense fallback={<Skeleton className="h-96" />}>

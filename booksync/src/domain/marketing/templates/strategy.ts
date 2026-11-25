@@ -134,6 +134,35 @@ export function strategyTemplate(p: ProductInfo, v: Values, seed = 0): Strategy 
   return {
     summary: `Plan de 30 jours pour ${goal.label} avec ${p.name}, sur ${channels.join(", ")}. Semaine 1 : vous présenter. Semaine 2 : montrer le produit. Semaine 3 : ${goal.week3.toLowerCase()}. Semaine 4 : ${goal.week4.toLowerCase()}. ${adPerDay ? "La publicité payante n'arrive qu'après avoir testé des contenus gratuits." : "Tout est gratuit : aucune publicité payante."}`,
     positioning: `${p.name}, ${noun(p)}${audience ? ` pour ${lowerFirst(audience)}` : ""}${benefits[0] ? ` : ${lowerFirst(benefits[0])}` : ""}.`,
+    objectives: [
+      goal.measure === "Ventes"
+        ? "Faire votre première vente (puis la suivante) en notant chaque vente"
+        : `Suivre chaque semaine : ${goal.measure.toLowerCase()}`,
+      `Publier régulièrement sur ${main} pendant 30 jours`,
+      "Échanger chaque semaine avec au moins 10 personnes de votre public",
+    ],
+    launch: [
+      "Préparer vos profils : bio claire, lien vers votre offre, 3 premières publications",
+      "Prévenir votre entourage et lui demander de partager",
+      `Publier vos premiers contenus sur ${channels.join(", ")}`,
+      "Proposer une offre de lancement réelle aux premiers clients, en échange d'un avis",
+      "Faire le bilan à la fin de la 2e semaine et garder ce qui marche",
+    ],
+    budget: adPerDay
+      ? {
+          total: `${adPerDay * 3} € de publicité test, puis à ajuster (dans la limite de votre budget)`,
+          split: [
+            `${adPerDay} € par jour pendant 3 jours sur votre meilleur contenu (jour 22)`,
+            "0 € pour tout le reste : contenus, échanges et bouche-à-oreille sont gratuits",
+          ],
+        }
+      : { total: "0 € : stratégie 100 % gratuite", split: ["Contenus, échanges et bouche-à-oreille : gratuits"] },
+    firstClients: [
+      "Écrire à 30 personnes de votre entourage avec un message personnel",
+      "Répondre en moins d'une heure à chaque message ou commentaire",
+      "Proposer un prix de lancement aux 3 premiers clients contre un avis",
+      `Aider dans un groupe ou une communauté de votre thème avant de proposer ${p.name}`,
+    ],
     pillars: [
       { title: "Le produit en vrai", description: "Démonstrations, coulisses, détails : montrer plutôt que décrire." },
       { title: "Les conseils", description: "Des astuces utiles liées à votre domaine, même pour ceux qui n'achètent pas." },

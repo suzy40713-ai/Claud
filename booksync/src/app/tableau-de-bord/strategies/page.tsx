@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ToolLanding } from "@/components/marketing/tool-landing";
 import { requirePermission } from "@/server/auth/session";
 
-export const metadata: Metadata = { title: "Stratégies" };
+export const metadata: Metadata = { title: "Stratégies marketing" };
 
 async function Content({ searchParams }: { searchParams: Promise<{ produit?: string }> }) {
   const ctx = await requirePermission("marketing.manage");
@@ -24,7 +24,7 @@ export default function Page(props: PageProps<"/tableau-de-bord/strategies">) {
   return (
     <>
       <PageHeader
-        title="Stratégies"
+        title="Stratégies marketing"
         description="Une stratégie marketing réaliste sur 30 jours, avec 3 actions par jour adaptées à votre temps et à votre budget."
       />
       <Suspense fallback={<Skeleton className="h-96" />}>

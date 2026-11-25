@@ -12,7 +12,7 @@ import { requirePermission } from "@/server/auth/session";
 import { getProduct } from "@/server/marketing/products";
 import { getToolResult } from "@/server/marketing/tools";
 
-export const metadata: Metadata = { title: "Sales Booster" };
+export const metadata: Metadata = { title: "Optimisation des ventes" };
 
 async function Content({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -25,11 +25,11 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
       <div>
         <Button asChild variant="ghost" size="sm">
           <Link href="/tableau-de-bord/sales-booster">
-            <ArrowLeft /> Sales Booster
+            <ArrowLeft /> Optimisation des ventes
           </Link>
         </Button>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight" data-testid="tool-result-title">
-          Sales Booster · {product?.name ?? "Produit supprimé"}
+          Optimisation des ventes · {product?.name ?? "Produit supprimé"}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Généré le {r.createdAt.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}

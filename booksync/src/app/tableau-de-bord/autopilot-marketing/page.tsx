@@ -15,7 +15,7 @@ import { requirePermission } from "@/server/auth/session";
 import { getActivePlan } from "@/server/marketing/autopilot";
 import { StopPlanButton, TaskItem } from "./controls";
 
-export const metadata: Metadata = { title: "Autopilot" };
+export const metadata: Metadata = { title: "Plan d'action" };
 
 async function Content() {
   const ctx = await requirePermission("marketing.manage");
@@ -138,7 +138,7 @@ export default function MarketingAutopilotPage() {
   return (
     <>
       <PageHeader
-        title="Autopilot"
+        title="Plan d'action"
         description="Chaque jour, 3 actions marketing simples tirées de votre stratégie. Cochez-les au fur et à mesure."
       />
       <Suspense fallback={<Skeleton className="h-96" />}>

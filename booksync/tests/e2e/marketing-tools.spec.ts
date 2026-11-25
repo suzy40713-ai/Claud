@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { createOrganization, signUpAndVerify, sql } from "./helpers";
 
 /** Outils marketing gratuits (sans IA) : parcours réel, de la fiche produit à l'Autopilot. */
-test("copilote : stratégie, Autopilot, publicités, contenus et Sales Booster", async ({ page }) => {
+test("copilote : stratégie, plan d'action, publicités, contenus, ventes, clients, concurrence", async ({ page }) => {
   test.setTimeout(150_000);
   await signUpAndVerify(page, { name: "Nora Petit" });
   const orgName = `Atelier ${Date.now().toString(36)}`;
@@ -65,6 +65,22 @@ test("copilote : stratégie, Autopilot, publicités, contenus et Sales Booster",
   await page.getByLabel(/Texte de votre page de vente/).fill("Bougie Lumi, coulée à la main.");
   await page.getByTestId("tool-submit").click();
   await expect(page.getByTestId("sales-view")).toContainText("Afficher le prix");
+
+  // Recherche de clients et concurrence (sans adresse : analyse générale, rien d'inventé).
+  await page.goto("/tableau-de-bord/clients-cibles");
+  await expect(page.getByRole("heading", { name: "Recherche de clients" })).toBeVisible();
+  await page.getByTestId("tool-submit").click();
+  await expect(page.getByTestId("customers-view")).toContainText("Besoins");
+  await expect(page.getByTestId("result-origin")).toContainText("Version modèle BookSync");
+  await page.goto("/tableau-de-bord/concurrence");
+  await page.getByTestId("tool-submit").click();
+  await expect(page.getByTestId("competitors-view")).toContainText("Aucune adresse fournie");
+  await expect(page.getByTestId("competitors-view")).toContainText("Comment vous différencier");
+
+  // Assistant IA : sans clé gratuite configurée, pas de faux assistant.
+  await expect(page.getByRole("link", { name: "Assistant IA" })).toHaveCount(0);
+  await page.goto("/tableau-de-bord/assistant");
+  await expect(page.getByTestId("assistant-disabled")).toBeVisible();
 
   // Historique ; un identifiant d'un autre outil est introuvable.
   await page.goto("/tableau-de-bord/publicites");

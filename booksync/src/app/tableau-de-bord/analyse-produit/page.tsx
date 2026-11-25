@@ -13,7 +13,7 @@ import { listGenerations } from "@/server/ai/gateway";
 import { ANALYSIS_KIND } from "@/server/marketing/analysis";
 import { listProducts } from "@/server/marketing/products";
 
-export const metadata: Metadata = { title: "Analyse produit" };
+export const metadata: Metadata = { title: "Analyse IA" };
 
 async function Content() {
   const ctx = await requirePermission("marketing.manage");
@@ -79,7 +79,7 @@ export default function AnalysisPage() {
   return (
     <>
       <PageHeader
-        title="Analyse produit"
+        title="Analyse IA"
         description="Points forts, acheteurs possibles, angles de vente et premières actions pour chacun de vos produits."
       />
       <Suspense fallback={<Skeleton className="h-64" />}>

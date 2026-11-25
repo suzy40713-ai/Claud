@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ToolLanding } from "@/components/marketing/tool-landing";
 import { requirePermission } from "@/server/auth/session";
 
-export const metadata: Metadata = { title: "Sales Booster" };
+export const metadata: Metadata = { title: "Optimisation des ventes" };
 
 async function Content({ searchParams }: { searchParams: Promise<{ produit?: string }> }) {
   const ctx = await requirePermission("marketing.manage");
@@ -24,7 +24,7 @@ export default function Page(props: PageProps<"/tableau-de-bord/sales-booster">)
   return (
     <>
       <PageHeader
-        title="Sales Booster"
+        title="Optimisation des ventes"
         description="Des améliorations concrètes pour transformer plus de visiteurs en acheteurs : textes, tests A/B, confiance."
       />
       <Suspense fallback={<Skeleton className="h-96" />}>

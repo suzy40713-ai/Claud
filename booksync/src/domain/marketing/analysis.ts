@@ -17,8 +17,24 @@ const point = z.object({
   basis: z.enum(BASIS).describe("fourni si cela découle des informations données, sinon hypothese."),
 });
 
+export const POTENTIAL_LEVELS = ["faible", "moyen", "eleve"] as const;
+export const POTENTIAL_LABELS: Record<(typeof POTENTIAL_LEVELS)[number], string> = {
+  faible: "Potentiel faible",
+  moyen: "Potentiel moyen",
+  eleve: "Potentiel élevé",
+};
+
 export const productAnalysisSchema = z.object({
   summary: z.string().describe("Résumé en 2 ou 3 phrases de ce que vend l'utilisateur et à qui."),
+  pitch: z.string().describe("Présentation commerciale prête à utiliser, 3 à 4 phrases."),
+  potential: z
+    .object({
+      level: z.enum(POTENTIAL_LEVELS),
+      reasoning: z.string().describe("Pourquoi, en 2 phrases. Estimation qualitative, jamais un chiffre de ventes."),
+    })
+    .describe("Potentiel commercial estimé (hypothèse)."),
+  sellingArguments: z.array(z.string()).describe("4 arguments qui pourraient convaincre un client."),
+  improvements: z.array(z.string()).describe("3 à 5 recommandations d'amélioration du produit ou de l'offre."),
   strengths: z.array(point).describe("3 à 5 points forts du produit tel que décrit."),
   weaknesses: z.array(point).describe("2 à 4 points faibles ou flous à corriger."),
   audiences: z
