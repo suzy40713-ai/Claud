@@ -333,6 +333,21 @@ def hat_parts(hat, x, hy, R):
                 lx, ly = x + math.cos(a) * R * 1.0, hy - R * 0.35 + math.sin(a) * R * 0.75
                 out.append(ellipse(lx, ly, R * 0.16, R * 0.08, col, sw=4))
         return "".join(out)
+    if kind == "bicorne":  # bicorne noir de Napoléon, avec cocarde
+        return (path("M %s %s Q %s %s %s %s Q %s %s %s %s Z" % (
+            f(x - R * 1.6), f(hy - R * 0.62), f(x), f(hy - R * 2.05), f(x + R * 1.6), f(hy - R * 0.62),
+            f(x), f(hy - R * 0.95), f(x - R * 1.6), f(hy - R * 0.62)), fill=col, sw=6) +
+                circle(x + R * 0.55, hy - R * 1.05, R * 0.2, "#e63946", sw=4) +
+                circle(x + R * 0.55, hy - R * 1.05, R * 0.12, "#ffffff", sw=0, stroke="none") +
+                circle(x + R * 0.55, hy - R * 1.05, R * 0.06, "#1d4ed8", sw=0, stroke="none"))
+    if kind == "phrygien":  # bonnet phrygien rouge qui retombe vers l'avant, avec cocarde
+        return (path("M %s %s Q %s %s %s %s Q %s %s %s %s Q %s %s %s %s Z" % (
+            f(x - R * 0.95), f(hy - R * 0.5), f(x - R * 0.9), f(hy - R * 1.75), f(x + R * 0.35), f(hy - R * 1.7),
+            f(x + R * 1.25), f(hy - R * 1.6), f(x + R * 1.1), f(hy - R * 1.05),
+            f(x + R * 0.6), f(hy - R * 1.2), f(x + R * 0.95), f(hy - R * 0.5)), fill=col, sw=6) +
+                circle(x - R * 0.55, hy - R * 0.8, R * 0.16, "#1d4ed8", sw=4) +
+                circle(x - R * 0.55, hy - R * 0.8, R * 0.1, "#ffffff", sw=0, stroke="none") +
+                circle(x - R * 0.55, hy - R * 0.8, R * 0.05, "#e63946", sw=0, stroke="none"))
     if kind == "crown":  # couronne royale dorée
         pts = []
         for k in range(7):

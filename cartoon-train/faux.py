@@ -3,6 +3,7 @@
 « FAUX, espèce de fils de pute ! » puis rétablit la vérité. Narrateur = Léo, le furieux = Aziz (ElevenLabs).
 Audio déposé dans build/story-h/<slug>/NN_<voix>.wav (voir momo_leo.py pour le principe)."""
 import copy
+import math
 
 from story import B
 from sketches import P, SKIN
@@ -312,9 +313,30 @@ PIRATE = P(skin=SKIN[3], hair=("curly", "#1c1412"), top=("tshirt", "#e63946"), b
            shoes="#1b1b1b", beard="#1c1412", hat=("pirate", "#1b1b1b"), R=116)
 
 
+def shout(rep):
+    """« FAUX, espèce de fils de pute ! » -> « FAUX ! Espèce de fils de pute ! » (crié plus fort par Léo)."""
+    for old, new in (("Encore FAUX, espèce de gros fils de pute !", "Encore FAUX ! Espèce de gros fils de pute !"),
+                     ("FAUX, espèce de fils de pute !", "FAUX ! Espèce de fils de pute !"),
+                     ("FAUX, fils de pute !", "FAUX ! Fils de pute !")):
+        if rep.startswith(old):
+            return new + rep[len(old):]
+    return rep
+
+
+SHOUTED = ("FAUX ! Espèce", "FAUX ! Fils", "Encore FAUX !", "Alors, tu y croyais")
+
+
+def tts_prompt(text):
+    """Texte envoyé à ElevenLabs : on fait hurler les répliques « FAUX ! … fils de pute ! »."""
+    if text.startswith(SHOUTED):
+        return "[shouting] " + text
+    return text
+
+
 def lot2(slug, sujet, tag, scene, hero, items):
     beats, total = [], len(items)
     for k, (q, label, rep) in enumerate(items):
+        rep = shout(rep)
         o = dict(expr="smug", look="CAM", tag=(label, "#ffd166"))
         beats.append(B(q, scene, [(hero, 540, o)], (540, 1000, 1.25), quiz=(k + 1, total, False)))
         beats.append(B(rep, scene, [(hero, 540, dict(expr="angry", look="CAM", pose="gesture"))], (540, 960, 1.5),
@@ -324,7 +346,6 @@ def lot2(slug, sujet, tag, scene, hero, items):
                    scene, [(hero, 540, dict(expr="angry", look="CAM", pose="gesture"))], (540, 960, 1.5),
                    stamp="ABONNE-TOI", cta=True))
     d = dict(slug=slug, title="%s : tout ce que tu crois est faux" % sujet, hero=hero, beats=beats,
-             voice=("fr_FR-miro-high", None, 0.82, 0.0),  # voix gratuite tant qu'il n'y a plus de crédits ElevenLabs
              hook_text="%s ? TOUT est FAUX" % sujet, caption_y=1390, caps="keywords", out="videos-faux",
              caption="%s : tout ce que tu crois est FAUX 😤 Tu y croyais à combien ?" % sujet,
              hashtags=["#faux", "#histoire", tag, "#lesaviezvous", "#humour", "#animation", "#pourtoi", "#fyp"])
@@ -342,3 +363,101 @@ def _items(st):
 
 STORIES[STORIES.index(_ROM)] = lot2("fx06-romains", "Les Romains", "#rome", "colisee", ROMAIN, _items(_ROM))
 STORIES[STORIES.index(_PIR)] = lot2("fx07-pirates", "Les pirates", "#pirates", "navire", PIRATE, _items(_PIR))
+
+
+# --- Lot 3 (voix Léo, insultes criées) : Révolution, Napoléon, Préhistoire ---
+import tendances  # noqa: F401  (enregistre le décor « chateau »)
+
+
+class Bastille(engine.Scene):
+    """Forteresse de la Bastille, ciel orageux, drapeau tricolore."""
+
+    def back(self, t):
+        s = [_rect(-800, 0, 2700, 1300, "#f4a261", stroke="none", sw=0),
+             _rect(-800, 0, 2700, 500, "#e76f51", stroke="none", sw=0, extra='opacity="0.6"')]
+        for tx in (-260, 140, 940, 1340):
+            s.append(_rect(tx - 130, 260, 260, 980, "#6c757d", sw=6))
+            for k in range(-2, 3):
+                s.append(_rect(tx + k * 52 - 20, 220, 40, 50, "#6c757d", sw=5))
+            s.append(_rect(tx - 25, 520, 50, 90, "#343a40", rx=20, sw=4))
+        s.append(_rect(140, 520, 800, 720, "#868e96", sw=6))
+        for k in range(8):
+            s.append(_rect(160 + k * 100, 480, 50, 50, "#868e96", sw=5))
+        s.append(_path("M 440 1240 L 440 950 A 100 100 0 0 1 640 950 L 640 1240 Z", fill="#343a40", sw=6))
+        s.append(_line(1340, 260, 1340, 60, sw=8))
+        wave = 10 * math.sin(t * 4)
+        for i, c in enumerate(("#1d4ed8", "#ffffff", "#e63946")):
+            s.append(_rect(1344 + i * 60, 70 + wave * (i / 3), 60, 120, c, sw=4))
+        s.append(_rect(-800, 1240, 2700, 700, "#a8a29e", stroke="none", sw=0))
+        s.append(_line(-800, 1240, 1900, 1240, sw=6))
+        return "".join(s)
+
+
+class Prehistoire(engine.Scene):
+    """Volcan qui fume, rochers, herbe sèche."""
+
+    def back(self, t):
+        s = [_rect(-800, 0, 2700, 1300, "#ffd6a5", stroke="none", sw=0),
+             _path("M 500 1220 L 900 380 L 1060 380 L 1500 1220 Z", fill="#6d4c41", sw=6),
+             _path("M 900 380 L 940 460 L 1000 420 L 1060 470 L 1060 380 Z", fill="#e63946", sw=5)]
+        for k in range(4):
+            u = ((t * 0.3 + k * 0.25) % 1.0)
+            s.append('<g opacity="%.2f">' % (0.9 - u * 0.8)
+                     + _circle(980 + 40 * math.sin(u * 6 + k), 340 - u * 300, 40 + u * 50, "#adb5bd", sw=4) + "</g>")
+        s.append(_path("M -800 1000 Q -300 880 200 1000 T 1300 980 L 1900 1000 L 1900 1240 L -800 1240 Z",
+                       fill="#bc8a5f", sw=6))
+        for x, w in ((-200, 160), (60, 110), (1180, 140)):
+            s.append(_path("M %d 1240 Q %d %d %d 1240 Z" % (x - w, x, 1240 - w * 1.4, x + w), fill="#8d8d8d", sw=6))
+        s.append(_rect(-800, 1240, 2700, 700, "#c9a227", stroke="none", sw=0))
+        s.append(_line(-800, 1240, 1900, 1240, sw=6))
+        return "".join(s)
+
+
+SCENES["bastille"], SCENES["prehistoire"] = Bastille, Prehistoire
+
+REVOLUTION = P(skin=SKIN[1], hair=("short", "#3a2a1f"), top=("vest", "#1d4ed8", "#ffffff"), bottom=("pants", "#f2e8cf"),
+               shoes="#1b1b1b", hat=("phrygien", "#e63946"), R=116)
+NAPOLEON = P(skin=SKIN[0], hair=("short", "#3a2a1f"), top=("blazer", "#1d3a8a", "#ffffff"), bottom=("pants", "#ffffff"),
+             shoes="#1b1b1b", hat=("bicorne", "#1b1b1b"), R=116)
+CAVERNE = P(skin=SKIN[2], hair=("long", "#3a2a1f"), top=("tank", "#a1683a"), bottom=("shorts", "#7a4a24"),
+            shoes="#a1683a", beard="#3a2a1f", R=118)
+
+_REV = next(x for x in STORIES if x["slug"] == "fx09-revolution")
+STORIES[STORIES.index(_REV)] = lot2("fx09-revolution", "La Révolution française", "#revolution", "bastille",
+                                    REVOLUTION, _items(_REV))
+
+STORIES += [
+    lot2("fx10-napoleon", "Napoléon", "#napoleon", "chateau", NAPOLEON, [
+        ("Tu crois que Napoléon était tout petit ?", "PETIT",
+         "FAUX, espèce de fils de pute ! Il mesurait environ un mètre soixante-neuf. Normal pour l'époque. "
+         "La légende vient des caricatures anglaises."),
+        ("Tu crois que Napoléon parlait français depuis tout petit ?", "FRANÇAIS",
+         "FAUX, fils de pute ! Il est né en Corse. Sa langue, c'était le corse. Il a appris le français à neuf ans, "
+         "et il a gardé un accent toute sa vie."),
+        ("Tu crois qu'il mettait la main dans son gilet parce qu'il avait mal au ventre ?", "LA MAIN",
+         "Encore FAUX, espèce de gros fils de pute ! C'était une pose classique des portraits de l'époque. "
+         "Ça voulait dire : je suis calme et distingué."),
+        ("Tu crois que le pape l'a couronné empereur ?", "COURONNE",
+         "FAUX, fils de pute ! Le pape était là, mais c'est Napoléon qui s'est mis la couronne lui-même sur la tête."),
+        ("Et tu crois qu'à Waterloo, il a perdu contre les Anglais tout seuls ?", "WATERLOO",
+         "FAUX, fils de pute ! L'armée de Wellington venait de plusieurs pays. Et c'est l'arrivée des Prussiens "
+         "qui a tout changé."),
+    ]),
+    lot2("fx11-prehistoire", "La Préhistoire", "#prehistoire", "prehistoire", CAVERNE, [
+        ("Tu crois que les hommes préhistoriques chassaient les dinosaures ?", "DINOSAURES",
+         "FAUX, espèce de fils de pute ! Les dinosaures ont disparu soixante-six millions d'années avant le "
+         "premier humain."),
+        ("Tu crois que les hommes préhistoriques vivaient dans des grottes ?", "GROTTES",
+         "FAUX, fils de pute ! Ils vivaient surtout dans des huttes et des campements. Les grottes, c'était "
+         "pour s'abriter ou pour peindre."),
+        ("Tu crois que l'homme de Néandertal était une brute stupide qui grognait ?", "NÉANDERTAL",
+         "Encore FAUX, espèce de gros fils de pute ! Il enterrait ses morts, fabriquait des outils et faisait de "
+         "l'art. Et toi, tu as sûrement un peu de son ADN."),
+        ("Tu crois que les mammouths ont disparu bien avant les pyramides ?", "MAMMOUTHS",
+         "FAUX, fils de pute ! Sur une île de Sibérie, les derniers mammouths vivaient encore quand les "
+         "pyramides étaient déjà construites."),
+        ("Et tu crois qu'ils ne mangeaient que de la viande ?", "VIANDE",
+         "FAUX, fils de pute ! Ils mangeaient aussi des plantes, des fruits, des graines. Et ils les faisaient "
+         "même cuire."),
+    ]),
+]
