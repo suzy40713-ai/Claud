@@ -353,7 +353,7 @@ def frame_svg(segs, total, t):
     world.append(scene.front(t))
     world.extend(standing)
     if cur["fx"].get("crowd"):
-        effects.append(crowd_bubbles(cur["fx"]["crowd"], t, cur["t0"] + 0.2, cx, top_ if HEADER else (600 if cur["fx"].get("money") is not None else 430), sc))
+        effects.append(crowd_bubbles(cur["fx"]["crowd"], t, cur["t0"] + 0.2, cx, top_ if HEADER else cy + ((620 if cur["fx"].get("money") is not None else 390) - H / 2) / sc, sc))
 
     if cur["fx"].get("bills"):
         effects.append(bills_svg(t - cur["t0"] + 0.35, cx, cy, sc))
@@ -420,6 +420,8 @@ def frame_svg(segs, total, t):
         ui.append(captions(cur, t))
     if cur["fx"].get("money") is not None:
         ui.append(money_svg(cur, prev, t))
+    if cur["fx"].get("poof"):
+        ui.append(poof_svg(cur["fx"]["poof"], t - (cur["t0"] + cur["fx"].get("poof_at", 0.4) * (cur["t1"] - cur["t0"])), t))
     if cur["fx"].get("quiz"):
         ui.append(quiz_svg(cur["fx"]["quiz"], t - cur["t0"]))
     if cur["fx"].get("stamp"):  # gros tampon rouge qui claque au début de la réplique
@@ -454,6 +456,32 @@ def frame_svg(segs, total, t):
     return ('<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d">%s'
             '<rect width="%d" height="%d" fill="#dfe7ec"/><g transform="%s">%s</g>%s<g transform="%s">%s</g>%s</svg>') % (
         W, H, W, H, defs, W, H, tr, "".join(world), "".join(over), tr, "".join(effects), "".join(ui))
+
+
+def poof_svg(txt, u, t):
+    """Nuage magique qui « fait apparaître » quelque chose, avec une étiquette."""
+    if u < 0:
+        return ""
+    s_ = []
+    if u < 0.7:
+        k = ease(u / 0.7)
+        for i in range(9):
+            a = i * 0.7
+            r = 60 + 230 * k
+            s_.append(circle(540 + math.cos(a) * r, 780 + math.sin(a) * r * 0.7, 70 * (1 - k) + 20, "#ffffff",
+                             sw=5, extra='opacity="%.2f"' % (1 - k)) if False else
+                      '<circle cx="%s" cy="%s" r="%s" fill="#ffffff" stroke="#1b1b1b" stroke-width="5" opacity="%.2f"/>'
+                      % (f(540 + math.cos(a) * r), f(780 + math.sin(a) * r * 0.7), f(70 * (1 - k) + 20), 1 - k))
+        for i in range(10):
+            a = i * 0.63 + 0.3
+            r = 120 + 300 * k
+            s_.append('<path d="M %s %s l 12 -30 l 12 30 l 30 12 l -30 12 l -12 30 l -12 -30 l -30 -12 z" fill="#ffd166" '
+                      'stroke="#1b1b1b" stroke-width="3" opacity="%.2f"/>' % (f(528 + math.cos(a) * r), f(780 + math.sin(a) * r), 1 - k))
+    k = ease(u / 0.25)
+    tw_ = text_w(txt, 58) + 80
+    s_.append('<g transform="translate(540 %s) rotate(-4) scale(%.3f)">' % (f(640 + math.sin(t * 3) * 6), k)
+              + rect(-tw_ / 2, -55, tw_, 110, "#ffd166", rx=30, sw=8) + text_el(0, 20, txt, 58, INK, weight=900) + "</g>")
+    return "".join(s_)
 
 
 def euros(v):
@@ -837,6 +865,9 @@ def main():
     elif a.story.startswith("b"):
         from galere_bio import STORIES as Bs
         stories = [s_ for s_ in Bs if a.story == "ball" or s_["slug"].startswith(a.story)]
+    elif a.story.startswith("tn"):
+        from tendances import STORIES as TN
+        stories = [s_ for s_ in TN if a.story == "tnall" or s_["slug"].startswith(a.story)]
     elif a.story.startswith("mi"):
         from milliard import STORIES as MI
         stories = [s_ for s_ in MI if a.story == "miall" or s_["slug"].startswith(a.story)]

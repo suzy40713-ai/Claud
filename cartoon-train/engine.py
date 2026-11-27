@@ -333,6 +333,17 @@ def hat_parts(hat, x, hy, R):
                 lx, ly = x + math.cos(a) * R * 1.0, hy - R * 0.35 + math.sin(a) * R * 0.75
                 out.append(ellipse(lx, ly, R * 0.16, R * 0.08, col, sw=4))
         return "".join(out)
+    if kind == "crown":  # couronne royale dorée
+        pts = []
+        for k in range(7):
+            px = x - R * 0.75 + k * R * 0.25
+            py = hy - R * (1.55 if k % 2 == 0 else 1.2)
+            pts.append("%s %s" % (f(px), f(py)))
+        return (path("M %s %s L %s L %s %s Z" % (f(x - R * 0.75), f(hy - R * 0.72), " L ".join(pts), f(x + R * 0.75),
+                                                f(hy - R * 0.72)), fill=col, sw=6) +
+                circle(x, hy - R * 0.95, R * 0.1, "#e63946", sw=3) +
+                circle(x - R * 0.4, hy - R * 0.92, R * 0.07, "#3a86ff", sw=3) +
+                circle(x + R * 0.4, hy - R * 0.92, R * 0.07, "#3a86ff", sw=3))
     if kind == "pirate":  # tricorne noir avec tête de mort
         return (path("M %s %s Q %s %s %s %s Q %s %s %s %s Z" % (
             f(x - R * 1.35), f(hy - R * 0.55), f(x), f(hy - R * 1.95), f(x + R * 1.35), f(hy - R * 0.55),
