@@ -461,3 +461,65 @@ STORIES += [
          "même cuire."),
     ]),
 ]
+
+
+# --- Lot 4 : retour au style « Égypte » (perso au sweat rouge, fonds en rayons) + insultes criées ---
+def lot_classique(slug, sujet, sur, tag, items):
+    d = lot(slug, sujet, tag, [(q, label, shout(rep)) for q, label, rep in items],
+            hook="Tout ce que tu crois sur %s est FAUX" % sur)
+    d["caption"] = "Tout ce que tu crois sur %s est FAUX 😤 Tu y croyais à combien ?" % sur
+    return d
+
+
+STORIES += [
+    lot_classique("fx12-egypte-3", "L'Égypte, partie 3", "l'Égypte (partie 3)", "#egypte", [
+        ("Tu crois que les pyramides étaient perdues au milieu du désert ?", "LE DÉSERT",
+         "FAUX, espèce de fils de pute ! Elles étaient tout près du Nil, avec des villages d'ouvriers, "
+         "des boulangeries et des ports autour."),
+        ("Tu crois que les pyramides ont toujours été couleur sable ?", "LA COULEUR",
+         "FAUX, fils de pute ! Elles étaient recouvertes de pierres blanches polies qui brillaient au soleil. "
+         "On les voyait de très loin."),
+        ("Tu crois que les ouvriers des tombes royales ne prenaient jamais de congé ?", "LES CONGÉS",
+         "Encore FAUX, espèce de gros fils de pute ! On a retrouvé leurs feuilles d'absence : malade, piqué par "
+         "un scorpion… ou occupé à faire de la bière pour une fête."),
+        ("Tu crois que les Égyptiens se maquillaient les yeux juste pour être beaux ?", "LE MAQUILLAGE",
+         "FAUX, fils de pute ! Le khôl aidait aussi à protéger les yeux du soleil et des infections. "
+         "Les hommes en mettaient aussi."),
+        ("Et tu crois qu'on a trouvé les pyramides pleines de trésors ?", "LES TRÉSORS",
+         "FAUX, fils de pute ! Elles avaient presque toutes été pillées il y a des milliers d'années. "
+         "Les trésors de Toutankhamon, c'est l'exception."),
+    ]),
+    lot_classique("fx13-gaulois", "Les Gaulois", "les Gaulois", "#gaulois", [
+        ("Tu crois que les Gaulois portaient des casques avec des ailes ?", "LES AILES",
+         "FAUX, espèce de fils de pute ! Les vrais casques gaulois n'avaient pas d'ailes. C'est une image "
+         "inventée bien plus tard, au dix-neuvième siècle."),
+        ("Tu crois que les Gaulois vivaient dans des huttes au fond des forêts, sans villes ?", "LES VILLES",
+         "FAUX, fils de pute ! Ils avaient de vraies villes fortifiées, avec des rues, des artisans et des "
+         "marchés. Comme Bibracte."),
+        ("Tu crois que les Gaulois avaient peur que le ciel leur tombe sur la tête ?", "LE CIEL",
+         "Encore FAUX, espèce de gros fils de pute ! D'après un auteur antique, des chefs celtes ont dit "
+         "qu'ils ne craignaient que ça. Ça voulait dire : on n'a peur de rien."),
+        ("Tu crois que les Gaulois mangeaient du sanglier à tous les repas ?", "LE SANGLIER",
+         "FAUX, fils de pute ! Les archéologues trouvent surtout des os de cochon, de bœuf et de mouton. "
+         "Le sanglier, c'était rare."),
+        ("Et tu crois que Vercingétorix est mort à la bataille d'Alésia ?", "VERCINGÉTORIX",
+         "FAUX, fils de pute ! Il s'est rendu à César. Il a été emmené à Rome, et exécuté environ six ans "
+         "plus tard."),
+    ]),
+    lot_classique("fx14-mayas", "Les Mayas", "les Mayas", "#mayas", [
+        ("Tu crois que les Mayas avaient prédit la fin du monde en deux mille douze ?", "2012",
+         "FAUX, espèce de fils de pute ! C'était juste la fin d'un grand cycle de leur calendrier. Comme "
+         "un compteur qui repasse à zéro."),
+        ("Tu crois que les Mayas ont tous disparu ?", "DISPARUS",
+         "FAUX, fils de pute ! Des millions de Mayas vivent encore aujourd'hui, au Mexique et au Guatemala. "
+         "Et ils parlent encore leurs langues."),
+        ("Tu crois que le chocolat a été inventé en Europe ?", "LE CHOCOLAT",
+         "Encore FAUX, espèce de gros fils de pute ! Les Mayas buvaient déjà du cacao il y a plus de deux "
+         "mille ans."),
+        ("Tu crois que les Mayas, les Aztèques et les Incas, c'est le même peuple ?", "MÊME PEUPLE",
+         "FAUX, fils de pute ! Trois peuples différents, dans des régions différentes, à des époques "
+         "différentes."),
+        ("Et tu crois que les Mayas ne connaissaient pas le zéro ?", "LE ZÉRO",
+         "FAUX, fils de pute ! Ils utilisaient le zéro, parmi les tout premiers au monde."),
+    ]),
+]
